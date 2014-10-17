@@ -1029,6 +1029,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		jtButtonShowRun.setSelected(isShowRun);
 		runView.setRunState(isShowRun);
 		runView.setVisible(isShowRun);
+		if (isShowRun)
+			splitPaneV.setDividerLocation(runView.getPreferredSize().height);
 		prop.setProperty(Prop_Show_Run, isShowRun ? "Y" : "N");
 	}
 	

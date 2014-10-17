@@ -15,7 +15,7 @@ import static org.paradise.etrc.ETRC._;
  */
 
 public class Train {
-	public static int MAX_STOP_NUM = 100;
+//	public static int MAX_STOP_NUM = 100;
 
 	public String trainNameDown = "";
 
@@ -37,13 +37,34 @@ public class Train {
 //	再次添加，以便加入不全的点单，但采用set方法，不直接存取，get方法优先取本值
 	private String terminalStation = "";
 
-	public int stopNum = 0;
+//	private int stopNum = 0;
 
-	public Stop[] stops = new Stop[MAX_STOP_NUM];
+//	private Stop[] _stops = new Stop[MAX_STOP_NUM];
+	private Vector<Stop> stops = new Vector<Stop>(15);
 
 	public Color color = null;
 
 	public Train() {
+	}
+
+	public Stop getStop(int index) {
+		return stops.get(index);
+	}
+	
+	public void setStop(int index, Stop stop) {
+		//
+	}
+	
+//	private Stop[] getStops() {
+//		return _stops;
+//	}
+
+//	public void setStops(Stop[] stops) {
+//		this._stops = stops;
+//	}
+
+	public int getStopNum() {
+		return stops.size();
 	}
 
 	public Train copy() {
@@ -54,9 +75,10 @@ public class Train {
 		tr.trainNameDown = trainNameDown;
 		tr.trainNameUp = trainNameUp;
 		tr.trainNameFull = trainNameFull;
-		tr.stopNum = stopNum;
-		for (int i = 0; i < stopNum; i++) {
-			tr.stops[i] = stops[i].copy();
+//		tr.setStopNum(stopNum);
+		for (int i = 0; i < getStopNum(); i++) {
+//			tr.getStops()[i] = getStops()[i].copy();
+			tr.stops.add(stops.get(i).copy());
 		}
 		return tr;
 	}
@@ -72,8 +94,8 @@ public class Train {
 	public String getStartStation() {
 		if(!startStation.equalsIgnoreCase(""))
 			return startStation;
-		else if(stopNum > 0)
-			return stops[0].stationName;
+		else if(getStopNum() > 0)
+			return stops.get(0).stationName;
 		else
 			return "";
 	}
@@ -81,8 +103,8 @@ public class Train {
 	public String getTerminalStation() {
 		if(!terminalStation.equalsIgnoreCase(""))
 			return terminalStation;
-		else if(stopNum > 0)
-			return stops[stopNum - 1].stationName;
+		else if(getStopNum() > 0)
+			return stops.get(getStopNum() - 1).stationName;
 		else
 			return "";
 	}
@@ -93,24 +115,26 @@ public class Train {
 	 * @param index int
 	 */
 	public void insertStop(Stop stop, int index) {
-		if ((index < 0) || (index >= MAX_STOP_NUM))
+		if ((index < 0) /* || (index >= MAX_STOP_NUM) */ )
 			return;
 
-		Stop[] newStops = new Stop[MAX_STOP_NUM];
-
-		int j = 0;
-		for (int i = 0; i < index; i++) {
-			newStops[j++] = stops[i];
-		}
-
-		newStops[j++] = stop;
-
-		for (int i = index; i < stopNum; i++) {
-			newStops[j++] = stops[i];
-		}
-
-		stops = newStops;
-		stopNum++;
+//		Stop[] newStops = new Stop[MAX_STOP_NUM];
+//
+//		int j = 0;
+//		for (int i = 0; i < index; i++) {
+//			newStops[j++] = getStops()[i];
+//		}
+//
+//		newStops[j++] = stop;
+//
+//		for (int i = index; i < getStopNum(); i++) {
+//			newStops[j++] = getStops()[i];
+//		}
+//
+//		setStops(newStops);
+//		setStopNum(getStopNum() + 1);
+		
+		stops.insertElementAt(stop, index);
 	}
 
 	/**
@@ -118,50 +142,54 @@ public class Train {
 	 * @param stop Stop
 	 */
 	public void appendStop(Stop stop) {
-		Stop[] newStops = new Stop[MAX_STOP_NUM];
-
-		int j = 0;
-		for (int i = 0; i < stopNum; i++) {
-			newStops[j++] = stops[i];
-		}
-
-		newStops[j++] = stop;
-
-		stops = newStops;
-		stopNum++;
+//		Stop[] newStops = new Stop[MAX_STOP_NUM];
+//
+//		int j = 0;
+//		for (int i = 0; i < getStopNum(); i++) {
+//			newStops[j++] = getStops()[i];
+//		}
+//
+//		newStops[j++] = stop;
+//
+//		setStops(newStops);
+//		setStopNum(getStopNum() + 1);
+		stops.add(stop);
 	}
 
 	public void delStop(int index) {
-		if ((index < 0) || (index >= MAX_STOP_NUM))
+		if ((index < 0) || index >= getStopNum() /*(index >= MAX_STOP_NUM) */ )
 			return;
 
-		Stop[] newStops = new Stop[MAX_STOP_NUM];
-
-		int j = 0;
-		for (int i = 0; i < index; i++) {
-			newStops[j++] = stops[i];
-		}
-
-		for (int i = index + 1; i < stopNum; i++) {
-			newStops[j++] = stops[i];
-		}
-
-		stops = newStops;
-		stopNum--;
+//		Stop[] newStops = new Stop[MAX_STOP_NUM];
+//
+//		int j = 0;
+//		for (int i = 0; i < index; i++) {
+//			newStops[j++] = getStops()[i];
+//		}
+//
+//		for (int i = index + 1; i < getStopNum(); i++) {
+//			newStops[j++] = getStops()[i];
+//		}
+//
+//		setStops(newStops);
+//		setStopNum(getStopNum() - 1);
+		
+		stops.remove(index);
 	}
 
 	public void delStop(String name) {
-		Stop[] newStops = new Stop[MAX_STOP_NUM];
+//		Stop[] newStops = new Stop[MAX_STOP_NUM];
 
-		int j = 0;
-		for (int i = 0; i < stopNum; i++) {
-			if (!stops[i].stationName.equalsIgnoreCase(name)) {
-				newStops[j++] = stops[i];
+//		int j = 0;
+		for (int i = 0; i < getStopNum(); i++) {
+			if (!stops.get(i).stationName.equalsIgnoreCase(name)) {
+//				newStops[j++] = getStops()[i];
+				stops.remove(i);
 			}
 		}
-
-		stops = newStops;
-		stopNum--;
+//
+//		setStops(newStops);
+//		setStopNum(getStopNum() - 1);
 	}
 
 	public void loadFromFile(String file) throws IOException {
@@ -172,6 +200,7 @@ public class Train {
 		if ((line = in.readLine()) != null) {
 			paserTrainNameLine(line);
 		} else {
+			in.close();
 			throw new IOException(_("Error reading train number."));
 		}
 
@@ -179,6 +208,7 @@ public class Train {
 		if ((line = in.readLine()) != null) {
 			this.setStartStation(line);
 		} else {
+			in.close();
 			throw new IOException(_("Error reading departure station."));
 		}
 
@@ -186,6 +216,7 @@ public class Train {
 		if ((line = in.readLine()) != null) {
 			this.setTerminalStation(line);
 		} else {
+			in.close();
 			throw new IOException(_("Error reading terminal station."));
 		}
 
@@ -193,8 +224,10 @@ public class Train {
 		while ((line = in.readLine()) != null) {
 			parseStopLine(line);
 		}
+		
+		in.close();
 
-		if (stopNum < 2)
+		if (getStopNum() < 2)
 			throw new IOException(_("Data incomplete in:" + file ));
 	}
 	
@@ -228,11 +261,11 @@ public class Train {
 		out.write(getTerminalStation());
 		out.newLine();
 		//停站
-		for (int i = 0; i < stopNum; i++) {
-			out.write(stops[i].stationName + ","
-					+ stops[i].arrive + ","
-					+ stops[i].leave + ","
-					+ stops[i].isPassenger); //20070224新增，是否图定
+		for (int i = 0; i < getStopNum(); i++) {
+			out.write(stops.get(i).stationName + ","
+					+ stops.get(i).arrive + ","
+					+ stops.get(i).leave + ","
+					+ stops.get(i).isPassenger); //20070224新增，是否图定
 			out.newLine();
 		}
 	}
@@ -258,7 +291,7 @@ public class Train {
 
 		String stStop[] = line.split(",");
 		if (stStop.length < 3)
-			throw new IOException(String.format(_("Station %d data error in line %s"), (stopNum + 1), line));
+			throw new IOException(String.format(_("Station %d data error in line %s"), (getStopNum() + 1), line));
 		
 		//20070224增加是否图定
 		boolean isSchedular = true;
@@ -289,8 +322,9 @@ public class Train {
 //		}
 
 		Stop stop = new Stop(stName, stArrive, stLeave, isSchedular);
-		stops[stopNum] = stop;
-		stopNum++;
+		stops.add(stop);
+//		getStops()[getStopNum()] = stop;
+//		setStopNum(getStopNum() + 1);
 	}
 
 	private void paserTrainNameLine(String line) throws IOException {
@@ -384,55 +418,45 @@ public class Train {
 		if(afterStop == null)
 			insertStopAtFirst(newStop);
 		
-		Stop newStops[] = new Stop[MAX_STOP_NUM];
-		int newStopNum = 0;
-		for (int i = 0; i < stopNum; i++) {
-			newStops[newStopNum] = stops[i];
-			newStopNum++;
+//		Stop newStops[] = new Stop[MAX_STOP_NUM];
+//		int newStopNum = 0;
+		for (int i = 0; i < getStopNum(); i++) {
+//			newStops[newStopNum] = getStops()[i];
+//			newStopNum++;
 
-			if (stops[i].equals(afterStop)) {
-				newStops[newStopNum] = newStop;
-				newStopNum++;
+			if (stops.get(i).equals(afterStop)) {
+//				newStops[newStopNum] = newStop;
+//				newStopNum++;
+				stops.insertElementAt(newStop, i);
 			}
 		}
 
-		stops = newStops;
-		stopNum = newStopNum;
+//		setStops(newStops);
+//		setStopNum(newStopNum);
 	}
 
 	private void insertStopAtFirst(Stop newStop) {
-		Stop newStops[] = new Stop[MAX_STOP_NUM];
-		int newStopNum = 0;
-		
-		newStops[0] = newStop;
-		newStopNum++;
-		for (int i = 0; i < stopNum; i++) {
-			newStops[newStopNum] = stops[i];
-			newStopNum++;
-		}
-
-		stops = newStops;
-		stopNum = newStopNum;
+		insertStop(newStop, 0);
 	}
 
 	public void replaceStop(String oldName, String newName) {
-		for (int i = 0; i < stopNum; i++) {
-			if (stops[i].stationName.equalsIgnoreCase(oldName))
-				stops[i].stationName = newName;
+		for (int i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).stationName.equalsIgnoreCase(oldName))
+				stops.get(i).stationName = newName;
 		}
 	}
 
 	public void setArrive(String name, String _arrive) {
-		for (int i = 0; i < stopNum; i++) {
-			if (stops[i].stationName.equalsIgnoreCase(name))
-				stops[i].arrive = _arrive;
+		for (int i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).stationName.equalsIgnoreCase(name))
+				stops.get(i).arrive = _arrive;
 		}
 	}
 
 	public void setLeave(String name, String _leave) {
-		for (int i = 0; i < stopNum; i++) {
-			if (stops[i].stationName.equalsIgnoreCase(name))
-				stops[i].leave = _leave;
+		for (int i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).stationName.equalsIgnoreCase(name))
+				stops.get(i).leave = _leave;
 		}
 	}
 
@@ -447,8 +471,8 @@ public class Train {
 	}
 	public int isDownTrain(Circuit c, boolean isGuessByTrainName) {
 		int lastDist = -1;
-		for (int i = 0; i < stopNum; i++) {
-			int thisDist = c.getStationDist(stops[i].stationName);
+		for (int i = 0; i < getStopNum(); i++) {
+			int thisDist = c.getStationDist(stops.get(i).stationName);
 			//当上站距离不为-1时，即经过本线路第二站时可以判断上下行
 			if ((lastDist != -1) && (thisDist != -1)) {
 				//本站距离大于上站距离，下行
@@ -498,12 +522,12 @@ public class Train {
 
 	public String toString() {
 		String strRt = getTrainName() + "次从" + getStartStation() + "到"
-				+ getTerminalStation() + "，共经停" + stopNum + "个车站\r\n";
+				+ getTerminalStation() + "，共经停" + getStopNum() + "个车站\r\n";
 
-		for (int i = 0; i < stopNum; i++)
-			strRt += stops[i].stationName + "站 "
-					+ stops[i].arrive + " 到 "
-					+ stops[i].leave + " 发\r\n";
+		for (int i = 0; i < getStopNum(); i++)
+			strRt += stops.get(i).stationName + "站 "
+					+ stops.get(i).arrive + " 到 "
+					+ stops.get(i).leave + " 发\r\n";
 
 		return strRt;
 	}
@@ -515,11 +539,11 @@ public class Train {
 			t.loadFromFile("c:\\N518_519_w.trf");
 
 			System.out.println(t.getTrainName() + "次从" + t.getStartStation() + "到"
-					+ t.getTerminalStation() + "，共经停" + t.stopNum + "个车站");
-			for (int i = 0; i < t.stopNum; i++)
-				System.out.println(t.stops[i].stationName + "站 "
-						+ t.stops[i].arrive + " 到 "
-						+ t.stops[i].leave + " 发");
+					+ t.getTerminalStation() + "，共经停" + t.getStopNum() + "个车站");
+			for (int i = 0; i < t.getStopNum(); i++)
+				System.out.println(t.stops.get(i).stationName + "站 "
+						+ t.stops.get(i).arrive + " 到 "
+						+ t.stops.get(i).leave + " 发");
 
 			File f = new File("c:\\test_w.trf");
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -539,24 +563,24 @@ public class Train {
 	 */
 	public String getNextStopName(String stopName) {
 		int i = 0;
-		for (i = 0; i < stopNum; i++) {
-			if (stops[i].stationName.equalsIgnoreCase(stopName))
+		for (i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).stationName.equalsIgnoreCase(stopName))
 				break;
 		}
-		if (i < stopNum - 1)
-			return stops[i + 1].stationName;
+		if (i < getStopNum() - 1)
+			return stops.get(i + 1).stationName;
 		else
 			return null;
 	}
 
 	public String getPrevStopName(String stopName) {
 		int i = 0;
-		for (i = 0; i < stopNum; i++) {
-			if (stops[i].stationName.equalsIgnoreCase(stopName))
+		for (i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).stationName.equalsIgnoreCase(stopName))
 				break;
 		}
 		if (i > 1)
-			return stops[i - 1].stationName;
+			return stops.get(i - 1).stationName;
 		else
 			return null;
 	}
@@ -745,8 +769,8 @@ public class Train {
 	}
 
 	public boolean hasStop(String staName) {
-		for (int i = 0; i < stopNum; i++) {
-			if (stops[i].stationName.equalsIgnoreCase(staName))
+		for (int i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).stationName.equalsIgnoreCase(staName))
 				return true;
 		}
 		
@@ -754,8 +778,8 @@ public class Train {
 	}
 	
 	public int findStopIndex(String staName) {
-		for (int i = 0; i < stopNum; i++) {
-			if (stops[i].stationName.equalsIgnoreCase(staName))
+		for (int i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).stationName.equalsIgnoreCase(staName))
 				return i;
 		}
 		
@@ -763,9 +787,9 @@ public class Train {
 	}
 
 	public Stop findStop(String staName) {
-		for (int i = 0; i < stopNum; i++) {
-			if (stops[i].stationName.equalsIgnoreCase(staName))
-				return stops[i];
+		for (int i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).stationName.equalsIgnoreCase(staName))
+				return stops.get(i);
 		}
 		
 		return null;

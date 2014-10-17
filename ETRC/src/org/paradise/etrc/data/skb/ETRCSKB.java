@@ -75,6 +75,8 @@ public class ETRCSKB {
 			
 			tk.add(decodeTK(new String(buffer)));
 		}
+		
+		in.close();
 	}
 
 	private void loadzm() throws IOException {
@@ -88,6 +90,8 @@ public class ETRCSKB {
 			
 			line = in.readLine();
 		}
+		
+		in.close();
 	}
 	
 	private void loadcc() throws IOException {
@@ -101,6 +105,8 @@ public class ETRCSKB {
 			
 			line = in.readLine();
 		}
+		
+		in.close();
 	}
 	
 	private String[] decodeTK(String tk) {
@@ -133,8 +139,8 @@ public class ETRCSKB {
 	public Vector<Train> findTrains(Circuit cir) {
 		Vector<Train> trains = new Vector<Train>();
 		
-		for(int i=0; i<cir.stationNum; i++) {
-			Vector<Train> newTrains = findTrains(cir.stations[i].name);
+		for(int i=0; i<cir.getStationNum(); i++) {
+			Vector<Train> newTrains = findTrains(cir.getStation(i).name);
 			
 			Enumeration<Train> en = newTrains.elements();
 			while(en.hasMoreElements()) {

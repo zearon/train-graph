@@ -125,7 +125,7 @@ public class TrainsDialog extends JDialog {
 //				TrainsDialog.this.setVisible(false);
 				if(table.getSelectedRow() < 0)
 					return;
-				doEditTrain(chart.trains[table.getSelectedRow()]);
+				doEditTrain(chart.getTrain(table.getSelectedRow()));
 			}
 		});
 		
@@ -191,10 +191,13 @@ public class TrainsDialog extends JDialog {
 		newTrain.trainNameFull = "XXXX/YYYY";
 		newTrain.trainNameDown = "DDDD";
 		newTrain.trainNameUp   = "UUUU";
-		newTrain.stopNum = 3;
-		newTrain.stops[0] = new Stop(_("Departure"), "00:00", "00:00", false);
-		newTrain.stops[1] = new Stop(_("Middle"), "00:00", "00:00", false);
-		newTrain.stops[2] = new Stop(_("Terminal"), "00:00", "00:00", false);
+//		newTrain.stopNum = 3;
+//		newTrain.getStops()[0] = new Stop(_("Departure"), "00:00", "00:00", false);
+//		newTrain.getStops()[1] = new Stop(_("Middle"), "00:00", "00:00", false);
+//		newTrain.getStops()[2] = new Stop(_("Terminal"), "00:00", "00:00", false);
+		newTrain.appendStop(new Stop(_("Departure"), "00:00", "00:00", false));
+		newTrain.appendStop(new Stop(_("Middle"), "00:00", "00:00", false));
+		newTrain.appendStop(new Stop(_("Terminal"), "00:00", "00:00", false));
 		TrainDialog dialog = new TrainDialog(mainFrame, newTrain);
 
 		dialog.editTrain();
@@ -288,7 +291,7 @@ public class TrainsDialog extends JDialog {
 					super.paint(g);
 				}
 			};
-			colorButton.setText(chart.trains[row].getTrainName(chart.circuit));
+			colorButton.setText(chart.getTrain(row).getTrainName(chart.circuit));
 			colorButton.setForeground(currentColor);
 			colorButton.setBackground(Color.white);
 
@@ -345,7 +348,7 @@ public class TrainsDialog extends JDialog {
 					super.paint(g);
 				}
 			};
-			colorLabel.setText(chart.trains[row].getTrainName(chart.circuit));
+			colorLabel.setText(chart.getTrain(row).getTrainName(chart.circuit));
 			colorLabel.setForeground(color);
 			colorLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			colorLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -378,7 +381,7 @@ public class TrainsDialog extends JDialog {
 		 * @return int
 		 */
 		public int getRowCount() {
-			return chart.trainNum;
+			return chart.getTrainNum();
 		}
 
 		/**
@@ -421,13 +424,13 @@ public class TrainsDialog extends JDialog {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return chart.trains[rowIndex].getTrainName();
+				return chart.getTrain(rowIndex).getTrainName();
 			case 1:
-				return chart.trains[rowIndex].getStartStation();
+				return chart.getTrain(rowIndex).getStartStation();
 			case 2:
-				return chart.trains[rowIndex].getTerminalStation();
+				return chart.getTrain(rowIndex).getTerminalStation();
 			case 3:
-				return chart.trains[rowIndex].color;
+				return chart.getTrain(rowIndex).color;
 			default:
 				return null;
 			}
@@ -442,7 +445,7 @@ public class TrainsDialog extends JDialog {
 		 */
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			if (columnIndex == 3) {
-				chart.trains[rowIndex].color = (Color) aValue;
+				chart.getTrain(rowIndex).color = (Color) aValue;
 				//System.out.println("SET: " + ((Color)aValue));
 				fireTableCellUpdated(rowIndex, columnIndex);
 			}
@@ -499,7 +502,7 @@ public class TrainsDialog extends JDialog {
 				public void mouseClicked(MouseEvent e) {
 					if   (e.getClickCount()   ==   2){ //双击  
 	                    int row = getSelectedRow();
-	                    doEditTrain(chart.trains[row]);
+	                    doEditTrain(chart.getTrain(row));
 					}
 				}
 			});

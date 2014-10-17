@@ -316,7 +316,7 @@ public class TrainDialog extends JDialog {
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
 		chooser.setApproveButtonText(_("Save "));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(mainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
@@ -336,7 +336,7 @@ public class TrainDialog extends JDialog {
 				
 				out.close();
 
-				mainFrame.prop.setProperty(mainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
+				mainFrame.prop.setProperty(MainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -354,7 +354,7 @@ public class TrainDialog extends JDialog {
 		chooser.addChoosableFileFilter(new TRFFilter());
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(mainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
@@ -366,7 +366,7 @@ public class TrainDialog extends JDialog {
 			Train loadingTrain = new Train();
 			try {
 				loadingTrain.loadFromFile(f.getAbsolutePath());
-				mainFrame.prop.setProperty(mainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
+				mainFrame.prop.setProperty(MainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -448,8 +448,8 @@ public class TrainDialog extends JDialog {
 		}
 		
 		// Fix wrong start/end time
-		train.stops[0].arrive = train.stops[0].leave;
-		train.stops[train.stopNum - 1].leave = train.stops[train.stopNum - 1].arrive;
+		train.getStop(0).arrive = train.getStop(0).leave;
+		train.getStop(train.getStopNum() - 1).leave = train.getStop(train.getStopNum() - 1).arrive;
 		
 		return train;
 	    }
@@ -519,7 +519,7 @@ public class TrainDialog extends JDialog {
 		 * @return int
 		 */
 		public int getRowCount() {
-			return myTrain.stopNum;
+			return myTrain.getStopNum();
 		}
 
 		/**
@@ -563,13 +563,13 @@ public class TrainDialog extends JDialog {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return myTrain.stops[rowIndex].stationName;
+				return myTrain.getStop(rowIndex).stationName;
 			case 1:
-				return myTrain.stops[rowIndex].arrive;
+				return myTrain.getStop(rowIndex).arrive;
 			case 2:
-				return myTrain.stops[rowIndex].leave;
+				return myTrain.getStop(rowIndex).leave;
 			case 3:
-				return Boolean.valueOf(myTrain.stops[rowIndex].isPassenger);
+				return Boolean.valueOf(myTrain.getStop(rowIndex).isPassenger);
 			default:
 				return null;
 			}
@@ -587,18 +587,18 @@ public class TrainDialog extends JDialog {
 //			try {
 				switch (columnIndex) {
 				case 0:
-					myTrain.stops[rowIndex].stationName = (String) aValue;
+					myTrain.getStop(rowIndex).stationName = (String) aValue;
 					break;
 				case 1:
 //					train.stops[rowIndex].arrive = df.parse((String) aValue);
-					myTrain.stops[rowIndex].arrive = (String) aValue;
+					myTrain.getStop(rowIndex).arrive = (String) aValue;
 					break;
 				case 2:
 //					train.stops[rowIndex].leave = df.parse((String) aValue);
-					myTrain.stops[rowIndex].leave = (String) aValue;
+					myTrain.getStop(rowIndex).leave = (String) aValue;
 					break;
 				case 3:
-					myTrain.stops[rowIndex].isPassenger = ((Boolean) aValue).booleanValue();
+					myTrain.getStop(rowIndex).isPassenger = ((Boolean) aValue).booleanValue();
 					break;
 				default:
 				}

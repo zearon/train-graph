@@ -83,7 +83,7 @@ public class CircuitMakeDialog extends JDialog {
 			cir.name = xianlu + firstStation.getOneName()
 			           + lastStation.getOneName() + _(" Section");
 		
-		cir.length = cir.stations[cir.stationNum - 1].dist;
+		cir.length = cir.getStation(cir.getStationNum() - 1).dist;
 
 		return cir;
 	}

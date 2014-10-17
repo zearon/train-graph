@@ -103,8 +103,8 @@ public class RunningPanel extends JPanel {
 		
 		g.setColor(oldColor);
 
-		for (int i = 0; i < chart.circuit.stationNum; i++) {
-			drawStation(g, chart.circuit.stations[i]);
+		for (int i = 0; i < chart.circuit.getStationNum(); i++) {
+			drawStation(g, chart.circuit.getStation(i));
 		}
 	}
 	
@@ -162,12 +162,12 @@ public class RunningPanel extends JPanel {
 //		System.out.println(atStationTrains.size());
 		//遍历一下，看看哪些车是运行中的
 		runningTrains.clear();
-		for(int i = 0; i < chart.trainNum; i++) {
-			int dist = chart.circuit.getDistOfTrain(chart.trains[i], dView.getCurrentTime());
+		for(int i = 0; i < chart.getTrainNum(); i++) {
+			int dist = chart.circuit.getDistOfTrain(chart.getTrain(i), dView.getCurrentTime());
 			
 			if(dist >= 0) {
-				if(!atStationTrains.keySet().contains(chart.trains[i]))
-					runningTrains.put(chart.trains[i], "" + dist);
+				if(!atStationTrains.keySet().contains(chart.getTrain(i)))
+					runningTrains.put(chart.getTrain(i), "" + dist);
 			}
 			
 //			String station = chart.circuit.getStationName(dist, true);
@@ -196,9 +196,9 @@ public class RunningPanel extends JPanel {
 		}
 
 		//画停站的列车
-		for(int i=0; i<chart.circuit.stationNum; i++) {
-			String theStation = chart.circuit.stations[i].name;
-			int stationDist = chart.circuit.stations[i].dist;
+		for(int i=0; i<chart.circuit.getStationNum(); i++) {
+			String theStation = chart.circuit.getStation(i).name;
+			int stationDist = chart.circuit.getStation(i).dist;
 			Vector<Train> myTrains = new Vector<Train>();
 			
 			Enumeration<Train> stoped = atStationTrains.keys();
@@ -217,11 +217,11 @@ public class RunningPanel extends JPanel {
 	//找出停靠于本线区间车站上的列车
 	private Hashtable<Train, String> findTrainsAtStation(int time) {
 		Hashtable<Train, String> trains = new Hashtable<Train, String>();
-		for(int i = 0; i < chart.trainNum; i++) {
-			String station = chart.circuit.getStationNameAtTheTime(chart.trains[i], time);
+		for(int i = 0; i < chart.getTrainNum(); i++) {
+			String station = chart.circuit.getStationNameAtTheTime(chart.getTrain(i), time);
 			
 			if(!station.equalsIgnoreCase("")) {
-				trains.put(chart.trains[i], station);
+				trains.put(chart.getTrain(i), station);
 			}
 		}
 		return trains;

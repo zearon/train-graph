@@ -50,7 +50,7 @@ public class TrainTableModel extends AbstractTableModel {
 	}
 
 	public int getRowCount() {
-		return (myTrain == null) ? 0 : myTrain.stopNum;
+		return (myTrain == null) ? 0 : myTrain.getStopNum();
 	}
 
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -60,13 +60,13 @@ public class TrainTableModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			return (myTrain == null) ? "" : myTrain.stops[rowIndex].stationName;
+			return (myTrain == null) ? "" : myTrain.getStop(rowIndex).stationName;
 		case 1:
-			return (myTrain == null) ? null : myTrain.stops[rowIndex];
+			return (myTrain == null) ? null : myTrain.getStop(rowIndex);
 		case 2:
-			return (myTrain == null) ? null : myTrain.stops[rowIndex];
+			return (myTrain == null) ? null : myTrain.getStop(rowIndex);
 		case 3:
-			return (myTrain == null) ? new Boolean(true) : Boolean.valueOf(myTrain.stops[rowIndex].isPassenger);
+			return (myTrain == null) ? new Boolean(true) : Boolean.valueOf(myTrain.getStop(rowIndex).isPassenger);
 		default:
 			return null;
 		}
@@ -78,16 +78,16 @@ public class TrainTableModel extends AbstractTableModel {
 		
 		switch (columnIndex) {
 		case 0:
-			myTrain.stops[rowIndex].stationName = (String) aValue;
+			myTrain.getStop(rowIndex).stationName = (String) aValue;
 			break;
 		case 1:
-			myTrain.stops[rowIndex] = (Stop) aValue;
+			myTrain.setStop(rowIndex, (Stop) aValue);
 			break;
 		case 2:
-			myTrain.stops[rowIndex] = (Stop) aValue;
+			myTrain.setStop(rowIndex, (Stop) aValue);
 			break;
 		case 3:
-			myTrain.stops[rowIndex].isPassenger = ((Boolean) aValue).booleanValue();
+			myTrain.getStop(rowIndex).isPassenger = ((Boolean) aValue).booleanValue();
 			break;
 		default:
 		}

@@ -46,8 +46,8 @@ public class ChartSlice {
 	
 	//初始化
 	private void buildUp() {
-		for(int i=0; i<chart.trainNum; i++) {
-			trainSlices.put(chart.trains[i], new TrainSlice(chart.trains[i], chart.circuit));
+		for(int i=0; i<chart.getTrainNum(); i++) {
+			trainSlices.put(chart.getTrain(i), new TrainSlice(chart.getTrain(i), chart.circuit));
 		}
 	}
 	

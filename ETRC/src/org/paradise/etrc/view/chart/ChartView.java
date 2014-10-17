@@ -159,30 +159,30 @@ public class ChartView extends JPanel {
 		underDrawings.removeAllElements();
 
 		Chart chart = mainFrame.chart;
-		for (int i = 0; i < chart.trainNum; i++) {
-			int isDown = chart.trains[i].isDownTrain(chart.circuit);
+		for (int i = 0; i < chart.getTrainNum(); i++) {
+			int isDown = chart.getTrain(i).isDownTrain(chart.circuit);
 			switch (showUpDownState) {
 			//全不显示
 			case ChartView.SHOW_NONE:
-				underDrawings.add(new TrainDrawing(this, chart.trains[i], false, true));
+				underDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, true));
 				break;
 			//显示下行列车
 			case ChartView.SHOW_DOWN:
 				if (isDown == Train.DOWN_TRAIN)
-					normalDrawings.add(new TrainDrawing(this, chart.trains[i], false, false));
+					normalDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, false));
 				else
-					underDrawings.add(new TrainDrawing(this, chart.trains[i], false, true));
+					underDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, true));
 				break;
 			//显示上行列车
 			case ChartView.SHOW_UP:
 				if (isDown == Train.UP_TRAIN)
-					normalDrawings.add(new TrainDrawing(this, chart.trains[i], false, false));
+					normalDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, false));
 				else
-					underDrawings.add(new TrainDrawing(this, chart.trains[i], false, true));
+					underDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, true));
 				break;
 			//缺省为全部显示
 			default:
-				normalDrawings.add(new TrainDrawing(this, chart.trains[i], false, false));
+				normalDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, false));
 			}
 		}
 	}
@@ -465,12 +465,12 @@ public class ChartView extends JPanel {
 	 */
 	public Stop[] getDrawStops(Train train) {
 		Circuit circuit = mainFrame.chart.circuit;
-		Stop[] drawStops = new Stop[circuit.stationNum];
+		Stop[] drawStops = new Stop[circuit.getStationNum()];
 
 		int iDraw = 0;
-		for (int i = 0; i < train.stopNum; i++) {
-			if (circuit.getStationDist(train.stops[i].stationName) >= 0) {
-				drawStops[iDraw] = train.stops[i];
+		for (int i = 0; i < train.getStopNum(); i++) {
+			if (circuit.getStationDist(train.getStop(i).stationName) >= 0) {
+				drawStops[iDraw] = train.getStop(i);
 				iDraw++;
 			}
 		}
@@ -546,7 +546,7 @@ public class ChartView extends JPanel {
 	public void setActiveSation(int y) {
 		int dist = this.getDist(y);
 		int index = mainFrame.chart.circuit.getStationIndex(dist);
-		setActiveStation(mainFrame.chart.circuit.stations[index]);
+		setActiveStation(mainFrame.chart.circuit.getStation(index));
 	}
 	
 	public void setActiveStation(Station station) {

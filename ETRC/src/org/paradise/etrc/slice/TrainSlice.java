@@ -266,8 +266,8 @@ public class TrainSlice {
 		Vector<ChartEvent> events = new Vector<ChartEvent>();
 		
 		//用车站横线扫描列车线
-		for(int staIndex=0; staIndex<circuit.stationNum; staIndex++) {
-			Station station = circuit.stations[staIndex];
+		for(int staIndex=0; staIndex<circuit.getStationNum(); staIndex++) {
+			Station station = circuit.getStation(staIndex);
 			
 			events.addAll(getStationEventsAt(station));
 		}
@@ -462,13 +462,13 @@ public class TrainSlice {
 		int lastDist = -1;
 		int lastLeave_t = -1;
 		Stop lastStop = null;
-		for(int i=0; i<train.stopNum; i++) {
-			Stop curStop = train.stops[i];
+		for(int i=0; i<train.getStopNum(); i++) {
+			Stop curStop = train.getStop(i);
 			int arrive_t = Train.trainTimeToInt(curStop.arrive);
 			int leave_t  = Train.trainTimeToInt(curStop.leave);
 			
 			int curDist = -1;
-			if(circuit.haveTheStation(curStop.stationName))
+			if(circuit.haveTheStation(curStop.stationName) >= 0)
 				curDist = circuit.getDistOfTrain(train, arrive_t);
 			
 			if(curDist >=0)

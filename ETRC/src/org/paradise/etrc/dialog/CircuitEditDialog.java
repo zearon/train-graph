@@ -72,7 +72,7 @@ public class CircuitEditDialog extends JDialog {
 		chooser.addChoosableFileFilter(new CIRFilter());
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(mainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
@@ -85,7 +85,7 @@ public class CircuitEditDialog extends JDialog {
 			Circuit c = new Circuit();
 			try {
 				c.loadFromFile(f.getAbsolutePath());
-				mainFrame.prop.setProperty(mainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
+				mainFrame.prop.setProperty(MainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -110,7 +110,7 @@ public class CircuitEditDialog extends JDialog {
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
 		chooser.setSelectedFile(new File(circuit.name));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(mainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
@@ -127,7 +127,7 @@ public class CircuitEditDialog extends JDialog {
 				circuit.writeTo(out);
 				
 				out.close();
-				mainFrame.prop.setProperty(mainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
+				mainFrame.prop.setProperty(MainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -151,20 +151,20 @@ public class CircuitEditDialog extends JDialog {
 				
 				// Normalize
 				Circuit c = ((StationTableModel)table.getModel()).circuit;
-				if (c.stationNum < 2)
+				if (c.getStationNum() < 2)
 				{
 					new MessageBox(mainFrame, _("A circut must have at least two stations.")).showMessage();
 					return;
 				}
-				int offset = c.stations[0].dist;
+				int offset = c.getStation(0).dist;
 				if (offset != 0) {
 					if (new YesNoBox(mainFrame, _("The distance of the first station is not zero, do normalization?")).askForYes()) {
-						for (int i = 0; i < c.stationNum; ++i) {
-							c.stations[i].dist -= offset; 
+						for (int i = 0; i < c.getStationNum(); ++i) {
+							c.getStation(i).dist -= offset; 
 						}	
 					}
 				}
-				c.length = c.stations[c.stationNum - 1].dist;
+				c.length = c.getStation(c.getStationNum() - 1).dist;
 				
 				mainFrame.chart.circuit = c;
 				mainFrame.chart.circuit.name = tfName.getText();
@@ -341,7 +341,7 @@ public class CircuitEditDialog extends JDialog {
 		 * @return int
 		 */
 		public int getRowCount() {
-			return circuit.stationNum;
+			return circuit.getStationNum();
 		}
 
 		/**
@@ -387,13 +387,13 @@ public class CircuitEditDialog extends JDialog {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return circuit.stations[rowIndex].name;
+				return circuit.getStation(rowIndex).name;
 			case 1:
-				return new Integer(circuit.stations[rowIndex].dist);
+				return new Integer(circuit.getStation(rowIndex).dist);
 			case 2:
-				return new Integer(circuit.stations[rowIndex].level);
+				return new Integer(circuit.getStation(rowIndex).level);
 			case 3:
-				return new Boolean(circuit.stations[rowIndex].hide);
+				return new Boolean(circuit.getStation(rowIndex).hide);
 			default:
 				return null;
 			}
@@ -409,18 +409,18 @@ public class CircuitEditDialog extends JDialog {
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				circuit.stations[rowIndex].name = (String) aValue;
+				circuit.getStation(rowIndex).name = (String) aValue;
 				break;
 			case 1:
-				circuit.stations[rowIndex].dist = ((Integer) aValue).intValue();
-				if (rowIndex == circuit.stationNum - 1)
+				circuit.getStation(rowIndex).dist = ((Integer) aValue).intValue();
+				if (rowIndex == circuit.getStationNum() - 1)
 					circuit.length = ((Integer) aValue).intValue();
 				break;
 			case 2:
-				circuit.stations[rowIndex].level = ((Integer) aValue).intValue();
+				circuit.getStation(rowIndex).level = ((Integer) aValue).intValue();
 				break;
 			case 3:
-				circuit.stations[rowIndex].hide = ((Boolean) aValue).booleanValue();
+				circuit.getStation(rowIndex).hide = ((Boolean) aValue).booleanValue();
 				break;
 			default:
 			}

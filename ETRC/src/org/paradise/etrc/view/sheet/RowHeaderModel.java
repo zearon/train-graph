@@ -14,11 +14,11 @@ public class RowHeaderModel extends AbstractListModel {
 	}
 	
     public int getSize() { 
-    	return chart.circuit.stationNum * 2;
+    	return chart.circuit.getStationNum() * 2;
     }
     
     public Object getElementAt(int index) { 
-		String sta = chart.circuit.stations[index / 2].name;
+		String sta = chart.circuit.getStation(index / 2).name;
 		sta += index % 2 == 0 ? "站 到" : "站 发";
 		return sta;
     }

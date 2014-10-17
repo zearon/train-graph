@@ -59,8 +59,8 @@ public class CircuitPanel extends JPanel {
 			return;
 
 		if (chart.circuit != null)
-			for (int i = 0; i < chart.circuit.stationNum; i++) {
-				DrawStation(g, chart.circuit.stations[i]);
+			for (int i = 0; i < chart.circuit.getStationNum(); i++) {
+				DrawStation(g, chart.circuit.getStation(i));
 			}
 	}
 

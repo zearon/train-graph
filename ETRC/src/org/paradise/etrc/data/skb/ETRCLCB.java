@@ -110,6 +110,8 @@ public class ETRCLCB {
 			
 			line = in.readLine();
 		}
+		
+		in.close();
 	}
 
 	private void loadxl() throws IOException {
@@ -124,6 +126,8 @@ public class ETRCLCB {
 			
 			line = in.readLine();
 		}
+		
+		in.close();
 	}
 
 	/**

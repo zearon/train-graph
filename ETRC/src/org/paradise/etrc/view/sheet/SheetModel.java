@@ -15,16 +15,16 @@ public class SheetModel extends AbstractTableModel {
 	}
 	
 	public int getColumnCount() {
-		return chart.trainNum;
+		return chart.getTrainNum();
 	}
 
 	public int getRowCount() {
-		return chart.circuit.stationNum * 2;
+		return chart.circuit.getStationNum() * 2;
 	}
 
 	public Object getValueAt(int rowIndex, int colIndex) {
-		Train theTrain = chart.trains[colIndex];
-		String staName = chart.circuit.stations[rowIndex / 2].name;
+		Train theTrain = chart.getTrain(colIndex);
+		String staName = chart.circuit.getStation(rowIndex / 2).name;
 		Stop stop = findStop(theTrain, staName);
 		
 		return stop;		
@@ -37,16 +37,16 @@ public class SheetModel extends AbstractTableModel {
 	}
 
 	private Stop findStop(Train theTrain, String staName) {
-		for(int i=0; i<theTrain.stopNum; i++) {
-			if(theTrain.stops[i].stationName.equalsIgnoreCase(staName)) {
-				return theTrain.stops[i];
+		for(int i=0; i<theTrain.getStopNum(); i++) {
+			if(theTrain.getStop(i).stationName.equalsIgnoreCase(staName)) {
+				return theTrain.getStop(i);
 			}
 		}
 		return null;
 	}
 
 	public String getColumnName(int conIndex) {
-		return chart.trains[conIndex].getTrainName(chart.circuit);
+		return chart.getTrain(conIndex).getTrainName(chart.circuit);
 	}
 	
 	public Class<?> getColumnClass(int columnIndex) {
@@ -60,8 +60,8 @@ public class SheetModel extends AbstractTableModel {
 	//修改到发点时间不需要特殊处理，在CellEditor里面就处理好了
 	//此处需要处理添加、删除停站的操作
 	public void setValueAt(Object aValue, int rowIndex, int colIndex)  {
-		Train theTrain = chart.trains[colIndex];
-		String staName = chart.circuit.stations[rowIndex / 2].name;
+		Train theTrain = chart.getTrain(colIndex);
+		String staName = chart.circuit.getStation(rowIndex / 2).name;
 		Stop stop = (Stop) aValue;
 		
 		if(stop != null) {

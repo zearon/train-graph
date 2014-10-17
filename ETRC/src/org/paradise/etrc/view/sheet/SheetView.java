@@ -114,8 +114,8 @@ public class SheetView extends JPanel {
 
 	public void selectStation(Station station) {
 		Circuit circuit = mainFrame.chart.circuit;
-		for(int i=0; i<circuit.stationNum; i++) {
-			if(station.equals(circuit.stations[i]))
+		for(int i=0; i<circuit.getStationNum(); i++) {
+			if(station.equals(circuit.getStation(i)))
 				rowHeader.setSelectedIndex(i*2);
 		}
 	}

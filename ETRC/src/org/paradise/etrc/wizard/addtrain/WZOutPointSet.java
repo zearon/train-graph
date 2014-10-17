@@ -73,7 +73,7 @@ public class WZOutPointSet extends WizardDialog {
 					tfTime.setText("");
 				}
 				else {
-					curStation = chart.circuit.stations[row];
+					curStation = chart.circuit.getStation(row);
 					tfTime.setText(calculTime());
 				}
 			}
@@ -125,7 +125,7 @@ public class WZOutPointSet extends WizardDialog {
 		//有这个停站
 		int stopIndex = train.findStopIndex(curStation.name);
 		if(stopIndex >= 0) {
-			return train.stops[stopIndex].leave;
+			return train.getStop(stopIndex).leave;
 		}
 		else {
 			Station lastStation = chart.circuit.getLastStopOnMe(train);
@@ -176,14 +176,14 @@ public class WZOutPointSet extends WizardDialog {
 
 	protected void updateStepPane() {
 		//设置List选项
-		String[] dispNames = new String[chart.circuit.stationNum];
-		for(int i=0; i<chart.circuit.stationNum; i++) {
-			String strDist = "" + chart.circuit.stations[i].dist;
+		String[] dispNames = new String[chart.circuit.getStationNum()];
+		for(int i=0; i<chart.circuit.getStationNum(); i++) {
+			String strDist = "" + chart.circuit.getStation(i).dist;
 			while(strDist.length() < 4) {
 				strDist = " " + strDist;
 			}
 			dispNames[i] = String.format(_(" %s down-going direction %s km from %s station: %s station"), 
-					chart.circuit.name, strDist, chart.circuit.stations[0].name,   chart.circuit.stations[i].name); 
+					chart.circuit.name, strDist, chart.circuit.getStation(0).name,   chart.circuit.getStation(i).name); 
 
 		}
 		circuitList.setListData(dispNames);

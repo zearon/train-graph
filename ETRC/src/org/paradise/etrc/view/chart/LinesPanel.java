@@ -227,8 +227,8 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 
 		Chart chart = chartView.mainFrame.chart;
 		if (chart.circuit != null) {
-			for (int i = 0; i < chart.circuit.stationNum; i++) {
-				drawStationLine(g, chart.circuit.stations[i], chart.distScale);
+			for (int i = 0; i < chart.circuit.getStationNum(); i++) {
+				drawStationLine(g, chart.circuit.getStation(i), chart.distScale);
 			}
 		}
 

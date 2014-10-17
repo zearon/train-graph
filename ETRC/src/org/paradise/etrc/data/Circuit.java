@@ -1,6 +1,8 @@
 package org.paradise.etrc.data;
 
 import java.io.*;
+import java.util.Vector;
+
 import static org.paradise.etrc.ETRC._;
 
 /**
@@ -13,15 +15,16 @@ import static org.paradise.etrc.ETRC._;
  */
 
 public class Circuit {
-	public static int MAX_STATION_NUM = 256;
+//	public static int MAX_STATION_NUM = 512;
 
 	public String name = "";
 
 	public int length = 0;
 
-	public int stationNum = 0;
+//	private int stationNum = 0;
 
-	public Station[] stations = new Station[MAX_STATION_NUM];
+//	private Station[] _stations = new Station[MAX_STATION_NUM];
+	private Vector<Station> stations = new Vector<Station> (10);
 
 	public Circuit() {
 	}
@@ -31,12 +34,24 @@ public class Circuit {
 
 		cir.name = this.name;
 		cir.length = this.length;
-		cir.stationNum = this.stationNum;
+//		cir.stationNum = this.stationNum;
 
-		for (int i = 0; i < stationNum; i++)
-			cir.stations[i] = this.stations[i].copy();
+		for (int i = 0; i < getStationNum(); i++)
+//			cir._stations[i] = this._stations[i].copy();
+			cir.stations.add(stations.get(i).copy());
+		
 
 		return cir;
+	}
+	
+	public Station getStation(int index) {
+//		return _stations[index];
+		return stations.get(index);
+	}
+
+	public int getStationNum() {
+//		return stationNum;
+		return stations.size();
 	}
 
 	/**
@@ -45,27 +60,28 @@ public class Circuit {
 	 * @param index int
 	 */
 	public void insertStation(Station station, int index) {
-		if ((index < 0) || (index >= MAX_STATION_NUM))
+		if ((index < 0) /* || (index >= MAX_STATION_NUM) */ )
 			return;
 
-		Station[] newStations = new Station[MAX_STATION_NUM];
-
-		int j = 0;
-		for (int i = 0; i < index; i++) {
-			newStations[j++] = stations[i];
-		}
-
-		newStations[j++] = station;
-
-		for (int i = index; i < stationNum; i++) {
-			newStations[j++] = stations[i];
-		}
-
-		stations = newStations;
-		stationNum++;
+//		Station[] newStations = new Station[MAX_STATION_NUM];
+//
+//		int j = 0;
+//		for (int i = 0; i < index; i++) {
+//			newStations[j++] = _stations[i];
+//		}
+//
+//		newStations[j++] = station;
+//
+//		for (int i = index; i < stationNum; i++) {
+//			newStations[j++] = _stations[i];
+//		}
+//
+//		_stations = newStations;
+		stations.insertElementAt(station, index);
+//		stationNum++;
 		
-		if (stationNum != 0)
-			this.length = stations[stationNum - 1].dist;
+		if (getStationNum() != 0)
+			this.length = stations.get(getStationNum() - 1).dist;
 		else
 			this.length = 0;
 	}
@@ -75,88 +91,95 @@ public class Circuit {
 	 * @param station Station
 	 */
 	public void appendStation(Station station) {
-		Station[] newStations = new Station[MAX_STATION_NUM];
-
-		int j = 0;
-		for (int i = 0; i < stationNum; i++) {
-			newStations[j++] = stations[i];
-		}
-
-		newStations[j++] = station;
-
-		stations = newStations;
-		stationNum++;
+//		Station[] newStations = new Station[MAX_STATION_NUM];
+//
+//		int j = 0;
+//		for (int i = 0; i < stationNum; i++) {
+//			newStations[j++] = _stations[i];
+//		}
+//
+//		newStations[j++] = station;
+//
+//		_stations = newStations;
+//		stationNum++;
 		
-		if (stationNum != 0)
-			this.length = stations[stationNum - 1].dist;
+		stations.add(station);
+		
+		if (getStationNum() != 0)
+//			this.length = _stations[stationNum - 1].dist;
+			this.length = stations.get(getStationNum() - 1).dist;
 		else
 			this.length = 0;
 	}
 
 	public void delStation(int index) {
-		if ((index < 0) || (index >= MAX_STATION_NUM))
+		if ((index < 0) || index >= getStationNum() /*(index >= MAX_STATION_NUM)*/ )
 			return;
 
-		Station[] newStations = new Station[MAX_STATION_NUM];
-
-		int j = 0;
-		for (int i = 0; i < index; i++) {
-			newStations[j++] = stations[i];
-		}
-
-		for (int i = index + 1; i < stationNum; i++) {
-			newStations[j++] = stations[i];
-		}
-
-		stations = newStations;
-		stationNum--;
+//		Station[] newStations = new Station[MAX_STATION_NUM];
+//
+//		int j = 0;
+//		for (int i = 0; i < index; i++) {
+//			newStations[j++] = _stations[i];
+//		}
+//
+//		for (int i = index + 1; i < stationNum; i++) {
+//			newStations[j++] = _stations[i];
+//		}
+//
+//		_stations = newStations;
+		stations.remove(index);
+//		stationNum--;
 		
-		if (stationNum != 0)
-			this.length = stations[stationNum - 1].dist;
+		if (getStationNum() != 0)
+			this.length = stations.get(getStationNum() - 1).dist;
 		else
 			this.length = 0;
 	}
 
 	public void delStation(String name) {
-		if(!haveTheStation(name))
+		int index = haveTheStation(name);
+		if(index >= 0)
 			return;
 		
-		Station[] newStations = new Station[MAX_STATION_NUM];
-
-		int j = 0;
-		for (int i = 0; i < stationNum; i++) {
-			if (!stations[i].name.equalsIgnoreCase(name)) {
-				newStations[j++] = stations[i];
-			}
-		}
-
-		stations = newStations;
-		stationNum--;
+//		Station[] newStations = new Station[MAX_STATION_NUM];
+//
+//		int j = 0;
+//		for (int i = 0; i < stationNum; i++) {
+//			if (!_stations[i].name.equalsIgnoreCase(name)) {
+//				newStations[j++] = _stations[i];
+//			}
+//		}
+//
+//		_stations = newStations;
 		
-		if (stationNum != 0)
-			this.length = stations[stationNum - 1].dist;
+		stations.remove(index);
+//		stationNum--;
+		
+		if (getStationNum() != 0)
+			this.length = stations.get(getStationNum() - 1).dist;
 		else
 			this.length = 0;
 	}
 	
-	public boolean haveTheStation(String theName) {
-		for (int i = 0; i < stationNum; i++) {
-			if (theName.equalsIgnoreCase(stations[i].name))
-				return true;
+	public int haveTheStation(String theName) {
+		for (int i = 0; i < getStationNum(); i++) {
+			if (theName.equalsIgnoreCase(stations.get(i).name))
+				return i;
 		}
 
-		return false;
+		return -1;
 	}
 	
 	public Station getStationBetweenTheDists(int dist1, int dist2) {
 		if(dist1 == -1 || dist2 == -1)
 			return null;
 		
-		for (int i = 0; i < stationNum; i++) {
-			if ((dist1 < stations[i].dist && stations[i].dist <= dist2) ||
-				(dist2 <= stations[i].dist && stations[i].dist < dist1))
+		for (int i = 0; i < getStationNum(); i++) {
+			if ((dist1 < stations.get(i).dist && stations.get(i).dist <= dist2) ||
+				(dist2 <= stations.get(i).dist && stations.get(i).dist < dist1))
 				
-				return stations[i];
+				return stations.get(i);
 		}
 
 		return null;
@@ -165,9 +188,9 @@ public class Circuit {
 	//查找在时刻time的时候列车train是否停靠在某站
 	//如果停靠于某站则返回站名，否则返回空字符串
 	public String getStationNameAtTheTime(Train train, int time) {
-		for(int i=0; i<train.stopNum; i++) {
-			int t1 = Train.trainTimeToInt(train.stops[i].arrive);
-			int t2 = Train.trainTimeToInt(train.stops[i].leave);
+		for(int i=0; i<train.getStopNum(); i++) {
+			int t1 = Train.trainTimeToInt(train.getStop(i).arrive);
+			int t2 = Train.trainTimeToInt(train.getStop(i).leave);
 
 			//跨越0点情况的处理
 			int myTime = time;
@@ -179,13 +202,13 @@ public class Circuit {
 
 			//t1 == t2时通过或者始发、终到，不作为停靠处理
 			if(t1<= myTime && t2 >= myTime && t1 != t2) {
-				int d = getStationDist(train.stops[i].stationName);
+				int d = getStationDist(train.getStop(i).stationName);
 //				System.out.println(train.getTrainName() + "^" + time + "~" + train.stops[i].stationName + 
 //						"~" + t1 + "~" + train.stops[i].arrive + 
 //						"~" + t2 + "~" + train.stops[i].leave +
 //						"~" + d);
 				if(d >= 0)
-					return train.stops[i].stationName;
+					return train.getStop(i).stationName;
 			}
 		}
 		
@@ -203,9 +226,9 @@ public class Circuit {
 	//查找train在时刻time的时候本线位置的距离值，不在本线上则返回-1
 	public int getDistOfTrain(Train train, int time) {
 		//停站的情况
-		for(int i=0; i<train.stopNum; i++) {
-			int t1 = Train.trainTimeToInt(train.stops[i].arrive);
-			int t2 = Train.trainTimeToInt(train.stops[i].leave);
+		for(int i=0; i<train.getStopNum(); i++) {
+			int t1 = Train.trainTimeToInt(train.getStop(i).arrive);
+			int t2 = Train.trainTimeToInt(train.getStop(i).leave);
 			
 			//跨越0点情况的处理
 			int myTime = time;
@@ -219,7 +242,7 @@ public class Circuit {
 //				System.out.println(train.getTrainName() + "^" + time + "~" + train.stops[i].stationName + 
 //						"~" + t1 + "~" + train.stops[i].arrive + 
 //						"~" + t2 + "~" + train.stops[i].leave);
-				int d = getStationDist(train.stops[i].stationName);
+				int d = getStationDist(train.getStop(i).stationName);
 				
 				if(d >= 0)
 					return d;
@@ -227,9 +250,9 @@ public class Circuit {
 		}
 		
 		//运行中的情况
-		for(int i=0; i<train.stopNum-1; i++) {
-			Stop s1 = train.stops[i];
-			Stop s2 = train.stops[i+1];
+		for(int i=0; i<train.getStopNum()-1; i++) {
+			Stop s1 = train.getStop(i);
+			Stop s2 = train.getStop(i+1);
 			
 			int d1 = getStationDist(s1.stationName);
 			int d2 = getStationDist(s2.stationName);
@@ -271,6 +294,7 @@ public class Circuit {
 		if ((line = in.readLine()) != null) {
 			this.name = line;
 		} else {
+			in.close();
 			throw new IOException(_("Error reading circuit name."));
 		}
 
@@ -280,9 +304,11 @@ public class Circuit {
 			try {
 				this.length = Integer.parseInt(stLength);
 			} catch (NumberFormatException e) {
+				in.close();
 				throw new IOException(_("Error in circuit length format."));
 			}
 		} else {
+			in.close();
 			throw new IOException(_("Error reading circuit length."));
 		}
 
@@ -290,6 +316,8 @@ public class Circuit {
 		while ((line = in.readLine()) != null) {
 			parseStationLine(line);
 		}
+		
+		in.close();
 	}
 
 	/**
@@ -300,16 +328,16 @@ public class Circuit {
 	 * @return int
 	 */
 	public int getStationDist(String stationName) {
-		for (int i = 0; i < stationNum; i++)
-			if (stations[i].name.equalsIgnoreCase(stationName))
-				return stations[i].dist;
+		for (int i = 0; i < getStationNum(); i++)
+			if (stations.get(i).name.equalsIgnoreCase(stationName))
+				return stations.get(i).dist;
 		return -1;
 	}
 
 	public Station getStation(String stationName) {
-		for (int i = 0; i < stationNum; i++)
-			if (stations[i].name.equalsIgnoreCase(stationName))
-				return stations[i];
+		for (int i = 0; i < getStationNum(); i++)
+			if (stations.get(i).name.equalsIgnoreCase(stationName))
+				return stations.get(i);
 		return null;
 	}
 
@@ -319,12 +347,12 @@ public class Circuit {
 	 */
 
 	public int getStationIndex(String stationName) {
-		for (int i = 0; i < stationNum; i++) {
+		for (int i = 0; i < getStationNum(); i++) {
 			// 被隐藏的站不返回
-			if (stations[i].hide)
+			if (stations.get(i).hide)
 				continue;
 
-			if (stations[i].name.equalsIgnoreCase(stationName))
+			if (stations.get(i).name.equalsIgnoreCase(stationName))
 				return i;
 		}
 		return -1;
@@ -333,9 +361,9 @@ public class Circuit {
 	// 查找下一个可停站，下行递增，上行递减
 	public int getNextStationIndex(Train train, int index) {
 		if (train.isDownTrain(this) == Train.DOWN_TRAIN) {
-			for (int i = index + 1; i < stationNum; i++) {
+			for (int i = index + 1; i < getStationNum(); i++) {
 				// 被隐藏的站不返回跳过
-				if (stations[i].hide)
+				if (stations.get(i).hide)
 					continue;
 				else
 					return i;
@@ -343,7 +371,7 @@ public class Circuit {
 		} else {
 			for (int i = index - 1; i > 0; i--) {
 				// 被隐藏的站不返回跳过
-				if (stations[i].hide)
+				if (stations.get(i).hide)
 					continue;
 				else
 					return i;
@@ -355,9 +383,9 @@ public class Circuit {
 	// 查找上一个可停站，上行递增，下行递减
 	public int getPrevStationIndex(Train train, int index) {
 		if (train.isDownTrain(this) == Train.UP_TRAIN) {
-			for (int i = index + 1; i < stationNum; i++) {
+			for (int i = index + 1; i < getStationNum(); i++) {
 				// 被隐藏的站不返回跳过
-				if (stations[i].hide)
+				if (stations.get(i).hide)
 					continue;
 				else
 					return i;
@@ -365,7 +393,7 @@ public class Circuit {
 		} else {
 			for (int i = index - 1; i > 0; i--) {
 				// 被隐藏的站不返回跳过
-				if (stations[i].hide)
+				if (stations.get(i).hide)
 					continue;
 				else
 					return i;
@@ -376,17 +404,17 @@ public class Circuit {
 
 	//查找距离dist最近的station的Index
 	public int getStationIndex(int dist) {
-		int gap[] = new int[stationNum];
+		int gap[] = new int[getStationNum()];
 		// 计算给定距离值与各站距离值之间的差
-		for (int i = 0; i < stationNum; i++) {
-			gap[i] = Math.abs(dist - stations[i].dist);
+		for (int i = 0; i < getStationNum(); i++) {
+			gap[i] = Math.abs(dist - stations.get(i).dist);
 		}
 		// 找出距离差最小的那一站
 		int minIndex = 0;
 		int minGap = gap[0];
-		for (int i = 1; i < stationNum; i++) {
+		for (int i = 1; i < getStationNum(); i++) {
 			// 被隐藏的站不参加比较
-			if (stations[i].hide)
+			if (stations.get(i).hide)
 				continue;
 			if (gap[i] < minGap) {
 				minIndex = i;
@@ -399,17 +427,17 @@ public class Circuit {
 
 	//查找距离dist最近的station
 	public String getStationName(int dist, boolean addSuffix) {
-		int gap[] = new int[stationNum];
+		int gap[] = new int[getStationNum()];
 		// 计算给定距离值与各站距离值之间的差
-		for (int i = 0; i < stationNum; i++) {
-			gap[i] = Math.abs(dist - stations[i].dist);
+		for (int i = 0; i < getStationNum(); i++) {
+			gap[i] = Math.abs(dist - stations.get(i).dist);
 		}
 		// 找出距离差最小的那一站
 		int minIndex = 0;
 		int minGap = gap[0];
-		for (int i = 1; i < stationNum; i++) {
+		for (int i = 1; i < getStationNum(); i++) {
 			// 被隐藏的站不参加比较
-			if (stations[i].hide)
+			if (stations.get(i).hide)
 				continue;
 			if (gap[i] < minGap) {
 				minIndex = i;
@@ -419,11 +447,11 @@ public class Circuit {
 
 		if (addSuffix) {
 			if (minGap > 1)
-				return String.format(_("Near %s Station"), stations[minIndex].name);
+				return String.format(_("Near %s Station"), stations.get(minIndex).name);
 			else
-				return String.format(_("%s Station"), stations[minIndex].name);
+				return String.format(_("%s Station"), stations.get(minIndex).name);
 		} else
-			return stations[minIndex].name;
+			return stations.get(minIndex).name;
 	}
 
 	public String getStationName(int dist) {
@@ -435,9 +463,9 @@ public class Circuit {
 		out.newLine();
 		out.write(length + "");
 		out.newLine();
-		for (int i = 0; i < stationNum; i++) {
-			out.write(stations[i].name + "," + stations[i].dist + ","
-					+ stations[i].level + "," + stations[i].hide);
+		for (int i = 0; i < getStationNum(); i++) {
+			out.write(stations.get(i).name + "," + stations.get(i).dist + ","
+					+ stations.get(i).level + "," + stations.get(i).hide);
 			out.newLine();
 		}
 	}
@@ -462,7 +490,7 @@ public class Circuit {
 	private void parseStationLine(String line) throws IOException {
 		String stStation[] = line.split(",");
 		if (stStation.length < 2)
-			throw new IOException(String.format(_("Invalid data for station %d"), stationNum + 1));
+			throw new IOException(String.format(_("Invalid data for station %d"), getStationNum() + 1));
 
 		// 站名
 		String stName = stStation[0];
@@ -502,21 +530,22 @@ public class Circuit {
 		}
 
 		Station st = new Station(stName, dist, level, hide);
-		stations[stationNum] = st;
-		stationNum++;
+		stations.add(st);
+//		_stations[stationNum] = st;
+//		stationNum++;
 	}
 
 	public String toString() {
 		StringBuffer sb = new StringBuffer(this.name);
 
-		sb.append("共").append(this.stationNum).append("个车站，总长：").append(
+		sb.append("共").append(this.getStationNum()).append("个车站，总长：").append(
 				this.length).append("公里\n");
 
-		for (int i = 0; i < this.stationNum; i++)
-			sb.append(this.stations[i].name).append("站 距离：").append(
-					this.stations[i].dist).append(" 等级:").append(
-					this.stations[i].level).append(" 隐藏：").append(
-					this.stations[i].hide).append("\n");
+		for (int i = 0; i < this.getStationNum(); i++)
+			sb.append(this.stations.get(i).name).append("站 距离：").append(
+					this.stations.get(i).dist).append(" 等级:").append(
+					this.stations.get(i).level).append(" 隐藏：").append(
+					this.stations.get(i).hide).append("\n");
 
 		return sb.toString();
 	}
@@ -525,12 +554,12 @@ public class Circuit {
 		Circuit c = new Circuit();
 		try {
 			c.loadFromFile("c:\\沪宁线.cir");
-			System.out.println(c.name + "共" + c.stationNum + "个车站，总长："
+			System.out.println(c.name + "共" + c.getStationNum() + "个车站，总长："
 					+ c.length);
-			for (int i = 0; i < c.stationNum; i++)
-				System.out.println(c.stations[i].name + "站" + " 距离："
-						+ c.stations[i].dist + " 等级:" + c.stations[i].level
-						+ " 隐藏：" + c.stations[i].hide);
+			for (int i = 0; i < c.getStationNum(); i++)
+				System.out.println(c.stations.get(i).name + "站" + " 距离："
+						+ c.stations.get(i).dist + " 等级:" + c.stations.get(i).level
+						+ " 隐藏：" + c.stations.get(i).hide);
 		} catch (IOException ex) {
 			System.out.println("Error:" + ex.getMessage());
 		}
@@ -551,8 +580,8 @@ public class Circuit {
 	}
 
 	public Station getFirstStopOnMe(Train train) {
-		for(int i=0; i<train.stopNum; i++) {
-			Station sta = getStation(train.stops[i].stationName);
+		for(int i=0; i<train.getStopNum(); i++) {
+			Station sta = getStation(train.getStop(i).stationName);
 			if(sta != null)
 				return sta;
 		}
@@ -561,8 +590,8 @@ public class Circuit {
 	}
 	
 	public Station getLastStopOnMe(Train train) {
-		for(int i=train.stopNum - 1; i>=0; i--) {
-			Station sta = getStation(train.stops[i].stationName);
+		for(int i=train.getStopNum() - 1; i>=0; i--) {
+			Station sta = getStation(train.getStop(i).stationName);
 			if(sta != null)
 				return sta;
 		}

@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
+import java.util.Vector;
 
 import static org.paradise.etrc.ETRC._;
 
@@ -27,11 +28,12 @@ public class Chart {
 	public Circuit circuit;
 
 	//本运行图所包含的车次，最多600趟
-	public static final int MAX_TRAIN_NUM = 600;
-	public Train trains[] = new Train[MAX_TRAIN_NUM];
+//	public static final int MAX_TRAIN_NUM = 6000;
+//	private Train _trains[] = new Train[MAX_TRAIN_NUM];
+	private Vector<Train> trains = new Vector<Train> (100);
 
 	//本运行图的车次总数
-	public int trainNum = 0;
+//	private int trainNum = 0;
 	//下行车次数目
 	public int dNum = 0;
 	//上行车次数目
@@ -44,10 +46,18 @@ public class Chart {
 	public Chart(Circuit cir) {
 		circuit = cir;
 	}
+	
+	public Train getTrain(int index) {
+		return trains.get(index);
+	}
+
+	public int getTrainNum() {
+		return trains.size();
+	}
 
 	public void addTrain(Train loadingTrain) {
-		if (trainNum >= MAX_TRAIN_NUM)
-			return;
+//		if (getTrainNum() >= MAX_TRAIN_NUM)
+//			return;
 
 		if (isLoaded(loadingTrain)) {
 			updateTrain(loadingTrain);
@@ -58,7 +68,8 @@ public class Chart {
 			loadingTrain.color = loadingTrain.getDefaultColor();
 //			loadingTrain.color = getNextTrainColor();
 
-		this.trains[trainNum] = loadingTrain;
+//		this._trains[getTrainNum()] = loadingTrain;
+		trains.add(loadingTrain);
 
 		switch (loadingTrain.isDownTrain(circuit)) {
 		case Train.DOWN_TRAIN:
@@ -68,7 +79,7 @@ public class Chart {
 			uNum++;
 			break;
 		}
-		trainNum++;
+//		setTrainNum(getTrainNum() + 1);
 
 //	    String direction="";
 //	    switch(loadingTrain.isDownTrain(circuit)){
@@ -85,67 +96,74 @@ public class Chart {
 	}
 	
 	public Train findTrain(String trainName) {
-		for(int i=0; i<trainNum; i++) {
-			if(trains[i].getTrainName(circuit).equals(trainName))
-				return trains[i];
+		for(int i=0; i<getTrainNum(); i++) {
+			if(trains.get(i).getTrainName(circuit).equals(trainName))
+				return trains.get(i);
 		}
 		
 		return null;
 	}
 	
 	public boolean containTrain(Train train) {
-		for(int i=0; i<trainNum; i++) {
-			if(trains[i].equals(train))
-				return true;
-		}
+//		for(int i=0; i<getTrainNum(); i++) {
+//			if(_trains[i].equals(train))
+//				return true;
+//		}
+//		
+//		return false;
 		
-		return false;
+		return trains.contains(train);
 	}
 
 	public void updateTrain(Train newTrain) {
-		for (int i = 0; i < trains.length; i++) {
-			if (newTrain.equals(trains[i])) {
+		for (int i = 0; i < trains.size(); i++) {
+			if (newTrain.equals(trains.get(i))) {
 				if(newTrain.color == null)
-					newTrain.color = trains[i].color;
-				trains[i] = newTrain;
+					newTrain.color = trains.get(i).color;
+				trains.set(i, newTrain);
 			}
 		}
 	}
 	
 	public void delTrain(int index) {
-		if ((index < 0) || (index >= MAX_TRAIN_NUM))
+		if ((index < 0) || index >= getTrainNum() /* (index >= MAX_TRAIN_NUM) */ )
 			return;
+		
+		trains.remove(index);
+		
 
-		Train[] newTrains = new Train[MAX_TRAIN_NUM];
-
-		int j = 0;
-		for (int i = 0; i < index; i++) {
-			newTrains[j++] = trains[i];
-		}
-
-		for (int i = index + 1; i < trainNum; i++) {
-			newTrains[j++] = trains[i];
-		}
-
-		trains = newTrains;
-		trainNum--;
+//		Train[] newTrains = new Train[MAX_TRAIN_NUM];
+//
+//		int j = 0;
+//		for (int i = 0; i < index; i++) {
+//			newTrains[j++] = _trains[i];
+//		}
+//
+//		for (int i = index + 1; i < getTrainNum(); i++) {
+//			newTrains[j++] = _trains[i];
+//		}
+//
+//		_trains = newTrains;
+//		setTrainNum(getTrainNum() - 1);
 	}
 	
 	public void delTrain(Train theTrain) {
 		if(!isLoaded(theTrain))
 			return;
 		
-		Train[] newTrains = new Train[MAX_TRAIN_NUM];
-
-		int j = 0;
-		for (int i = 0; i < trainNum; i++) {
-			if (!trains[i].equals(theTrain)) {
-				newTrains[j++] = trains[i];
-			}
-		}
-
-		trains = newTrains;
-		trainNum--;
+//		Train[] newTrains = new Train[MAX_TRAIN_NUM];
+//
+//		int j = 0;
+//		for (int i = 0; i < getTrainNum(); i++) {
+//			if (!_trains[i].equals(theTrain)) {
+//				newTrains[j++] = _trains[i];
+//			}
+//		}
+//
+//		_trains = newTrains;
+//		setTrainNum(getTrainNum() - 1);
+		
+		trains.remove(theTrain);
 	}
 
 	//画运行线的颜色
@@ -174,8 +192,8 @@ public class Chart {
 //					trains[i].getTrainName(circuit)))
 //				return true;
 //		}
-		for (int i = 0; i < trainNum; i++) {
-			if (_t.getTrainName().equalsIgnoreCase(trains[i].getTrainName()))
+		for (int i = 0; i < getTrainNum(); i++) {
+			if (_t.getTrainName().equalsIgnoreCase(trains.get(i).getTrainName()))
 				return true;
 		}
 
@@ -198,19 +216,19 @@ public class Chart {
 		out.newLine();
 		circuit.writeTo(out);
 		//车次
-		for (int i = 0; i < trainNum; i++) {
+		for (int i = 0; i < getTrainNum(); i++) {
 			out.write(trainPattern);
 			out.newLine();
-			trains[i].writeTo(out);
+			trains.get(i).writeTo(out);
 		}
 		//颜色
 		out.write(colorPattern);
 		out.newLine();
-		for (int i = 0; i < trainNum; i++) {
-			out.write(trains[i].getTrainName());
-			out.write("," + trains[i].color.getRed());
-			out.write("," + trains[i].color.getGreen());
-			out.write("," + trains[i].color.getBlue());
+		for (int i = 0; i < getTrainNum(); i++) {
+			out.write(trains.get(i).getTrainName());
+			out.write("," + trains.get(i).color.getRed());
+			out.write("," + trains.get(i).color.getGreen());
+			out.write("," + trains.get(i).color.getBlue());
 			out.newLine();
 		}
 		//设置
@@ -241,12 +259,15 @@ public class Chart {
 		int lineNum = 0;
 
 		String line = in.readLine();
-		if (line == null)
+		if (line == null) {
+			in.close();
 			throw new IOException("运行图文件格式错");
+		}
 
 		Circuit readingCircuit = new Circuit();
-		Train readingTrains[] = new Train[MAX_TRAIN_NUM];
-		int readTrainNum = 0;
+//		Train readingTrains[] = new Train[MAX_TRAIN_NUM];
+		Vector<Train> readingTrains = new Vector<Train>(20);
+//		int readTrainNum = 0;
 
 		while (line != null) {
 			if (line.equalsIgnoreCase(circuitPattern)) {
@@ -254,9 +275,10 @@ public class Chart {
 				lineNum = 0;
 			} else if (line.equalsIgnoreCase(trainPattern)) {
 				reading_state = READING_TRAIN;
-				readingTrains[readTrainNum] = new Train();
+//				readingTrains[readTrainNum] = new Train();
+				readingTrains.add(new Train());
 				lineNum = 0;
-				readTrainNum++;
+//				readTrainNum++;
 			} else if (line.equalsIgnoreCase(colorPattern)) {
 				reading_state = READING_COLOR;
 				lineNum = 0;
@@ -270,11 +292,13 @@ public class Chart {
 					lineNum++;
 					break;
 				case READING_TRAIN:
-					readingTrains[readTrainNum - 1].parseLine(line, lineNum);
+//					readingTrains[readTrainNum - 1].parseLine(line, lineNum);
+					readingTrains.get(readingTrains.size() - 1).parseLine(line, lineNum);
 					lineNum++;
 					break;
 				case READING_COLOR:
-					parseColor(line, readingTrains, readTrainNum);
+//					parseColor(line, readingTrains, readTrainNum);
+					parseColor(line, readingTrains, readingTrains.size());
 					lineNum++;
 					break;
 				case READING_SETUP:
@@ -290,14 +314,16 @@ public class Chart {
 
 		this.circuit=readingCircuit;
 
-		trainNum = 0;
+		trains.clear();
 		dNum = 0;
 		uNum = 0;
-		for (int i = 0; i < readTrainNum; i++) {
-			addTrain(readingTrains[i]);
+		for (int i = 0; i < readingTrains.size() /*readTrainNum*/; i++) {
+//			addTrain(readingTrains[i]);
+			addTrain(readingTrains.get(i));
 		}
 
 		//System.out.println("下行："+dNum+"，上行："+uNum);
+		in.close();
 	}
 
 	private void parseSetup(String line) throws IOException {
@@ -320,7 +346,7 @@ public class Chart {
 	 *
 	 * @param readingTrains Train[]
 	 */
-	private void parseColor(String line, Train[] readingTrains, int readTrainNum)
+	private void parseColor(String line, Vector<Train> /*Train[]*/ readingTrains, int readTrainNum)
 			throws IOException {
 		String colorLine[] = line.split(",");
 
@@ -339,8 +365,8 @@ public class Chart {
 		}
 
 		for (int i = 0; i < readTrainNum; i++) {
-			if (readingTrains[i].getTrainName().equalsIgnoreCase(colorLine[0])) {
-				readingTrains[i].color = new Color(r, g, b);
+			if (readingTrains.get(i).getTrainName().equalsIgnoreCase(colorLine[0])) {
+				readingTrains.get(i).color = new Color(r, g, b);
 				//System.out.println(readingTrains[i].getTrainName()+":"+r+","+g+","+b);
 			}
 		}
@@ -357,12 +383,12 @@ public class Chart {
 	    }
 	    
 	    System.out.print(chart.circuit.toString());
-	    for (int i = 0; i < chart.trainNum; i++) {
+	    for (int i = 0; i < chart.getTrainNum(); i++) {
 			System.out.print("==== " + i + " ==== (");
-			System.out.println(chart.trains[i].color.getRed() + "," + 
-					           chart.trains[i].color.getGreen() + "," + 
-					           chart.trains[i].color.getBlue() + ") ====");
-			System.out.print(chart.trains[i].toString());
+			System.out.println(chart.trains.get(i).color.getRed() + "," + 
+					           chart.trains.get(i).color.getGreen() + "," + 
+					           chart.trains.get(i).color.getBlue() + ") ====");
+			System.out.print(chart.trains.get(i).toString());
 		}
 	    System.out.println("\nSettings: " + 
 	    		  chart.distScale + "," +
@@ -384,9 +410,9 @@ public class Chart {
 	  }
 
 	public void clearTrains() {
-		trainNum = 0;
 		dNum = 0;
 		uNum = 0;
+		trains.clear();
 	}
 
 	public void insertNewStopToTrain(Train theTrain, Stop stop) {
@@ -425,14 +451,14 @@ public class Chart {
 		}
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
-		for(int i=0; i<theTrain.stopNum-1; i++) {
-			int dist1 = circuit.getStationDist(theTrain.stops[i].stationName);
-			int dist2 = circuit.getStationDist(theTrain.stops[i+1].stationName);
+		for(int i=0; i<theTrain.getStopNum()-1; i++) {
+			int dist1 = circuit.getStationDist(theTrain.getStop(i).stationName);
+			int dist2 = circuit.getStationDist(theTrain.getStop(i+1).stationName);
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
 				if(dist1 > newDist  && newDist > dist2)
-					theTrain.insertStopAfter(theTrain.stops[i], stop);
+					theTrain.insertStopAfter(theTrain.getStop(i), stop);
 		}
 	}
 
@@ -467,14 +493,14 @@ public class Chart {
 		}
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
-		for(int i=0; i<theTrain.stopNum-1; i++) {
-			int dist1 = circuit.getStationDist(theTrain.stops[i].stationName);
-			int dist2 = circuit.getStationDist(theTrain.stops[i+1].stationName);
+		for(int i=0; i<theTrain.getStopNum()-1; i++) {
+			int dist1 = circuit.getStationDist(theTrain.getStop(i).stationName);
+			int dist2 = circuit.getStationDist(theTrain.getStop(i+1).stationName);
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
 				if(dist1 < newDist  && newDist < dist2)
-					theTrain.insertStopAfter(theTrain.stops[i], stop);
+					theTrain.insertStopAfter(theTrain.getStop(i), stop);
 		}
 	}
 }

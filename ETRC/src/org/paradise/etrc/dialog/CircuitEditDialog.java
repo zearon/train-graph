@@ -26,6 +26,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 
 import static org.paradise.etrc.ETRC._;
+
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.Circuit;
@@ -70,7 +71,12 @@ public class CircuitEditDialog extends JDialog {
 		chooser.addChoosableFileFilter(new CSVFilter());
 		chooser.addChoosableFileFilter(new CIRFilter());
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-
+		try {
+			File recentPath = new File(mainFrame.prop.getProperty(mainFrame.Prop_Recent_Open_File_Path, ""));
+			if (recentPath.exists() && recentPath.isDirectory())
+				chooser.setCurrentDirectory(recentPath);
+		} catch (Exception e) {}
+		
 		int returnVal = chooser.showOpenDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
@@ -79,6 +85,7 @@ public class CircuitEditDialog extends JDialog {
 			Circuit c = new Circuit();
 			try {
 				c.loadFromFile(f.getAbsolutePath());
+				mainFrame.prop.setProperty(mainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -102,6 +109,11 @@ public class CircuitEditDialog extends JDialog {
 		chooser.addChoosableFileFilter(new CIRFilter());
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
 		chooser.setSelectedFile(new File(circuit.name));
+		try {
+			File recentPath = new File(mainFrame.prop.getProperty(mainFrame.Prop_Recent_Open_File_Path, ""));
+			if (recentPath.exists() && recentPath.isDirectory())
+				chooser.setCurrentDirectory(recentPath);
+		} catch (Exception e) {}
 
 		int returnVal = chooser.showSaveDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -115,6 +127,7 @@ public class CircuitEditDialog extends JDialog {
 				circuit.writeTo(out);
 				
 				out.close();
+				mainFrame.prop.setProperty(mainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}

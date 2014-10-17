@@ -58,7 +58,7 @@ public class ChartView extends JPanel {
 
 	private JScrollPane spLines = new JScrollPane();
 
-	public Color gridColor = Color.GRAY;
+	public Color gridColor = new Color(0xE0E0E0); //MOD Color.GRAY;
 	public Color activeGridColor = Color.DARK_GRAY;
 	
 	public Train activeTrain;

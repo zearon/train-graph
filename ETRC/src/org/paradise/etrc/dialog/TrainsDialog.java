@@ -5,7 +5,9 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.event.TableModelListener;
+
 import java.awt.event.*;
+import java.util.Arrays;
 
 import javax.swing.event.*;
 
@@ -134,7 +136,11 @@ public class TrainsDialog extends JDialog {
 				if (table.getCellEditor() != null)
 					table.getCellEditor().stopCellEditing();
 
-				chart.delTrain(table.getSelectedRow());
+				int[] selectedRows = table.getSelectedRows();
+				Arrays.sort(selectedRows);
+				for (int i = selectedRows.length - 1; i>=0; --i) {
+					chart.delTrain(selectedRows[i]);
+				}
 
 				table.revalidate();
 				mainFrame.chartView.repaint();
@@ -487,7 +493,7 @@ public class TrainsDialog extends JDialog {
 		private static final long serialVersionUID = -5356639615057465995L;
 
 		public TrainsTable() {
-			setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 			
 			addMouseListener(new MouseAdapter() {  
 				public void mouseClicked(MouseEvent e) {

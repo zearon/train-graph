@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Vector;
-
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.*;
@@ -57,6 +56,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public static String Prop_Show_Run = "Show_Run";
 	public static String Prop_HTTP_Proxy_Server = "HTTP_Proxy_Server";
 	public static String Prop_HTTP_Proxy_Port = "HTTP_Proxy_Port";
+	public static String Prop_Recent_Open_File_Path = "Recent_Open_File_Path";
 	
 	private static String Sample_Chart_File = "sample.trc";
 	private static String Properties_File = "htrc.prop";
@@ -77,6 +77,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		defaultProp.setProperty(Prop_Show_Run, "Y");
 		defaultProp.setProperty(Prop_HTTP_Proxy_Server, "");
 		defaultProp.setProperty(Prop_HTTP_Proxy_Port, "");
+		defaultProp.setProperty(Prop_Recent_Open_File_Path, "");
 		
 		prop = new Properties(defaultProp);
 		
@@ -795,6 +796,11 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileFilter(new TRCFilter());
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		try {
+			File recentPath = new File(prop.getProperty(Prop_Recent_Open_File_Path, ""));
+			if (recentPath.exists() && recentPath.isDirectory())
+				chooser.setCurrentDirectory(recentPath);
+		} catch (Exception e) {}
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
 		String fileName = chart.circuit.name + df.format(new Date());
@@ -810,6 +816,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			try {
 				chart.saveToFile(f);
 				prop.setProperty(Prop_Working_Chart, f.getAbsolutePath());
+				prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Err:" + ex.getMessage());
 				this.statusBarMain.setText(_("Unable to save the graph."));
@@ -829,6 +836,11 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileFilter(new TRCFilter());
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		try {
+			File recentPath = new File(prop.getProperty(Prop_Recent_Open_File_Path, ""));
+			if (recentPath.exists() && recentPath.isDirectory())
+				chooser.setCurrentDirectory(recentPath);
+		} catch (Exception e) {}
 
 		int returnVal = chooser.showOpenDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -847,6 +859,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				
 				setTitle();
 				prop.setProperty(Prop_Working_Chart, f.getAbsolutePath());
+				prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Err:" + ex.getMessage());
 				statusBarMain.setText(_("Unable to load the graph."));
@@ -870,7 +883,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.addChoosableFileFilter(new CSVFilter());
 		chooser.addChoosableFileFilter(new TRFFilter());
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-
+		try {
+			File recentPath = new File(prop.getProperty(Prop_Recent_Open_File_Path, ""));
+			if (recentPath.exists() && recentPath.isDirectory())
+				chooser.setCurrentDirectory(recentPath);
+		} catch (Exception e) {}
+		
 		int returnVal = chooser.showOpenDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f[] = chooser.getSelectedFiles();
@@ -884,6 +902,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				loadingTrain = new Train();
 				try {
 					loadingTrain.loadFromFile(f[j].getAbsolutePath());
+					prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 				} catch (IOException ex) {
 					System.err.println("Error: " + ex.getMessage());
 				}

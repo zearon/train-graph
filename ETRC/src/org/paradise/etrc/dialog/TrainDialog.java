@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.TableModelListener;
+
 import java.awt.event.*;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -16,7 +17,6 @@ import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.util.Date;
 import java.text.SimpleDateFormat;
-
 import java.net.URL;
 import java.net.Proxy;
 import java.net.InetSocketAddress;
@@ -315,6 +315,11 @@ public class TrainDialog extends JDialog {
 		chooser.addChoosableFileFilter(new TRFFilter());
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
 		chooser.setApproveButtonText(_("Save "));
+		try {
+			File recentPath = new File(mainFrame.prop.getProperty(mainFrame.Prop_Recent_Open_File_Path, ""));
+			if (recentPath.exists() && recentPath.isDirectory())
+				chooser.setCurrentDirectory(recentPath);
+		} catch (Exception e) {}
 		
 		String savingName = savingTrain.getTrainName().replace('/', '_'); 
 		chooser.setSelectedFile(new File(savingName));
@@ -330,6 +335,8 @@ public class TrainDialog extends JDialog {
 				savingTrain.writeTo(out);
 				
 				out.close();
+
+				mainFrame.prop.setProperty(mainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -346,6 +353,11 @@ public class TrainDialog extends JDialog {
 		chooser.addChoosableFileFilter(new CSVFilter());
 		chooser.addChoosableFileFilter(new TRFFilter());
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		try {
+			File recentPath = new File(mainFrame.prop.getProperty(mainFrame.Prop_Recent_Open_File_Path, ""));
+			if (recentPath.exists() && recentPath.isDirectory())
+				chooser.setCurrentDirectory(recentPath);
+		} catch (Exception e) {}
 
 		int returnVal = chooser.showOpenDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -354,6 +366,7 @@ public class TrainDialog extends JDialog {
 			Train loadingTrain = new Train();
 			try {
 				loadingTrain.loadFromFile(f.getAbsolutePath());
+				mainFrame.prop.setProperty(mainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}

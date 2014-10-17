@@ -24,7 +24,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 	public int bottomMargin = DEFAULT_BOTTOM_MARGIN;
 
 	public int ditancePanelHeight = 16;
-	public int runningPanelHeight = topMargin + bottomMargin + 28;
+	public int runningPanelHeight = topMargin + bottomMargin + 28; // MOD. original value: 28
 	public int clockPanelWidth = 80;
 
 	private DistancePanel panelDistance;

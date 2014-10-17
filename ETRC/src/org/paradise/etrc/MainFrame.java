@@ -38,7 +38,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private static final long serialVersionUID = 1L;
 	
 	public JPanel mainPanel;
-	public JSplitPane splitPane;
+	public JSplitPane splitPaneV;
+	public JSplitPane splitPaneH;
 	public ChartView chartView;
 	public DynamicView runView;
 	public SheetView sheetView;
@@ -131,15 +132,21 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 		
-		mainPanel.add(runView, BorderLayout.NORTH);
+		//mainPanel.add(runView, BorderLayout.NORTH);
 		
-		splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, chartView, sheetView);
-	    int dividerPos = Toolkit.getDefaultToolkit().getScreenSize().width - 253;
-		splitPane.setDividerLocation(dividerPos);
-		splitPane.setDividerSize(6);
-		splitPane.setOneTouchExpandable(true);
+		splitPaneH = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, chartView, sheetView);
+	    int dividerPosH = Toolkit.getDefaultToolkit().getScreenSize().width - 253;
+		splitPaneH.setDividerLocation(dividerPosH);
+		splitPaneH.setDividerSize(6);
+		splitPaneH.setOneTouchExpandable(true);
 		
-		mainPanel.add(splitPane, BorderLayout.CENTER);
+		splitPaneV = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, runView, splitPaneH);
+	    int dividerPosV = runView.getPreferredSize().height;
+		splitPaneV.setDividerLocation(dividerPosV);
+		splitPaneV.setDividerSize(6);
+		splitPaneV.setOneTouchExpandable(true);
+		
+		mainPanel.add(splitPaneV, BorderLayout.CENTER);
 
 		this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setFont(new java.awt.Font(_("FONT_NAME"), 0, 10));
@@ -420,6 +427,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 	private final String Edit_FindTrain = "Edit_FindTrain";
 	private final String Edit_Circuit = "Edit_Circuit";
+	private final String Edit_Rail_Network = "Edit_Rail_Network";
 	private final String Edit_Trains = "Edit_Trains";
 
 	private final String Setup_Margin = "Setup_MarginSet";
@@ -459,6 +467,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
         JMenu menuEdit = createMenu(_("EditMenu"));
 		menuEdit.setMnemonic(KeyEvent.VK_E);
         menuEdit.add(createMenuItem(_("Circuit..."), Edit_Circuit)).setMnemonic(KeyEvent.VK_C);
+        menuEdit.add(createMenuItem(_("Rail Network..."), Edit_Rail_Network)).setMnemonic(KeyEvent.VK_K);
         menuEdit.add(createMenuItem(_("Train..."), Edit_Trains)).setMnemonic(KeyEvent.VK_R);
 		menuEdit.addSeparator();
 //		menuEdit.add(createMenuItem("车次录入...", Edit_NewTrain));
@@ -537,6 +546,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			this.doDistSet();
 		} else if (command.equalsIgnoreCase(Edit_Circuit)) {
 			this.doEditCircuit();
+		} else if (command.equalsIgnoreCase(Edit_Rail_Network)) {
+			this.doEditRailNetwork();
 		} else if (command.equalsIgnoreCase(Edit_Trains)) {
 			this.doEditTrains();
 //		} else if (command.equalsIgnoreCase(Edit_NewTrain)) {
@@ -605,6 +616,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 		chartView.repaint();
 		sheetView.updateData();
+		runView.refresh();
+	}
+	
+	private void doEditRailNetwork() {
+		new CircuitEditDialog(this, this.chart.circuit.copy()).showDialog();
+		
+		this.setTitle();
+		chartView.repaint();
 		runView.refresh();
 	}
 

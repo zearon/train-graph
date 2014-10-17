@@ -131,7 +131,7 @@ public class ETRCLCB {
 	 */
 	public static void main(String[] args) {
 		try {
-			ETRCLCB lcb = new ETRCLCB("C:\\trains\\");
+			ETRCLCB lcb = new ETRCLCB("/Users/zhiyuangong/Hobby/Railroad/列车运行图/train-graph-2.60/eda/");
 			
 			System.out.println("lc = " + lcb.lc.size());
 			System.out.println("xl = " + lcb.xl.size());

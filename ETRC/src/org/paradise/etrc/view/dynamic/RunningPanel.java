@@ -21,7 +21,8 @@ import org.paradise.etrc.data.Train;
 public class RunningPanel extends JPanel {
 	private static final long serialVersionUID = -2001053748609300887L;
 
-	private static final int SPACE_AT_STATION = 16;
+	private static final int SPACE_BETWEEN_RAIL = 20;
+	private static final int SPACE_AT_STATION = 9;
 
 	private Chart chart;
 	private DynamicView dView;
@@ -261,7 +262,8 @@ public class RunningPanel extends JPanel {
 
 	private void drawTrainAtStationUp(Graphics g, int i, Train train, int dist) {
 		int x = dView.getPelsX(dist);
-		int y = getHeight() - dView.bottomMargin + (i+1) * SPACE_AT_STATION;
+		int y = getHeight() - dView.bottomMargin + SPACE_BETWEEN_RAIL + i * SPACE_AT_STATION;
+		// MOD  int y = getHeight() - dView.bottomMargin + (i+1) * SPACE_AT_STATION;
 
 		drawTrainRect(g, train, x, y);
 		
@@ -270,15 +272,17 @@ public class RunningPanel extends JPanel {
 		Font oldFont = g.getFont();
 		g.setFont(new Font("Dialog", Font.PLAIN, 10));
 		
-		int w = (int) g.getFontMetrics().getStringBounds(trainName, g).getWidth();
-		g.drawString(trainName, x - w/2, y + 13);
+		// MOD   int w = (int) g.getFontMetrics().getStringBounds(trainName, g).getWidth();
+		// g.drawString(trainName, x - w/2, y + 13);
+		g.drawString(trainName, x + 9, y + 5);
 		
 		g.setFont(oldFont);
 	}
 
 	private void drawTrainAtStationDown(Graphics g, int i, Train train, int dist) {
 		int x = dView.getPelsX(dist);
-		int y = dView.topMargin - (i+1) * SPACE_AT_STATION;
+		//MOD   int y = dView.topMargin - (i+1) * SPACE_AT_STATION;
+		int y = dView.topMargin - SPACE_BETWEEN_RAIL -  i * SPACE_AT_STATION;
 		
 		drawTrainRect(g, train, x, y);
 
@@ -287,8 +291,9 @@ public class RunningPanel extends JPanel {
 		Font oldFont = g.getFont();
 		g.setFont(new Font("Dialog", Font.PLAIN, 10));
 		
-		int w = (int) g.getFontMetrics().getStringBounds(trainName, g).getWidth();
-		g.drawString(trainName, x - w/2, y - 5);
+		// int w = (int) g.getFontMetrics().getStringBounds(trainName, g).getWidth();
+		//MOD   g.drawString(trainName, x - w/2, y - 5);
+		g.drawString(trainName, x + 9, y + 5);
 		
 		g.setFont(oldFont);
 	}

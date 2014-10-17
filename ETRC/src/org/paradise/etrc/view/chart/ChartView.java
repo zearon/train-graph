@@ -222,7 +222,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getPelsY(int dist) {
-		return dist * mainFrame.chart.distScale + topMargin;
+		return Math.round(dist * mainFrame.chart.distScale) + topMargin;
 	}
 
 	/**
@@ -240,7 +240,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getDist(int py) {
-		return (py - topMargin) / mainFrame.chart.distScale;
+		return Math.round((py - topMargin) / mainFrame.chart.distScale);
 	}
 
 	public String getStationName(int py) {
@@ -359,7 +359,7 @@ public class ChartView extends JPanel {
 	}
 
 	public void setCoordinateCorner(Point p) {
-		int dist = (p.y - topMargin) / mainFrame.chart.distScale;
+		int dist = Math.round((p.y - topMargin) / mainFrame.chart.distScale);
 		int minutes = (p.x - leftMargin) / mainFrame.chart.minuteScale;
 		cornerCoordinate.setText("(" + getClockString(minutes) + ","
 				+ getDistString(dist) + ")");
@@ -367,7 +367,7 @@ public class ChartView extends JPanel {
 	}
 
 	public String getDistString(Point p) {
-		int dist = (p.y - topMargin) / mainFrame.chart.distScale;
+		int dist = Math.round((p.y - topMargin) / mainFrame.chart.distScale);
 		return getDistString(dist);
 	}
 	

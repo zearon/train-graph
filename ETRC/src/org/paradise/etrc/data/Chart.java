@@ -15,7 +15,7 @@ import static org.paradise.etrc.ETRC._;
 
 public class Chart {
 	//Y轴（距离）显示参数
-	public int distScale = 3; //每公里像素数
+	public float distScale = 3; //每公里像素数
 	public int displayLevel = 4; //最低可显示车站等级
 	public int boldLevel = 2; //最低粗线显示车站等级（特等为0）
 
@@ -329,7 +329,7 @@ public class Chart {
 	private void parseSetup(String line) throws IOException {
 		String setup[] = line.split(",");
 		try {
-			distScale = Integer.parseInt(setup[0]);
+			distScale = Float.parseFloat(setup[0]);
 			displayLevel = Integer.parseInt(setup[1]);
 			boldLevel = Integer.parseInt(setup[2]);
 			startHour = Integer.parseInt(setup[3]);

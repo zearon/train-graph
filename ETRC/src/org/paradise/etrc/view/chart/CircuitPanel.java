@@ -72,7 +72,7 @@ public class CircuitPanel extends JPanel {
 			return new Dimension(ChartView.circuitPanelWidth, 480);
 
 		int w = ChartView.circuitPanelWidth;
-		int h = chart.circuit.length * chart.distScale + chartView.topMargin
+		int h = Math.round(chart.circuit.length * chart.distScale) + chartView.topMargin
 				+ chartView.bottomMargin;
 		return new Dimension(w, h);
 	}
@@ -81,7 +81,7 @@ public class CircuitPanel extends JPanel {
 		if (station.hide)
 			return;
 
-		int y = station.dist * chart.distScale + chartView.topMargin;
+		int y = Math.round(station.dist * chart.distScale) + chartView.topMargin;
 
 		if (station.level <= chart.displayLevel) {
 			//设置坐标线颜色

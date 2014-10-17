@@ -295,7 +295,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		  + chartView.rightMargin;
 		
 		if (chart.circuit != null)
-			h = chart.circuit.length * chart.distScale 
+			h = Math.round(chart.circuit.length * chart.distScale )
 			  + chartView.topMargin
 			  + chartView.bottomMargin;
 		else
@@ -317,7 +317,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 
 		Chart chart = chartView.mainFrame.chart;
 		int start = clock * 60 * chart.minuteScale + chartView.leftMargin;
-		int h = chart.circuit.length * chart.distScale;
+		int h = Math.round(chart.circuit.length * chart.distScale);
 		
 		// 0～23点整点竖线
 		g.drawLine(start, 0, 
@@ -347,7 +347,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		g.setColor(oldColor);
 	}
 
-	private void drawStationLine(Graphics g, Station st, int scale) {
+	private void drawStationLine(Graphics g, Station st, float scale) {
 		if (st.hide)
 			return;
 
@@ -362,7 +362,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 			g.setColor(chartView.gridColor);
 
 		// 画坐标线
-		int y = st.dist * scale + chartView.topMargin;
+		int y = Math.round(st.dist * scale) + chartView.topMargin;
 		int w = 60 * 24 * chart.minuteScale 
 		        + chartView.leftMargin
 				+ chartView.rightMargin;

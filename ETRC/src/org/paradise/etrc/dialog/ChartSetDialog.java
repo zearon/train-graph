@@ -277,7 +277,7 @@ public class ChartSetDialog extends JDialog {
 	    String stMinScale = t1.getText();
 	    String stInterval = t2.getText();
 
-	    int distScale = 3;
+	    float distScale = 3;
 	    int display = 4;
 	    int bold = 2;
 	    
@@ -285,7 +285,7 @@ public class ChartSetDialog extends JDialog {
 	    int minScale = 2;
 	    int interval = 10;
 	    try{
-	      distScale = Integer.parseInt(stDistScale);
+	      distScale = Float.parseFloat(stDistScale);
 	      display = Integer.parseInt(stDisplay);
 	      bold = Integer.parseInt(stBold);
 

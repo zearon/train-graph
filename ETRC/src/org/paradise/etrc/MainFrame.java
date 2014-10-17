@@ -687,7 +687,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		String fileName = chart.circuit.name + df.format(new Date());
 		chooser.setSelectedFile(new File(fileName));
 
-		int returnVal = chooser.showOpenDialog(this); 
+		int returnVal = chooser.showSaveDialog(this); 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
 			if (!f.getAbsolutePath().endsWith(".gif"))
@@ -800,7 +800,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		String fileName = chart.circuit.name + df.format(new Date());
 		chooser.setSelectedFile(new File(fileName));
 
-		int returnVal = chooser.showOpenDialog(this); 
+		int returnVal = chooser.showSaveDialog(this); 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
 			if (!f.getAbsolutePath().endsWith(".trc"))

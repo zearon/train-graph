@@ -319,7 +319,7 @@ public class TrainDialog extends JDialog {
 		String savingName = savingTrain.getTrainName().replace('/', '_'); 
 		chooser.setSelectedFile(new File(savingName));
 
-		int returnVal = chooser.showOpenDialog(this);
+		int returnVal = chooser.showSaveDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			String f = chooser.getSelectedFile().getAbsolutePath();
 			if(!f.endsWith(".trf"))

@@ -78,10 +78,10 @@ public class ControlPanel extends JPanel {
 		});
 		
 		add(btdl);
-		add(btsl);
-		add(btmd);
-		add(btsr);
 		add(btdr);
+		add(btmd);
+		add(btsl);
+		add(btsr);
 	}
 	
 	public JButton createButton(String pic) {

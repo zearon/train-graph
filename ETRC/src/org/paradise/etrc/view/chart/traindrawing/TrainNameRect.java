@@ -305,7 +305,7 @@ public class TrainNameRect {
       g.setFont(new Font(_("FONT_NAME_FIXED"), 0, 10));
       g.drawRect(x, y, 10, ChartView.trainNameRecHeight);
 
-      int h = g.getFontMetrics().getHeight() - 5;
+      int h = g.getFontMetrics().getHeight() - 4;
       int xt = x + 3;
       int yt = y + h + 2;
       for(int i=0; i<trainName.length(); i++) {

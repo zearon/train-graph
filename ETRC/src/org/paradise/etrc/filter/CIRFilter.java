@@ -5,6 +5,8 @@ import static org.paradise.etrc.ETRC._;
 
 public class CIRFilter extends javax.swing.filechooser.FileFilter {
 
+	public static String suffix = ".cir";
+	
 	/**
 	 * accept
 	 *
@@ -12,14 +14,14 @@ public class CIRFilter extends javax.swing.filechooser.FileFilter {
 	 * @return boolean
 	 */
 	public boolean accept(File pathname) {
-		if (pathname.getName().endsWith("cir") || pathname.isDirectory())
+		if (pathname.getName().endsWith(suffix) || pathname.isDirectory())
 			return true;
 		else
 			return false;
 	}
 
 	public String getDescription() {
-		return _("Line Description File (*.cir)");
+		return _("Line Description File (*"+suffix+")");
 	}
 }
 

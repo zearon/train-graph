@@ -91,7 +91,7 @@ public class SheetView extends JPanel {
 				if(me.getClickCount() >= 2 && me.getButton() == MouseEvent.BUTTON1) {
 					String rowHeaderName = (String) ((JList)me.getSource()).getSelectedValue();
 					String staName = rowHeaderName.substring(0, rowHeaderName.length()-3);
-					Station station = mainFrame.chart.circuit.getStation(staName);
+					Station station = mainFrame.chart.trunkCircuit.getStation(staName);
 //					new MessageBox(mainFrame, "TODO: 给出 "
 //							   + station.name
 //							   + "站 所有列车停靠、通过（推算）时刻表。 ").showMessage();
@@ -113,7 +113,7 @@ public class SheetView extends JPanel {
 	}
 
 	public void selectStation(Station station) {
-		Circuit circuit = mainFrame.chart.circuit;
+		Circuit circuit = mainFrame.chart.trunkCircuit;
 		for(int i=0; i<circuit.getStationNum(); i++) {
 			if(station.equals(circuit.getStation(i)))
 				rowHeader.setSelectedIndex(i*2);
@@ -122,7 +122,7 @@ public class SheetView extends JPanel {
 	
 	public void selectTrain(Train train) {
 		for(int i=0; i<table.getColumnCount(); i++) {
-			if(table.getColumnName(i).equals(train.getTrainName(mainFrame.chart.circuit))) {
+			if(table.getColumnName(i).equals(train.getTrainName(mainFrame.chart.trunkCircuit))) {
 				int row = table.getSelectedRow();
 				table.changeSelection(row, i, false, false);
 				table.editCellAt(row, i);

@@ -20,6 +20,9 @@ public class Circuit {
 	public String name = "";
 
 	public int length = 0;
+	public int multiplicity = 2;
+	public int zindex = 0;
+	public float dispScale = 1.0f;
 
 //	private int stationNum = 0;
 
@@ -28,12 +31,25 @@ public class Circuit {
 
 	public Circuit() {
 	}
+	
+	public Circuit(String name) {
+		this.name = name;
+		this.length = 30;
+		this.multiplicity = 2;
+		this.zindex = 1;
+		this.dispScale = 1.0f;
+		
+		appendStation(new Station("Stop 1", 0, 1, false));
+		appendStation(new Station("Stop 2", 30, 1, false));
+	}
 
 	public Circuit copy() {
 		Circuit cir = new Circuit();
 
 		cir.name = this.name;
 		cir.length = this.length;
+		cir.multiplicity = this.multiplicity;
+		cir.zindex = this.zindex;
 //		cir.stationNum = this.stationNum;
 
 		for (int i = 0; i < getStationNum(); i++)
@@ -298,15 +314,39 @@ public class Circuit {
 			throw new IOException(_("Error reading circuit name."));
 		}
 
-		// 线路总长
+		// 线路总长,单线/复线/四线，zindex, dispScale
 		if ((line = in.readLine()) != null) {
-			String stLength = line;
+			String[] parts = line.split(",");
+			this.length = Integer.parseInt(parts[0]);
+			String stLength = parts[0];
 			try {
 				this.length = Integer.parseInt(stLength);
 			} catch (NumberFormatException e) {
 				in.close();
 				throw new IOException(_("Error in circuit length format."));
 			}
+			try {
+				if (parts.length > 1)
+					this.multiplicity = Integer.parseInt(parts[1]);
+			} catch (NumberFormatException e) {
+				in.close();
+				throw new IOException(_("Error in circuit multiplicity format."));
+			}
+			try {
+				if (parts.length > 2)
+					this.zindex = Integer.parseInt(parts[2]);
+			} catch (NumberFormatException e) {
+				in.close();
+				throw new IOException(_("Error in circuit zindex format."));
+			}
+			try {
+				if (parts.length > 3)
+					this.dispScale = Float.parseFloat(parts[3]);
+			} catch (NumberFormatException e) {
+				in.close();
+				throw new IOException(_("Error in circuit display scale format."));
+			}
+			
 		} else {
 			in.close();
 			throw new IOException(_("Error reading circuit length."));
@@ -461,7 +501,7 @@ public class Circuit {
 	public void writeTo(BufferedWriter out) throws IOException {
 		out.write(name);
 		out.newLine();
-		out.write(length + "");
+		out.write(length + "," + multiplicity + "," + zindex + "," + dispScale);
 		out.newLine();
 		for (int i = 0; i < getStationNum(); i++) {
 			out.write(stations.get(i).name + "," + stations.get(i).dist + ","
@@ -477,9 +517,16 @@ public class Circuit {
 			break;
 		case 1:
 			try {
-				this.length = Integer.parseInt(line);
+				String[] parts = line.split(",");
+				this.length = Integer.parseInt(parts[0]);
+				if (parts.length > 1)
+					this.multiplicity = Integer.parseInt(parts[1]);
+				if (parts.length > 2)
+					this.zindex = Integer.parseInt(parts[2]);
+				if (parts.length > 3)
+					this.dispScale = Float.parseFloat(parts[3]);
 			} catch (NumberFormatException e) {
-				throw new IOException(_("Error in circuit lenght format."));
+				throw new IOException(_("Error in circuit lenght[,multiplicity,zindex,display scale] format."));
 			}
 			break;
 		default:
@@ -538,6 +585,20 @@ public class Circuit {
 	public String toString() {
 		StringBuffer sb = new StringBuffer(this.name);
 
+		switch (multiplicity) {
+		case 1:
+			sb.append("单线");
+			break;
+		case 2:
+			sb.append("复线");
+			break;
+		case 4:
+			sb.append("四线");
+			break;
+		default:
+			sb.append(multiplicity).append("线");
+			break;
+		}
 		sb.append("共").append(this.getStationNum()).append("个车站，总长：").append(
 				this.length).append("公里\n");
 

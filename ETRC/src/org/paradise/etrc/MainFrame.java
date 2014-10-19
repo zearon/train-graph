@@ -28,6 +28,7 @@ import org.paradise.etrc.view.dynamic.DynamicView;
 import org.paradise.etrc.view.sheet.SheetView;
 
 import static org.paradise.etrc.ETRC._;
+import static org.paradise.etrc.ETRCUtil.*;
 
 /**
  * @author lguo@sina.com
@@ -43,6 +44,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public ChartView chartView;
 	public DynamicView runView;
 	public SheetView sheetView;
+	
+	private CircuitEditDialog circuitEditDialog;
 	
 	private boolean isShowRun = true;
 	
@@ -64,10 +67,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	public boolean isNewCircuit = false;
 	public Chart chart;
+	private String railNetworkName;
 
 	private static final int MAX_TRAIN_SELECT_HISTORY_RECORD = 12;
 	public Vector<String> trainSelectHistory;
 	public JComboBox cbTrainSelectHistory;
+	
+	private boolean firstTimeLoading = true;
 	
 	//Construct the frame
 	public MainFrame() {
@@ -95,9 +101,24 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 		try {
 			jbInit();
+			circuitEditDialog = new CircuitEditDialog(this, chart.allCircuits);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		// for DEBUG purposes
+		addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowActivated(WindowEvent e) {
+				if (!firstTimeLoading)
+					return;
+				
+				firstTimeLoading = false;
+				
+				// test circuitEditDialog
+				//DEBUG(() -> circuitEditDialog.showDialog());
+			}
+		});
 	}
 
 	public void doExit() {
@@ -115,6 +136,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 	//Component initialization
 	private void jbInit() throws Exception {
+		
 		chartView = new ChartView(this);
 		runView = new DynamicView(this);
 		sheetView = new SheetView(this);
@@ -223,7 +245,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		this.setTitle();
 	}
 */
-    private static final String titlePrefix = _("LGuo's Electronic Train Graph");
+    private static final String titlePrefix = _("Jeff's Electronic Train Graph");
 
 	private String activeTrainName = "";
 
@@ -252,18 +274,26 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		setTitle();
 	}
 
-	public String getCircuitName() {
-		String circuitName = "";
-		if (chart.circuit.name.equalsIgnoreCase(""))
-			circuitName = "";
-		else
-			circuitName = " -- [" + chart.circuit.name + "] ";
-
-		return circuitName;
+	public String getRailNetworkName() {
+		if (railNetworkName == null)
+			return "";
+		
+		if (railNetworkName.endsWith(TRCFilter.suffix))
+			railNetworkName = railNetworkName.replace(TRCFilter.suffix, "");
+		
+		return railNetworkName;
+		
+//		String circuitName = "";
+//		if (chart.trunkCircuit.name.equalsIgnoreCase(""))
+//			circuitName = "";
+//		else
+////			circuitName = chart.allCircuits.get(0).name + _(" etc");
+//
+//		return circuitName;
 	}
 
 	public void setTitle() {
-		setTitle(titlePrefix + getCircuitName() + activeTrainName);
+		setTitle(titlePrefix + " -- [" + getRailNetworkName() + "]" + activeTrainName);
 	}
 
 	private JLabel loadStatusBar() {
@@ -427,7 +457,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 	private final String Edit_FindTrain = "Edit_FindTrain";
 	private final String Edit_Circuit = "Edit_Circuit";
-	private final String Edit_Rail_Network = "Edit_Rail_Network";
 	private final String Edit_Trains = "Edit_Trains";
 
 	private final String Setup_Margin = "Setup_MarginSet";
@@ -467,7 +496,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
         JMenu menuEdit = createMenu(_("EditMenu"));
 		menuEdit.setMnemonic(KeyEvent.VK_E);
         menuEdit.add(createMenuItem(_("Circuit..."), Edit_Circuit)).setMnemonic(KeyEvent.VK_C);
-        menuEdit.add(createMenuItem(_("Rail Network..."), Edit_Rail_Network)).setMnemonic(KeyEvent.VK_K);
         menuEdit.add(createMenuItem(_("Train..."), Edit_Trains)).setMnemonic(KeyEvent.VK_R);
 		menuEdit.addSeparator();
 //		menuEdit.add(createMenuItem("车次录入...", Edit_NewTrain));
@@ -525,6 +553,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			}
 		}
 		finally {
+			railNetworkName = chartFile.getName();
 			prop.setProperty(Prop_Working_Chart, chartFile.getAbsolutePath());
 		}
 	}
@@ -546,8 +575,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			this.doDistSet();
 		} else if (command.equalsIgnoreCase(Edit_Circuit)) {
 			this.doEditCircuit();
-		} else if (command.equalsIgnoreCase(Edit_Rail_Network)) {
-			this.doEditRailNetwork();
 		} else if (command.equalsIgnoreCase(Edit_Trains)) {
 			this.doEditTrains();
 //		} else if (command.equalsIgnoreCase(Edit_NewTrain)) {
@@ -594,7 +621,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			return;
 		
 		System.out.println(circuit);
-		new CircuitEditDialog(this, circuit).showDialog();
+		circuitEditDialog.showDialogForCircuit(circuit);
 		
 		this.setTitle();
 		chartView.repaint();
@@ -618,17 +645,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		sheetView.updateData();
 		runView.refresh();
 	}
-	
-	private void doEditRailNetwork() {
-		new CircuitEditDialog(this, this.chart.circuit.copy()).showDialog();
-		
-		this.setTitle();
-		chartView.repaint();
-		runView.refresh();
-	}
 
 	private void doEditCircuit() {
-		new CircuitEditDialog(this, this.chart.circuit.copy()).showDialog();
+		circuitEditDialog.showDialog();
 		
 		this.setTitle();
 		chartView.repaint();
@@ -704,7 +723,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = chart.circuit.name + df.format(new Date());
+		String fileName = chart.trunkCircuit.name + df.format(new Date());
 		chooser.setSelectedFile(new File(fileName));
 
 		int returnVal = chooser.showSaveDialog(this); 
@@ -822,18 +841,22 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		} catch (Exception e) {}
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = chart.circuit.name + df.format(new Date());
+		String fileName = railNetworkName;
 		chooser.setSelectedFile(new File(fileName));
 
 		int returnVal = chooser.showSaveDialog(this); 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
-			if (!f.getAbsolutePath().endsWith(".trc"))
+			if (!f.getAbsolutePath().endsWith(".trc")) {
 				f = new File(f.getAbsolutePath() + ".trc");
+			}
+			railNetworkName = f.getName();
 			//System.out.println(f);
 
 			try {
 				chart.saveToFile(f);
+				
+				setTitle();
 				prop.setProperty(Prop_Working_Chart, f.getAbsolutePath());
 				prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
@@ -876,7 +899,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				
 				runView.refresh();
 				
+				railNetworkName = f.getName();				
 				setTitle();
+				
 				prop.setProperty(Prop_Working_Chart, f.getAbsolutePath());
 				prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
@@ -937,7 +962,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //							+ Train.toTrainFormat(loadingTrain.stops[i].leave)
 //							+ " 发");
 
-				if(loadingTrain.isDownTrain(chart.circuit, false) > 0)
+				if(loadingTrain.isDownTrain(chart.trunkCircuit, false) > 0)
 					chart.addTrain(loadingTrain);
 			}
 
@@ -945,7 +970,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			//mainView.buildTrainDrawings();
 			chartView.repaint();
 			sheetView.updateData();
-			chartView.findAndMoveToTrain(loadingTrain.getTrainName(chart.circuit));
+			chartView.findAndMoveToTrain(loadingTrain.getTrainName(chart.trunkCircuit));
 			runView.refresh();
 			//panelChart.panelLines.repaint();
 		}

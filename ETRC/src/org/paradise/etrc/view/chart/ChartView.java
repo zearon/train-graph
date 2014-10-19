@@ -135,7 +135,7 @@ public class ChartView extends JPanel {
 		
 		// 设置MainFrame的标题和ToolTip
 		if (activeTrain != null) {
-			mainFrame.setActiceTrainName(activeTrain.getTrainName(mainFrame.chart.circuit));
+			mainFrame.setActiceTrainName(activeTrain.getTrainName(mainFrame.chart.trunkCircuit));
 			//ADD For SheetView
 			mainFrame.sheetView.selectTrain(activeTrain);
 			//打开ToolTip
@@ -160,7 +160,7 @@ public class ChartView extends JPanel {
 
 		Chart chart = mainFrame.chart;
 		for (int i = 0; i < chart.getTrainNum(); i++) {
-			int isDown = chart.getTrain(i).isDownTrain(chart.circuit);
+			int isDown = chart.getTrain(i).isDownTrain(chart.trunkCircuit);
 			switch (showUpDownState) {
 			//全不显示
 			case ChartView.SHOW_NONE:
@@ -231,7 +231,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getPelsY(String stationName) {
-		return getPelsY(mainFrame.chart.circuit.getStationDist(stationName));
+		return getPelsY(mainFrame.chart.trunkCircuit.getStationDist(stationName));
 	}
 
 	/**
@@ -244,7 +244,7 @@ public class ChartView extends JPanel {
 	}
 
 	public String getStationName(int py) {
-		return mainFrame.chart.circuit.getStationName(getDist(py));
+		return mainFrame.chart.trunkCircuit.getStationName(getDist(py));
 	}
 
 	public int getMinute(int px) {
@@ -363,7 +363,7 @@ public class ChartView extends JPanel {
 		int minutes = (p.x - leftMargin) / mainFrame.chart.minuteScale;
 		cornerCoordinate.setText("(" + getClockString(minutes) + ","
 				+ getDistString(dist) + ")");
-		mainFrame.statusBarMain.setText(mainFrame.chart.circuit.getStationName(dist, true));
+		mainFrame.statusBarMain.setText(mainFrame.chart.trunkCircuit.getStationName(dist, true));
 	}
 
 	public String getDistString(Point p) {
@@ -380,7 +380,7 @@ public class ChartView extends JPanel {
 		if (distUpDownState == SHOW_DOWN)
 			return "" + dist;
 		else
-			return "" + (mainFrame.chart.circuit.length - dist);
+			return "" + (mainFrame.chart.trunkCircuit.length - dist);
 	}
 	
 	private String getClockString(int minutes) {
@@ -464,7 +464,7 @@ public class ChartView extends JPanel {
 	 * 取在图chart上画的停站
 	 */
 	public Stop[] getDrawStops(Train train) {
-		Circuit circuit = mainFrame.chart.circuit;
+		Circuit circuit = mainFrame.chart.trunkCircuit;
 		Stop[] drawStops = new Stop[circuit.getStationNum()];
 
 		int iDraw = 0;
@@ -545,8 +545,8 @@ public class ChartView extends JPanel {
 
 	public void setActiveSation(int y) {
 		int dist = this.getDist(y);
-		int index = mainFrame.chart.circuit.getStationIndex(dist);
-		setActiveStation(mainFrame.chart.circuit.getStation(index));
+		int index = mainFrame.chart.trunkCircuit.getStationIndex(dist);
+		setActiveStation(mainFrame.chart.trunkCircuit.getStation(index));
 	}
 	
 	public void setActiveStation(Station station) {

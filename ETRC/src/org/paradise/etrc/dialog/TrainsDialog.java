@@ -291,7 +291,7 @@ public class TrainsDialog extends JDialog {
 					super.paint(g);
 				}
 			};
-			colorButton.setText(chart.getTrain(row).getTrainName(chart.circuit));
+			colorButton.setText(chart.getTrain(row).getTrainName(chart.trunkCircuit));
 			colorButton.setForeground(currentColor);
 			colorButton.setBackground(Color.white);
 
@@ -348,7 +348,7 @@ public class TrainsDialog extends JDialog {
 					super.paint(g);
 				}
 			};
-			colorLabel.setText(chart.getTrain(row).getTrainName(chart.circuit));
+			colorLabel.setText(chart.getTrain(row).getTrainName(chart.trunkCircuit));
 			colorLabel.setForeground(color);
 			colorLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			colorLabel.setVerticalAlignment(SwingConstants.CENTER);

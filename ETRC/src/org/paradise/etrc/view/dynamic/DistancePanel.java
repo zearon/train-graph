@@ -93,21 +93,21 @@ public class DistancePanel extends JPanel {
 	}
 	
 	private void drawGridUp(Graphics g) {
-		for (int dist = chart.circuit.length; dist >= 0 ; dist--) {
+		for (int dist = chart.trunkCircuit.length; dist >= 0 ; dist--) {
 			drawDistanceGrid(g, dist);
 		}
 		
 		int x = dView.getPelsX(0);
-		drawDistanceString(g, chart.circuit.length, x);
+		drawDistanceString(g, chart.trunkCircuit.length, x);
 	}
 
 	private void drawGridDown(Graphics g) {
-		for (int dist = 0; dist <= chart.circuit.length; dist++) {
+		for (int dist = 0; dist <= chart.trunkCircuit.length; dist++) {
 			drawDistanceGrid(g, dist);
 		}
 		
-		int x = dView.getPelsX(chart.circuit.length);
-		drawDistanceString(g, chart.circuit.length, x);
+		int x = dView.getPelsX(chart.trunkCircuit.length);
+		drawDistanceString(g, chart.trunkCircuit.length, x);
 	}
 	
 	private void drawDistanceGrid(Graphics g, int dist) {
@@ -119,7 +119,7 @@ public class DistancePanel extends JPanel {
 		}
 		//上行里程数
 		else {
-			drawingDist = (chart.circuit.length - dist);
+			drawingDist = (chart.trunkCircuit.length - dist);
 		}
 
 		int x = dView.getPelsX(dist);
@@ -162,7 +162,7 @@ public class DistancePanel extends JPanel {
 
 	public Dimension getPreferredSize() {
 		int w, h;
-		w = chart.circuit.length * dView.scale + dView.leftMargin + dView.rightMargin;
+		w = chart.trunkCircuit.length * dView.scale + dView.leftMargin + dView.rightMargin;
 		h = dView.ditancePanelHeight;
 		return new Dimension(w, h);
 	}

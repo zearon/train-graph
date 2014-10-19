@@ -89,7 +89,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 	 * @return int
 	 */
 	public int getPelsX(String stationName) {
-		return getPelsX(mainFrame.chart.circuit.getStationDist(stationName));
+		return getPelsX(mainFrame.chart.trunkCircuit.getStationDist(stationName));
 	}
 
 	/**
@@ -107,7 +107,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 	 * @return int
 	 */
 	public String getStationName(int px) {
-		return mainFrame.chart.circuit.getStationName(getDist(px));
+		return mainFrame.chart.trunkCircuit.getStationName(getDist(px));
 	}
 
 	/*
@@ -296,7 +296,6 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 				try {
 					Thread.sleep(timeGap);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -304,7 +303,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 				try {
 					Thread.sleep(MIN_GAP);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 			}

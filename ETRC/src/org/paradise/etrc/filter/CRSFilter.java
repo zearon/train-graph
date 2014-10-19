@@ -1,11 +1,13 @@
 package org.paradise.etrc.filter;
 
 import java.io.File;
+
 import static org.paradise.etrc.ETRC._;
 
-public class TRCFilter extends javax.swing.filechooser.FileFilter {
+public class CRSFilter extends javax.swing.filechooser.FileFilter {
 
-	public static String suffix = ".trc";
+	public static String suffix = ".crs";
+
 	/**
 	 * accept
 	 *
@@ -20,7 +22,7 @@ public class TRCFilter extends javax.swing.filechooser.FileFilter {
 	}
 
 	public String getDescription() {
-		return _("Train Graph File (*"+suffix+")");
+		return _("Lines Description File (*"+suffix+")");
 	}
 }
 

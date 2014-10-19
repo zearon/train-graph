@@ -25,7 +25,8 @@ public class Chart {
 	public int timeInterval = 10; //时间轴间隔（必须是60的约数，即可以是5，6，10等，但不能是7分钟）
 
 	//本运行图的线路
-	public Circuit circuit;
+	public Circuit trunkCircuit;
+	public Vector<Circuit> allCircuits = new Vector<Circuit>(6);
 
 	//本运行图所包含的车次，最多600趟
 //	public static final int MAX_TRAIN_NUM = 6000;
@@ -44,7 +45,7 @@ public class Chart {
 	}
 	
 	public Chart(Circuit cir) {
-		circuit = cir;
+		trunkCircuit = cir;
 	}
 	
 	public Train getTrain(int index) {
@@ -71,7 +72,7 @@ public class Chart {
 //		this._trains[getTrainNum()] = loadingTrain;
 		trains.add(loadingTrain);
 
-		switch (loadingTrain.isDownTrain(circuit)) {
+		switch (loadingTrain.isDownTrain(trunkCircuit)) {
 		case Train.DOWN_TRAIN:
 			dNum++;
 			break;
@@ -97,7 +98,7 @@ public class Chart {
 	
 	public Train findTrain(String trainName) {
 		for(int i=0; i<getTrainNum(); i++) {
-			if(trains.get(i).getTrainName(circuit).equals(trainName))
+			if(trains.get(i).getTrainName(trunkCircuit).equals(trainName))
 				return trains.get(i);
 		}
 		
@@ -212,9 +213,12 @@ public class Chart {
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
 
 		//线路
-		out.write(circuitPattern);
-		out.newLine();
-		circuit.writeTo(out);
+		for (int i = 0; i < allCircuits.size(); ++ i) {
+			out.write(circuitPattern);
+			out.newLine();
+			allCircuits.get(i).writeTo(out);
+		}
+		
 		//车次
 		for (int i = 0; i < getTrainNum(); i++) {
 			out.write(trainPattern);
@@ -264,14 +268,16 @@ public class Chart {
 			throw new IOException("运行图文件格式错");
 		}
 
-		Circuit readingCircuit = new Circuit();
+//		Circuit readingCircuit = new Circuit();
 //		Train readingTrains[] = new Train[MAX_TRAIN_NUM];
+		Vector<Circuit> readingCircuits = new Vector<Circuit>(7);
 		Vector<Train> readingTrains = new Vector<Train>(20);
 //		int readTrainNum = 0;
 
 		while (line != null) {
 			if (line.equalsIgnoreCase(circuitPattern)) {
 				reading_state = READING_CIRCUIT;
+				readingCircuits.add(new Circuit());
 				lineNum = 0;
 			} else if (line.equalsIgnoreCase(trainPattern)) {
 				reading_state = READING_TRAIN;
@@ -288,7 +294,7 @@ public class Chart {
 			} else {
 				switch (reading_state) {
 				case READING_CIRCUIT:
-					readingCircuit.parseLine(line, lineNum);
+					readingCircuits.get(readingCircuits.size() - 1).parseLine(line, lineNum);
 					lineNum++;
 					break;
 				case READING_TRAIN:
@@ -312,7 +318,8 @@ public class Chart {
 			line = in.readLine();
 		}
 
-		this.circuit=readingCircuit;
+		this.trunkCircuit=readingCircuits.get(0);
+		this.allCircuits = readingCircuits;
 
 		trains.clear();
 		dNum = 0;
@@ -382,7 +389,7 @@ public class Chart {
 	      System.out.println("Error:" + ex.getMessage());
 	    }
 	    
-	    System.out.print(chart.circuit.toString());
+	    System.out.print(chart.trunkCircuit.toString());
 	    for (int i = 0; i < chart.getTrainNum(); i++) {
 			System.out.print("==== " + i + " ==== (");
 			System.out.println(chart.trains.get(i).color.getRed() + "," + 
@@ -403,7 +410,6 @@ public class Chart {
 	    try {
 			chart.saveToFile(new File("d:\\huning3.trc"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	    
@@ -416,44 +422,44 @@ public class Chart {
 	}
 
 	public void insertNewStopToTrain(Train theTrain, Stop stop) {
-		if (theTrain.isDownTrain(circuit) == Train.DOWN_TRAIN) {
+		if (theTrain.isDownTrain(trunkCircuit) == Train.DOWN_TRAIN) {
 			insertNewStopToTrainDown(theTrain, stop);
 		} else
 			insertNewStopToTrainUp(theTrain, stop);
 	}
 
 	private void insertNewStopToTrainUp(Train theTrain, Stop stop) {
-		int newDist = this.circuit.getStationDist(stop.stationName);
+		int newDist = this.trunkCircuit.getStationDist(stop.stationName);
 		
 		//不在本线 返回 null
 		if(newDist < 0)
 			return;
 		
 		//新站在theTrain在本线的第一个停靠站之前 插在第一个站之前
-		Station firstStop = this.circuit.getFirstStopOnMe(theTrain);
+		Station firstStop = this.trunkCircuit.getFirstStopOnMe(theTrain);
 		if (firstStop == null) {
 			theTrain.insertStop(stop, 0);
 		}
 		else {
-			int firstDist = this.circuit.getStationDist(firstStop.name);
+			int firstDist = this.trunkCircuit.getStationDist(firstStop.name);
 			if(newDist > firstDist)
 				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
 		}
 		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
-		Station lastStop = this.circuit.getLastStopOnMe(theTrain);
+		Station lastStop = this.trunkCircuit.getLastStopOnMe(theTrain);
 		if (lastStop == null) {
 			theTrain.appendStop(stop);
 		}
 		else {
-			int lastDist = this.circuit.getStationDist(lastStop.name);
+			int lastDist = this.trunkCircuit.getStationDist(lastStop.name);
 			if(newDist < lastDist)
 				theTrain.appendStop(stop);
 		}
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
 		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = circuit.getStationDist(theTrain.getStop(i).stationName);
-			int dist2 = circuit.getStationDist(theTrain.getStop(i+1).stationName);
+			int dist1 = trunkCircuit.getStationDist(theTrain.getStop(i).stationName);
+			int dist2 = trunkCircuit.getStationDist(theTrain.getStop(i+1).stationName);
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
@@ -463,39 +469,39 @@ public class Chart {
 	}
 
 	private void insertNewStopToTrainDown(Train theTrain, Stop stop) {
-		int newDist = this.circuit.getStationDist(stop.stationName);
+		int newDist = this.trunkCircuit.getStationDist(stop.stationName);
 		
 		//不在本线 返回 null
 		if(newDist < 0)
 			return;
 		
 		//新站在theTrain在本线的第一个停靠站之前 插在第一个站之前
-		Station firstStop = this.circuit.getFirstStopOnMe(theTrain);
+		Station firstStop = this.trunkCircuit.getFirstStopOnMe(theTrain);
 		if (firstStop == null) {
 			theTrain.insertStop(stop, 0);
 		}
 		else
 		{
-			int firstDist = this.circuit.getStationDist(firstStop.name);
+			int firstDist = this.trunkCircuit.getStationDist(firstStop.name);
 			if(newDist < firstDist)
 				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
 		}
 		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
-		Station lastStop = this.circuit.getLastStopOnMe(theTrain);
+		Station lastStop = this.trunkCircuit.getLastStopOnMe(theTrain);
 		if (lastStop == null) {
 			theTrain.appendStop(stop);
 		}
 		else
 		{
-			int lastDist = this.circuit.getStationDist(lastStop.name);
+			int lastDist = this.trunkCircuit.getStationDist(lastStop.name);
 			if(newDist > lastDist)
 				theTrain.appendStop(stop);
 		}
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
 		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = circuit.getStationDist(theTrain.getStop(i).stationName);
-			int dist2 = circuit.getStationDist(theTrain.getStop(i+1).stationName);
+			int dist1 = trunkCircuit.getStationDist(theTrain.getStop(i).stationName);
+			int dist2 = trunkCircuit.getStationDist(theTrain.getStop(i+1).stationName);
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）

@@ -53,7 +53,7 @@ public class TrainDrawing {
 
   private void buildUp() {
 	Chart chart = chartView.mainFrame.chart;
-    int direction = train.isDownTrain(chart.circuit);
+    int direction = train.isDownTrain(chart.trunkCircuit);
     String trainName = getTrainName();
 
     //首先计算要画的停站
@@ -326,7 +326,7 @@ public class TrainDrawing {
   }
 
   String getTrainName() {
-    return train.getTrainName(chartView.mainFrame.chart.circuit);
+    return train.getTrainName(chartView.mainFrame.chart.trunkCircuit);
   }
 
   /**
@@ -375,15 +375,15 @@ public class TrainDrawing {
       min += 24*60;
 
 	Chart chart = chartView.mainFrame.chart;
-    int dist = Math.abs(chart.circuit.getStationDist(stop[0].stationName)
-                      - chart.circuit.getStationDist(stop[stop.length-1].stationName));
+    int dist = Math.abs(chart.trunkCircuit.getStationDist(stop[0].stationName)
+                      - chart.trunkCircuit.getStationDist(stop[stop.length-1].stationName));
     
     if(min == 0)
     	return train.getTrainName() + "Error!";
 
     return train.getTrainName() + "次 "
         + train.getStartStation() + "至" + train.getTerminalStation()
-        + " 在" + chart.circuit.name + "行驶" + dist + "公里 "
+        + " 在" + chart.trunkCircuit.name + "行驶" + dist + "公里 "
         + "耗时" + min + "分钟 旅行速度" + dist*60/min +"公里/小时";
   }
 

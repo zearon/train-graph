@@ -139,7 +139,7 @@ public class WZTimeEdit extends WizardDialog {
 	}
 	
 	protected void updateStepPane() {
-		// TODO Auto-generated method stub
+		
 		
 	}
 

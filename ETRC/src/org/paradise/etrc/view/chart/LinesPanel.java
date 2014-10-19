@@ -226,9 +226,9 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		}
 
 		Chart chart = chartView.mainFrame.chart;
-		if (chart.circuit != null) {
-			for (int i = 0; i < chart.circuit.getStationNum(); i++) {
-				drawStationLine(g, chart.circuit.getStation(i), chart.distScale);
+		if (chart.trunkCircuit != null) {
+			for (int i = 0; i < chart.trunkCircuit.getStationNum(); i++) {
+				drawStationLine(g, chart.trunkCircuit.getStation(i), chart.distScale);
 			}
 		}
 
@@ -294,8 +294,8 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		  + chartView.leftMargin 
 		  + chartView.rightMargin;
 		
-		if (chart.circuit != null)
-			h = Math.round(chart.circuit.length * chart.distScale )
+		if (chart.trunkCircuit != null)
+			h = Math.round(chart.trunkCircuit.length * chart.distScale )
 			  + chartView.topMargin
 			  + chartView.bottomMargin;
 		else
@@ -317,7 +317,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 
 		Chart chart = chartView.mainFrame.chart;
 		int start = clock * 60 * chart.minuteScale + chartView.leftMargin;
-		int h = Math.round(chart.circuit.length * chart.distScale);
+		int h = Math.round(chart.trunkCircuit.length * chart.distScale);
 		
 		// 0～23点整点竖线
 		g.drawLine(start, 0, 
@@ -422,7 +422,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		Train nearTrain[] = findTrains(p);
 		for (int i = 0; i < nearTrain.length; i++)
 			chartView.mainFrame.statusBarMain.setText(
-					nearTrain[i].getTrainName(chartView.mainFrame.chart.circuit) + "次 " 
+					nearTrain[i].getTrainName(chartView.mainFrame.chart.trunkCircuit) + "次 " 
 					+ chartView.mainFrame.statusBarMain.getText());
 	}
 

@@ -73,7 +73,7 @@ public class WZOutPointSet extends WizardDialog {
 					tfTime.setText("");
 				}
 				else {
-					curStation = chart.circuit.getStation(row);
+					curStation = chart.trunkCircuit.getStation(row);
 					tfTime.setText(calculTime());
 				}
 			}
@@ -128,7 +128,7 @@ public class WZOutPointSet extends WizardDialog {
 			return train.getStop(stopIndex).leave;
 		}
 		else {
-			Station lastStation = chart.circuit.getLastStopOnMe(train);
+			Station lastStation = chart.trunkCircuit.getLastStopOnMe(train);
 			
 			if(lastStation == null)
 				return "";
@@ -140,7 +140,7 @@ public class WZOutPointSet extends WizardDialog {
 			
 			int timeA = Train.trainTimeToInt(stop.leave);
 			int timeIn = 0;
-			if(train.isDownTrain(chart.circuit) == Train.DOWN_TRAIN)
+			if(train.isDownTrain(chart.trunkCircuit) == Train.DOWN_TRAIN)
 				timeIn = timeA + timeGap;
 			else
 				timeIn = timeA - timeGap;
@@ -176,25 +176,25 @@ public class WZOutPointSet extends WizardDialog {
 
 	protected void updateStepPane() {
 		//设置List选项
-		String[] dispNames = new String[chart.circuit.getStationNum()];
-		for(int i=0; i<chart.circuit.getStationNum(); i++) {
-			String strDist = "" + chart.circuit.getStation(i).dist;
+		String[] dispNames = new String[chart.trunkCircuit.getStationNum()];
+		for(int i=0; i<chart.trunkCircuit.getStationNum(); i++) {
+			String strDist = "" + chart.trunkCircuit.getStation(i).dist;
 			while(strDist.length() < 4) {
 				strDist = " " + strDist;
 			}
 			dispNames[i] = String.format(_(" %s down-going direction %s km from %s station: %s station"), 
-					chart.circuit.name, strDist, chart.circuit.getStation(0).name,   chart.circuit.getStation(i).name); 
+					chart.trunkCircuit.name, strDist, chart.trunkCircuit.getStation(0).name,   chart.trunkCircuit.getStation(i).name); 
 
 		}
 		circuitList.setListData(dispNames);
 
 		//设置当前选中的车站
-		if(chart.circuit.isEndInsideMe(train)) {
+		if(chart.trunkCircuit.isEndInsideMe(train)) {
 			info.setText(String.format(_("  Train %s terminates at %s station in this section, no need to set end point"), train.getTrainName(), train.getTerminalStation()));
-			curStation = chart.circuit.getStation(train.getTerminalStation());
+			curStation = chart.trunkCircuit.getStation(train.getTerminalStation());
 		}
 		else {
-			curStation = chart.circuit.getLastStopOnMe(train);
+			curStation = chart.trunkCircuit.getLastStopOnMe(train);
 			if(curStation != null) {
 				info.setText(String.format(_("  The last stop of train %s in this section is %s, change the station and time if this is not correct."), train.getTrainName(), curStation.name));
 			}
@@ -205,7 +205,7 @@ public class WZOutPointSet extends WizardDialog {
 
 		int index = -1;
 		if(curStation != null)
-			index = chart.circuit.getStationIndex(curStation.name);
+			index = chart.trunkCircuit.getStationIndex(curStation.name);
 		
 		circuitList.setSelectedIndex(index);
 		circuitList.ensureIndexIsVisible(index);

@@ -50,13 +50,15 @@ public class RunningPanel extends JPanel {
 		
 		//上行线
 		drawRailwayLine(g, 0, dView.topMargin, getPreferredSize().width, 0);
+		drawRailwayLine(g, 0, dView.topMargin+4, getPreferredSize().width, 0);
 		//下行线
 		drawRailwayLine(g, 0, this.getHeight() - dView.bottomMargin, getPreferredSize().width, 1);
+		drawRailwayLine(g, 0, this.getHeight() - dView.bottomMargin - 4, getPreferredSize().width, 1);
 		
 		if (chart == null)
 			return;
 
-		if (chart.circuit != null)
+		if (chart.trunkCircuit != null)
 			drawStationsLine(g);
 		
 		drawTrains(g);
@@ -64,7 +66,7 @@ public class RunningPanel extends JPanel {
 
 	public Dimension getPreferredSize() {
 		int w, h;
-		w = chart.circuit.length * dView.scale + dView.leftMargin + dView.rightMargin;
+		w = chart.trunkCircuit.length * dView.scale + dView.leftMargin + dView.rightMargin;
 		h = dView.runningPanelHeight;
 		return new Dimension(w, h);
 	}
@@ -103,8 +105,8 @@ public class RunningPanel extends JPanel {
 		
 		g.setColor(oldColor);
 
-		for (int i = 0; i < chart.circuit.getStationNum(); i++) {
-			drawStation(g, chart.circuit.getStation(i));
+		for (int i = 0; i < chart.trunkCircuit.getStationNum(); i++) {
+			drawStation(g, chart.trunkCircuit.getStation(i));
 		}
 	}
 	
@@ -146,7 +148,7 @@ public class RunningPanel extends JPanel {
 		int top = getHeight() / 2 + r.height / 2 - 2;
 
 		g.setColor(Color.white);
-		g.fillRect(left - 1, top - r.height + 1, r.width + 2, r.height + 4);
+		g.fillRect(left - 1, top - r.height + 2, r.width + 2, r.height);
 		
 		g.setColor(Color.black);
 		g.drawString(station.name, left, top);
@@ -163,7 +165,7 @@ public class RunningPanel extends JPanel {
 		//遍历一下，看看哪些车是运行中的
 		runningTrains.clear();
 		for(int i = 0; i < chart.getTrainNum(); i++) {
-			int dist = chart.circuit.getDistOfTrain(chart.getTrain(i), dView.getCurrentTime());
+			int dist = chart.trunkCircuit.getDistOfTrain(chart.getTrain(i), dView.getCurrentTime());
 			
 			if(dist >= 0) {
 				if(!atStationTrains.keySet().contains(chart.getTrain(i)))
@@ -187,7 +189,7 @@ public class RunningPanel extends JPanel {
 		while(en.hasMoreElements()) {
 			Train theRunningTrain = (Train) en.nextElement();
 			int theDist = Integer.parseInt((String) runningTrains.get(theRunningTrain));
-			if(theRunningTrain.isDownTrain(chart.circuit) == Train.DOWN_TRAIN) {
+			if(theRunningTrain.isDownTrain(chart.trunkCircuit) == Train.DOWN_TRAIN) {
 				drawRunningTrainDown(g, theRunningTrain, theDist);
 			}
 			else {
@@ -196,9 +198,9 @@ public class RunningPanel extends JPanel {
 		}
 
 		//画停站的列车
-		for(int i=0; i<chart.circuit.getStationNum(); i++) {
-			String theStation = chart.circuit.getStation(i).name;
-			int stationDist = chart.circuit.getStation(i).dist;
+		for(int i=0; i<chart.trunkCircuit.getStationNum(); i++) {
+			String theStation = chart.trunkCircuit.getStation(i).name;
+			int stationDist = chart.trunkCircuit.getStation(i).dist;
 			Vector<Train> myTrains = new Vector<Train>();
 			
 			Enumeration<Train> stoped = atStationTrains.keys();
@@ -218,7 +220,7 @@ public class RunningPanel extends JPanel {
 	private Hashtable<Train, String> findTrainsAtStation(int time) {
 		Hashtable<Train, String> trains = new Hashtable<Train, String>();
 		for(int i = 0; i < chart.getTrainNum(); i++) {
-			String station = chart.circuit.getStationNameAtTheTime(chart.getTrain(i), time);
+			String station = chart.trunkCircuit.getStationNameAtTheTime(chart.getTrain(i), time);
 			
 			if(!station.equalsIgnoreCase("")) {
 				trains.put(chart.getTrain(i), station);
@@ -233,7 +235,7 @@ public class RunningPanel extends JPanel {
 		for(int i = 0; i < myTrains.size(); i++) {
 			Train train = (Train) myTrains.get(i);
 			
-			if(train.isDownTrain(chart.circuit) == Train.DOWN_TRAIN) {
+			if(train.isDownTrain(chart.trunkCircuit) == Train.DOWN_TRAIN) {
 				drawTrainAtStationDown(g, dNum, train, dist);
 				dNum ++;
 			}
@@ -267,7 +269,7 @@ public class RunningPanel extends JPanel {
 
 		drawTrainRect(g, train, x, y);
 		
-		String trainName = train.getTrainName(chart.circuit);
+		String trainName = train.getTrainName(chart.trunkCircuit);
 		
 		Font oldFont = g.getFont();
 		g.setFont(new Font("Dialog", Font.PLAIN, 10));
@@ -286,7 +288,7 @@ public class RunningPanel extends JPanel {
 		
 		drawTrainRect(g, train, x, y);
 
-		String trainName = train.getTrainName(chart.circuit);
+		String trainName = train.getTrainName(chart.trunkCircuit);
 		
 		Font oldFont = g.getFont();
 		g.setFont(new Font("Dialog", Font.PLAIN, 10));
@@ -304,7 +306,7 @@ public class RunningPanel extends JPanel {
 		
 		drawTrainRect(g, train, x, y);
 		
-		String trainName = train.getTrainName(chart.circuit);
+		String trainName = train.getTrainName(chart.trunkCircuit);
 		
 		Font oldFont = g.getFont();
 		g.setFont(new Font("Dialog", Font.PLAIN, 10));
@@ -321,7 +323,7 @@ public class RunningPanel extends JPanel {
 		
 		drawTrainRect(g, train, x, y);
 		
-		String trainName = train.getTrainName(chart.circuit);
+		String trainName = train.getTrainName(chart.trunkCircuit);
 		
 		Font oldFont = g.getFont();
 		g.setFont(new Font("Dialog", Font.PLAIN, 10));

@@ -58,9 +58,9 @@ public class CircuitPanel extends JPanel {
 		if (chart == null)
 			return;
 
-		if (chart.circuit != null)
-			for (int i = 0; i < chart.circuit.getStationNum(); i++) {
-				DrawStation(g, chart.circuit.getStation(i));
+		if (chart.trunkCircuit != null)
+			for (int i = 0; i < chart.trunkCircuit.getStationNum(); i++) {
+				DrawStation(g, chart.trunkCircuit.getStation(i));
 			}
 	}
 
@@ -68,11 +68,11 @@ public class CircuitPanel extends JPanel {
 		if (chart == null)
 			return new Dimension(640, 480);
 
-		if (chart.circuit == null)
+		if (chart.trunkCircuit == null)
 			return new Dimension(ChartView.circuitPanelWidth, 480);
 
 		int w = ChartView.circuitPanelWidth;
-		int h = Math.round(chart.circuit.length * chart.distScale) + chartView.topMargin
+		int h = Math.round(chart.trunkCircuit.length * chart.distScale) + chartView.topMargin
 				+ chartView.bottomMargin;
 		return new Dimension(w, h);
 	}
@@ -120,7 +120,7 @@ public class CircuitPanel extends JPanel {
 		}
 		//上行里程
 		else {
-			stDist = station.dist == chart.circuit.length ? "0km" : "" + (chart.circuit.length - station.dist);
+			stDist = station.dist == chart.trunkCircuit.length ? "0km" : "" + (chart.trunkCircuit.length - station.dist);
 			g.setColor(chartView.upDistColor);
 		}
 		Font oldFont = g.getFont();

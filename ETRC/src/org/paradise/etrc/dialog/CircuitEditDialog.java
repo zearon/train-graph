@@ -1,5 +1,7 @@
 package org.paradise.etrc.dialog;
 
+import static org.paradise.etrc.ETRC.__;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -23,10 +25,6 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Vector;
 
-import javax.sound.midi.MidiDevice.Info;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -45,9 +43,6 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import static org.paradise.etrc.ETRC._;
-import static org.paradise.etrc.ETRCUtil.*;
-
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.BOMStripperInputStream;
@@ -58,22 +53,19 @@ import org.paradise.etrc.filter.CIRFilter;
 import org.paradise.etrc.filter.CRSFilter;
 import org.paradise.etrc.filter.CSVFilter;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-import sun.swing.table.DefaultTableCellHeaderRenderer;
-
 public class CircuitEditDialog extends JDialog {
 	private static final long serialVersionUID = 8501387955756137148L;
 	MainFrame mainFrame;
 	Vector<Circuit> circuitsInChart;
 
-	CircuitTable circuitTable;
+	CircuitTable circuitTable1;
 	CircuitTableModel circuitTableModel;
 	StationTable stationTable;
 	StationTableModel stationTableModel;
 	
 	private JTextField tfName;
 	private JLabel lbLength;
-	private JComboBox cbMultiplicity;
+	private JComboBox<String> cbMultiplicity;
 	private JTextField tfDispScale;
 	private JCheckBox ckSuccesiveChange;
 	
@@ -84,7 +76,7 @@ public class CircuitEditDialog extends JDialog {
 	private ArrayList<String> crossoverStations = new ArrayList<String> (16);
 
 	public CircuitEditDialog(MainFrame _mainFrame, Vector<Circuit> existingCircuits) {
-		super(_mainFrame, _("Railway Circuits: ") + _mainFrame.getRailNetworkName(), true);
+		super(_mainFrame, __("Railway Circuits: ") + _mainFrame.getRailNetworkName(), true);
 		
 		mainFrame = _mainFrame;
 		circuitsInChart = existingCircuits;
@@ -105,12 +97,12 @@ public class CircuitEditDialog extends JDialog {
 		JFileChooser chooser = new JFileChooser();
 		ETRC.setFont(chooser);
 
-		chooser.setDialogTitle(_("Load Circuit"));
+		chooser.setDialogTitle(__("Load Circuit"));
 		chooser.setDialogType(JFileChooser.OPEN_DIALOG);
 		chooser.setMultiSelectionEnabled(false);
 		chooser.addChoosableFileFilter(new CSVFilter());
 		chooser.addChoosableFileFilter(new CIRFilter());
-		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
 			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
@@ -142,12 +134,12 @@ public class CircuitEditDialog extends JDialog {
 		JFileChooser chooser = new JFileChooser();
 		ETRC.setFont(chooser);
 
-		chooser.setDialogTitle(_("Load Circuits"));
+		chooser.setDialogTitle(__("Load Circuits"));
 		chooser.setDialogType(JFileChooser.OPEN_DIALOG);
 		chooser.setMultiSelectionEnabled(false);
 		chooser.addChoosableFileFilter(new CSVFilter());
 		chooser.addChoosableFileFilter(new CRSFilter());
-		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
 			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
@@ -177,7 +169,7 @@ public class CircuitEditDialog extends JDialog {
 				}
 				
 				if (loadedCircuits.size() < 1) {
-					throw new IOException(_("Loaded circuits are empty."));
+					throw new IOException(__("Loaded circuits are empty."));
 				}
 				
 				if (clearOriginalCircuits)
@@ -188,7 +180,7 @@ public class CircuitEditDialog extends JDialog {
 				mainFrame.prop.setProperty(MainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
-				InfoDialog.showErrorDialog(this, _("Cannot load circuits due to\r\n") + ex.getMessage());
+				InfoDialog.showErrorDialog(this, __("Cannot load circuits due to\r\n") + ex.getMessage());
 			} finally {
 				try {
 					if (in != null)
@@ -207,12 +199,12 @@ public class CircuitEditDialog extends JDialog {
 		try {
 			stationTableModel.circuit.multiplicity = Integer.parseInt(cbMultiplicity.getSelectedItem().toString());
 		} catch (NumberFormatException e) {
-			throw new IOException(_("Invalid rail count. It should be 1/2/4"));
+			throw new IOException(__("Invalid rail count. It should be 1/2/4"));
 		}
 		try {
 			stationTableModel.circuit.dispScale = Float.parseFloat(tfDispScale.getText());
 		} catch (NumberFormatException e) {
-			InfoDialog.showErrorDialog(this, _("Invalid display scale. It should be a decimal"));
+			InfoDialog.showErrorDialog(this, __("Invalid display scale. It should be a decimal"));
 		}
 		doSaveCircuits(circuit, null);
 	}
@@ -226,22 +218,22 @@ public class CircuitEditDialog extends JDialog {
 		String suffix;
 
 		if (circuit != null) {
-			chooser.setDialogTitle(_("Save Circuit"));
+			chooser.setDialogTitle(__("Save Circuit"));
 			chooser.addChoosableFileFilter(new CIRFilter());
 			suffix = CIRFilter.suffix;
 			chooser.setSelectedFile(new File(circuit.name));
 		} else if (circuits != null && circuits.size() > 0) {
-			chooser.setDialogTitle(_("Save Circuits"));
+			chooser.setDialogTitle(__("Save Circuits"));
 			chooser.addChoosableFileFilter(new CRSFilter());
 			suffix = CRSFilter.suffix;
 			chooser.setSelectedFile(new File(mainFrame.getRailNetworkName().replace(' ', '_')));
 		} else {
 			return;
 		}
-		chooser.setApproveButtonText(_("Save"));
+		chooser.setApproveButtonText(__("Save"));
 		chooser.setDialogType(JFileChooser.SAVE_DIALOG);
 		chooser.setMultiSelectionEnabled(false);
-		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
 			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
@@ -278,7 +270,7 @@ public class CircuitEditDialog extends JDialog {
 
 //		JPanel circuitPanel = new JPanel();
 		//trainPanel.add(underColorPanel,  BorderLayout.SOUTH);
-		JButton btAddCircuit = new JButton(_("Add Circuit"));
+		JButton btAddCircuit = new JButton(__("Add Circuit"));
 		btAddCircuit.setFont(new Font("dialog", 0, 12));
 		btAddCircuit.addActionListener(new ActionListener() {			
 			@Override
@@ -287,7 +279,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btImportCircuit = new JButton(_("Import Circuit"));
+		JButton btImportCircuit = new JButton(__("Import Circuit"));
 		btImportCircuit.setFont(new Font("dialog", 0, 12));
 		btImportCircuit.addActionListener(new ActionListener() {	
 			@Override
@@ -296,7 +288,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btMoveUp = new JButton(_("Move Up"));
+		JButton btMoveUp = new JButton(__("Move Up"));
 		btMoveUp.setFont(new Font("dialog", 0, 12));
 		btMoveUp.addActionListener(new ActionListener() {			
 			@Override
@@ -305,7 +297,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btMoveDown = new JButton(_("Move Down"));
+		JButton btMoveDown = new JButton(__("Move Down"));
 		btMoveDown.setFont(new Font("dialog", 0, 12));
 		btMoveDown.addActionListener(new ActionListener() {			
 			@Override
@@ -314,7 +306,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btRemoveCircuit = new JButton(_("Remove Circuit"));
+		JButton btRemoveCircuit = new JButton(__("Remove Circuit"));
 		btRemoveCircuit.setFont(new Font("dialog", 0, 12));
 		btRemoveCircuit.addActionListener(new ActionListener() {			
 			@Override
@@ -323,7 +315,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btNewCircuits = new JButton(_("New Circuits"));
+		JButton btNewCircuits = new JButton(__("New Circuits"));
 		btNewCircuits.setFont(new Font("dialog", 0, 12));
 		btNewCircuits.addActionListener(new ActionListener() {			
 			@Override
@@ -332,7 +324,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btSaveCircuits = new JButton(_("Save Circuits"));
+		JButton btSaveCircuits = new JButton(__("Save Circuits"));
 		btSaveCircuits.setFont(new Font("dialog", 0, 12));
 		btSaveCircuits.addActionListener(new ActionListener() {			
 			@Override
@@ -341,7 +333,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btLoadCircuits = new JButton(_("Load Circuits"));
+		JButton btLoadCircuits = new JButton(__("Load Circuits"));
 		btLoadCircuits.setFont(new Font("dialog", 0, 12));
 		btLoadCircuits.addActionListener(new ActionListener() {			
 			@Override
@@ -350,7 +342,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btComplete = new JButton(_("Complete"));
+		JButton btComplete = new JButton(__("Complete"));
 		btComplete.setFont(new Font("dialog", 0, 12));
 		btComplete.addActionListener(new ActionListener() {			
 			@Override
@@ -359,7 +351,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btCancel = new JButton(_("Cancel"));
+		JButton btCancel = new JButton(__("Cancel"));
 		btCancel.setFont(new Font("dialog", 0, 12));
 		btCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -367,15 +359,15 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btAdjust = new JButton(_("Adjust"));
+		JButton btAdjust = new JButton(__("Adjust"));
 		btAdjust.setFont(new Font("dialog", 0, 12));
 		btAdjust.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				doCircuits_Command();
+				doCircuits_Calculate();
 			}
 		});
 
-		JButton btCommand2 = new JButton(_("Command2"));
+		JButton btCommand2 = new JButton(__("Command2"));
 		btCommand2.setFont(new Font("dialog", 0, 12));
 		btCommand2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -422,7 +414,7 @@ public class CircuitEditDialog extends JDialog {
 		
 		buildCircuitTable();
 
-		JScrollPane spCircuitList = new JScrollPane(circuitTable);
+		JScrollPane spCircuitList = new JScrollPane(circuitTable1);
 
 		JPanel circuitPanel = new JPanel();
 		circuitPanel.setLayout(new BorderLayout());
@@ -432,16 +424,16 @@ public class CircuitEditDialog extends JDialog {
 	}
 
 	private void buildCircuitTable() {
-		circuitTable = new CircuitTable();
-		circuitTable.setFont(new Font("Dialog", 0, 12));
-		circuitTable.getTableHeader().setFont(new Font("Dialog", 0, 12));
+		circuitTable1 = new CircuitTable();
+		circuitTable1.setFont(new Font("Dialog", 0, 12));
+		circuitTable1.getTableHeader().setFont(new Font("Dialog", 0, 12));
 		
 		circuitTableModel = new CircuitTableModel(circuitsInChart);
-		circuitTable.setModel(circuitTableModel);
-		circuitTable.getColumnModel().getColumn(0).setPreferredWidth(120);
-		circuitTable.getColumnModel().getColumn(1).setPreferredWidth(60);
+		circuitTable1.setModel(circuitTableModel);
+		circuitTable1.getColumnModel().getColumn(0).setPreferredWidth(120);
+		circuitTable1.getColumnModel().getColumn(1).setPreferredWidth(60);
 		
-		circuitTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+		circuitTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			
 			@Override
 			public void valueChanged(ListSelectionEvent arg0) {
@@ -452,6 +444,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 		
+		@SuppressWarnings("serial")
 		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
 			
 			@Override
@@ -470,17 +463,17 @@ public class CircuitEditDialog extends JDialog {
 			
 		};
 		
-		for (int i = 0; i < circuitTable.getColumnCount(); i++) {
-			circuitTable.getColumn(circuitTable.getColumnName(i)).setCellRenderer(renderer);
+		for (int i = 0; i < circuitTable1.getColumnCount(); i++) {
+			circuitTable1.getColumn(circuitTable1.getColumnName(i)).setCellRenderer(renderer);
 		}
 	}
 	
 	private JPanel buildCircuitPanel() {
-	    ckSuccesiveChange = new JCheckBox(_("Succesive Change"), false);
+	    ckSuccesiveChange = new JCheckBox(__("Succesive Change"), false);
 		
 		buildStationTable();
 
-		JButton btOK = new JButton(_("OK"));
+		JButton btOK = new JButton(__("OK"));
 		btOK.setFont(new Font("dialog", 0, 12));
 		btOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -489,7 +482,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btLoad = new JButton(_("Load"));
+		JButton btLoad = new JButton(__("Load"));
 		btLoad.setFont(new Font("dialog", 0, 12));
 		btLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -497,7 +490,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btSave = new JButton(_("Save"));
+		JButton btSave = new JButton(__("Save"));
 		btSave.setFont(new Font("dialog", 0, 12));
 		btSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -505,7 +498,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 		
-		JButton btDel = new JButton(_("Delete"));
+		JButton btDel = new JButton(__("Delete"));
 		btDel.setFont(new Font("dialog", 0, 12));
 		btDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -513,7 +506,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 		
-		JButton btRevert = new JButton(_("Revert"));
+		JButton btRevert = new JButton(__("Revert"));
 		btRevert.setFont(new Font("dialog", 0, 12));
 		btRevert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -521,7 +514,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btInsert = new JButton(_("Insert"));
+		JButton btInsert = new JButton(__("Insert"));
 		btInsert.setFont(new Font("dialog", 0, 12));
 		btInsert.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -529,7 +522,7 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JButton btAdd = new JButton(_("Add"));
+		JButton btAdd = new JButton(__("Add"));
 		btAdd.setFont(new Font("dialog", 0, 12));
 		btAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -537,28 +530,28 @@ public class CircuitEditDialog extends JDialog {
 			}
 		});
 
-		JLabel lbName = new JLabel(_("Circuit Name:"));
+		JLabel lbName = new JLabel(__("Circuit Name:"));
 		lbName.setFont(new Font("dialog", 0, 12));
 		
 		tfName = new JTextField(12);
 		tfName.setFont(new Font("dialog", 0, 12));
 		tfName.setText(stationTableModel.circuit.name);
 		
-		JLabel lbLengthLabel = new JLabel(_("Total Length:"));
-		lbLength = new JLabel("0 "+ _("km"));
+		JLabel lbLengthLabel = new JLabel(__("Total Length:"));
+		lbLength = new JLabel("0 "+ __("km"));
 
-		JLabel lbMultiplicity = new JLabel(_("Rail Count:"));
+		JLabel lbMultiplicity = new JLabel(__("Rail Count:"));
 		lbName.setFont(new Font("dialog", 0, 12));
 		
-	    cbMultiplicity = new JComboBox();
+	    cbMultiplicity = new JComboBox<String>();
 	    cbMultiplicity.setFont(new Font("dialog", 0, 12));
 	    cbMultiplicity.setEditable(true);
-	    cbMultiplicity.addItem(_("1"));
-	    cbMultiplicity.addItem(_("2"));
-	    cbMultiplicity.addItem(_("4"));
+	    cbMultiplicity.addItem(__("1"));
+	    cbMultiplicity.addItem(__("2"));
+	    cbMultiplicity.addItem(__("4"));
 	    cbMultiplicity.setSelectedItem(stationTableModel.circuit.multiplicity);
 	    
-	    JLabel lbDispScale = new JLabel(_("Display Scale:"));
+	    JLabel lbDispScale = new JLabel(__("Display Scale:"));
 		lbName.setFont(new Font("dialog", 0, 12));
 		
 		tfDispScale = new JTextField(2);
@@ -588,7 +581,7 @@ public class CircuitEditDialog extends JDialog {
 	    namePanel.setBorder(new EmptyBorder(1,1,1,1));
 
 	    JPanel tipPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-	    JLabel lbTip = new JLabel(_("                 Note: Press OK button after editing."));
+	    JLabel lbTip = new JLabel(__("                 Note: Press OK button after editing."));
 	    tipPanel.add(lbLengthLabel);
 	    tipPanel.add(lbLength);
 	    tipPanel.add(ckSuccesiveChange);
@@ -632,6 +625,7 @@ public class CircuitEditDialog extends JDialog {
 		stationTable.getColumnModel().getColumn(3).setPreferredWidth(40);
 		stationTable.getColumnModel().getColumn(4).setPreferredWidth(40);
 		
+		@SuppressWarnings("serial")
 		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer() {
 
 			@Override
@@ -692,7 +686,7 @@ public class CircuitEditDialog extends JDialog {
 			this.tempCircuit = circuit;
 			circuit.zindex = 1;
 			circuitTableModel.circuits.add(circuit);
-			circuitTable.updateUI();
+			circuitTable1.updateUI();
 			
 			switchCircuit(circuit);
 		}
@@ -701,7 +695,7 @@ public class CircuitEditDialog extends JDialog {
 	}
 	
 	private void doChangeCircuit() {
-		int circuitIndex = circuitTable.getSelectedRow();
+		int circuitIndex = circuitTable1.getSelectedRow();
 		Circuit circuit = circuitTableModel.circuits.get(circuitIndex).copy();
 		switchCircuit(circuit);
 	}
@@ -714,12 +708,12 @@ public class CircuitEditDialog extends JDialog {
 		Circuit c = ((StationTableModel)stationTable.getModel()).circuit;
 		if (c.getStationNum() < 2)
 		{
-			new MessageBox(mainFrame, _("A circut must have at least two stations.")).showMessage();
+			new MessageBox(mainFrame, __("A circut must have at least two stations.")).showMessage();
 			return;
 		}
 		int offset = c.getStation(0).dist;
 		if (offset != 0) {
-			if (new YesNoBox(mainFrame, _("The distance of the first station is not zero, do normalization?")).askForYes()) {
+			if (new YesNoBox(mainFrame, __("The distance of the first station is not zero, do normalization?")).askForYes()) {
 				for (int i = 0; i < c.getStationNum(); ++i) {
 					c.getStation(i).dist -= offset; 
 				}	
@@ -731,14 +725,14 @@ public class CircuitEditDialog extends JDialog {
 			c.multiplicity = Integer.parseInt(cbMultiplicity.getSelectedItem().toString());
 			c.dispScale = Float.parseFloat(tfDispScale.getText());
 		} catch (NumberFormatException e) {
-			InfoDialog.showErrorDialog(this, _("Rail count should be an integer and display scale should be a decimal"));
+			InfoDialog.showErrorDialog(this, __("Rail count should be an integer and display scale should be a decimal"));
 		}
 		
-		int selectedCircuitIndex = circuitTable.getSelectedRow();
+		int selectedCircuitIndex = circuitTable1.getSelectedRow();
 		if (selectedCircuitIndex >= 0)
 			circuitTableModel.circuits.set(selectedCircuitIndex, c);
 		
-		circuitTable.updateUI();
+		circuitTable1.updateUI();
 	}
 
 	private void doCircuit_Load() {
@@ -754,7 +748,7 @@ public class CircuitEditDialog extends JDialog {
 			doSaveCircuit(stationTableModel.circuit);
 		} catch (IOException e1) {
 			e1.printStackTrace();
-			InfoDialog.showErrorDialog(this, _("Cannot save the circuit due to: \r\n") + e1.getMessage());
+			InfoDialog.showErrorDialog(this, __("Cannot save the circuit due to: \r\n") + e1.getMessage());
 		}
 	}
 
@@ -802,11 +796,11 @@ public class CircuitEditDialog extends JDialog {
 		Circuit cir = stationTableModel.circuit;
 		int selectedIndex = stationTable.getSelectedRow();
 		if(selectedIndex < 0) {
-			InfoDialog.showInfoDialog(this, _("Please choose a station first."));
+			InfoDialog.showInfoDialog(this, __("Please choose a station first."));
 			return;
 		}
 		
-		String name = _("Station");
+		String name = __("Station");
 		int dist = cir.getStation(selectedIndex).dist;
 		int level = cir.getStation(selectedIndex).level;
 		boolean hide = false;
@@ -821,11 +815,11 @@ public class CircuitEditDialog extends JDialog {
 		Circuit cir = stationTableModel.circuit;
 		int selectedIndex = stationTable.getSelectedRow();
 		if(selectedIndex < 0) {
-			InfoDialog.showInfoDialog(this, _("Please choose a station first."));
+			InfoDialog.showInfoDialog(this, __("Please choose a station first."));
 			return;
 		}
 		
-		String name = _("Station");
+		String name = __("Station");
 		int dist = cir.getStation(selectedIndex).dist;
 		int level = cir.getStation(selectedIndex).level;
 		boolean hide = false;
@@ -841,8 +835,8 @@ public class CircuitEditDialog extends JDialog {
 		circuitTableModel.circuits.add(newCircuit.copy());
 		
 		int circuitIndex = circuitTableModel.circuits.size() - 1;
-		circuitTable.setRowSelectionInterval(circuitIndex, circuitIndex);
-		circuitTable.updateUI();
+		circuitTable1.setRowSelectionInterval(circuitIndex, circuitIndex);
+		circuitTable1.updateUI();
 		
 		switchCircuit(newCircuit);
 	}
@@ -862,52 +856,52 @@ public class CircuitEditDialog extends JDialog {
 		circuit.zindex = 1;
 		circuitTableModel.circuits.add(circuit);
 		int index0 = circuitTableModel.circuits.size() - 1;
-		circuitTable.setRowSelectionInterval(index0, index0);
-		circuitTable.updateUI();
+		circuitTable1.setRowSelectionInterval(index0, index0);
+		circuitTable1.updateUI();
 
 		switchCircuit(circuit);
 	}
 
 	private void doCircuits_MoveUpCircuit() {
 		// Move up a circuit
-		int selectedCircuitIndex = circuitTable.getSelectedRow();
+		int selectedCircuitIndex = circuitTable1.getSelectedRow();
 		if (selectedCircuitIndex == 0) {
-			InfoDialog.showInfoDialog(this, _("This is already the first circuit and thus cannot be moved up any more."));
+			InfoDialog.showInfoDialog(this, __("This is already the first circuit and thus cannot be moved up any more."));
 			return;
 		}
 		Circuit circuitMoved = circuitTableModel.circuits.remove(selectedCircuitIndex);
 		circuitTableModel.circuits.insertElementAt(circuitMoved, selectedCircuitIndex - 1);
 		
-		circuitTable.setRowSelectionInterval(selectedCircuitIndex - 1, selectedCircuitIndex - 1); 
-		circuitTable.updateUI();
+		circuitTable1.setRowSelectionInterval(selectedCircuitIndex - 1, selectedCircuitIndex - 1); 
+		circuitTable1.updateUI();
 	}
 
 	private void doCircuits_MoveDownCircuit() {
 		// Move down a circuit
-		int selectedCircuitIndex = circuitTable.getSelectedRow();
+		int selectedCircuitIndex = circuitTable1.getSelectedRow();
 		if (selectedCircuitIndex == circuitTableModel.circuits.size() - 1) {
-			InfoDialog.showInfoDialog(this, _("This is already the last circuit and thus cannot be moved down any more."));
+			InfoDialog.showInfoDialog(this, __("This is already the last circuit and thus cannot be moved down any more."));
 			return;
 		}
 		Circuit circuitMoved = circuitTableModel.circuits.remove(selectedCircuitIndex);
 		circuitTableModel.circuits.insertElementAt(circuitMoved, selectedCircuitIndex + 1);
 		
-		circuitTable.setRowSelectionInterval(selectedCircuitIndex + 1, selectedCircuitIndex + 1); 
-		circuitTable.updateUI();
+		circuitTable1.setRowSelectionInterval(selectedCircuitIndex + 1, selectedCircuitIndex + 1); 
+		circuitTable1.updateUI();
 	}
 
 	private void doCircuits_RemoveCircuit() {
 		// Remove a circuit
-		int selectedCircuitIndex = circuitTable.getSelectedRow();
+		int selectedCircuitIndex = circuitTable1.getSelectedRow();
 		if (selectedCircuitIndex == 0 && circuitTableModel.circuits.size() == 1) {
-			InfoDialog.showErrorDialog(this, _("Cannot remove the last circuit."));
+			InfoDialog.showErrorDialog(this, __("Cannot remove the last circuit."));
 			return;
 		}
 		circuitTableModel.circuits.remove(selectedCircuitIndex);
 		if (selectedCircuitIndex >= circuitTableModel.circuits.size())
 			--selectedCircuitIndex;
-		circuitTable.setRowSelectionInterval(selectedCircuitIndex, selectedCircuitIndex);
-		circuitTable.updateUI();
+		circuitTable1.setRowSelectionInterval(selectedCircuitIndex, selectedCircuitIndex);
+		circuitTable1.updateUI();
 		
 		switchCircuit(circuitTableModel.circuits.get(selectedCircuitIndex));
 	}
@@ -917,7 +911,7 @@ public class CircuitEditDialog extends JDialog {
 		Circuit newCircuit = new Circuit("New Circuit " + circuitNum++);
 		circuitTableModel.circuits.clear();
 		circuitTableModel.circuits.add(newCircuit);
-		circuitTable.updateUI();
+		circuitTable1.updateUI();
 		
 		switchCircuit(newCircuit);
 	}
@@ -925,14 +919,14 @@ public class CircuitEditDialog extends JDialog {
 	private void doCircuits_SaveCircuits() {
 		// Save all circuits
 		if (circuitTableModel.circuits.size() == 0) {
-			InfoDialog.showErrorDialog(this, _("Cannot save empty circuits."));
+			InfoDialog.showErrorDialog(this, __("Cannot save empty circuits."));
 			return;
 		}
 		try {
 			doSaveCircuits(null, circuitTableModel.circuits);
 		} catch (IOException e) {
 			e.printStackTrace();
-			InfoDialog.showErrorDialog(mainFrame, _("Cannot save the circuit due to: \r\n") + e.getMessage());
+			InfoDialog.showErrorDialog(mainFrame, __("Cannot save the circuit due to: \r\n") + e.getMessage());
 		}
 	}
 
@@ -940,16 +934,16 @@ public class CircuitEditDialog extends JDialog {
 		// Load all circuits
 		try {
 			doLoadCircuits(circuitTableModel.circuits, true);
-			circuitTable.updateUI();
+			circuitTable1.updateUI();
 			
 			switchCircuit(circuitTableModel.circuits.get(0));
 		} catch (Exception e) {
 			System.err.println("Error: " + e.getMessage());
-			InfoDialog.showErrorDialog(this, _("Cannot load circuits due to\r\n") + e.getMessage());
+			InfoDialog.showErrorDialog(this, __("Cannot load circuits due to\r\n") + e.getMessage());
 		}
 	}
 
-	protected void doCircuits_Command() {
+	protected void doCircuits_Calculate() {
 	}
 
 	protected void doCircuits_Command2() {
@@ -1102,9 +1096,9 @@ public class CircuitEditDialog extends JDialog {
 		public String getColumnName(int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return _("Circuit");
+				return __("Circuit");
 			case 1:
-				return _("zIndex");
+				return __("zIndex");
 			default:
 				return null;
 			}
@@ -1266,15 +1260,15 @@ public class CircuitEditDialog extends JDialog {
 		public String getColumnName(int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return _("Station");
+				return __("Station");
 			case 1:
-				return _("Distance");
+				return __("Distance");
 			case 2:
-				return _("Display Dist.");
+				return __("Display Dist.");
 			case 3:
-				return _("Level");
+				return __("Level");
 			case 4:
-				return _("Hidden");
+				return __("Hidden");
 			default:
 				return null;
 			}

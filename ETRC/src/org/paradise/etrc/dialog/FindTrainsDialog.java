@@ -1,13 +1,25 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoundedRangeModel;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
-import static org.paradise.etrc.ETRC._;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.skb.ETRCSKB;
@@ -38,13 +50,13 @@ public class FindTrainsDialog extends JDialog {
 	}
 
 	private void jbInit() throws Exception {
-		this.setTitle(_("Finding Train Information"));
+		this.setTitle(__("Finding Train Information"));
 
 		ImageIcon image = new ImageIcon(org.paradise.etrc.MainFrame.class.getResource("/pic/msg.png"));
 		JLabel imageLabel = new JLabel();
 		imageLabel.setIcon(image);
 		
-		msgLabel = new JLabel(_("Removing existing train data, please wait..."));
+		msgLabel = new JLabel(__("Removing existing train data, please wait..."));
 		msgLabel.setFont(new java.awt.Font("Dialog", 0, 12));
 
 		JPanel messagePanel = new JPanel();
@@ -90,7 +102,7 @@ public class FindTrainsDialog extends JDialog {
 			mainFrame.chart.clearTrains();
 			mainFrame.chartView.repaint();
 			
-			msgLabel.setText(_("Please wait while imporing train information..."));
+			msgLabel.setText(__("Please wait while imporing train information..."));
 			
 			ETRCSKB skb = mainFrame.getSKB();
 			Vector<Train> trains = skb.findTrains(mainFrame.chart.trunkCircuit);
@@ -101,7 +113,7 @@ public class FindTrainsDialog extends JDialog {
 				if(loadingTrain.isDownTrain(mainFrame.chart.trunkCircuit, false) > 0) {
 					mainFrame.chart.addTrain(loadingTrain);
 					
-					msgLabel.setText(String.format(_("Importing train information %s"), loadingTrain.getTrainName()));
+					msgLabel.setText(String.format(__("Importing train information %s"), loadingTrain.getTrainName()));
 					hold(50);
 				}
 			}

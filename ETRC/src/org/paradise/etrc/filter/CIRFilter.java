@@ -1,7 +1,8 @@
 package org.paradise.etrc.filter;
 
+import static org.paradise.etrc.ETRC.__;
+
 import java.io.File;
-import static org.paradise.etrc.ETRC._;
 
 public class CIRFilter extends javax.swing.filechooser.FileFilter {
 
@@ -21,7 +22,7 @@ public class CIRFilter extends javax.swing.filechooser.FileFilter {
 	}
 
 	public String getDescription() {
-		return _("Line Description File (*"+suffix+")");
+		return __("Line Description File (*"+suffix+")");
 	}
 }
 

@@ -1,13 +1,30 @@
 package org.paradise.etrc.wizard;
 
-import java.awt.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowEvent;
 
-import javax.swing.*;
-
-import static org.paradise.etrc.ETRC._;
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.InputMap;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 
 public abstract class WizardDialog extends JDialog {
 	private static final long serialVersionUID = -5409636948664788767L;
@@ -51,8 +68,8 @@ public abstract class WizardDialog extends JDialog {
 		lbNumberPic.setVerticalAlignment(JLabel.TOP);
 		lbNumberPic.setBorder(BorderFactory.createEmptyBorder(20, 2, 20, 2));
 		
-		JLabel lbStepTitle = new JLabel(String.format(_("Step %d: %s"), step, stepTitle));
-		lbStepTitle.setFont(new Font(_("FONT_NAME"), Font.PLAIN, 12));
+		JLabel lbStepTitle = new JLabel(String.format(__("Step %d: %s"), step, stepTitle));
+		lbStepTitle.setFont(new Font(__("FONT_NAME"), Font.PLAIN, 12));
 		lbStepTitle.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
 
 		JPanel right = new JPanel();
@@ -101,10 +118,10 @@ public abstract class WizardDialog extends JDialog {
 		btPane.setLayout(new BorderLayout());
 		btPane.add(right, BorderLayout.EAST);
 		
-		finishButton = new JButton(_("Finish"));
-		cancelButton = new JButton(_("Cancel"));
-		nextButton = new JButton(_("Next >"));
-		prevButton = new JButton(_("< Previous"));
+		finishButton = new JButton(__("Finish"));
+		cancelButton = new JButton(__("Cancel"));
+		nextButton = new JButton(__("Next >"));
+		prevButton = new JButton(__("< Previous"));
 		
 		finishButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {

@@ -1,6 +1,7 @@
 package org.paradise.etrc.view.sheet;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Component;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;

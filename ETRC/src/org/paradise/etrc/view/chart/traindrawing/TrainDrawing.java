@@ -1,12 +1,18 @@
 package org.paradise.etrc.view.chart.traindrawing;
 
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Vector;
 
-import java.awt.*;
-
-import org.paradise.etrc.data.*;
+import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.Stop;
+import org.paradise.etrc.data.Train;
 import org.paradise.etrc.view.chart.ChartView;
 
 /**

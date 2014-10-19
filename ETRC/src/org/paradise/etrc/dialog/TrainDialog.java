@@ -1,35 +1,48 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
+import static org.paradise.etrc.ETRC.__;
 
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelListener;
-
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.io.InputStreamReader;
-import java.io.BufferedReader;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.net.URL;
-import java.net.Proxy;
+import java.io.OutputStreamWriter;
 import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.URL;
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import javax.swing.JButton;
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.*;
+import org.paradise.etrc.data.Stop;
+import org.paradise.etrc.data.Train;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.TRFFilter;
-import org.paradise.etrc.dialog.MessageBox;
-
-import static org.paradise.etrc.ETRC._;
 
 
 /**
@@ -79,7 +92,7 @@ public class TrainDialog extends JDialog {
 		table.setFont(new Font("Dialog", 0, 12));
 		table.getTableHeader().setFont(new Font("Dialog", 0, 12));
 		
-		JButton btColor = new JButton(_("Color")); 
+		JButton btColor = new JButton(__("Color")); 
 		btColor.setFont(new Font("dialog", 0, 12));
 		btColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -90,7 +103,7 @@ public class TrainDialog extends JDialog {
 			}
 		});
 
-		JButton btLoad = new JButton(_("Load"));
+		JButton btLoad = new JButton(__("Load"));
 		btLoad.setFont(new Font("dialog", 0, 12));
 		btLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -112,7 +125,7 @@ public class TrainDialog extends JDialog {
 			}
 		});
 
-		JButton btSave = new JButton(_("Save"));
+		JButton btSave = new JButton(__("Save"));
 		btSave.setFont(new Font("dialog", 0, 12));
 		btSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -128,7 +141,7 @@ public class TrainDialog extends JDialog {
 			}
 		});
 
-		JButton btOK = new JButton(_("OK"));
+		JButton btOK = new JButton(__("OK"));
 		btOK.setFont(new Font("dialog", 0, 12));
 		btOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -146,7 +159,7 @@ public class TrainDialog extends JDialog {
 			}
 		});
 
-		JButton btCancel = new JButton(_("Cancel"));
+		JButton btCancel = new JButton(__("Cancel"));
 		btCancel.setFont(new Font("dialog", 0, 12));
 		btCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -156,12 +169,12 @@ public class TrainDialog extends JDialog {
 			}
 		});
 
-		JButton btWeb = new JButton(_("Get From Web"));
+		JButton btWeb = new JButton(__("Get From Web"));
 		btWeb.setFont(new Font("dialog", 0, 12));
 		btWeb.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			    if (tfName.getText().trim().equals("")) {
-				new MessageBox(_("Must input train number before trying to get data from web.")).showMessage();
+				new MessageBox(__("Must input train number before trying to get data from web.")).showMessage();
 				return;
 			    }
 			    if (table.getCellEditor() != null)
@@ -192,7 +205,7 @@ public class TrainDialog extends JDialog {
 					table.updateUI();
 			    }
 			    else {
-				new MessageBox(_("Unable to get train information from web.")).showMessage();
+				new MessageBox(__("Unable to get train information from web.")).showMessage();
 			    }
 				
 			}
@@ -216,7 +229,7 @@ public class TrainDialog extends JDialog {
 	}
 	
 	private JPanel buildTrainPanel() {
-		JButton btDel = new JButton(_("Delete"));
+		JButton btDel = new JButton(__("Delete"));
 		btDel.setFont(new Font("dialog", 0, 12));
 		btDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -229,12 +242,12 @@ public class TrainDialog extends JDialog {
 			}
 		});
 
-		JButton btAdd = new JButton(_("Add(Before)"));
+		JButton btAdd = new JButton(__("Add(Before)"));
 		btAdd.setFont(new Font("dialog", 0, 12));
 		btAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				//        table.getCellEditor().stopCellEditing();
-				String name = _("Station");
+				String name = __("Station");
 				String arrive = "00:00";
 				String leave = "00:00";
 				((TrainTableModel)table.getModel()).myTrain.insertStop(new Stop(name, arrive, leave, false), 
@@ -244,7 +257,7 @@ public class TrainDialog extends JDialog {
 			}
 		});
 
-		JButton btApp = new JButton(_("Add(After)"));
+		JButton btApp = new JButton(__("Add(After)"));
 		btApp.setFont(new Font("dialog", 0, 12));
 		btApp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -253,7 +266,7 @@ public class TrainDialog extends JDialog {
 				if(curIndex<0)
 					return;
 				
-				String name = _("Station");
+				String name = __("Station");
 				String arrive = "00:00";
 				String leave = "00:00";
 				((TrainTableModel)table.getModel()).myTrain.insertStop(new Stop(name, arrive, leave, false), curIndex+1);
@@ -267,11 +280,11 @@ public class TrainDialog extends JDialog {
 		buttonPanel.add(btApp);
 		buttonPanel.add(btDel);
 		
-		JLabel lbNameU = new JLabel(_("Up-going:"));
+		JLabel lbNameU = new JLabel(__("Up-going:"));
 		lbNameU.setFont(new Font("dialog", 0, 12));
-		JLabel lbNameD = new JLabel(_("Down-going"));
+		JLabel lbNameD = new JLabel(__("Down-going"));
 		lbNameD.setFont(new Font("dialog", 0, 12));
-		JLabel lbName = new JLabel(_("Train number:"));
+		JLabel lbName = new JLabel(__("Train number:"));
 		lbName.setFont(new Font("dialog", 0, 12));
 		
 		tfNameU = new JTextField(4);
@@ -308,13 +321,13 @@ public class TrainDialog extends JDialog {
 		JFileChooser chooser = new JFileChooser();
 		ETRC.setFont(chooser);
 
-		chooser.setDialogTitle(_("Save Train"));
+		chooser.setDialogTitle(__("Save Train"));
 		chooser.setDialogType(JFileChooser.SAVE_DIALOG);
 		chooser.setMultiSelectionEnabled(false);
 		chooser.addChoosableFileFilter(new CSVFilter());
 		chooser.addChoosableFileFilter(new TRFFilter());
-		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-		chooser.setApproveButtonText(_("Save "));
+		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+		chooser.setApproveButtonText(__("Save "));
 		try {
 			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
@@ -347,12 +360,12 @@ public class TrainDialog extends JDialog {
 		JFileChooser chooser = new JFileChooser();
 		ETRC.setFont(chooser);
 
-		chooser.setDialogTitle(_("Load Train Information"));
+		chooser.setDialogTitle(__("Load Train Information"));
 		chooser.setDialogType(JFileChooser.OPEN_DIALOG);
 		chooser.setMultiSelectionEnabled(false);
 		chooser.addChoosableFileFilter(new CSVFilter());
 		chooser.addChoosableFileFilter(new TRFFilter());
-		chooser.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
 			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
@@ -468,7 +481,7 @@ public class TrainDialog extends JDialog {
 		};
 
 		JDialog dialog = JColorChooser.createDialog(mainFrame,
-				_("Select the color for the line"), true, // modal
+				__("Select the color for the line"), true, // modal
 				colorChooser, listener, // OK button handler
 				null); // no CANCEL button handler
 		ETRC.setFont(dialog);
@@ -617,13 +630,13 @@ public class TrainDialog extends JDialog {
 		public String getColumnName(int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return _("Station");
+				return __("Station");
 			case 1:
-				return _("Arrival");
+				return __("Arrival");
 			case 2:
-				return _("Leave");
+				return __("Leave");
 			case 3:
-				return _("Passenger");
+				return __("Passenger");
 			default:
 				return null;
 			}

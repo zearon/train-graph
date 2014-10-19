@@ -1,13 +1,24 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import static org.paradise.etrc.ETRC.__;
 
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 //import com.borland.jbcl.layout.*;
-
-import org.paradise.etrc.*;
-import static org.paradise.etrc.ETRC._;
+import org.paradise.etrc.MainFrame;
 
 /**
  * @author lguo@sina.com
@@ -30,10 +41,10 @@ MainFrame mainFrame = null;
   JPanel jPanel3 = new JPanel();
   GridBagLayout gridBagLayout2 = new GridBagLayout();
 
-  String defaultStatus = _("Input the train you want to find");
+  String defaultStatus = __("Input the train you want to find");
 
   public FindTrainDialog(Frame frame) {
-    super(frame, _("Find a Train"), false);
+    super(frame, __("Find a Train"), false);
 
     if(frame instanceof MainFrame) {
       mainFrame = (MainFrame) frame;
@@ -51,12 +62,12 @@ MainFrame mainFrame = null;
   private void jbInit() throws Exception {
     panel.setLayout(verticalFlowLayout1);
     this.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
-    this.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    this.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     panel.setFont(new java.awt.Font("Dialog", 0, 12));
     panel.setBorder(BorderFactory.createRaisedBevelBorder());
 
-    lbTrainName.setText(_("Train number to find:"));
-    lbTrainName.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    lbTrainName.setText(__("Train number to find:"));
+    lbTrainName.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     lbTrainName.setPreferredSize(new Dimension(8, 15));
     lbTrainName.setToolTipText("");
     lbTrainName.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -68,20 +79,20 @@ MainFrame mainFrame = null;
     tfTrainName.setActionCommand("Button_Find");
     tfTrainName.addActionListener(this);
 
-    btFind.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-    btFind.setText(_("Find"));
+    btFind.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+    btFind.setText(__("Find"));
     btFind.setActionCommand("Button_Find");
     btFind.addActionListener(this);
     btFind.requestFocus(false);
 
-    btClear.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-    btClear.setText(_("Clear"));
+    btClear.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+    btClear.setText(__("Clear"));
     btClear.setActionCommand("Button_Clear");
     btClear.addActionListener(this);
 
-    statusBar.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    statusBar.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     statusBar.setBorder(BorderFactory.createLoweredBevelBorder());
-    statusBar.setText(_("Input the train you want to find"));
+    statusBar.setText(__("Input the train you want to find"));
     verticalFlowLayout1.setHgap(2);
     verticalFlowLayout1.setVgap(2);
 
@@ -136,7 +147,7 @@ MainFrame mainFrame = null;
     if(mainFrame.chartView.findAndMoveToTrain(trainName))
       this.statusBar.setText(trainName);
     else {
-      this.statusBar.setText(_("Not found"));
+      this.statusBar.setText(__("Not found"));
       //doClear();
     }
   }

@@ -1,10 +1,15 @@
 package org.paradise.etrc.view.sheet;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import javax.swing.*;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -25,7 +30,7 @@ public class SheetView extends JPanel {
 	
 	MainFrame mainFrame;
 	public SheetTable table;
-	JList rowHeader;
+	JList<?> rowHeader;
 	SheetHeaderRanderer conner;
 
 	public SheetView(MainFrame _mainFrame) {
@@ -75,9 +80,9 @@ public class SheetView extends JPanel {
 //		return controlPanel;
 //	}
 		
-	private JList buildeRowHeader(final JTable table) {
+	private JList<?> buildeRowHeader(final JTable table) {
 		RowHeaderModel listModel = new RowHeaderModel(mainFrame.chart);
-        JList rowHeader = new JList(listModel);
+        JList<?> rowHeader = new JList<Object>(listModel);
         rowHeader.setFixedCellWidth(80);
         rowHeader.setFixedCellHeight(table.getRowHeight());
         rowHeader.setCellRenderer(new RowHeaderRenderer(table));
@@ -89,7 +94,7 @@ public class SheetView extends JPanel {
 
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() >= 2 && me.getButton() == MouseEvent.BUTTON1) {
-					String rowHeaderName = (String) ((JList)me.getSource()).getSelectedValue();
+					String rowHeaderName = (String) ((JList<?>)me.getSource()).getSelectedValue();
 					String staName = rowHeaderName.substring(0, rowHeaderName.length()-3);
 					Station station = mainFrame.chart.trunkCircuit.getStation(staName);
 //					new MessageBox(mainFrame, "TODO: 给出 "
@@ -103,7 +108,7 @@ public class SheetView extends JPanel {
         
         rowHeader.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent lse) {
-				int row = ((JList) lse.getSource()).getSelectedIndex();
+				int row = ((JList<?>) lse.getSource()).getSelectedIndex();
 				table.changeSelection(row, table.getSelectedColumn(), false, false);
 				table.editCellAt(row, table.getSelectedColumn());
 			}

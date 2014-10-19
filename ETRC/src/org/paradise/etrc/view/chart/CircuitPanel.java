@@ -1,12 +1,19 @@
 package org.paradise.etrc.view.chart;
 
-import java.awt.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
-import java.awt.event.*;
 
-import static org.paradise.etrc.ETRC._;
-import org.paradise.etrc.data.*;
+import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.Station;
 import org.paradise.etrc.slice.ChartSlice;
 
 /**
@@ -36,7 +43,7 @@ public class CircuitPanel extends JPanel {
 	}
 
 	void jbInit() throws Exception {
-		this.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		this.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		this.setLayout(borderLayout1);
 		this.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {

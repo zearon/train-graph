@@ -1,5 +1,7 @@
 package org.paradise.etrc.wizard.addtrain;
 
+import static org.paradise.etrc.ETRC.__;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -22,8 +24,6 @@ import javax.swing.text.DefaultCaret;
 
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.wizard.WizardDialog;
-
-import static org.paradise.etrc.ETRC._;
 
 public class WZTrainNameInput extends WizardDialog {
 	private static final long serialVersionUID = -874417475779045052L;
@@ -49,8 +49,8 @@ public class WZTrainNameInput extends WizardDialog {
 		private static final long serialVersionUID = -5916279280631048174L;
 
 		private JTextField tfFull;
-		private JComboBox  cbDown;
-		private JComboBox  cbUp;
+		private JComboBox<String>  cbDown;
+		private JComboBox<String>  cbUp;
 		private JTextArea info;
 		
 		private String[] myNames = new String[4];
@@ -84,12 +84,12 @@ public class WZTrainNameInput extends WizardDialog {
 			if(src.equals(tfFull)) {
 				canNext = false;
 				updateButtonState();
-				info.setText(_("  Please input full train number, the separator for the train number can be slash, comma or period, <Tab> to finish input"));
+				info.setText(__("  Please input full train number, the separator for the train number can be slash, comma or period, <Tab> to finish input"));
 				info.setForeground(new Color(40,80,40));
 			}
 			else if(src.equals(cbDown)) {
 				if(cbDown.getModel().getSize() >= 2) {
-					info.setText(_("  Select the down-going train number for this circuit, use Mouse or Up/Down arrow key, <Tab> to finish selection."));
+					info.setText(__("  Select the down-going train number for this circuit, use Mouse or Up/Down arrow key, <Tab> to finish selection."));
 					info.setForeground(new Color(80,40,40));
 				}
 				else
@@ -97,18 +97,18 @@ public class WZTrainNameInput extends WizardDialog {
 			}
 			else if(src.equals(cbUp)) {
 				if(cbUp.getModel().getSize() >= 2) {
-					info.setText(_("  Select the up-going train number for this circuit, use Mouse or Up/Down arrow key, <Tab> to finish selection."));
+					info.setText(__("  Select the up-going train number for this circuit, use Mouse or Up/Down arrow key, <Tab> to finish selection."));
 					info.setForeground(new Color(40,40,80));
 				}
 				else
 					nextButton.requestFocus();
 			}
 			else if(src.equals(nextButton)) {
-				info.setText(String.format(_("  Next Step: Input or read train information for the train %s. (Press Enter or Spacebar)"), tfFull.getText()));
+				info.setText(String.format(__("  Next Step: Input or read train information for the train %s. (Press Enter or Spacebar)"), tfFull.getText()));
 				info.setForeground(new Color(40,80,40));
 			}
 			else if(src.equals(cancelButton)) {
-				info.setText(_("  Cancel adding train."));
+				info.setText(__("  Cancel adding train."));
 				info.setForeground(new Color(40,80,40));
 			}
 		}
@@ -133,16 +133,16 @@ public class WZTrainNameInput extends WizardDialog {
 			JPanel input = new JPanel();
 			
 			tfFull = new JTextField("");
-			cbDown = new JComboBox();
-			cbUp   = new JComboBox();
+			cbDown = new JComboBox<String>();
+			cbUp   = new JComboBox<String>();
 			
 			JPanel down = new JPanel();
 			down.setLayout(new GridLayout(1,2));
-			down.add(createNamedPanel(_("Down-going"), cbDown));
-			down.add(createNamedPanel(_("Up-going"), cbUp));
+			down.add(createNamedPanel(__("Down-going"), cbDown));
+			down.add(createNamedPanel(__("Up-going"), cbUp));
 			
 			input.setLayout(new GridLayout(2,1));
-			input.add(createNamedPanel(_("Train Number"), tfFull));
+			input.add(createNamedPanel(__("Train Number"), tfFull));
 			input.add(down);
 			
 			return input;
@@ -201,8 +201,8 @@ public class WZTrainNameInput extends WizardDialog {
 			if(upNames.size() == 0 && downNames.size() == 0)
 				return false;
 			
-			cbDown.setModel(new DefaultComboBoxModel(downNames));
-			cbUp.setModel(new DefaultComboBoxModel(upNames));
+			cbDown.setModel(new DefaultComboBoxModel<String>(downNames));
+			cbUp.setModel(new DefaultComboBoxModel<String>(upNames));
 
 			return true;
 		}
@@ -211,7 +211,7 @@ public class WZTrainNameInput extends WizardDialog {
 			JPanel pane = new JPanel();
 			
 			JLabel lbName = new JLabel(name);
-			lbName.setFont(new Font(_("FONT_NAME"), Font.PLAIN, 12));
+			lbName.setFont(new Font(__("FONT_NAME"), Font.PLAIN, 12));
 			
 			pane.setLayout(new BorderLayout());
 			pane.add(lbName, BorderLayout.WEST);
@@ -226,7 +226,7 @@ public class WZTrainNameInput extends WizardDialog {
 			info = new JTextArea();
 			
 //			info.setText("    请输入全车次，复车次的间隔符可以是左右斜杠，顿号，逗号，句号（点），后续车次可以只输入最后一位或者两位，Tab键结束输入。");
-			info.setFont(new Font(_("FONT_NAME"), Font.PLAIN, 12));
+			info.setFont(new Font(__("FONT_NAME"), Font.PLAIN, 12));
 			info.setCaret(new DefaultCaret() {  
 				private static final long serialVersionUID = 1L;
 				public boolean isVisible() {  

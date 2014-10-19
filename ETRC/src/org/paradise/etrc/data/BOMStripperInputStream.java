@@ -3,9 +3,9 @@
 
 package org.paradise.etrc.data;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
-import java.io.IOException;
 
 public class BOMStripperInputStream extends PushbackInputStream
 {

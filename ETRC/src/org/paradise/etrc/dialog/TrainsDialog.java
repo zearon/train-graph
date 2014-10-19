@@ -1,15 +1,36 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
+import static org.paradise.etrc.ETRC.__;
 
-import javax.swing.*;
-import javax.swing.table.*;
-import javax.swing.event.TableModelListener;
-
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
-import javax.swing.event.*;
+import javax.swing.AbstractCellEditor;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
@@ -17,8 +38,6 @@ import org.paradise.etrc.data.Chart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.view.chart.ChartView;
-
-import static org.paradise.etrc.ETRC._;
 
 /**
  * @author lguo@sina.com
@@ -37,7 +56,7 @@ public class TrainsDialog extends JDialog {
 	JCheckBox cbUnderColor;
 
 	public TrainsDialog(MainFrame _mainFrame) {
-		super(_mainFrame, _("Train Information"), true);
+		super(_mainFrame, __("Train Information"), true);
 		
 		mainFrame = _mainFrame;
 		chart = mainFrame.chart;
@@ -63,7 +82,7 @@ public class TrainsDialog extends JDialog {
 
 		cbUnderColor = new JCheckBox();
 		cbUnderColor.setFont(new java.awt.Font("Dialog", 0, 12));
-		cbUnderColor.setText(_("Display opposite direction train using watermark"));
+		cbUnderColor.setText(__("Display opposite direction train using watermark"));
 		cbUnderColor.setSelected(!(mainFrame.chartView.underDrawingColor == null));
 		cbUnderColor.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -85,7 +104,7 @@ public class TrainsDialog extends JDialog {
 		colorPanel.add(spColorTable, BorderLayout.CENTER);
 		colorPanel.add(underColorPanel, BorderLayout.SOUTH);
 
-		JButton btOK = new JButton(_("OK"));
+		JButton btOK = new JButton(__("OK"));
 		btOK.setFont(new Font("dialog", 0, 12));
 		btOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -102,7 +121,7 @@ public class TrainsDialog extends JDialog {
 //			}
 //		});
 
-		JButton btAdd = new JButton(_("Add"));
+		JButton btAdd = new JButton(__("Add"));
 		btAdd.setFont(new Font("dialog", 0, 12));
 		btAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -110,7 +129,7 @@ public class TrainsDialog extends JDialog {
 			}
 		});
 		
-		JButton btLoad = new JButton(_("Load"));
+		JButton btLoad = new JButton(__("Load"));
 		btLoad.setFont(new Font("dialog", 0, 12));
 		btLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -118,7 +137,7 @@ public class TrainsDialog extends JDialog {
 			}
 		});
 		
-		JButton btEdit = new JButton(_("Edit"));
+		JButton btEdit = new JButton(__("Edit"));
 		btEdit.setFont(new Font("dialog", 0, 12));
 		btEdit.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -129,7 +148,7 @@ public class TrainsDialog extends JDialog {
 			}
 		});
 		
-		JButton btDel = new JButton(_("Delete"));
+		JButton btDel = new JButton(__("Delete"));
 		btDel.setFont(new Font("dialog", 0, 12));
 		btDel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -195,9 +214,9 @@ public class TrainsDialog extends JDialog {
 //		newTrain.getStops()[0] = new Stop(_("Departure"), "00:00", "00:00", false);
 //		newTrain.getStops()[1] = new Stop(_("Middle"), "00:00", "00:00", false);
 //		newTrain.getStops()[2] = new Stop(_("Terminal"), "00:00", "00:00", false);
-		newTrain.appendStop(new Stop(_("Departure"), "00:00", "00:00", false));
-		newTrain.appendStop(new Stop(_("Middle"), "00:00", "00:00", false));
-		newTrain.appendStop(new Stop(_("Terminal"), "00:00", "00:00", false));
+		newTrain.appendStop(new Stop(__("Departure"), "00:00", "00:00", false));
+		newTrain.appendStop(new Stop(__("Middle"), "00:00", "00:00", false));
+		newTrain.appendStop(new Stop(__("Terminal"), "00:00", "00:00", false));
 		TrainDialog dialog = new TrainDialog(mainFrame, newTrain);
 
 		dialog.editTrain();
@@ -205,7 +224,7 @@ public class TrainsDialog extends JDialog {
 		if(!dialog.isCanceled) {
 			Train addingTrain = dialog.getTrain();
 			if(chart.isLoaded(addingTrain)) {
-				if(new YesNoBox(mainFrame, String.format(_("%s is already in the graph. Overwrite?"), addingTrain.getTrainName())).askForYes())
+				if(new YesNoBox(mainFrame, String.format(__("%s is already in the graph. Overwrite?"), addingTrain.getTrainName())).askForYes())
 					chart.updateTrain(addingTrain);
 			}
 			else {
@@ -460,13 +479,13 @@ public class TrainsDialog extends JDialog {
 		public String getColumnName(int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return _("Number");
+				return __("Number");
 			case 1:
-				return _("Departure");
+				return __("Departure");
 			case 2:
-				return _("Terminal");
+				return __("Terminal");
 			case 3:
-				return _("Color");
+				return __("Color");
 			default:
 				return null;
 			}

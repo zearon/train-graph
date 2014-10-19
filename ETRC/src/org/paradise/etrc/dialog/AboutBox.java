@@ -1,10 +1,22 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRC._;
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 /**
  * @author lguo@sina.com
@@ -50,23 +62,23 @@ public class AboutBox extends JDialog implements ActionListener {
 		image1 = new ImageIcon(org.paradise.etrc.MainFrame.class
 				.getResource("/pic/about.png"));
 		imageLabel.setIcon(image1);
-		this.setTitle(_("About"));
+		this.setTitle(__("About"));
 		panel1.setLayout(gridBagLayout1);
 		label1.setFont(new java.awt.Font("Dialog", 0, 12));
-		label1.setText(_("LGuo's Train Graph"));
+		label1.setText(__("LGuo's Train Graph"));
 
 		label2.setText("Version 2.60");
 		label3.setText("Build 20100916 Revision 102");
 
 		label4.setFont(new java.awt.Font("Dialog", 0, 12));
-		label4.setText(_("Author: Guo Lei (HASEA ID:lguo)"));
-		label5.setText(_("Thanks to: achen1 on HASEA"));
+		label4.setText(__("Author: Guo Lei (HASEA ID:lguo)"));
+		label5.setText(__("Thanks to: achen1 on HASEA"));
 		label5.setFont(new java.awt.Font("Dialog", 0, 12));
 		label6.setText("http://train-graph.googlecode.com    ");
 		label6.setFont(new java.awt.Font("Dialog", 0, 12));
 
 		button1.setActionCommand("Ok");
-		button1.setText(_("OK"));
+		button1.setText(__("OK"));
 		button1.setFont(new java.awt.Font("Dialog", 0, 12));
 		button1.addActionListener(this);
 

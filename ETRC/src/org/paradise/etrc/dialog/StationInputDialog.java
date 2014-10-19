@@ -1,14 +1,26 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
-
-import static org.paradise.etrc.ETRC._;
 
 /**
  * @author lguo@sina.com
@@ -41,19 +53,19 @@ public class StationInputDialog extends JDialog implements ActionListener {
 	}
 
 	public StationInputDialog(MainFrame frame) {
-		this(frame, _("Input Station Name"), false);
+		this(frame, __("Input Station Name"), false);
 		mainFrame = frame;
 	}
 
 	private void jbInit() throws Exception {
 		panel.setLayout(new BorderLayout());
 		this.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
-		this.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		this.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		panel.setFont(new java.awt.Font("Dialog", 0, 12));
 		panel.setBorder(BorderFactory.createRaisedBevelBorder());
 
-		lbStationName.setText(_("Station name:"));
-		lbStationName.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		lbStationName.setText(__("Station name:"));
+		lbStationName.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		lbStationName.setPreferredSize(new Dimension(8, 15));
 		lbStationName.setToolTipText("");
 		lbStationName.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -65,14 +77,14 @@ public class StationInputDialog extends JDialog implements ActionListener {
 		tfStationName.setActionCommand("Button_Find");
 		tfStationName.addActionListener(this);
 
-		btFind.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-		btFind.setText(_("Find"));
+		btFind.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+		btFind.setText(__("Find"));
 		btFind.setActionCommand("Button_Find");
 		btFind.addActionListener(this);
 		btFind.requestFocus(false);
 
-		btCancel.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-		btCancel.setText(_("Cancel"));
+		btCancel.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+		btCancel.setText(__("Cancel"));
 		btCancel.setActionCommand("Button_Cancel");
 		btCancel.addActionListener(this);
 

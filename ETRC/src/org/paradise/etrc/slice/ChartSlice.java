@@ -1,6 +1,8 @@
 package org.paradise.etrc.slice;
 
-import java.util.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Vector;
 
 import org.paradise.etrc.data.Chart;
 import org.paradise.etrc.data.Station;

@@ -3,7 +3,10 @@ package org.paradise.etrc.slice;
 import java.awt.Point;
 import java.util.Vector;
 
-import org.paradise.etrc.data.*;
+import org.paradise.etrc.data.Circuit;
+import org.paradise.etrc.data.Station;
+import org.paradise.etrc.data.Stop;
+import org.paradise.etrc.data.Train;
 
 public class TrainSlice {
 	Train train;

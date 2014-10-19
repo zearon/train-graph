@@ -1,18 +1,42 @@
 package org.paradise.etrc.view.chart;
 
-import java.util.*;
+import static org.paradise.etrc.ETRC.__;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.Point;
+import java.awt.PopupMenu;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.TimerTask;
+import java.util.Vector;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.JColorChooser;
+import javax.swing.JDialog;
+import javax.swing.JPanel;
+import javax.swing.JToolTip;
 
-import static org.paradise.etrc.ETRC._;
 import org.paradise.etrc.ETRC;
-import org.paradise.etrc.data.*;
-import org.paradise.etrc.dialog.*;
+import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.Station;
+import org.paradise.etrc.data.Stop;
+import org.paradise.etrc.data.Train;
+import org.paradise.etrc.dialog.TrainDialog;
+import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.slice.ChartSlice;
 import org.paradise.etrc.view.chart.traindrawing.TrainDrawing;
 import org.paradise.etrc.view.chart.traindrawing.TrainLine;
@@ -211,7 +235,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	
 	void jbInit() throws Exception {
 		this.setBackground(Color.white);
-		this.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+		this.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		this.setDebugGraphicsOptions(0);
 		this.setLayout(new BorderLayout());
 		this.addMouseMotionListener(this);
@@ -672,7 +696,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 //		}
 		
 		//菜单项
-		MenuItem miNewTrain = new MenuItem(_("Add New Train"));
+		MenuItem miNewTrain = new MenuItem(__("Add New Train"));
 		miNewTrain.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doAddNewTrain();
@@ -684,31 +708,31 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 //				editActiveTrain();
 		//	}
 		//});
-		MenuItem miGif = new MenuItem(_("Export Graph..."));
+		MenuItem miGif = new MenuItem(__("Export Graph..."));
 		miGif.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ETRC.getInstance().getMainFrame().doExportChart();
 			}
 		});
-		MenuItem miFindTrains = new MenuItem(_("Load Train..."));
+		MenuItem miFindTrains = new MenuItem(__("Load Train..."));
 		miFindTrains.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ETRC.getInstance().getMainFrame().doLoadTrain();
 			}
 		});
-		MenuItem miLoad = new MenuItem(_("Open..."));
+		MenuItem miLoad = new MenuItem(__("Open..."));
 		miLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ETRC.getInstance().getMainFrame().doLoadChart();
 			}
 		});
-		MenuItem miSave = new MenuItem(_("Save"));
+		MenuItem miSave = new MenuItem(__("Save"));
 		miSave.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ETRC.getInstance().getMainFrame().doSaveChart();
 			}
 		});
-		MenuItem miSaveAs = new MenuItem(_("Save As..."));
+		MenuItem miSaveAs = new MenuItem(__("Save As..."));
 		miSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ETRC.getInstance().getMainFrame().doSaveChartAs();
@@ -741,25 +765,25 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 			return;
 		
 		//菜单项
-		MenuItem miDelTrain = new MenuItem(_("Delete"));
+		MenuItem miDelTrain = new MenuItem(__("Delete"));
 		miDelTrain.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doDeleteActiveTrain();
 			}
 		});
-		MenuItem miEditTimes = new MenuItem(_("Edit Time Table"));
+		MenuItem miEditTimes = new MenuItem(__("Edit Time Table"));
 		miEditTimes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doEditActiveTrain();
 			}
 		});
-		MenuItem miColor = new MenuItem(_("Change Color"));
+		MenuItem miColor = new MenuItem(__("Change Color"));
 		miColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				doSetColor();
 			}
 		});
-		MenuItem miTrainSlice = new MenuItem(_("Train Slice"));
+		MenuItem miTrainSlice = new MenuItem(__("Train Slice"));
 		miTrainSlice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new ChartSlice(chartView.mainFrame.chart).makeTrainSlice(chartView.activeTrain);
@@ -795,7 +819,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 			
 			Chart chart = chartView.mainFrame.chart;
 			if(chart.containTrain(train)) {
-				if(new YesNoBox(chartView.mainFrame, String.format(_("Train %s is already in the graph, overwrite?"), train.getTrainName())).askForYes()) {
+				if(new YesNoBox(chartView.mainFrame, String.format(__("Train %s is already in the graph, overwrite?"), train.getTrainName())).askForYes()) {
 					chartView.mainFrame.chart.delTrain(train);
 					chartView.addTrain(train);
 				}
@@ -816,7 +840,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		};
 
 		JDialog dialog = JColorChooser.createDialog(chartView.mainFrame,
-				_("Select the color for the line"), true, // modal
+				__("Select the color for the line"), true, // modal
 				colorChooser, listener, // OK button handler
 				null); // no CANCEL button handler
 		colorChooser.setColor(chartView.activeTrainDrawing.train.color);

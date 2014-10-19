@@ -11,7 +11,7 @@ import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.table.JTableHeader;
 
-public class RowHeaderRenderer extends JLabel implements ListCellRenderer {
+public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object> {
 	private static final long serialVersionUID = -3720951686492113933L;
 
 	JTable table;
@@ -36,7 +36,7 @@ public class RowHeaderRenderer extends JLabel implements ListCellRenderer {
     	g.drawLine(getWidth()-1, 0, getWidth()-1, getHeight());
     }
     
-	public Component getListCellRendererComponent(JList list, Object value,
+	public Component getListCellRendererComponent(JList<?> list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 
 		setText((value == null) ? "" : value.toString());

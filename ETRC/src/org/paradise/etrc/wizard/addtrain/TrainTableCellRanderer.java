@@ -1,6 +1,6 @@
 package org.paradise.etrc.wizard.addtrain;
 
-import java.awt.*;
+import java.awt.Component;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;

@@ -1,9 +1,10 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
-import javax.swing.*;
+import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRC._;
+import java.awt.Component;
+
+import javax.swing.JOptionPane;
 
 /**
  * @author lguo@sina.com
@@ -14,6 +15,7 @@ public class InfoDialog /* extends JDialog */ {
   /**
 	 * 
 	 */
+	@SuppressWarnings("unused")
 	private static final long serialVersionUID = 4118036852990630326L;
 //JPanel panel1 = new JPanel();
 //  BorderLayout borderLayout1 = new BorderLayout();
@@ -30,11 +32,11 @@ public class InfoDialog /* extends JDialog */ {
 //  }
   
   public static void showErrorDialog(Component parent, String msg) {
-	  JOptionPane.showMessageDialog(parent, msg, _("Error"), JOptionPane.ERROR_MESSAGE);
+	  JOptionPane.showMessageDialog(parent, msg, __("Error"), JOptionPane.ERROR_MESSAGE);
   }
   
   public static void showInfoDialog(Component parent, String msg) {
-	  JOptionPane.showMessageDialog(parent, msg, _("Tip"), JOptionPane.INFORMATION_MESSAGE);
+	  JOptionPane.showMessageDialog(parent, msg, __("Tip"), JOptionPane.INFORMATION_MESSAGE);
   }
 
 //  public InfoDialog() {

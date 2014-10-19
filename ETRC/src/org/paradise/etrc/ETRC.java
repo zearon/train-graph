@@ -1,12 +1,17 @@
 package org.paradise.etrc;
 
-import javax.swing.UIManager;
-import java.awt.*;
-import java.util.ResourceBundle;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Toolkit;
 import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.JComponent;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.border.TitledBorder;
 
 
 /**
@@ -30,7 +35,7 @@ public class ETRC {
 	  return frame;
   }
   
-  public static String _(String str) {
+  public static String __(String str) {
 	  if (res == null) {
 		  return str; 
 	  }

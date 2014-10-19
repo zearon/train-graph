@@ -1,5 +1,7 @@
 package org.paradise.etrc.dialog;
 
+import static org.paradise.etrc.ETRC.__;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -8,13 +10,15 @@ import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.EmptyBorder;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.skb.ETRCLCB;
-
-import static org.paradise.etrc.ETRC._;
 
 public class XianluSelectDialog extends JDialog {
 	private static final long serialVersionUID = 1389706992939223725L;
@@ -24,7 +28,7 @@ public class XianluSelectDialog extends JDialog {
 	private JButton[] btChar;
 	private JButton btSearch;
 	
-	private JList xlList;
+	private JList<String> xlList;
 	
 //	private Vector curXianlu;
 	private String xianlu;
@@ -34,7 +38,7 @@ public class XianluSelectDialog extends JDialog {
 	public boolean isCanceled = false;
 	
 	public XianluSelectDialog(MainFrame _mainFrame){
-		super(_mainFrame, _("Circuit Selection"), true);
+		super(_mainFrame, __("Circuit Selection"), true);
 		
 		mainFrame = _mainFrame;
 		lcb = mainFrame.getLCB();
@@ -48,7 +52,7 @@ public class XianluSelectDialog extends JDialog {
 	}
 	
 	private void jbInit() throws Exception {
-		this.setTitle(_("Circuit Selection"));
+		this.setTitle(__("Circuit Selection"));
 		btChar = new JButton[27];
 		
 		JPanel buttonPanel = new JPanel();
@@ -62,8 +66,8 @@ public class XianluSelectDialog extends JDialog {
 		buttonPanel.setBorder(new EmptyBorder(5,2,5,2));
 		buttonPanel.add(btChar[26]);
 		
-		btSearch = new JButton(_("Search"));
-		btSearch.setFont(new Font(_("FONT_NAME"), 0, 12));
+		btSearch = new JButton(__("Search"));
+		btSearch.setFont(new Font(__("FONT_NAME"), 0, 12));
 		btSearch.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e)
 			{
@@ -87,7 +91,7 @@ public class XianluSelectDialog extends JDialog {
 		xlList = buildXianluList();
 		JScrollPane jsp = new JScrollPane(xlList);
 
-		JButton btOK = new JButton(_("OK"));
+		JButton btOK = new JButton(__("OK"));
 		btOK.setFont(new Font("dialog", 0, 12));
 		btOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -96,7 +100,7 @@ public class XianluSelectDialog extends JDialog {
 			}
 		});
 
-		JButton btCancel = new JButton(_("Cancel"));
+		JButton btCancel = new JButton(__("Cancel"));
 		btCancel.setFont(new Font("dialog", 0, 12));
 		btCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -118,8 +122,8 @@ public class XianluSelectDialog extends JDialog {
 		getContentPane().add(rootPanel);
 	}
 	
-	private JList buildXianluList() {
-		xlList = new JList();
+	private JList<String> buildXianluList() {
+		xlList = new JList<String>();
 		xlList.setListData(lcb.findXianlu('J'));
 		xlList.setFont(new Font("dialog", 0, 12));
 //		xlList.addListSelectionListener(new ListSelectionListener() {

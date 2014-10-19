@@ -3,7 +3,6 @@ package org.paradise.etrc;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.function.Consumer;
 
 /**
  * Utility class

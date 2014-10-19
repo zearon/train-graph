@@ -1,13 +1,21 @@
 package org.paradise.etrc.data;
 
-import java.io.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.Color;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import java.awt.*;
-
-import static org.paradise.etrc.ETRC._;
+import java.util.Date;
+import java.util.Vector;
 
 /**
  * @author lguo@sina.com
@@ -201,7 +209,7 @@ public class Train {
 			paserTrainNameLine(line);
 		} else {
 			in.close();
-			throw new IOException(_("Error reading train number."));
+			throw new IOException(__("Error reading train number."));
 		}
 
 		//始发站
@@ -209,7 +217,7 @@ public class Train {
 			this.setStartStation(line);
 		} else {
 			in.close();
-			throw new IOException(_("Error reading departure station."));
+			throw new IOException(__("Error reading departure station."));
 		}
 
 		//终到站
@@ -217,7 +225,7 @@ public class Train {
 			this.setTerminalStation(line);
 		} else {
 			in.close();
-			throw new IOException(_("Error reading terminal station."));
+			throw new IOException(__("Error reading terminal station."));
 		}
 
 		//停站
@@ -228,7 +236,7 @@ public class Train {
 		in.close();
 
 		if (getStopNum() < 2)
-			throw new IOException(_("Data incomplete in:" + file ));
+			throw new IOException(__("Data incomplete in:" + file ));
 	}
 	
 	public void writeTo(String fileName) throws IOException {
@@ -291,7 +299,7 @@ public class Train {
 
 		String stStop[] = line.split(",");
 		if (stStop.length < 3)
-			throw new IOException(String.format(_("Station %d data error in line %s"), (getStopNum() + 1), line));
+			throw new IOException(String.format(__("Station %d data error in line %s"), (getStopNum() + 1), line));
 		
 		//20070224增加是否图定
 		boolean isSchedular = true;

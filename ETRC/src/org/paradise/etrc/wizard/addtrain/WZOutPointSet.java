@@ -1,5 +1,7 @@
 package org.paradise.etrc.wizard.addtrain;
 
+import static org.paradise.etrc.ETRC.__;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -28,8 +30,6 @@ import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.wizard.WizardDialog;
 
-import static org.paradise.etrc.ETRC._;
-
 public class WZOutPointSet extends WizardDialog {
 	private static final long serialVersionUID = 1558550027322954767L;
 
@@ -41,7 +41,7 @@ public class WZOutPointSet extends WizardDialog {
 	String oldTime = "00:00";
 	Station curStation;
 
-	private JList circuitList;
+	private JList<String> circuitList;
 	
 	public WZOutPointSet(JFrame _frame, int _step, String _wizardTitle, String _stepTitle) {
 		super(_frame, _step, _wizardTitle, _stepTitle);
@@ -62,11 +62,11 @@ public class WZOutPointSet extends WizardDialog {
 	protected JPanel createStepPane() {
 		JPanel panel = new JPanel();
 
-		circuitList = new JList();
+		circuitList = new JList<String>();
 		circuitList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		circuitList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent lse) {
-				int row = ((JList) lse.getSource()).getSelectedIndex();
+				int row = ((JList<?>) lse.getSource()).getSelectedIndex();
 				
 				if(row < 0) {
 					curStation = null;
@@ -96,7 +96,7 @@ public class WZOutPointSet extends WizardDialog {
 	private Component createTimePane() {
 		JPanel panel = new JPanel();
 		
-		JLabel lb = new JLabel(_("Terminal/End Time:"));
+		JLabel lb = new JLabel(__("Terminal/End Time:"));
 		tfTime = new JTextField();
 		tfTime.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent arg0) {
@@ -157,7 +157,7 @@ public class WZOutPointSet extends WizardDialog {
 	private JComponent createInfoField() {
 		info = new JTextArea();
 		
-		info.setFont(new Font(_("FONT_NAME"), Font.PLAIN, 12));
+		info.setFont(new Font(__("FONT_NAME"), Font.PLAIN, 12));
 		info.setCaret(new DefaultCaret() {  
 			private static final long serialVersionUID = 1L;
 			public boolean isVisible() {  
@@ -182,7 +182,7 @@ public class WZOutPointSet extends WizardDialog {
 			while(strDist.length() < 4) {
 				strDist = " " + strDist;
 			}
-			dispNames[i] = String.format(_(" %s down-going direction %s km from %s station: %s station"), 
+			dispNames[i] = String.format(__(" %s down-going direction %s km from %s station: %s station"), 
 					chart.trunkCircuit.name, strDist, chart.trunkCircuit.getStation(0).name,   chart.trunkCircuit.getStation(i).name); 
 
 		}
@@ -190,16 +190,16 @@ public class WZOutPointSet extends WizardDialog {
 
 		//设置当前选中的车站
 		if(chart.trunkCircuit.isEndInsideMe(train)) {
-			info.setText(String.format(_("  Train %s terminates at %s station in this section, no need to set end point"), train.getTrainName(), train.getTerminalStation()));
+			info.setText(String.format(__("  Train %s terminates at %s station in this section, no need to set end point"), train.getTrainName(), train.getTerminalStation()));
 			curStation = chart.trunkCircuit.getStation(train.getTerminalStation());
 		}
 		else {
 			curStation = chart.trunkCircuit.getLastStopOnMe(train);
 			if(curStation != null) {
-				info.setText(String.format(_("  The last stop of train %s in this section is %s, change the station and time if this is not correct."), train.getTrainName(), curStation.name));
+				info.setText(String.format(__("  The last stop of train %s in this section is %s, change the station and time if this is not correct."), train.getTrainName(), curStation.name));
 			}
 			else {
-				info.setText(String.format(_("  The train %s passes this section, set the end point manually."), train.getTrainName()));
+				info.setText(String.format(__("  The train %s passes this section, set the end point manually."), train.getTrainName()));
 			}
 		}
 

@@ -4,7 +4,7 @@ import javax.swing.AbstractListModel;
 
 import org.paradise.etrc.data.Chart;
 
-public class RowHeaderModel extends AbstractListModel {
+public class RowHeaderModel extends AbstractListModel<Object> {
 	private static final long serialVersionUID = 547009998890792058L;
 	
 	private Chart chart;

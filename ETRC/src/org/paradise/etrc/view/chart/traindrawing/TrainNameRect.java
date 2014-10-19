@@ -1,12 +1,13 @@
 package org.paradise.etrc.view.chart.traindrawing;
 
+import static org.paradise.etrc.ETRC.__;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import static org.paradise.etrc.ETRC._;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.view.chart.ChartView;
 
@@ -302,7 +303,7 @@ public class TrainNameRect {
       g.setColor(Color.white);
       g.fillRect(x, y, 10, ChartView.trainNameRecHeight);
       g.setColor(oldColor);
-      g.setFont(new Font(_("FONT_NAME_FIXED"), 0, 10));
+      g.setFont(new Font(__("FONT_NAME_FIXED"), 0, 10));
       g.drawRect(x, y, 10, ChartView.trainNameRecHeight);
 
       int h = g.getFontMetrics().getHeight() - 4;

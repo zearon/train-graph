@@ -1,16 +1,26 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
-import javax.swing.border.*;
+import static org.paradise.etrc.ETRC.__;
 
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.TitledBorder;
 //import com.borland.jbcl.layout.*;
-
-import org.paradise.etrc.*;
 import org.paradise.etrc.data.Chart;
-
-import static org.paradise.etrc.ETRC._;
+import org.paradise.etrc.MainFrame;
 
 /**
  * @author lguo@sina.com
@@ -37,7 +47,7 @@ public class TimeSetDialog extends JDialog implements ActionListener {
   GridBagLayout gridBagLayout2 = new GridBagLayout();
   JLabel jLabel1 = new JLabel();
 
-  String defaultStatus = _("Timeline Settings");
+  String defaultStatus = __("Timeline Settings");
   JLabel jLabel2 = new JLabel();
   JTextField tfStart = new JTextField();
   JLabel lbStart = new JLabel();
@@ -45,7 +55,7 @@ public class TimeSetDialog extends JDialog implements ActionListener {
 
   Chart chart;
   public TimeSetDialog(Frame frame, Chart _chart) {
-    super(frame, _("Timeline Settings"), false);
+    super(frame, __("Timeline Settings"), false);
 
     if(frame instanceof MainFrame) {
       mainFrame = (MainFrame) frame;
@@ -64,7 +74,7 @@ public class TimeSetDialog extends JDialog implements ActionListener {
     titledBorder1 = new TitledBorder("");
     panel.setLayout(verticalFlowLayout1);
     this.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
-    this.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    this.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     panel.setFont(new java.awt.Font("Dialog", 0, 12));
     panel.setBorder(BorderFactory.createRaisedBevelBorder());
 
@@ -72,8 +82,8 @@ public class TimeSetDialog extends JDialog implements ActionListener {
 
 
 
-    lbMinScale.setText(_("Pixel per min:"));
-    lbMinScale.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    lbMinScale.setText(__("Pixel per min:"));
+    lbMinScale.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     lbMinScale.setPreferredSize(new Dimension(8, 15));
     lbMinScale.setToolTipText("");
     lbMinScale.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -83,8 +93,8 @@ public class TimeSetDialog extends JDialog implements ActionListener {
     tfMinScale.setText(chart.minuteScale+"");
     tfMinScale.setColumns(0);
 
-    lbInterval.setText(_("Y-axis gap (min):"));
-    lbInterval.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    lbInterval.setText(__("Y-axis gap (min):"));
+    lbInterval.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     lbInterval.setPreferredSize(new Dimension(32, 15));
     lbInterval.setRequestFocusEnabled(true);
     lbInterval.setToolTipText("");
@@ -94,13 +104,13 @@ public class TimeSetDialog extends JDialog implements ActionListener {
     tfInterval.setPreferredSize(new Dimension(20, 22));
     tfInterval.setText(chart.timeInterval+"");
 
-    btOK.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-    btOK.setText(_("Set"));
+    btOK.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+    btOK.setText(__("Set"));
     btOK.setActionCommand("Button_OK");
     btOK.addActionListener(this);
 
-    btDefault.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-    btDefault.setText(_("Default"));
+    btDefault.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+    btDefault.setText(__("Default"));
     btDefault.setActionCommand("Button_Default");
     btDefault.addActionListener(this);
 
@@ -109,23 +119,23 @@ public class TimeSetDialog extends JDialog implements ActionListener {
 
 
     titledBorder1.setTitlePosition(2);
-    titledBorder1.setTitleFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-    titledBorder1.setTitle(_("Timeline Settings"));
+    titledBorder1.setTitleFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+    titledBorder1.setTitle(__("Timeline Settings"));
 
-    statusBar.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    statusBar.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     statusBar.setBorder(BorderFactory.createLoweredBevelBorder());
-    statusBar.setText(_("Set timeline settings"));
+    statusBar.setText(__("Set timeline settings"));
     verticalFlowLayout1.setHgap(2);
     verticalFlowLayout1.setVgap(2);
 
     jPanel3.setBorder(titledBorder1);
     jPanel3.setInputVerifier(null);
     jPanel3.setLayout(gridBagLayout2);
-    jLabel1.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    jLabel1.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     jLabel1.setHorizontalAlignment(SwingConstants.LEFT);
-    jLabel1.setText(_("min"));
-    jLabel2.setText(_(" Must be a divider of 60"));
-    jLabel2.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    jLabel1.setText(__("min"));
+    jLabel2.setText(__(" Must be a divider of 60"));
+    jLabel2.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     jLabel2.setToolTipText("");
     jLabel2.setHorizontalAlignment(SwingConstants.LEFT);
     jLabel2.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -138,12 +148,12 @@ public class TimeSetDialog extends JDialog implements ActionListener {
     lbStart.setHorizontalAlignment(SwingConstants.RIGHT);
     lbStart.setToolTipText("");
     lbStart.setPreferredSize(new Dimension(8, 15));
-    lbStart.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
-    lbStart.setText(_("Time for 0 pos:"));
+    lbStart.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+    lbStart.setText(__("Time for 0 pos:"));
 
     jLabel3.setText(" ");
     jLabel3.setHorizontalAlignment(SwingConstants.LEFT);
-    jLabel3.setFont(new java.awt.Font(_("FONT_NAME"), 0, 12));
+    jLabel3.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     getContentPane().add(panel);
 
     panel.add(jPanel3, null);
@@ -241,7 +251,7 @@ public class TimeSetDialog extends JDialog implements ActionListener {
               || (interval == 20)
               || (interval == 30)
               || (interval == 60)))) {
-        this.statusBar.setText(_("Input data out of range."));
+        this.statusBar.setText(__("Input data out of range."));
       }
       else{
         if(this.mainFrame != null) {
@@ -256,7 +266,7 @@ public class TimeSetDialog extends JDialog implements ActionListener {
       }
     }
     catch(NumberFormatException e) {
-      this.statusBar.setText(_("Invalid input"));
+      this.statusBar.setText(__("Invalid input"));
     }
   }
 }

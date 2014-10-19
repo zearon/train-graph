@@ -1,14 +1,30 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import static org.paradise.etrc.ETRC._;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.Chart;
 import org.paradise.etrc.view.chart.ChartView;
@@ -28,10 +44,10 @@ public class ChartSetDialog extends JDialog {
 	private JTextField t1;
 	private JTextField t2;
 	
-	private static String defaultStatus = _("Settings for Train Graph");
+	private static String defaultStatus = __("Settings for Train Graph");
 
 	public ChartSetDialog(MainFrame _mainFrame) {
-		super(_mainFrame, _("Settings for Train Graph"), false);
+		super(_mainFrame, __("Settings for Train Graph"), false);
 		mainFrame = _mainFrame;
 
 		init();
@@ -51,20 +67,20 @@ public class ChartSetDialog extends JDialog {
 		t2 = createJTextField("" + chart.timeInterval);
 		
 		JPanel distPanel = creatJPanel(
-                createJLabelL(_("Pixels per km:")), d0, createJLabelR(" "),
-				createJLabelL(_("Display level:")), d1, createJLabelR(" "),
-				createJLabelL(_("Bold line level:")), d2, createJLabelR(" "),
-                createJLabelM(_(" The highest station level is 0")));
+                createJLabelL(__("Pixels per km:")), d0, createJLabelR(" "),
+				createJLabelL(__("Display level:")), d1, createJLabelR(" "),
+				createJLabelL(__("Bold line level:")), d2, createJLabelR(" "),
+                createJLabelM(__(" The highest station level is 0")));
 		
 		JPanel timePanel = creatJPanel(				
-				createJLabelL(_("Time for 0 pos:")), t0, createJLabelR(" "),
-				createJLabelL(_("Pixel per min:")), t1, createJLabelR(" "),
-				createJLabelL(_("Y-axis gap:")), t2, createJLabelR("min"),
-				createJLabelM(_(" Must be a divider of 60")));
+				createJLabelL(__("Time for 0 pos:")), t0, createJLabelR(" "),
+				createJLabelL(__("Pixel per min:")), t1, createJLabelR(" "),
+				createJLabelL(__("Y-axis gap:")), t2, createJLabelR("min"),
+				createJLabelM(__(" Must be a divider of 60")));
 
 
-        tbPane.add(_("Distance bar"), distPanel);
-		tbPane.add(_("Timeline"), timePanel);
+        tbPane.add(__("Distance bar"), distPanel);
+		tbPane.add(__("Timeline"), timePanel);
 
 	    statusBar = new JLabel(defaultStatus);
 	    statusBar.setBorder(BorderFactory.createLoweredBevelBorder());
@@ -82,8 +98,8 @@ public class ChartSetDialog extends JDialog {
 		JPanel panel = new JPanel();
 		
 		JPanel panelBT = new JPanel();
-		JButton btDefault = createJButton(_("Default"));
-		JButton btOK      = createJButton(_("Set"));
+		JButton btDefault = createJButton(__("Default"));
+		JButton btOK      = createJButton(__("Set"));
 	
 		panelBT.add(btDefault);
 		panelBT.add(btOK);
@@ -100,7 +116,7 @@ public class ChartSetDialog extends JDialog {
 		JCheckBox cbDrawPoint;
 		cbDrawPoint = new JCheckBox();
 		cbDrawPoint.setFont(new java.awt.Font("Dialog", 0, 12));
-		cbDrawPoint.setText(_("Always highlight terminals"));
+		cbDrawPoint.setText(__("Always highlight terminals"));
 		cbDrawPoint.setSelected(mainFrame.chartView.isDrawNormalPoint);
 		cbDrawPoint.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -116,7 +132,7 @@ public class ChartSetDialog extends JDialog {
 		JCheckBox cbUnderColor;
 		cbUnderColor = new JCheckBox();
 		cbUnderColor.setFont(new java.awt.Font("Dialog", 0, 12));
-		cbUnderColor.setText(_("Enable watermark display"));
+		cbUnderColor.setText(__("Enable watermark display"));
 		cbUnderColor.setSelected(!(mainFrame.chartView.underDrawingColor == null));
 		cbUnderColor.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -148,7 +164,7 @@ public class ChartSetDialog extends JDialog {
 		bt.setPreferredSize(new Dimension(62, 24));
 		bt.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent ae) {
-				if(ae.getActionCommand().equals(_("Default")))
+				if(ae.getActionCommand().equals(__("Default")))
 					setDefault();
 				else
 					setValues();
@@ -317,7 +333,7 @@ public class ChartSetDialog extends JDialog {
     	              || (interval == 60))))	           
 	        ){
 
-	        this.statusBar.setText(_("Input data out of range."));
+	        this.statusBar.setText(__("Input data out of range."));
 	      }
 	      
 	      else{
@@ -336,7 +352,7 @@ public class ChartSetDialog extends JDialog {
 	      }
 	    }
 	    catch(NumberFormatException e) {
-	      this.statusBar.setText(_("Invalid input"));
+	      this.statusBar.setText(__("Invalid input"));
 	    }
 	  }
 }

@@ -1,5 +1,7 @@
 package org.paradise.etrc.view.dynamic;
 
+import static org.paradise.etrc.ETRC.__;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,7 +14,6 @@ import java.util.Vector;
 
 import javax.swing.JPanel;
 
-import static org.paradise.etrc.ETRC._;
 import org.paradise.etrc.data.Chart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Train;
@@ -42,7 +43,7 @@ public class RunningPanel extends JPanel {
 	void jbInit() throws Exception {
 		this.setBackground(Color.white);
 		this.setLayout(new BorderLayout());
-		this.setFont(new Font(_("FONT_NAME"), 0, 12));
+		this.setFont(new Font(__("FONT_NAME"), 0, 12));
 	}
 
 	public void paint(Graphics g) {

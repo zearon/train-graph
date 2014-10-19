@@ -1,9 +1,13 @@
 package org.paradise.etrc.data;
 
-import java.io.*;
-import java.util.Vector;
+import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRC._;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Vector;
 
 /**
  * @author lguo@sina.com
@@ -311,7 +315,7 @@ public class Circuit {
 			this.name = line;
 		} else {
 			in.close();
-			throw new IOException(_("Error reading circuit name."));
+			throw new IOException(__("Error reading circuit name."));
 		}
 
 		// 线路总长,单线/复线/四线，zindex, dispScale
@@ -323,33 +327,33 @@ public class Circuit {
 				this.length = Integer.parseInt(stLength);
 			} catch (NumberFormatException e) {
 				in.close();
-				throw new IOException(_("Error in circuit length format."));
+				throw new IOException(__("Error in circuit length format."));
 			}
 			try {
 				if (parts.length > 1)
 					this.multiplicity = Integer.parseInt(parts[1]);
 			} catch (NumberFormatException e) {
 				in.close();
-				throw new IOException(_("Error in circuit multiplicity format."));
+				throw new IOException(__("Error in circuit multiplicity format."));
 			}
 			try {
 				if (parts.length > 2)
 					this.zindex = Integer.parseInt(parts[2]);
 			} catch (NumberFormatException e) {
 				in.close();
-				throw new IOException(_("Error in circuit zindex format."));
+				throw new IOException(__("Error in circuit zindex format."));
 			}
 			try {
 				if (parts.length > 3)
 					this.dispScale = Float.parseFloat(parts[3]);
 			} catch (NumberFormatException e) {
 				in.close();
-				throw new IOException(_("Error in circuit display scale format."));
+				throw new IOException(__("Error in circuit display scale format."));
 			}
 			
 		} else {
 			in.close();
-			throw new IOException(_("Error reading circuit length."));
+			throw new IOException(__("Error reading circuit length."));
 		}
 
 		// 站点
@@ -487,9 +491,9 @@ public class Circuit {
 
 		if (addSuffix) {
 			if (minGap > 1)
-				return String.format(_("Near %s Station"), stations.get(minIndex).name);
+				return String.format(__("Near %s Station"), stations.get(minIndex).name);
 			else
-				return String.format(_("%s Station"), stations.get(minIndex).name);
+				return String.format(__("%s Station"), stations.get(minIndex).name);
 		} else
 			return stations.get(minIndex).name;
 	}
@@ -526,7 +530,7 @@ public class Circuit {
 				if (parts.length > 3)
 					this.dispScale = Float.parseFloat(parts[3]);
 			} catch (NumberFormatException e) {
-				throw new IOException(_("Error in circuit lenght[,multiplicity,zindex,display scale] format."));
+				throw new IOException(__("Error in circuit lenght[,multiplicity,zindex,display scale] format."));
 			}
 			break;
 		default:
@@ -537,7 +541,7 @@ public class Circuit {
 	private void parseStationLine(String line) throws IOException {
 		String stStation[] = line.split(",");
 		if (stStation.length < 2)
-			throw new IOException(String.format(_("Invalid data for station %d"), getStationNum() + 1));
+			throw new IOException(String.format(__("Invalid data for station %d"), getStationNum() + 1));
 
 		// 站名
 		String stName = stStation[0];
@@ -548,7 +552,7 @@ public class Circuit {
 		try {
 			dist = Integer.parseInt(stDist);
 		} catch (NumberFormatException e) {
-			throw new IOException(String.format(_("Invalid distance data for station %s"), stName));
+			throw new IOException(String.format(__("Invalid distance data for station %s"), stName));
 		}
 
 		// 等级，特等站为0；读不到的则认为是特等站
@@ -558,7 +562,7 @@ public class Circuit {
 			try {
 				level = Integer.parseInt(stLevel);
 			} catch (NumberFormatException e) {
-				throw new IOException(String.format(_("Invalid level data for station %s"), stName));
+				throw new IOException(String.format(__("Invalid level data for station %s"), stName));
 			}
 		}
 
@@ -573,7 +577,7 @@ public class Circuit {
 					|| stHide.equalsIgnoreCase("false"))
 				hide = false;
 			else
-				throw new IOException(String.format(_("Invalid hidden type data for station %s"), stName));
+				throw new IOException(String.format(__("Invalid hidden type data for station %s"), stName));
 		}
 
 		Station st = new Station(stName, dist, level, hide);

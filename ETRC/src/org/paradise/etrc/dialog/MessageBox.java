@@ -1,11 +1,25 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.paradise.etrc.ETRC;
-import static org.paradise.etrc.ETRC._;
 
 /**
  * @author lguo@sina.com
@@ -25,9 +39,9 @@ public class MessageBox extends JDialog implements ActionListener {
 
 	ImageIcon image1 = new ImageIcon();
 
-	String msg = _("Message Content");
+	String msg = __("Message Content");
 
-	String title = _("Message");
+	String title = __("Message");
 
 	BorderLayout borderLayout1 = new BorderLayout();
 
@@ -51,11 +65,11 @@ public class MessageBox extends JDialog implements ActionListener {
 	}
 
 	public MessageBox(Frame parent, String _msg) {
-		this(parent, _msg, _("Message"));
+		this(parent, _msg, __("Message"));
 	}
 
 	public MessageBox(String _msg) {
-		this(ETRC.getInstance().getMainFrame(), _msg, _("Message"));
+		this(ETRC.getInstance().getMainFrame(), _msg, __("Message"));
 	}
 
 	//Component initialization

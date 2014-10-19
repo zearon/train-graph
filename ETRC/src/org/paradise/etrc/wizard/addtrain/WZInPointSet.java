@@ -1,11 +1,26 @@
 package org.paradise.etrc.wizard.addtrain;
 
-import java.awt.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.util.Vector;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.DefaultCaret;
@@ -19,8 +34,6 @@ import org.paradise.etrc.slice.ChartSlice;
 import org.paradise.etrc.slice.TrainSlice;
 import org.paradise.etrc.wizard.WizardDialog;
 
-import static org.paradise.etrc.ETRC._;
-
 public class WZInPointSet extends WizardDialog {
 	private static final long serialVersionUID = 1558550027322954767L;
 	private Train train;
@@ -31,7 +44,7 @@ public class WZInPointSet extends WizardDialog {
 	String oldTime = "00:00";
 	Station curStation;
 
-	private JList circuitList;
+	private JList<String> circuitList;
 	
 	public WZInPointSet(JFrame _frame, int _step, String _wizardTitle, String _stepTitle) {
 		super(_frame, _step, _wizardTitle, _stepTitle);
@@ -52,11 +65,11 @@ public class WZInPointSet extends WizardDialog {
 	protected JPanel createStepPane() {
 		JPanel panel = new JPanel();
 
-		circuitList = new JList();
+		circuitList = new JList<String>();
 		circuitList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		circuitList.addListSelectionListener(new ListSelectionListener() {
 			public void valueChanged(ListSelectionEvent lse) {
-				int row = ((JList) lse.getSource()).getSelectedIndex();
+				int row = ((JList<?>) lse.getSource()).getSelectedIndex();
 				
 				if(row < 0) {
 					curStation = null;
@@ -86,7 +99,7 @@ public class WZInPointSet extends WizardDialog {
 	private Component createTimePane() {
 		JPanel panel = new JPanel();
 		
-		JLabel lb = new JLabel(_("Departure/Start Time:"));
+		JLabel lb = new JLabel(__("Departure/Start Time:"));
 		tfTime = new JTextField();
 		tfTime.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent arg0) {
@@ -171,7 +184,7 @@ public class WZInPointSet extends WizardDialog {
 	private JComponent createInfoField() {
 		info = new JTextArea();
 		
-		info.setFont(new Font(_("FONT_NAME"), Font.PLAIN, 12));
+		info.setFont(new Font(__("FONT_NAME"), Font.PLAIN, 12));
 		info.setCaret(new DefaultCaret() {  
 			private static final long serialVersionUID = 1L;
 			public boolean isVisible() {  
@@ -196,7 +209,7 @@ public class WZInPointSet extends WizardDialog {
 			while(strDist.length() < 4) {
 				strDist = " " + strDist;
 			}
-			dispNames[i] = String.format(_(" %s down-going direction %s km from %s station: %s station"), 
+			dispNames[i] = String.format(__(" %s down-going direction %s km from %s station: %s station"), 
 					chart.trunkCircuit.name, strDist, chart.trunkCircuit.getStation(0).name,   chart.trunkCircuit.getStation(i).name); 
 			
 		}
@@ -204,16 +217,16 @@ public class WZInPointSet extends WizardDialog {
 
 		//设置当前选中的车站
 		if(chart.trunkCircuit.isStartInsideMe(train)) {
-			info.setText(String.format(_("  Train %s departures from %s station in this section, no need to set start point"), train.getTrainName(), train.getStartStation()));
+			info.setText(String.format(__("  Train %s departures from %s station in this section, no need to set start point"), train.getTrainName(), train.getStartStation()));
 			curStation = chart.trunkCircuit.getStation(train.getStartStation());
 		}
 		else {
 			curStation = chart.trunkCircuit.getFirstStopOnMe(train);
 			if(curStation != null) {
-				info.setText(String.format(_("  The first stop of train %s in this section is %s, change the station and time if this is not correct."), train.getTrainName(), curStation.name));
+				info.setText(String.format(__("  The first stop of train %s in this section is %s, change the station and time if this is not correct."), train.getTrainName(), curStation.name));
 			}
 			else {
-				info.setText(String.format(_("  The train %s passes this section, set the start point manually."), train.getTrainName()));
+				info.setText(String.format(__("  The train %s passes this section, set the start point manually."), train.getTrainName()));
 			}
 		}
 

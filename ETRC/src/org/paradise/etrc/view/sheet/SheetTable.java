@@ -3,7 +3,8 @@ package org.paradise.etrc.view.sheet;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Point;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JList;
 import javax.swing.JTable;
@@ -144,7 +145,7 @@ public class SheetTable extends JTable {
 		return maxw;
 	}
 	
-	public JList getRowHeader() {
+	public JList<?> getRowHeader() {
 		return sheetView.rowHeader;
 	}
 

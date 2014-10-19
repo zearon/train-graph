@@ -1,11 +1,28 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
 import org.paradise.etrc.ETRC;
-import static org.paradise.etrc.ETRC._;
 
 /**
  * @author lguo@sina.com
@@ -25,9 +42,9 @@ public class SliceDialog extends JDialog implements ActionListener {
 
 	ImageIcon image1 = new ImageIcon();
 
-	String msg = _("Message Content");
+	String msg = __("Message Content");
 
-	String title = _("Slice Output");
+	String title = __("Slice Output");
 	
 	String name;
 	
@@ -52,7 +69,7 @@ public class SliceDialog extends JDialog implements ActionListener {
 		super(ETRC.getInstance().getMainFrame());
 		name = _name;
 		msg = _msg;
-		title = _("Slice Output");
+		title = __("Slice Output");
 		frame = ETRC.getInstance().getMainFrame();
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 		try {
@@ -73,7 +90,7 @@ public class SliceDialog extends JDialog implements ActionListener {
 		mainPanel.setLayout(borderLayout1);
 		button1.setFont(new java.awt.Font("Dialog", 0, 12));
 		button1.setActionCommand("Ok");
-		button1.setText(_("OK"));
+		button1.setText(__("OK"));
 		button1.addActionListener(this);
 
 		msgLabel = new JLabel(name, image1, JLabel.LEFT);
@@ -101,7 +118,7 @@ public class SliceDialog extends JDialog implements ActionListener {
 
 	private void buildSliceText() {
 		taSlice.setEditable(false);
-		taSlice.setFont(new Font(_("FONT_NAME"), Font.PLAIN, 12));
+		taSlice.setFont(new Font(__("FONT_NAME"), Font.PLAIN, 12));
 		taSlice.setText(msg);
 //		taSlice.selectAll();
 	}

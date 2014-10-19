@@ -1,11 +1,11 @@
 package org.paradise.etrc.wizard.addtrain;
 
+import static org.paradise.etrc.ETRC.__;
+
 import javax.swing.table.AbstractTableModel;
 
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
-
-import static org.paradise.etrc.ETRC._;
 
 public class TrainTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1014817974495127589L;
@@ -23,13 +23,13 @@ public class TrainTableModel extends AbstractTableModel {
 	public String getColumnName(int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			return _("Station");
+			return __("Station");
 		case 1:
-			return _("Arrival");
+			return __("Arrival");
 		case 2:
-			return _("Leave");
+			return __("Leave");
 		case 3:
-			return _("Passenger");
+			return __("Passenger");
 		default:
 			return null;
 		}

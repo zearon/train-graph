@@ -1,11 +1,25 @@
 package org.paradise.etrc.dialog;
 
-import java.awt.*;
-import java.awt.event.*;
-import javax.swing.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.AWTEvent;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 import org.paradise.etrc.ETRC;
-import static org.paradise.etrc.ETRC._;
 
 /**
  * @author lguo@sina.com
@@ -27,8 +41,8 @@ public class YesNoBox extends JDialog implements ActionListener {
 
 	ImageIcon image1 = new ImageIcon();
 
-	String msg = _("Message Content");
-	String title = _("Message");
+	String msg = __("Message Content");
+	String title = __("Message");
 
 	BorderLayout borderLayout1 = new BorderLayout();
 
@@ -51,11 +65,11 @@ public class YesNoBox extends JDialog implements ActionListener {
 	}
 
 	public YesNoBox(Frame parent, String _msg) {
-		this(parent, _msg, _("Question"));
+		this(parent, _msg, __("Question"));
 	}
 
 	public YesNoBox(String _msg) {
-		this(ETRC.getInstance().getMainFrame(), _msg, _("Question"));
+		this(ETRC.getInstance().getMainFrame(), _msg, __("Question"));
 	}
 
 	//Component initialization
@@ -68,12 +82,12 @@ public class YesNoBox extends JDialog implements ActionListener {
 		
 		buttonYes.setFont(new java.awt.Font("Dialog", 0, 12));
 		buttonYes.setActionCommand("Yes");
-		buttonYes.setText(_("Yes"));
+		buttonYes.setText(__("Yes"));
 		buttonYes.addActionListener(this);
 		
 		buttonNo.setFont(new java.awt.Font("Dialog", 0, 12));
 		buttonNo.setActionCommand("No");
-		buttonNo.setText(_("No"));
+		buttonNo.setText(__("No"));
 		buttonNo.addActionListener(this);
 
 		msgLabel.setFont(new java.awt.Font("Dialog", 0, 12));

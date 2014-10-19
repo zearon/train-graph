@@ -1,10 +1,15 @@
 package org.paradise.etrc.wizard.addtrain;
 
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.Component;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 
-import javax.swing.*;
-import javax.swing.table.*;
+import javax.swing.AbstractCellEditor;
+import javax.swing.BorderFactory;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.table.TableCellEditor;
 
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;

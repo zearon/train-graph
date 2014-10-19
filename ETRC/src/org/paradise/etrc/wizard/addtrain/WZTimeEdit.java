@@ -1,17 +1,25 @@
 package org.paradise.etrc.wizard.addtrain;
 
-import java.awt.*;
+import static org.paradise.etrc.ETRC.__;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.wizard.WizardDialog;
-
-import static org.paradise.etrc.ETRC._;
 
 public class WZTimeEdit extends WizardDialog {
 	private static final long serialVersionUID = -1097100938159035740L;
@@ -67,9 +75,9 @@ public class WZTimeEdit extends WizardDialog {
 		btPane.setLayout(new BorderLayout());
 		btPane.add(right, BorderLayout.EAST);
 		
-		JButton addFButton = new JButton(_("Add(Before)"));
-		JButton addBButton = new JButton(_("Add(After)"));
-		JButton delButton = new JButton(_("Delete"));
+		JButton addFButton = new JButton(__("Add(Before)"));
+		JButton addBButton = new JButton(__("Add(After)"));
+		JButton delButton = new JButton(__("Delete"));
 		
 		addFButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -77,7 +85,7 @@ public class WZTimeEdit extends WizardDialog {
 					table.getCellEditor().stopCellEditing();
 
 				int row = table.getSelectedRow();
-				model.myTrain.insertStop(new Stop(_("Station"), "00:00", "00:00", false), row);
+				model.myTrain.insertStop(new Stop(__("Station"), "00:00", "00:00", false), row);
 				model.fireTableDataChanged();
 				
 				table.getSelectionModel().setSelectionInterval(row, row);
@@ -89,7 +97,7 @@ public class WZTimeEdit extends WizardDialog {
 					table.getCellEditor().stopCellEditing();
 
 				int row = table.getSelectedRow() + 1;
-				model.myTrain.insertStop(new Stop(_("Station"), "00:00", "00:00", false), row);
+				model.myTrain.insertStop(new Stop(__("Station"), "00:00", "00:00", false), row);
 				model.fireTableDataChanged();
 				
 				table.getSelectionModel().setSelectionInterval(row, row);
@@ -120,8 +128,8 @@ public class WZTimeEdit extends WizardDialog {
 	private JComponent createInfoField() {
 		info = new JTextArea();
 		
-		info.setText(_("  The separator between the hour and minute can be space, colon, comma or period. 3 or 4 digital number can also be accepted. Click on the next text box will complete the current input. "));
-		info.setFont(new Font(_("FONT_NAME"), Font.PLAIN, 12));
+		info.setText(__("  The separator between the hour and minute can be space, colon, comma or period. 3 or 4 digital number can also be accepted. Click on the next text box will complete the current input. "));
+		info.setFont(new Font(__("FONT_NAME"), Font.PLAIN, 12));
 		info.setCaret(new DefaultCaret() {  
 			private static final long serialVersionUID = 1L;
 			public boolean isVisible() {  

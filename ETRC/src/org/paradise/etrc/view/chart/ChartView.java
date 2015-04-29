@@ -24,6 +24,7 @@ import org.paradise.etrc.data.Circuit;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.view.chart.traindrawing.DrawingModel;
 import org.paradise.etrc.view.chart.traindrawing.TrainDrawing;
 
 /**
@@ -62,9 +63,11 @@ public class ChartView extends JPanel {
 
 	public static final int ScrollUnitIncrement = 16;
 
-	public TrainDrawing activeTrainDrawing;
-	Vector<TrainDrawing> normalDrawings = new Vector<TrainDrawing>();
-	Vector<TrainDrawing> underDrawings  = new Vector<TrainDrawing>();
+	boolean shouldUpdateDrawingModel = true;
+//	public TrainDrawing activeTrainDrawing;
+//	Vector<TrainDrawing> normalDrawings = new Vector<TrainDrawing>();
+//	Vector<TrainDrawing> underDrawings  = new Vector<TrainDrawing>();
+	DrawingModel drawingModel = new DrawingModel();
 
 	public CircuitPanel panelCircuit;
 	public LinesPanel panelLines;
@@ -97,23 +100,11 @@ public class ChartView extends JPanel {
 //		System.out.println("findAndMoveToTrain:" + trainName);
 //		
 		boolean found = false;
-	    for(Enumeration<TrainDrawing> e = normalDrawings.elements(); e.hasMoreElements(); ) {
-	      TrainDrawing trainDrawing = (TrainDrawing) e.nextElement();
-	      if((trainDrawing.train.trainNameDown.equalsIgnoreCase(trainName))
-	        ||(trainDrawing.train.trainNameUp.equalsIgnoreCase(trainName))) {
-	       moveToTrain(trainDrawing.train);
-	       found = true;
-	      }
-	    }
-
-	    for(Enumeration<TrainDrawing> e = underDrawings.elements(); e.hasMoreElements(); ) {
-	      TrainDrawing trainDrawing = (TrainDrawing) e.nextElement();
-	      if((trainDrawing.train.trainNameDown.equalsIgnoreCase(trainName))
-	        ||(trainDrawing.train.trainNameUp.equalsIgnoreCase(trainName))) {
-	       moveToTrain(trainDrawing.train);
-	       found = true;
-	      }
-	    }
+		TrainDrawing trainDrawing = drawingModel.findTrainDrawingByName(trainName);
+		if (trainDrawing != null) {
+			found = true;
+			panelLines.moveToTrainDrawing(trainDrawing);
+		}
 
 	    return found;
 	}
@@ -129,19 +120,8 @@ public class ChartView extends JPanel {
 		if (train == null)
 			return;
 		
-		for (Enumeration<TrainDrawing> e = normalDrawings.elements(); e.hasMoreElements();) {
-			TrainDrawing trainDrawing = (TrainDrawing) e.nextElement();
-			if (trainDrawing.train.equals(train)) {
-				panelLines.moveToTrainDrawing(trainDrawing);
-			}
-		}
-
-		for (Enumeration<TrainDrawing> e = underDrawings.elements(); e.hasMoreElements();) {
-			TrainDrawing trainDrawing = (TrainDrawing) e.nextElement();
-			if (trainDrawing.train.equals(train)) {
-				panelLines.moveToTrainDrawing(trainDrawing);
-			}
-		}
+		TrainDrawing trainDrawing = drawingModel.findTrainDrawing(train);
+		panelLines.moveToTrainDrawing(trainDrawing);
 	}
 	
 	public void setActiveTrain(Train train) {
@@ -159,46 +139,23 @@ public class ChartView extends JPanel {
 			//关闭ToolTip
 			panelLines.setToolTipText(null);
 		}
+		
+		drawingModel.setActiveTrain(train);
 
 		// 重绘
 		repaint();
 	}
 
-	public void buildTrainDrawings() {
-		//重建当前选中车次的图线
-		activeTrainDrawing = (activeTrain == null) ? null : new TrainDrawing(this, activeTrain, true, false);
-
-		//清空正常、水印显示车次列表
-		normalDrawings.removeAllElements();
-		underDrawings.removeAllElements();
-
-		Chart chart = mainFrame.chart;
-		for (int i = 0; i < chart.getTrainNum(); i++) {
-			int isDown = chart.getTrain(i).isDownTrain(chart.trunkCircuit);
-			switch (showUpDownState) {
-			//全不显示
-			case ChartView.SHOW_NONE:
-				underDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, true));
-				break;
-			//显示下行列车
-			case ChartView.SHOW_DOWN:
-				if (isDown == Train.DOWN_TRAIN)
-					normalDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, false));
-				else
-					underDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, true));
-				break;
-			//显示上行列车
-			case ChartView.SHOW_UP:
-				if (isDown == Train.UP_TRAIN)
-					normalDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, false));
-				else
-					underDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, true));
-				break;
-			//缺省为全部显示
-			default:
-				normalDrawings.add(new TrainDrawing(this, chart.getTrain(i), false, false));
-			}
+	public void updateDrawingModel() {
+		if (shouldUpdateDrawingModel) {
+			shouldUpdateDrawingModel = false;
+		} else {
+			return;
 		}
+		
+		drawingModel.updateCurrentCircuit(mainFrame.chart, mainFrame.chart.trunkCircuit, this);
+		drawingModel.updateUpDownTrainOption(showUpDownState);
+		drawingModel.setActiveTrain(activeTrain);
 	}
 
 	//水印颜色
@@ -354,7 +311,10 @@ public class ChartView extends JPanel {
 			mainFrame.prop.setProperty(MainFrame.Prop_Show_UP, "N");
 			break;
 		}
-		panelLines.repaint();
+		
+		drawingModel.updateUpDownTrainOption(showUpDownState);
+		
+		panelLines.updateBuffer();
 	}
 
 	public int distUpDownState = SHOW_DOWN;
@@ -584,5 +544,11 @@ public class ChartView extends JPanel {
 		mainFrame.sheetView.updateData();
 		
 		this.setActiveTrain(train);
+	}
+	
+	public void repaint() {
+		if (panelLines != null)
+			panelLines.updateBuffer();
+		super.repaint();
 	}
 }

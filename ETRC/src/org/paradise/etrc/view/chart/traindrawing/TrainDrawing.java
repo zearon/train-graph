@@ -48,7 +48,19 @@ public class TrainDrawing {
 //  private static final Color selectedColor = Color.black;
   static final Color notSchedularColor = new Color(192, 192, 0);
 
-  public TrainDrawing(ChartView _chartView, Train _train, boolean _active, boolean _under) {
+  public void setActive(boolean isActive) {
+	this.isActive = isActive;
+}
+
+public void setUnderDrawing(boolean isUnderDrawing) {
+	this.isUnderDrawing = isUnderDrawing;
+}
+
+public boolean isUnderDrawing() {
+	return isUnderDrawing;
+}
+
+public TrainDrawing(ChartView _chartView, Train _train, boolean _active, boolean _under) {
     chartView = _chartView;
     train = _train;
     isActive = _active;
@@ -303,8 +315,7 @@ public class TrainDrawing {
    * @return boolean
    */
   public boolean pointOnMe(Point p) {
-    for(Enumeration<TrainLine> e = lines.elements(); e.hasMoreElements(); ) {
-      TrainLine line = (TrainLine)e.nextElement();
+    for(TrainLine line : lines) {
       if(line.pointOnMe(p))
         return true;
     }

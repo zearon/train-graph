@@ -38,6 +38,7 @@ import org.paradise.etrc.data.Chart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.view.chart.ChartView;
+import org.paradise.etrc.view.widget.JEditTable;
 
 /**
  * @author lguo@sina.com

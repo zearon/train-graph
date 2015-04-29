@@ -1,6 +1,7 @@
 package org.paradise.etrc.dialog;
 
 import static org.paradise.etrc.ETRC.__;
+import static org.paradise.etrc.ETRCUtil.DEBUG;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -22,6 +23,8 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -43,7 +46,8 @@ import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.TRFFilter;
-
+import org.paradise.etrc.view.widget.DefaultJEditTableModel;
+import org.paradise.etrc.view.widget.JEditTable;
 
 /**
  * @author lguo@sina.com
@@ -57,14 +61,14 @@ public class TrainDialog extends JDialog {
 	private JTextField tfNameU;
 	private JTextField tfNameD;
 	private JTextField tfName;
-	
+
 	private MainFrame mainFrame;
-	
+
 	public boolean isCanceled = false;
-	
+
 	public TrainDialog(MainFrame _mainFrame, Train _train) {
 		super(_mainFrame, _train.getTrainName(), true);
-		
+
 		mainFrame = _mainFrame;
 
 		table = new TrainTable();
@@ -77,11 +81,11 @@ public class TrainDialog extends JDialog {
 			ex.printStackTrace();
 		}
 	}
-	
+
 	public Train getTrain() {
-		Train train = ((TrainTableModel)table.getModel()).myTrain;
-//		train.startStation = train.stops[0].stationName;
-//		train.terminalStation = train.stops[train.stopNum - 1].stationName;
+		Train train = ((TrainTableModel) table.getModel()).myTrain;
+		// train.startStation = train.stops[0].stationName;
+		// train.terminalStation = train.stops[train.stopNum - 1].stationName;
 		train.trainNameDown = tfNameD.getText().trim();
 		train.trainNameUp = tfNameU.getText().trim();
 		train.trainNameFull = tfName.getText().trim();
@@ -91,14 +95,14 @@ public class TrainDialog extends JDialog {
 	private void jbInit() throws Exception {
 		table.setFont(new Font("Dialog", 0, 12));
 		table.getTableHeader().setFont(new Font("Dialog", 0, 12));
-		
-		JButton btColor = new JButton(__("Color")); 
+
+		JButton btColor = new JButton(__("Color"));
 		btColor.setFont(new Font("dialog", 0, 12));
 		btColor.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (table.getCellEditor() != null)
 					table.getCellEditor().stopCellEditing();
-				
+
 				doSetColor(getTrain());
 			}
 		});
@@ -109,15 +113,15 @@ public class TrainDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				if (table.getCellEditor() != null)
 					table.getCellEditor().stopCellEditing();
-				
+
 				Train loadingTrain = doLoadTrain();
-				if(loadingTrain != null) {
-					if(loadingTrain.color == null) {
-						Color c = ((TrainTableModel)table.getModel()).myTrain.color;
+				if (loadingTrain != null) {
+					if (loadingTrain.color == null) {
+						Color c = ((TrainTableModel) table.getModel()).myTrain.color;
 						loadingTrain.color = c;
 					}
-					
-					((TrainTableModel)table.getModel()).myTrain = loadingTrain;
+
+					((TrainTableModel) table.getModel()).myTrain = loadingTrain;
 					tfName.setText(loadingTrain.getTrainName());
 					tfNameD.setText(loadingTrain.trainNameDown);
 					tfNameU.setText(loadingTrain.trainNameUp);
@@ -132,7 +136,7 @@ public class TrainDialog extends JDialog {
 				if (table.getCellEditor() != null)
 					table.getCellEditor().stopCellEditing();
 
-				Train savingTrain = ((TrainTableModel)table.getModel()).myTrain;
+				Train savingTrain = ((TrainTableModel) table.getModel()).myTrain;
 				savingTrain.trainNameDown = tfNameD.getText().trim();
 				savingTrain.trainNameUp = tfNameU.getText().trim();
 				savingTrain.trainNameFull = tfName.getText().trim();
@@ -148,13 +152,13 @@ public class TrainDialog extends JDialog {
 				if (table.getCellEditor() != null)
 					table.getCellEditor().stopCellEditing();
 
-				Train train = ((TrainTableModel)table.getModel()).myTrain;
+				Train train = ((TrainTableModel) table.getModel()).myTrain;
 				train.trainNameDown = tfNameD.getText().trim();
 				train.trainNameUp = tfNameU.getText().trim();
 				train.trainNameFull = tfName.getText().trim();
 
 				isCanceled = false;
-//				TrainDialog.this.setVisible(false);
+				// TrainDialog.this.setVisible(false);
 				TrainDialog.this.dispose();
 			}
 		});
@@ -164,7 +168,7 @@ public class TrainDialog extends JDialog {
 		btCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				isCanceled = true;
-//				TrainDialog.this.setVisible(false);
+				// TrainDialog.this.setVisible(false);
 				TrainDialog.this.dispose();
 			}
 		});
@@ -173,44 +177,69 @@ public class TrainDialog extends JDialog {
 		btWeb.setFont(new Font("dialog", 0, 12));
 		btWeb.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-			    if (tfName.getText().trim().equals("")) {
-				new MessageBox(__("Must input train number before trying to get data from web.")).showMessage();
-				return;
-			    }
-			    if (table.getCellEditor() != null)
-				table.getCellEditor().stopCellEditing();
-			    
+				if (tfName.getText().trim().equals("")) {
+					new MessageBox(
+							__("Must input train number before trying to get data from web."))
+							.showMessage();
+					return;
+				}
+				if (table.getCellEditor() != null)
+					table.getCellEditor().stopCellEditing();
 
-				String proxyAddress = mainFrame.prop.getProperty(MainFrame.Prop_HTTP_Proxy_Server);
+				String proxyAddress = mainFrame.prop
+						.getProperty(MainFrame.Prop_HTTP_Proxy_Server);
 				int proxyPort = 0;
 				try {
-					proxyPort = Integer.parseInt(mainFrame.prop.getProperty(MainFrame.Prop_HTTP_Proxy_Port));
+					proxyPort = Integer.parseInt(mainFrame.prop
+							.getProperty(MainFrame.Prop_HTTP_Proxy_Port));
+				} catch (NumberFormatException ex) {
+					proxyPort = 0;
 				}
-				catch (NumberFormatException ex) {
-				    proxyPort = 0;
-				}
-			    Train loadingTrain = doLoadTrainFromWeb(tfName.getText().trim(), proxyAddress, proxyPort);
-			    if(loadingTrain != null) {
-					if(loadingTrain.color == null) {
-					    Color c = ((TrainTableModel)table.getModel()).myTrain.color;
-					    loadingTrain.color = c;
-					}
-					
-					((TrainTableModel)table.getModel()).myTrain = loadingTrain;
-					tfName.setText(loadingTrain.getTrainName());
-					tfNameD.setText(loadingTrain.trainNameDown);
-					tfNameU.setText(loadingTrain.trainNameUp);
-
-					table.revalidate();
-					table.updateUI();
-			    }
-			    else {
-				new MessageBox(__("Unable to get train information from web.")).showMessage();
-			    }
 				
+				Color color = table.getBackground();
+				
+				int proxyPort0 = proxyPort;
+				new Thread( () -> {
+					Train loadingTrain = doLoadTrainFromWeb(
+							tfName.getText().trim(), proxyAddress, proxyPort0);
+
+					if (TrainDialog.this.isVisible()) {
+						if (loadingTrain != null ) {
+							if (loadingTrain.color == null) {
+								Color c = ((TrainTableModel) table.getModel()).myTrain.color;
+								loadingTrain.color = c;
+							}
+
+							((TrainTableModel) table.getModel()).myTrain = loadingTrain;
+							tfName.setText(loadingTrain.getTrainName());
+							tfNameD.setText(loadingTrain.trainNameDown);
+							tfNameU.setText(loadingTrain.trainNameUp);
+
+							table.revalidate();
+						} else {
+							new MessageBox(
+									__("Unable to get train information from web."))
+									.showMessage();
+						}
+						
+						btWeb.setText(__("Get From Web"));
+						btWeb.setForeground(Color.BLUE);
+						btWeb.updateUI();
+					
+						table.setBackground(color);
+						table.updateUI();
+					}
+				} ).start();
+
+				table.setBackground(Color.decode("0xB4FFDD"));
+				table.updateUI();
+				
+				btWeb.setText(__("Searching..."));
+				btWeb.setForeground(Color.RED);
+				btWeb.updateUI();
+
 			}
 		});
-
 
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(btColor);
@@ -227,7 +256,7 @@ public class TrainDialog extends JDialog {
 
 		getContentPane().add(rootPanel);
 	}
-	
+
 	private JPanel buildTrainPanel() {
 		JButton btDel = new JButton(__("Delete"));
 		btDel.setFont(new Font("dialog", 0, 12));
@@ -236,7 +265,8 @@ public class TrainDialog extends JDialog {
 				if (table.getCellEditor() != null)
 					table.getCellEditor().stopCellEditing();
 
-				((TrainTableModel)table.getModel()).myTrain.delStop(table.getSelectedRow());
+				((TrainTableModel) table.getModel()).myTrain.delStop(table
+						.getSelectedRow());
 
 				table.revalidate();
 			}
@@ -246,11 +276,12 @@ public class TrainDialog extends JDialog {
 		btAdd.setFont(new Font("dialog", 0, 12));
 		btAdd.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//        table.getCellEditor().stopCellEditing();
+				// table.getCellEditor().stopCellEditing();
 				String name = __("Station");
 				String arrive = "00:00";
 				String leave = "00:00";
-				((TrainTableModel)table.getModel()).myTrain.insertStop(new Stop(name, arrive, leave, false), 
+				((TrainTableModel) table.getModel()).myTrain.insertStop(
+						new Stop(name, arrive, leave, false),
 						table.getSelectedRow());
 
 				table.revalidate();
@@ -261,15 +292,16 @@ public class TrainDialog extends JDialog {
 		btApp.setFont(new Font("dialog", 0, 12));
 		btApp.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//        table.getCellEditor().stopCellEditing();
+				// table.getCellEditor().stopCellEditing();
 				int curIndex = table.getSelectedRow();
-				if(curIndex<0)
+				if (curIndex < 0)
 					return;
-				
+
 				String name = __("Station");
 				String arrive = "00:00";
 				String leave = "00:00";
-				((TrainTableModel)table.getModel()).myTrain.insertStop(new Stop(name, arrive, leave, false), curIndex+1);
+				((TrainTableModel) table.getModel()).myTrain.insertStop(
+						new Stop(name, arrive, leave, false), curIndex + 1);
 
 				table.revalidate();
 			}
@@ -279,26 +311,27 @@ public class TrainDialog extends JDialog {
 		buttonPanel.add(btAdd);
 		buttonPanel.add(btApp);
 		buttonPanel.add(btDel);
-		
+
 		JLabel lbNameU = new JLabel(__("Up-going:"));
 		lbNameU.setFont(new Font("dialog", 0, 12));
 		JLabel lbNameD = new JLabel(__("Down-going"));
 		lbNameD.setFont(new Font("dialog", 0, 12));
 		JLabel lbName = new JLabel(__("Train number:"));
 		lbName.setFont(new Font("dialog", 0, 12));
-		
+
 		tfNameU = new JTextField(4);
 		tfNameU.setFont(new Font("dialog", 0, 12));
-		tfNameU.setText(((TrainTableModel)table.getModel()).myTrain.trainNameUp);
+		tfNameU.setText(((TrainTableModel) table.getModel()).myTrain.trainNameUp);
 		tfNameD = new JTextField(4);
 		tfNameD.setFont(new Font("dialog", 0, 12));
-		tfNameD.setText(((TrainTableModel)table.getModel()).myTrain.trainNameDown);
+		tfNameD.setText(((TrainTableModel) table.getModel()).myTrain.trainNameDown);
 		tfName = new JTextField(12);
 		tfName.setFont(new Font("dialog", 0, 12));
-		tfName.setText(((TrainTableModel)table.getModel()).myTrain.getTrainName());
-				
+		tfName.setText(((TrainTableModel) table.getModel()).myTrain
+				.getTrainName());
+
 		JPanel namePanel = new JPanel();
-		namePanel.setBorder(new EmptyBorder(1,1,1,1));
+		namePanel.setBorder(new EmptyBorder(1, 1, 1, 1));
 		namePanel.add(lbName);
 		namePanel.add(tfName);
 		namePanel.add(lbNameD);
@@ -306,14 +339,14 @@ public class TrainDialog extends JDialog {
 		namePanel.add(lbNameU);
 		namePanel.add(tfNameU);
 
-		JScrollPane spTrain = new JScrollPane(table);
+//		JScrollPane spTrain = new JScrollPane(table);
 
 		JPanel trainPanel = new JPanel();
 		trainPanel.setLayout(new BorderLayout());
 		trainPanel.add(namePanel, BorderLayout.NORTH);
-		trainPanel.add(spTrain, BorderLayout.CENTER);
+		trainPanel.add(table.getContainerPanel(), BorderLayout.CENTER);
 		trainPanel.add(buttonPanel, BorderLayout.SOUTH);
-		
+
 		return trainPanel;
 	}
 
@@ -329,27 +362,33 @@ public class TrainDialog extends JDialog {
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		chooser.setApproveButtonText(__("Save "));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(mainFrame.prop.getProperty(
+					MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
-		} catch (Exception e) {}
-		
-		String savingName = savingTrain.getTrainName().replace('/', '_'); 
+		} catch (Exception e) {
+		}
+
+		String savingName = savingTrain.getTrainName().replace('/', '_');
 		chooser.setSelectedFile(new File(savingName));
 
 		int returnVal = chooser.showSaveDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			String f = chooser.getSelectedFile().getAbsolutePath();
-			if(!f.endsWith(".trf"))
+			if (!f.endsWith(".trf"))
 				f += ".trf";
 
 			try {
-				BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
+				BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
+						new FileOutputStream(f), "UTF-8"));
 				savingTrain.writeTo(out);
-				
+
 				out.close();
 
-				mainFrame.prop.setProperty(MainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
+				mainFrame.prop.setProperty(
+						MainFrame.Prop_Recent_Open_File_Path, chooser
+								.getSelectedFile().getParentFile()
+								.getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -367,10 +406,12 @@ public class TrainDialog extends JDialog {
 		chooser.addChoosableFileFilter(new TRFFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(MainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(mainFrame.prop.getProperty(
+					MainFrame.Prop_Recent_Open_File_Path, ""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
-		} catch (Exception e) {}
+		} catch (Exception e) {
+		}
 
 		int returnVal = chooser.showOpenDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -379,7 +420,10 @@ public class TrainDialog extends JDialog {
 			Train loadingTrain = new Train();
 			try {
 				loadingTrain.loadFromFile(f.getAbsolutePath());
-				mainFrame.prop.setProperty(MainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
+				mainFrame.prop.setProperty(
+						MainFrame.Prop_Recent_Open_File_Path, chooser
+								.getSelectedFile().getParentFile()
+								.getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -390,85 +434,179 @@ public class TrainDialog extends JDialog {
 		return null;
 	}
 
-    public static Train doLoadTrainFromWeb(String code, String proxyAddress, int proxyPort) {
-	    Train train = new Train();
-	    train.trainNameFull = "";
-	    Date now = new Date();
-	    SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
-	    String date = format.format(now);
-	    
-	    if (code.indexOf("/") != -1)
-	    	code = code.split("/")[0];
-	    
-	    String getData = "cxlx=cc&date=" + date + "&trainCode=" + code;
-	    try {
-		Proxy proxy = null;
-		if (proxyAddress.equals("") || proxyPort == 0)
-		     proxy = Proxy.NO_PROXY;
-		else
-		     proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(proxyAddress, proxyPort));
-		URL url = new URL("http://dynamic.12306.cn/TrainQuery/skbcx.jsp?" + getData);
+	/**
+	 * Load train data from 盛名时刻表
+	 * http://wap.smskb.com/search.asp?action=cccx&checi=K121
+	 * 
+	 * @param code
+	 * @param proxyAddress
+	 * @param proxyPort
+	 * @return
+	 */
+	public static Train doLoadTrainFromWeb(String code, String proxyAddress,
+			int proxyPort) {
+		Train train = new Train();
+		train.trainNameFull = "";
+		Date now = new Date();
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		String date = format.format(now);
 
-		URLConnection conn = url.openConnection(proxy);
-		conn.setRequestProperty ( "User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)" );
-		conn.setRequestProperty("Referer", "http://dynamic.12306.cn/TrainQuery/trainInfoByStation.jsp");
+		if (code.indexOf("/") != -1)
+			code = code.split("/")[0];
 
-		conn.setDoOutput(true); 
-		OutputStreamWriter wr = new OutputStreamWriter(conn.getOutputStream()); 
-		// wr.write(postData); 
-		wr.flush(); 
-		BufferedReader in = new BufferedReader(
-						       new InputStreamReader(
-									     conn.getInputStream(), "UTF-8"));
-		String inputLine;
+		String getData = "action=cccx&checi="  + code;
+		try {
+			Proxy proxy = null;
+			if (proxyAddress.equals("") || proxyPort == 0)
+				proxy = Proxy.NO_PROXY;
+			else
+				proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
+						proxyAddress, proxyPort));
+			URL url = new URL("http://wap.smskb.com/search.asp?"
+					+ getData);
 
-		while ((inputLine = in.readLine()) != null) {
-		    if ((inputLine.indexOf("//") == -1) && (inputLine.indexOf("mygrid.addRow") != -1)) {
-			String [] items = inputLine.split(",");
-			// if (items[4].indexOf("----") != -1) items[4] = items[5];
-			// if (items[5].indexOf("----") != -1) items[5] = items[4];
-			Stop stop = new Stop(items[2].split("\\^")[0].trim(), items[4].trim(), items[5].trim(), true);
-			train.appendStop(stop);
-			String c = items[3].trim();
-			if ((c.charAt(c.length() - 1) - '0') % 2 == 0) {
-			    if (train.trainNameUp.equals(""))
-				train.trainNameUp = c;
+			URLConnection conn = url.openConnection(proxy);
+			conn.setConnectTimeout(5000);
+			conn.setRequestProperty("User-Agent",
+//					"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)");
+					"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.78.2 (KHTML, like Gecko) Version/7.0.6 Safari/537.78.2");
+
+			conn.setRequestProperty("Referer",
+					"http://wap.smskb.com/index2.asp");
+
+			conn.setDoOutput(true);
+			OutputStreamWriter wr = new OutputStreamWriter(
+					conn.getOutputStream());
+			// wr.write(postData);
+			wr.flush();
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					conn.getInputStream(), "GBK"));
+			String inputLine;
+			String trainName = null;
+
+			while ((inputLine = in.readLine()) != null) {
+				DEBUG(inputLine);
+				if (trainName == null) {
+					Pattern trainNamePattern = Pattern.compile(">([^>]*?)次列车");   // <td width="100%">1112/1113次列车<br>
+					Matcher trainNameMather = trainNamePattern.matcher(inputLine);
+					trainName = trainNameMather.find() ? trainNameMather.group(1) : null;
+					train.trainNameFull = trainName;
+				}
+				
+				Pattern stopPattern = Pattern.compile("第\\d+站：(.*?)<br>(.*?)到；(.*?)开");   // <td width="100%">第1站：青岛<br>15:04到；15:05开<br>
+				Matcher stopMather = stopPattern.matcher(inputLine);
+				while (stopMather.find()) {
+					Stop stop = new Stop(stopMather.group(1),
+							stopMather.group(2), stopMather.group(3), true);
+					train.appendStop(stop);
+				}
+
 			}
-			else {
-			    if (train.trainNameDown.equals(""))
-				train.trainNameDown = c;
+			in.close();
+
+			String[] names = train.trainNameFull.split("/");
+			for (int i = 0; i < names.length; ++i) {
+				if ((names[i].charAt(names[i].length() - 1) - '0') % 2 == 0) {
+					train.trainNameUp = names[i];
+				} else {
+					train.trainNameDown = names[i];
+				}
 			}
-			if (train.trainNameFull.indexOf(c) == -1) {
-			    if (train.trainNameFull.equals("")) {
-				train.trainNameFull = c;
-			    }
-			    else {
-				train.trainNameFull += ("/" + c);
-			    }
-			}
-		    }
+
+			// Fix wrong start/end time
+			train.getStop(0).arrive = train.getStop(0).leave;
+			train.getStop(train.getStopNum() - 1).leave = train.getStop(train
+					.getStopNum() - 1).arrive;
+
+			return train;
+		} catch (Exception e) {
+			return null;
 		}
-		in.close();
-		
-		String [] names = train.trainNameFull.split("/");
-		for (int i = 0; i < names.length; ++i) {
-		    if ((names[i].charAt(names[i].length() - 1) - '0') % 2 == 0) {
-			train.trainNameUp = names[i];
-		    }
-		    else {
-			train.trainNameDown = names[i];
-		    }
+	}
+
+	public static Train doLoadTrainFromWeb_12306(String code,
+			String proxyAddress, int proxyPort) {
+		Train train = new Train();
+		train.trainNameFull = "";
+		Date now = new Date();
+		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
+		String date = format.format(now);
+
+		if (code.indexOf("/") != -1)
+			code = code.split("/")[0];
+
+		String getData = "cxlx=cc&date=" + date + "&trainCode=" + code;
+		try {
+			Proxy proxy = null;
+			if (proxyAddress.equals("") || proxyPort == 0)
+				proxy = Proxy.NO_PROXY;
+			else
+				proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
+						proxyAddress, proxyPort));
+			URL url = new URL("http://dynamic.12306.cn/TrainQuery/skbcx.jsp?"
+					+ getData);
+
+			URLConnection conn = url.openConnection(proxy);
+			conn.setRequestProperty("User-Agent",
+					"Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)");
+			conn.setRequestProperty("Referer",
+					"http://dynamic.12306.cn/TrainQuery/trainInfoByStation.jsp");
+
+			conn.setDoOutput(true);
+			OutputStreamWriter wr = new OutputStreamWriter(
+					conn.getOutputStream());
+			// wr.write(postData);
+			wr.flush();
+			BufferedReader in = new BufferedReader(new InputStreamReader(
+					conn.getInputStream(), "UTF-8"));
+			String inputLine;
+
+			while ((inputLine = in.readLine()) != null) {
+				if ((inputLine.indexOf("//") == -1)
+						&& (inputLine.indexOf("mygrid.addRow") != -1)) {
+					String[] items = inputLine.split(",");
+					// if (items[4].indexOf("----") != -1) items[4] = items[5];
+					// if (items[5].indexOf("----") != -1) items[5] = items[4];
+					Stop stop = new Stop(items[2].split("\\^")[0].trim(),
+							items[4].trim(), items[5].trim(), true);
+					train.appendStop(stop);
+					String c = items[3].trim();
+					if ((c.charAt(c.length() - 1) - '0') % 2 == 0) {
+						if (train.trainNameUp.equals(""))
+							train.trainNameUp = c;
+					} else {
+						if (train.trainNameDown.equals(""))
+							train.trainNameDown = c;
+					}
+					if (train.trainNameFull.indexOf(c) == -1) {
+						if (train.trainNameFull.equals("")) {
+							train.trainNameFull = c;
+						} else {
+							train.trainNameFull += ("/" + c);
+						}
+					}
+				}
+			}
+			in.close();
+
+			String[] names = train.trainNameFull.split("/");
+			for (int i = 0; i < names.length; ++i) {
+				if ((names[i].charAt(names[i].length() - 1) - '0') % 2 == 0) {
+					train.trainNameUp = names[i];
+				} else {
+					train.trainNameDown = names[i];
+				}
+			}
+
+			// Fix wrong start/end time
+			train.getStop(0).arrive = train.getStop(0).leave;
+			train.getStop(train.getStopNum() - 1).leave = train.getStop(train
+					.getStopNum() - 1).arrive;
+
+			return train;
+		} catch (Exception e) {
+			return null;
 		}
-		
-		// Fix wrong start/end time
-		train.getStop(0).arrive = train.getStop(0).leave;
-		train.getStop(train.getStopNum() - 1).leave = train.getStop(train.getStopNum() - 1).arrive;
-		
-		return train;
-	    }
-	    catch (Exception e) {
-		return null;
-	    }
 	}
 
 	private void doSetColor(final Train train) {
@@ -476,7 +614,7 @@ public class TrainDialog extends JDialog {
 		ActionListener listener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				train.color = colorChooser.getColor();
-				mainFrame.chartView.panelLines.repaint();
+				mainFrame.chartView.panelLines.updateBuffer();
 			}
 		};
 
@@ -485,7 +623,7 @@ public class TrainDialog extends JDialog {
 				colorChooser, listener, // OK button handler
 				null); // no CANCEL button handler
 		ETRC.setFont(dialog);
-		
+
 		colorChooser.setColor(train.color);
 
 		Dimension dlgSize = dialog.getPreferredSize();
@@ -505,12 +643,12 @@ public class TrainDialog extends JDialog {
 		setVisible(true);
 	}
 
-	public class TrainTableModel extends AbstractTableModel {
+	public class TrainTableModel extends DefaultJEditTableModel {
 		/**
 		 * 
 		 */
 		private static final long serialVersionUID = 1014817974495127589L;
-		
+
 		Train myTrain;
 
 		TrainTableModel(Train _train) {
@@ -538,19 +676,22 @@ public class TrainDialog extends JDialog {
 		/**
 		 * isCellEditable
 		 *
-		 * @param rowIndex int
-		 * @param columnIndex int
+		 * @param rowIndex
+		 *            int
+		 * @param columnIndex
+		 *            int
 		 * @return boolean
 		 */
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return (columnIndex == 0) || (columnIndex == 1)	
-				|| (columnIndex == 2) || (columnIndex == 3);
+			return (columnIndex == 0) || (columnIndex == 1)
+					|| (columnIndex == 2) || (columnIndex == 3);
 		}
 
 		/**
 		 * getColumnClass
 		 *
-		 * @param columnIndex int
+		 * @param columnIndex
+		 *            int
 		 * @return Class
 		 */
 		public Class<?> getColumnClass(int columnIndex) {
@@ -569,8 +710,10 @@ public class TrainDialog extends JDialog {
 		/**
 		 * getValueAt
 		 *
-		 * @param rowIndex int
-		 * @param columnIndex int
+		 * @param rowIndex
+		 *            int
+		 * @param columnIndex
+		 *            int
 		 * @return Object
 		 */
 		public Object getValueAt(int rowIndex, int columnIndex) {
@@ -591,40 +734,45 @@ public class TrainDialog extends JDialog {
 		/**
 		 * setValueAt
 		 *
-		 * @param aValue Object
-		 * @param rowIndex int
-		 * @param columnIndex int
+		 * @param aValue
+		 *            Object
+		 * @param rowIndex
+		 *            int
+		 * @param columnIndex
+		 *            int
 		 */
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-//			SimpleDateFormat df = new SimpleDateFormat("H:mm");
-//			try {
-				switch (columnIndex) {
-				case 0:
-					myTrain.getStop(rowIndex).stationName = (String) aValue;
-					break;
-				case 1:
-//					train.stops[rowIndex].arrive = df.parse((String) aValue);
-					myTrain.getStop(rowIndex).arrive = (String) aValue;
-					break;
-				case 2:
-//					train.stops[rowIndex].leave = df.parse((String) aValue);
-					myTrain.getStop(rowIndex).leave = (String) aValue;
-					break;
-				case 3:
-					myTrain.getStop(rowIndex).isPassenger = ((Boolean) aValue).booleanValue();
-					break;
-				default:
-				}
-//			} catch (ParseException ex) {
-//				ex.printStackTrace();
-//			}
+			// SimpleDateFormat df = new SimpleDateFormat("H:mm");
+			// try {
+			switch (columnIndex) {
+			case 0:
+				myTrain.getStop(rowIndex).stationName = (String) aValue;
+				break;
+			case 1:
+				// train.stops[rowIndex].arrive = df.parse((String) aValue);
+				myTrain.getStop(rowIndex).arrive = (String) aValue;
+				break;
+			case 2:
+				// train.stops[rowIndex].leave = df.parse((String) aValue);
+				myTrain.getStop(rowIndex).leave = (String) aValue;
+				break;
+			case 3:
+				myTrain.getStop(rowIndex).isPassenger = ((Boolean) aValue)
+						.booleanValue();
+				break;
+			default:
+			}
+			// } catch (ParseException ex) {
+			// ex.printStackTrace();
+			// }
 			fireTableCellUpdated(rowIndex, columnIndex);
 		}
 
 		/**
 		 * getColumnName
 		 *
-		 * @param columnIndex int
+		 * @param columnIndex
+		 *            int
 		 * @return String
 		 */
 		public String getColumnName(int columnIndex) {
@@ -645,7 +793,8 @@ public class TrainDialog extends JDialog {
 		/**
 		 * addTableModelListener
 		 *
-		 * @param l TableModelListener
+		 * @param l
+		 *            TableModelListener
 		 */
 		public void addTableModelListener(TableModelListener l) {
 		}
@@ -653,13 +802,24 @@ public class TrainDialog extends JDialog {
 		/**
 		 * removeTableModelListener
 		 *
-		 * @param l TableModelListener
+		 * @param l
+		 *            TableModelListener
 		 */
 		public void removeTableModelListener(TableModelListener l) {
 		}
+
+		@Override
+		public boolean nextCellIsBelow(int row, int column, int increment) {
+			return true;
+		}
+
+		@Override
+		public boolean columnIsTimeString(int column) {
+			return 1 <= column && column <= 2;
+		}
 	}
 
-	public class TrainTable extends JTable {
+	public class TrainTable extends JEditTable {
 		/**
 		 * 
 		 */
@@ -675,9 +835,42 @@ public class TrainDialog extends JDialog {
 			return new Dimension(w, h);
 		}
 
-		public boolean isRowSelected(int row) {
-			//      return chart.trains[row].equals(chart.getActiveTrain());
-			return super.isRowSelected(row);
+		@Override
+		protected boolean increaseCell(int row, int column, int startRow,
+				int startColumn, int increment) {
+			boolean changed = super.increaseCell(row, column, startRow, startColumn, increment);
+			
+			if (column == 1) {
+				// If the column in edit is the arrival time.
+				changed = super.increaseCell(row, column + 1, startRow, startColumn, increment) || changed;
+			} else if (column == 2) {
+				// If the column in edit is the departure time.
+				if (row != startRow) {
+					changed = super.increaseCell(row, column - 1, startRow, startColumn, increment) || changed;
+				}
+			}
+			
+			return changed;
+		}
+		
+	}
+	
+	public static void main(String[] args) {
+		String inputLine = "<td width=\"100%\">第1站：青岛<br>15:04到；15:05开<br>";
+		System.out.println(inputLine);
+		Pattern stopPattern = Pattern.compile("第\\d+站：(.*?)<br>(.*?)到；(.*?)开");   // <td width="100%">第1站：青岛<br>15:04到；15:05开<br>
+		Matcher stopMather = stopPattern.matcher(inputLine);
+//		System.out.println(trainNameMather.find());
+		if (stopMather.find()) {
+			String group0 = stopMather.group(0);
+			System.out.println(group0);
+			String group1 = stopMather.group(1);
+			System.out.println(group1);
+			String group2= stopMather.group(2);
+			System.out.println(group2);
+			String group3= stopMather.group(3);
+			System.out.println(group3);
+			int i = 1;
 		}
 	}
 }

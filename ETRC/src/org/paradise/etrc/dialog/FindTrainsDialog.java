@@ -1,6 +1,7 @@
 package org.paradise.etrc.dialog;
 
 import static org.paradise.etrc.ETRC.__;
+import static org.paradise.etrc.ETRCUtil.DEBUG;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -8,7 +9,10 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.Instant;
+import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
@@ -105,18 +109,35 @@ public class FindTrainsDialog extends JDialog {
 			msgLabel.setText(__("Please wait while imporing train information..."));
 			
 			ETRCSKB skb = mainFrame.getSKB();
-			Vector<Train> trains = skb.findTrains(mainFrame.chart.trunkCircuit);
+			List<Train> trains = skb.findTrains(mainFrame.chart.allCircuits.stream());		//skb.findTrains(mainFrame.chart.trunkCircuit);
+
+			Instant instant1 = null, instant2 = null;
+			if (DEBUG())
+				instant1= Instant.now();
 			
-			for(int i=0; i<trains.size(); i++) {
-				Train loadingTrain = (Train) (trains.get(i));
-				
-				if(loadingTrain.isDownTrain(mainFrame.chart.trunkCircuit, false) > 0) {
-					mainFrame.chart.addTrain(loadingTrain);
-					
-					msgLabel.setText(String.format(__("Importing train information %s"), loadingTrain.getTrainName()));
-					hold(50);
-				}
-			}
+			trains.stream().parallel()
+				.filter(train-> (train.isDownTrain(mainFrame.chart.trunkCircuit) > 0))
+				.forEach(train-> {
+					mainFrame.chart.addTrain(train);
+					msgLabel.setText(String.format(__("Importing train information %s"), train.getTrainName()));
+				});
+			
+			if (DEBUG())
+				instant2= Instant.now();
+			
+			DEBUG("Benchmark: [import circuit]: %d", instant2.toEpochMilli() - instant1.toEpochMilli());
+			
+			
+//			for(int i=0; i<trains.size(); i++) {
+//				Train loadingTrain = (Train) (trains.get(i));
+//				
+//				if(loadingTrain.isDownTrain(mainFrame.chart.trunkCircuit, false) > 0) {
+//					mainFrame.chart.addTrain(loadingTrain);
+//					
+//					msgLabel.setText(String.format(__("Importing train information %s"), loadingTrain.getTrainName()));
+//					hold(50);
+//				}
+//			}
 			
 			mainFrame.chartView.repaint();
 			mainFrame.sheetView.updateData();

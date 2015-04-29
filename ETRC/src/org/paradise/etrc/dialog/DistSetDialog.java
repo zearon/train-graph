@@ -18,9 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
+
+import org.paradise.etrc.MainFrame;
 //import com.borland.jbcl.layout.*;
 import org.paradise.etrc.data.Chart;
-import org.paradise.etrc.MainFrame;
 
 /**
  * @author lguo@sina.com

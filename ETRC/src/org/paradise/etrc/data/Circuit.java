@@ -2,20 +2,26 @@ package org.paradise.etrc.data;
 
 import static org.paradise.etrc.ETRC.__;
 
+import java.awt.Event;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.EventListener;
+import java.util.List;
 import java.util.Vector;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
- * @author lguo@sina.com
- * @version 1.0
- * 
  * 运行图的区间，可以是一整条线路，也可以是某条干线的一段
  * 一个circuit内的上下行应当一致（南京西－南京理解为下行） 
  * 距离一律以下行为递增方向，如沪宁线以南京（西）站为0坐标，沪杭线以上海站为0坐标
+ * @author lguo@sina.com
+ * @version 1.0
+ * 
  */
 
 public class Circuit {
@@ -27,11 +33,18 @@ public class Circuit {
 	public int multiplicity = 2;
 	public int zindex = 0;
 	public float dispScale = 1.0f;
+	public boolean visible = true;
+	
+	public transient String dinfo = "";
 
-//	private int stationNum = 0;
-
-//	private Station[] _stations = new Station[MAX_STATION_NUM];
 	private Vector<Station> stations = new Vector<Station> (10);
+	
+	public int calIndex = 0;
+	public boolean dispReverted = false;   // 在铁路网络中位于其他线路保持一致,颠倒了上下行顺序.
+	private int crossoverCount = 0;
+	private List<Station> crossoverStations = new Vector<Station> (4);
+	
+	private List<Consumer<Circuit>> circuitChangedListeners = new Vector<Consumer<Circuit>>();
 
 	public Circuit() {
 	}
@@ -54,14 +67,16 @@ public class Circuit {
 		cir.length = this.length;
 		cir.multiplicity = this.multiplicity;
 		cir.zindex = this.zindex;
-//		cir.stationNum = this.stationNum;
 
 		for (int i = 0; i < getStationNum(); i++)
-//			cir._stations[i] = this._stations[i].copy();
 			cir.stations.add(stations.get(i).copy());
 		
 
 		return cir;
+	}
+	
+	public Vector<Station> getAllStations() {
+		return stations;
 	}
 	
 	public Station getStation(int index) {
@@ -73,6 +88,38 @@ public class Circuit {
 //		return stationNum;
 		return stations.size();
 	}
+	
+	public void updateStations() {
+		crossoverStations = stations.stream().filter(station->station.isCrossover).collect(Collectors.toList());
+		crossoverCount = crossoverStations.size();
+	}
+	
+	public boolean hasCrossover() {
+		return crossoverCount > 0;
+	}
+	
+	public int getCrossoverCount() {
+		return crossoverCount;
+	}
+	
+	public List<Station> getCrossoverStations() {
+		return crossoverStations;
+	}
+	
+	public Station getCrossoverStation(int index) {
+		return crossoverStations.get(index);
+	}
+	
+	/**
+	 * Get a tuple of crossover station and its index in the circuit
+	 * @param index
+	 * @return
+	 */
+	public Tuple<Station, Integer> getCrossoverStationTuple(int index) {
+		Station station = crossoverStations.get(index);
+		int stationIndex = stations.indexOf(station);
+		return Tuple.of(station, stationIndex);
+	}
 
 	/**
 	 * 在index前插入新的车站
@@ -83,27 +130,14 @@ public class Circuit {
 		if ((index < 0) /* || (index >= MAX_STATION_NUM) */ )
 			return;
 
-//		Station[] newStations = new Station[MAX_STATION_NUM];
-//
-//		int j = 0;
-//		for (int i = 0; i < index; i++) {
-//			newStations[j++] = _stations[i];
-//		}
-//
-//		newStations[j++] = station;
-//
-//		for (int i = index; i < stationNum; i++) {
-//			newStations[j++] = _stations[i];
-//		}
-//
-//		_stations = newStations;
 		stations.insertElementAt(station, index);
-//		stationNum++;
 		
 		if (getStationNum() != 0)
 			this.length = stations.get(getStationNum() - 1).dist;
 		else
 			this.length = 0;
+
+		fireCircuitChangedEvent();
 	}
 
 	/**
@@ -111,50 +145,28 @@ public class Circuit {
 	 * @param station Station
 	 */
 	public void appendStation(Station station) {
-//		Station[] newStations = new Station[MAX_STATION_NUM];
-//
-//		int j = 0;
-//		for (int i = 0; i < stationNum; i++) {
-//			newStations[j++] = _stations[i];
-//		}
-//
-//		newStations[j++] = station;
-//
-//		_stations = newStations;
-//		stationNum++;
-		
 		stations.add(station);
 		
 		if (getStationNum() != 0)
-//			this.length = _stations[stationNum - 1].dist;
 			this.length = stations.get(getStationNum() - 1).dist;
 		else
 			this.length = 0;
+		
+		fireCircuitChangedEvent();
 	}
 
 	public void delStation(int index) {
 		if ((index < 0) || index >= getStationNum() /*(index >= MAX_STATION_NUM)*/ )
 			return;
-
-//		Station[] newStations = new Station[MAX_STATION_NUM];
-//
-//		int j = 0;
-//		for (int i = 0; i < index; i++) {
-//			newStations[j++] = _stations[i];
-//		}
-//
-//		for (int i = index + 1; i < stationNum; i++) {
-//			newStations[j++] = _stations[i];
-//		}
-//
-//		_stations = newStations;
+		
 		stations.remove(index);
-//		stationNum--;
 		
 		if (getStationNum() != 0)
 			this.length = stations.get(getStationNum() - 1).dist;
 		else
 			this.length = 0;
+
+		fireCircuitChangedEvent();
 	}
 
 	public void delStation(String name) {
@@ -162,24 +174,14 @@ public class Circuit {
 		if(index >= 0)
 			return;
 		
-//		Station[] newStations = new Station[MAX_STATION_NUM];
-//
-//		int j = 0;
-//		for (int i = 0; i < stationNum; i++) {
-//			if (!_stations[i].name.equalsIgnoreCase(name)) {
-//				newStations[j++] = _stations[i];
-//			}
-//		}
-//
-//		_stations = newStations;
-		
 		stations.remove(index);
-//		stationNum--;
 		
 		if (getStationNum() != 0)
 			this.length = stations.get(getStationNum() - 1).dist;
 		else
 			this.length = 0;
+		
+		fireCircuitChangedEvent();
 	}
 	
 	public int haveTheStation(String theName) {
@@ -361,7 +363,9 @@ public class Circuit {
 			parseStationLine(line);
 		}
 		
-		in.close();
+		in.close();		
+
+		fireCircuitChangedEvent();
 	}
 
 	/**
@@ -539,6 +543,9 @@ public class Circuit {
 	}
 
 	private void parseStationLine(String line) throws IOException {
+		if ("".equals(line.trim()))
+			return;
+		
 		String stStation[] = line.split(",");
 		if (stStation.length < 2)
 			throw new IOException(String.format(__("Invalid data for station %d"), getStationNum() + 1));
@@ -662,5 +669,47 @@ public class Circuit {
 		}
 		
 		return null;
+	}
+	
+	/**
+	 * Duplicated station names can only occur in the first or the last position of a circuit.
+	 * In this case, the circuit represents a loop circuit. Otherwise, the duplicates are illegal.
+	 * @return the illegal duplicated station names.
+	 */
+	public List<String> getDuplicatedStationNames() {
+		ArrayList<String> names = new ArrayList<>();
+		ArrayList<String> duplicatedNames = new ArrayList<>();
+		
+		int stationCount = stations.size();
+		String firstName = null;
+		for (int i = 0; i < stationCount; ++ i) {
+			Station station = stations.get(i);
+			if (i == 0)
+				firstName = station.name;
+			
+			if (names.contains(station.name)) {
+				if (i == stationCount - 1)
+					station.isLoopStation = true;
+				else if (i < stationCount - 1 || (firstName != null && !firstName.equals(station.name)))
+					duplicatedNames.add(station.name);
+			} else {
+				names.add(station.name);
+			}
+		}
+		
+		return duplicatedNames;
+	}
+	
+	public void addCircuitChangedListener(Consumer<Circuit> eventHandler) {
+		circuitChangedListeners.add(eventHandler);
+	}
+	
+	public void removeCircuitChangedListener(Consumer<Circuit> eventHandler) {
+		circuitChangedListeners.remove(eventHandler);
+	}
+	
+	protected void fireCircuitChangedEvent() {
+		circuitChangedListeners.stream().parallel()
+			.forEach(action->action.accept(this));
 	}
 }

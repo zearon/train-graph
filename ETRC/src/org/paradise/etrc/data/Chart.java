@@ -11,17 +11,25 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+import org.paradise.etrc.data.RailNetwork.CircuitChangeType;
 
 public class Chart {
 	//Y轴（距离）显示参数
 	public float distScale = 3; //每公里像素数
+	public static final float MAX_DIST_SCALE = 10f;
 	public int displayLevel = 4; //最低可显示车站等级
 	public int boldLevel = 2; //最低粗线显示车站等级（特等为0）
 
 	//X轴（时间）显示参数
 	public int startHour = 18; //0坐标时刻（0-23）
 	public int minuteScale = 2; //每分钟像素数
+	public static final int  MAX_MINUTE_SCALE = 10;
 	public int timeInterval = 10; //时间轴间隔（必须是60的约数，即可以是5，6，10等，但不能是7分钟）
 
 	//本运行图的线路
@@ -39,6 +47,9 @@ public class Chart {
 	public int dNum = 0;
 	//上行车次数目
 	public int uNum = 0;
+	
+
+	private List<Consumer<Chart>> chartChangedListeners = new Vector<Consumer<Chart>> ();
 
 	public Chart(File f) throws IOException {
 		loadFromFile(f);
@@ -94,6 +105,9 @@ public class Chart {
 //	        direction = "未知";
 //	    }
 //	    System.out.println(loadingTrain.getTrainName(circuit) + "次" + direction);
+		
+		loadingTrain.addTrainChangedListener(this::onTrainChanged);
+		fireChartChangedEvent();
 	}
 	
 	public Train findTrain(String trainName) {
@@ -130,41 +144,19 @@ public class Chart {
 		if ((index < 0) || index >= getTrainNum() /* (index >= MAX_TRAIN_NUM) */ )
 			return;
 		
-		trains.remove(index);
-		
+		trains.remove(index).removeTrainChangedListener(this::onTrainChanged);
 
-//		Train[] newTrains = new Train[MAX_TRAIN_NUM];
-//
-//		int j = 0;
-//		for (int i = 0; i < index; i++) {
-//			newTrains[j++] = _trains[i];
-//		}
-//
-//		for (int i = index + 1; i < getTrainNum(); i++) {
-//			newTrains[j++] = _trains[i];
-//		}
-//
-//		_trains = newTrains;
-//		setTrainNum(getTrainNum() - 1);
+		fireChartChangedEvent();
 	}
 	
 	public void delTrain(Train theTrain) {
 		if(!isLoaded(theTrain))
 			return;
 		
-//		Train[] newTrains = new Train[MAX_TRAIN_NUM];
-//
-//		int j = 0;
-//		for (int i = 0; i < getTrainNum(); i++) {
-//			if (!_trains[i].equals(theTrain)) {
-//				newTrains[j++] = _trains[i];
-//			}
-//		}
-//
-//		_trains = newTrains;
-//		setTrainNum(getTrainNum() - 1);
-		
 		trains.remove(theTrain);
+		
+		theTrain.removeTrainChangedListener(this::onTrainChanged);
+		fireChartChangedEvent();
 	}
 
 	//画运行线的颜色
@@ -331,6 +323,8 @@ public class Chart {
 
 		//System.out.println("下行："+dNum+"，上行："+uNum);
 		in.close();
+		
+		fireChartChangedEvent();
 	}
 
 	private void parseSetup(String line) throws IOException {
@@ -418,7 +412,10 @@ public class Chart {
 	public void clearTrains() {
 		dNum = 0;
 		uNum = 0;
+		trains.forEach(train->train.removeTrainChangedListener(this::onTrainChanged));
 		trains.clear();
+		
+		fireChartChangedEvent();
 	}
 
 	public void insertNewStopToTrain(Train theTrain, Stop stop) {
@@ -426,6 +423,10 @@ public class Chart {
 			insertNewStopToTrainDown(theTrain, stop);
 		} else
 			insertNewStopToTrainUp(theTrain, stop);
+		
+
+		theTrain.addTrainChangedListener(this::onTrainChanged);
+		fireChartChangedEvent();
 	}
 
 	private void insertNewStopToTrainUp(Train theTrain, Stop stop) {
@@ -508,5 +509,28 @@ public class Chart {
 				if(dist1 < newDist  && newDist < dist2)
 					theTrain.insertStopAfter(theTrain.getStop(i), stop);
 		}
+	}
+	
+
+	
+	public void addChartChangedListener(Consumer<Chart> eventHandler) {
+		chartChangedListeners.add(eventHandler);
+	}
+	
+	public void removeChartChangedListener(Consumer<Chart> eventHandler) {
+		chartChangedListeners.remove(eventHandler);
+	}
+	
+	public void fireChartChangedEvent() {
+		chartChangedListeners.stream().parallel()
+			.forEach(action->action.accept(this));
+	}
+	
+	protected void onTrainChanged(Train train) {
+		fireChartChangedEvent();
+	}
+	
+	protected void onCircuitChanged() {
+		fireChartChangedEvent();
 	}
 }

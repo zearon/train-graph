@@ -39,7 +39,7 @@ public class SheetView extends JPanel {
 		table = new SheetTable(this);
 		rowHeader = buildeRowHeader(table);
 		
-		JScrollPane spTable = new JScrollPane(table);
+		JScrollPane spTable = table.getScrollPane();
 		spTable.setRowHeaderView(rowHeader);
 		conner = new SheetHeaderRanderer();
 //		conner.setText(("(" + mainFrame.chart.dNum + " / " +  mainFrame.chart.uNum + ")"));
@@ -50,7 +50,7 @@ public class SheetView extends JPanel {
 		BorderLayout layout = new BorderLayout();
 		layout.setHgap(2);
 		setLayout(layout);
-		add(spTable, BorderLayout.CENTER);
+		add(table.getContainerPanel(), BorderLayout.CENTER);
 
 //		JPanel controlPanel = buildeControlPanel();
 //		add(controlPanel, BorderLayout.SOUTH);

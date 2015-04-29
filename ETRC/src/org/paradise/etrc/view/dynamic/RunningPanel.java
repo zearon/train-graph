@@ -8,11 +8,18 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 
 import org.paradise.etrc.data.Chart;
 import org.paradise.etrc.data.Station;
@@ -27,6 +34,8 @@ public class RunningPanel extends JPanel {
 
 	private Chart chart;
 	private DynamicView dView;
+	private JPopupMenu popupMenu;
+	private JMenuItem popupMenuStation;
 	
 
 	public RunningPanel(DynamicView _dView) {
@@ -44,6 +53,57 @@ public class RunningPanel extends JPanel {
 		this.setBackground(Color.white);
 		this.setLayout(new BorderLayout());
 		this.setFont(new Font(__("FONT_NAME"), 0, 12));
+		buildPopupMenu();
+	}
+
+	private void buildPopupMenu() {
+		popupMenu = new JPopupMenu();
+		popupMenu.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+		
+		popupMenuStation = createMenuItem("Station Name", null);
+		popupMenu.add(popupMenuStation);
+		popupMenu.add(new JSeparator(JSeparator.HORIZONTAL));
+		popupMenu.add(createMenuItem(__("Add to projection"), e->doPopupMenu_AddToProjection()));
+		popupMenu.add(createMenuItem(__("Remove from projection"), e->doPopupMenu_RemoveFromProjection()));
+		
+		//add(popupMenu);
+		
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				int mods=e.getModifiers();
+				//鼠标右键
+				if((mods&InputEvent.BUTTON3_MASK)!=0) {
+					//弹出菜单
+					String stationName = dView.getStationName(e.getX());
+					popupMenuStation.setText(stationName);
+					popupMenu.show(RunningPanel.this, e.getX(), e.getY());
+				}
+			}
+			
+		});
+	}
+
+	private Object doPopupMenu_AddToProjection() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Object doPopupMenu_RemoveFromProjection() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private JMenuItem createMenuItem(String name, ActionListener listener) {
+		JMenuItem menuItem = new JMenuItem(name);
+		menuItem.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+
+//		menuItem.setActionCommand(actionCommand);
+		if (listener != null)
+			menuItem.addActionListener(listener);
+
+		return menuItem;
 	}
 
 	public void paint(Graphics g) {

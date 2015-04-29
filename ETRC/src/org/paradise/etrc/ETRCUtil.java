@@ -13,6 +13,8 @@ public class ETRCUtil {
 	private static boolean isDebug;
 	private static DateFormat dateFormat;
 	
+	private static String lastInvoker;
+	
 	@FunctionalInterface
 	public static interface DebugAction {		
 		void doAction();
@@ -39,7 +41,20 @@ public class ETRCUtil {
 	   */
 	  public static boolean DEBUG(String msg) {
 		  if (isDebug)
-			  _printMsg("DEBUG: ", msg, true, true, true, true);
+			  _printMsg("DEBUG: ", msg, true, true, true, true, true, 0);
+		  
+		  return isDebug;
+	  }
+	  
+	  /**
+	   * Check if it is running in debug mode and print a message if yes.
+	   * @param msgFormat The string format of message to be printed if in debug mode.
+	   * @param msgArgs	 The arguments of the message format.
+	   * @return true if in debug mode and false if else.
+	   */
+	  public static boolean DEBUG(String msgFormat, Object... msgArgs) {
+		  if (isDebug)
+			  _printMsg("DEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
 		  
 		  return isDebug;
 	  }
@@ -49,9 +64,9 @@ public class ETRCUtil {
 	   * @param action The action to be done if in debug mode.
 	   * @return true if in debug mode and false if else.
 	   */
-	  public static boolean DEBUG(DebugAction action) {
+	  public static boolean DEBUG_ACTION(DebugAction action) {
 		  if (isDebug) {
-			  _printMsg("DEBUG ACTION:", "", true, true, false, true);
+			  _printMsg("DEBUG ACTION:", "", true, true, false, true, true, 0);
 			  action.doAction();
 		  }
 		  
@@ -62,33 +77,65 @@ public class ETRCUtil {
 	   * Print a message if it is running in debug mode.
 	   * @param msg
 	   */
-	  public static void DEBUG_MSG(String msg) {
+	  public static void DEBUG_MSG(String msgFormat, Object... msgArgs) {
 		  if (isDebug)
-			  _printMsg(null, msg, false, false, false, false);
+			  _printMsg("DEBUG_MSG: ", String.format(msgFormat, msgArgs), false, false, false, false, false, 0);
+	  }
+	  
+	  /**
+	   * Print a message if it is running in debug mode.
+	   * @param msg
+	   */
+	  public static void DEBUG_STACKTRACE(int level, String msgFormat, Object... msgArgs) {
+		  if (isDebug)
+			  _printMsg("DEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, false, level);
 	  }
 	  
 	  private static void _printMsg(String prefix, String msg, boolean printTime, boolean printInvoker, 
-			  boolean newLineBeforeMsg, boolean newLineAfterMsg) {
-		  
-		  if (prefix != null)
-			  System.err.print(prefix);
-		  
-		  if (printTime) {
-			  System.err.print(" [" + dateFormat.format(new Date()) + "]");
-		  }
-		  
-		  if (printTime && printInvoker)
-			  System.err.println("  ");
-		  
+			  boolean newLineBeforeMsg, boolean newLineAfterMsg, boolean skipSameInvoker, int stackLevel) {
+
+		  StringBuilder invoker = new StringBuilder();
+		  boolean notSameInvoker = true;
 		  if (printInvoker) {
+			  int startLevel = 2;
 			  StackTraceElement[] stackElements = new Throwable().getStackTrace();
 			  // System.err.println(stackElements[0]);	 		_printMsg
 			  // System.err.println(stackElements[1]);	  		DEBUG/DEBUG_MSG
-			  System.err.print(stackElements[2]);		 // 	caller of DEBUG/DEBUG_MSG
+			  // System.err.println(stackElements[2]);	 		caller of DEBUG/DEBUG_MSG
+			  invoker.append( stackElements[startLevel].toString() );
+			  for (int level = 0; level < stackLevel && level < stackElements.length - 2; ++ level) {
+				  invoker.append( "\r\n" + stackElements[startLevel + level + 1] );
+			  }
+			  
+			  if (lastInvoker == null || !lastInvoker.equals(invoker.toString())) {
+				  notSameInvoker = true;
+				  lastInvoker = invoker.toString();
+			  } else {
+				  notSameInvoker = false;
+			  }
+		  }
+		  
+		  notSameInvoker = skipSameInvoker ? skipSameInvoker && notSameInvoker : true;
+		  
+		  if (prefix != null  && notSameInvoker)
+			  System.err.print(prefix);
+		  
+		  if (printTime  && notSameInvoker) {
+			  System.err.print(" [" + dateFormat.format(new Date()) + "]");
+		  }
+		  
+		  if (printTime  && printInvoker && notSameInvoker)
+			  System.err.print("  ");
+		  
+		  if (printInvoker  && notSameInvoker) {
+			  System.err.print(invoker);
+		  }
+		  
+		  if (newLineBeforeMsg && notSameInvoker) {
+			  System.err.println("");
 		  }
 		  
 		  if (newLineBeforeMsg) {
-			  System.err.println("");
 			  System.err.print("  ");
 		  }
 		  

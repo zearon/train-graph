@@ -1,12 +1,11 @@
 package org.paradise.etrc.view.sheet;
 
-import javax.swing.table.AbstractTableModel;
-
 import org.paradise.etrc.data.Chart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 
-public class SheetModel extends AbstractTableModel {
+public class SheetModel extends DefaultJEditTableModel {
 	private static final long serialVersionUID = 6767541225039467460L;
 
 	public Chart chart;
@@ -84,6 +83,21 @@ public class SheetModel extends AbstractTableModel {
 		else {
 //			System.out.println("NN");
 		}
+	}
+
+	@Override
+	public boolean columnIsTimeString(int column) {
+		return false;
+	}
+
+	@Override
+	public boolean nextCellIsBelow(int row, int column, int increment) {
+		Train theTrain = chart.getTrain(column);
+		
+		if (theTrain.isDownTrain(chart.trunkCircuit) == Train.DOWN_TRAIN)
+			return true;
+		else
+			return false;
 	}
 
 }

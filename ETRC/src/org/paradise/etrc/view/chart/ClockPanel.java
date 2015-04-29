@@ -97,8 +97,8 @@ public class ClockPanel extends JPanel {
 	private void increaseMinuteGap(int i) {
 		chartView.mainFrame.chart.minuteScale += i;
 		
-		if(chartView.mainFrame.chart.minuteScale > 10) {
-			chartView.mainFrame.chart.minuteScale = 10;
+		if(chartView.mainFrame.chart.minuteScale > Chart.MAX_MINUTE_SCALE) {
+			chartView.mainFrame.chart.minuteScale = Chart.MAX_MINUTE_SCALE;
 			return;
 		}
 		
@@ -109,6 +109,7 @@ public class ClockPanel extends JPanel {
 		
 		chartView.mainFrame.chart.timeInterval = minuteGrids[chartView.mainFrame.chart.minuteScale-1];
 		chartView.resetSize();
+		chartView.panelLines.updateBuffer();
 	}
 
 	public void paint(Graphics g) {

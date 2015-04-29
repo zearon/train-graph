@@ -1,6 +1,7 @@
 package org.paradise.etrc;
 
 import static org.paradise.etrc.ETRC.__;
+import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -158,7 +159,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				firstTimeLoading = false;
 				
 				// test circuitEditDialog
-				//DEBUG(() -> circuitEditDialog.showDialog());
+				DEBUG_ACTION(() -> circuitEditDialog.showDialog());
 			}
 		});
 	}

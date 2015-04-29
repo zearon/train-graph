@@ -1,16 +1,23 @@
 package org.paradise.etrc.data.skb;
 
+import static org.paradise.etrc.ETRCUtil.*;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.Instant;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.paradise.etrc.data.BOMStripperInputStream;
 import org.paradise.etrc.data.Circuit;
+import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 
@@ -131,6 +138,32 @@ public class ETRCSKB {
 			h_arrive + ":" + m_arrive,
 			h_leave + ":" + m_leave
 		};
+	}
+	
+	public List<Train> findTrains(Stream<Circuit> circuits) {
+		Instant instant1 = null, instant2 = null, instant3 = null;
+		if (DEBUG())
+			instant1= Instant.now();
+		HashSet<String> allStationsOnCircuits = 
+				circuits.flatMap(cir->cir.getAllStations().stream()).distinct()
+				.map(station->station.name.toLowerCase())
+				.collect(Collectors.toCollection(HashSet::new));
+
+		if (DEBUG())
+			instant2= Instant.now();
+		List<Train> trains = 
+				tk.stream().parallel()
+				.filter(tkinfo->allStationsOnCircuits.contains(tkinfo[1].toLowerCase()))				// filter stops only matching the station lists.
+				.distinct()
+				.map(tkinfo->getTrainByFullName(tkinfo[0]))
+				.collect(Collectors.toList());
+		
+		if (DEBUG())
+			instant3= Instant.now();
+		
+		DEBUG("Benchmark: [find for circuit]: GetName:%d, GetTrain:%d", instant2.toEpochMilli() - instant1.toEpochMilli(), instant3.toEpochMilli() - instant2.toEpochMilli());
+		
+		return trains;
 	}
 	
 	/**

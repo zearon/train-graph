@@ -15,7 +15,9 @@ import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Vector;
+import java.util.function.Consumer;
 
 /**
  * @author lguo@sina.com
@@ -51,6 +53,8 @@ public class Train {
 	private Vector<Stop> stops = new Vector<Stop>(15);
 
 	public Color color = null;
+	
+	private List<Consumer<Train>> trainChangedListeners = new Vector<Consumer<Train>> ();
 
 	public Train() {
 	}
@@ -143,6 +147,8 @@ public class Train {
 //		setStopNum(getStopNum() + 1);
 		
 		stops.insertElementAt(stop, index);
+		
+		fireTrainChangedEvent();
 	}
 
 	/**
@@ -162,6 +168,8 @@ public class Train {
 //		setStops(newStops);
 //		setStopNum(getStopNum() + 1);
 		stops.add(stop);
+		
+		fireTrainChangedEvent();
 	}
 
 	public void delStop(int index) {
@@ -183,6 +191,8 @@ public class Train {
 //		setStopNum(getStopNum() - 1);
 		
 		stops.remove(index);
+		
+		fireTrainChangedEvent();
 	}
 
 	public void delStop(String name) {
@@ -198,6 +208,8 @@ public class Train {
 //
 //		setStops(newStops);
 //		setStopNum(getStopNum() - 1);
+		
+		fireTrainChangedEvent();
 	}
 
 	public void loadFromFile(String file) throws IOException {
@@ -237,6 +249,8 @@ public class Train {
 
 		if (getStopNum() < 2)
 			throw new IOException(__("Data incomplete in:" + file ));
+		
+		fireTrainChangedEvent();
 	}
 	
 	public void writeTo(String fileName) throws IOException {
@@ -441,6 +455,8 @@ public class Train {
 
 //		setStops(newStops);
 //		setStopNum(newStopNum);
+		
+		fireTrainChangedEvent();
 	}
 
 	private void insertStopAtFirst(Stop newStop) {
@@ -452,6 +468,8 @@ public class Train {
 			if (stops.get(i).stationName.equalsIgnoreCase(oldName))
 				stops.get(i).stationName = newName;
 		}
+		
+		fireTrainChangedEvent();
 	}
 
 	public void setArrive(String name, String _arrive) {
@@ -459,6 +477,8 @@ public class Train {
 			if (stops.get(i).stationName.equalsIgnoreCase(name))
 				stops.get(i).arrive = _arrive;
 		}
+		
+		fireTrainChangedEvent();
 	}
 
 	public void setLeave(String name, String _leave) {
@@ -466,9 +486,11 @@ public class Train {
 			if (stops.get(i).stationName.equalsIgnoreCase(name))
 				stops.get(i).leave = _leave;
 		}
+		
+		fireTrainChangedEvent();
 	}
 
-	public static final int UNKOWN = 0;
+	public static final int UNKNOWN = 0;
 
 	public static final int DOWN_TRAIN = 1;
 
@@ -492,7 +514,7 @@ public class Train {
 			lastDist = thisDist;
 		}
 		//遍历完仍然未能确定
-		return isGuessByTrainName?isDownTrainByTrainName(c):UNKOWN;
+		return isGuessByTrainName?isDownTrainByTrainName(c):UNKNOWN;
 	}
 
 	private int isDownTrainByTrainName(Circuit c) {
@@ -517,6 +539,7 @@ public class Train {
 //		return df.format(time);
 //	}
 
+	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
 			return false;
@@ -526,6 +549,11 @@ public class Train {
 
 		return ((Train) obj).getTrainName().equalsIgnoreCase(
 				this.getTrainName());
+	}
+	
+	@Override
+	public int hashCode() {
+		return getTrainName().hashCode();
 	}
 
 	public String toString() {
@@ -835,4 +863,17 @@ public class Train {
 		}
 	}
 
+	
+	public void addTrainChangedListener(Consumer<Train> eventHandler) {
+		trainChangedListeners.add(eventHandler);
+	}
+	
+	public void removeTrainChangedListener(Consumer<Train> eventHandler) {
+		trainChangedListeners.remove(eventHandler);
+	}
+	
+	public void fireTrainChangedEvent() {
+		trainChangedListeners.stream().parallel()
+			.forEach(action->action.accept(this));
+	}
 }

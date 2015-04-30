@@ -140,7 +140,7 @@ public class ChartView extends JPanel {
 			panelLines.setToolTipText(null);
 		}
 		
-		drawingModel.setActiveTrain(train);
+		drawingModel.setActiveTrain(train, showUpDownState);
 
 		// 重绘
 		repaint();
@@ -155,7 +155,7 @@ public class ChartView extends JPanel {
 		
 		drawingModel.updateCurrentCircuit(mainFrame.chart, mainFrame.chart.trunkCircuit, this);
 		drawingModel.updateUpDownTrainOption(showUpDownState);
-		drawingModel.setActiveTrain(activeTrain);
+		drawingModel.setActiveTrain(activeTrain, showUpDownState);
 	}
 
 	//水印颜色

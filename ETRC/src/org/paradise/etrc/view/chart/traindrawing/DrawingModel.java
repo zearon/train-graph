@@ -26,6 +26,8 @@ public class DrawingModel {
 	protected Vector<TrainDrawing> unknownTrainDrawings = new Vector<TrainDrawing>();
 	
 	protected HashMap<String, Integer> trainDrawingIndex = new HashMap<String, Integer>();
+	protected Vector<String> upTrainNames = new Vector<String>();
+	protected Vector<String> downTrainNames = new Vector<String>();
 
 	protected TrainDrawing activeTrainDrawing = null;
 	protected boolean isLastActiveTrainDrawingInUnderMode = false;
@@ -71,6 +73,8 @@ public class DrawingModel {
 		downTrainDrawings.clear();
 		unknownTrainDrawings.clear();
 		trainDrawingIndex.clear();
+		upTrainNames.clear();
+		downTrainNames.clear();
 		
 		for (int i = 0; i < chart.getTrainNum(); i++) {
 			Train train = chart.getTrain(i);
@@ -89,9 +93,13 @@ public class DrawingModel {
 				break;
 			case Train.UP_TRAIN:
 				upTrainDrawings.add(trainDrawing);
+				upTrainNames.add(train.trainNameFull);
+				upTrainNames.add(train.trainNameUp);
 				break;
 			case Train.DOWN_TRAIN:
 				downTrainDrawings.add(trainDrawing);
+				downTrainNames.add(train.trainNameFull);
+				downTrainNames.add(train.trainNameDown);
 				break;
 			default:
 				break;
@@ -99,18 +107,29 @@ public class DrawingModel {
 		}
 	}
 	
-	public void setActiveTrain(Train activeTrain) {
+	public void setActiveTrain(Train activeTrain, int showUpDownState) {
 		if (activeTrainDrawing != null) {
 			activeTrainDrawing.setActive(false);
-			activeTrainDrawing.setUnderDrawing(isLastActiveTrainDrawingInUnderMode);
+			switch (showUpDownState) {
+			case ChartView.SHOW_NONE:
+				activeTrainDrawing.setUnderDrawing(true);
+				break;
+			case ChartView.SHOW_UP:
+				activeTrainDrawing.setUnderDrawing(!upTrainNames.contains(activeTrainDrawing.train.trainNameFull));
+				break;
+			case ChartView.SHOW_DOWN:
+				activeTrainDrawing.setUnderDrawing(!downTrainNames.contains(activeTrainDrawing.train.trainNameFull));
+				break;
+			case ChartView.SHOW_ALL:
+				activeTrainDrawing.setUnderDrawing(false);
+				break;
+			}
 		}
 		
 		if (activeTrain == null) {
 			activeTrainDrawing = null;
 		} else {
 			activeTrainDrawing = findTrainDrawing(activeTrain);
-
-			isLastActiveTrainDrawingInUnderMode = activeTrainDrawing.isUnderDrawing();
 			activeTrainDrawing.setActive(true);
 			activeTrainDrawing.setUnderDrawing(false);
 		}

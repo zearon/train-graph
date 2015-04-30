@@ -1,8 +1,11 @@
 package org.paradise.etrc.view.chart.traindrawing;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Stroke;
 import java.awt.geom.Line2D;
 
 import org.paradise.etrc.view.chart.ChartView;
@@ -60,6 +63,8 @@ public class TrainLine {
     		g.setColor(TrainDrawing.notSchedularColor);
 
     	g.drawLine(p1.x, p1.y, p2.x, p2.y);
+    	Stroke oldStroke = ((Graphics2D) g).getStroke();
+    	((Graphics2D) g).setStroke(new BasicStroke(2.0f));
     	//画差1个像素的线加重
     	if(lineType == STOP_LINE)
     		g.drawLine(p1.x, p1.y+1, p2.x, p2.y+1);
@@ -70,6 +75,7 @@ public class TrainLine {
     	p2.draw(g);
 
     	g.setColor(oldColor);
+    	((Graphics2D) g).setStroke(oldStroke);
     }
 
 //    public void drawSelected(Graphics g) {

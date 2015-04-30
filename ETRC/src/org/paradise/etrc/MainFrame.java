@@ -177,6 +177,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				
 				// test circuitEditDialog
 				// DEBUG_ACTION(() -> circuitEditDialog.showDialog());
+				
+				DEBUG_ACTION( () -> com.apple.eawt.Application.getApplication().requestToggleFullScreen(MainFrame.this) );
 			}
 		});
 		

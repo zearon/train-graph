@@ -472,6 +472,8 @@ public class ChartView extends JPanel {
 		panelCircuit.setSize(panelCircuit.getPreferredSize());
 		panelClock.setSize(panelClock.getPreferredSize());
 		panelLines.setSize(panelLines.getPreferredSize());
+		
+		drawingModel.updateScale();
 	}
 	
 //	public BufferedImage getBufferedImage() {

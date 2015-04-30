@@ -2,6 +2,7 @@ package org.paradise.etrc;
 
 import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
+import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -120,6 +121,22 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	//Construct the frame
 	public MainFrame() {
+		DEBUG_MSG("OS Name=%s, OS Version=%s\n", System.getProperty("os.name"), System.getProperty("os.version"));
+		// If OS is Mac OS X and Version >= 10.7, then add full screen support.
+		if ("Mac OS X".equalsIgnoreCase(System.getProperty("os.name"))) {
+			String osVersionString = System.getProperty("os.version");
+			String[] versionParts = osVersionString.split("\\.");
+			if (versionParts.length >= 2) {
+				try {
+					int versionPart1Val = Integer.parseInt(versionParts[0]);
+					int versionPart2Val = Integer.parseInt(versionParts[1]);
+					if (versionPart1Val >= 10 && versionPart2Val >= 7) {
+						com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(this,true);
+					}
+				} finally {}
+			}
+		}
+		
 		defaultProp = new Properties();
 		defaultProp.setProperty(Prop_Working_Chart, Sample_Chart_File);
 		defaultProp.setProperty(Prop_Show_UP, "Y");
@@ -159,9 +176,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				firstTimeLoading = false;
 				
 				// test circuitEditDialog
-				DEBUG_ACTION(() -> circuitEditDialog.showDialog());
+				// DEBUG_ACTION(() -> circuitEditDialog.showDialog());
 			}
 		});
+		
 	}
 
 	public void doExit() {

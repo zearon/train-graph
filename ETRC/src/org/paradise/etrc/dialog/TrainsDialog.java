@@ -24,6 +24,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.RowSorter;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -31,6 +32,7 @@ import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableRowSorter;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
@@ -76,6 +78,7 @@ public class TrainsDialog extends JDialog {
 		table.setModel(new TrainsTableModel());
 		table.setDefaultRenderer(Color.class, new ColorCellRenderer());
 		table.setDefaultEditor(Color.class, new ColorCellEditor());
+		table.setRowSorter(new TableRowSorter<TrainsTableModel> ((TrainsTableModel)table.getModel()));
 
 		table.setFont(new Font("Dialog", 0, 12));
 		table.getTableHeader().setFont(new Font("Dialog", 0, 12));
@@ -145,7 +148,7 @@ public class TrainsDialog extends JDialog {
 //				TrainsDialog.this.setVisible(false);
 				if(table.getSelectedRow() < 0)
 					return;
-				doEditTrain(chart.getTrain(table.getSelectedRow()));
+				doEditTrain(chart.getTrain(table.convertRowIndexToModel(table.getSelectedRow())));
 			}
 		});
 		
@@ -311,7 +314,7 @@ public class TrainsDialog extends JDialog {
 					super.paint(g);
 				}
 			};
-			colorButton.setText(chart.getTrain(row).getTrainName(chart.trunkCircuit));
+			colorButton.setText(chart.getTrain(table.convertRowIndexToModel(row)).getTrainName(chart.trunkCircuit));
 			colorButton.setForeground(currentColor);
 			colorButton.setBackground(Color.white);
 
@@ -368,7 +371,9 @@ public class TrainsDialog extends JDialog {
 					super.paint(g);
 				}
 			};
-			colorLabel.setText(chart.getTrain(row).getTrainName(chart.trunkCircuit));
+			int trainIndex = table.convertRowIndexToModel(row);
+			String trainName = (String) table.getRowSorter().getModel().getValueAt(trainIndex, 0);
+			colorLabel.setText(trainName);
 			colorLabel.setForeground(color);
 			colorLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			colorLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -522,7 +527,7 @@ public class TrainsDialog extends JDialog {
 				public void mouseClicked(MouseEvent e) {
 					if   (e.getClickCount()   ==   2){ //双击  
 	                    int row = getSelectedRow();
-	                    doEditTrain(chart.getTrain(row));
+	                    doEditTrain(chart.getTrain(convertRowIndexToModel(row)));
 					}
 				}
 			});

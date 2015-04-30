@@ -28,6 +28,10 @@ public class TrainLine {
       isSchedular = _isSchedular;
     }
     
+    public boolean isStopLine() {
+    		return lineType == STOP_LINE;
+    }
+    
     public void draw(Graphics g) {
     	if(trainDrawing.isActive)
     		drawActive(g);
@@ -96,7 +100,9 @@ public class TrainLine {
 //    }
 
     public boolean pointOnMe(Point p) {
-      final int MAX_GAP = 5;
+    	  final int MAX_STOP_LINE_GAP = 10;
+    	  final int MAX_RUN_LINE_GAP = 5;
+      final int MAX_GAP = (lineType == STOP_LINE) ? MAX_STOP_LINE_GAP : MAX_RUN_LINE_GAP;
       if((p.x <= Math.min(p1.x, p2.x) - MAX_GAP)
          || (p.x >= Math.max(p1.x, p2.x) + MAX_GAP)
          || (p.y <= Math.min(p1.y, p2.y) - MAX_GAP)

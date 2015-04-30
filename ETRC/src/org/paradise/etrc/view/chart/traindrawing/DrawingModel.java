@@ -158,6 +158,12 @@ public class DrawingModel {
 			trainDrawing.setUnderDrawing(true);
 		}
 	}
+	
+	public void updateScale() {
+		for (TrainDrawing trainDrawing : allTrainDrawings) {
+			trainDrawing.rebuild();
+		}
+	}
 
 
 	/**

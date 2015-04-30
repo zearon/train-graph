@@ -4,10 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.security.cert.PKIXRevocationChecker.Option;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.Optional;
 import java.util.Vector;
 
 import org.paradise.etrc.data.Chart;
@@ -68,6 +70,11 @@ public TrainDrawing(ChartView _chartView, Train _train, boolean _active, boolean
 
     buildUp();
   }
+
+public void rebuild() {
+	lines.clear();
+	buildUp();
+}
 
   private void buildUp() {
 	Chart chart = chartView.mainFrame.chart;
@@ -334,12 +341,20 @@ public TrainDrawing(ChartView _chartView, Train _train, boolean _active, boolean
   }
 
   public TrainLine findNearTrainLine(Point p) {
-    for(Enumeration<TrainLine> e = lines.elements(); e.hasMoreElements(); ) {
-      TrainLine line = (TrainLine)e.nextElement();
-      if(line.pointOnMe(p))
-        return line;
-    }
-    return null;
+	  Optional<TrainLine> line;
+	  line = lines.stream().filter(ln -> ln.isStopLine() && ln.pointOnMe(p)).findFirst();
+	  if (line.isPresent()) {
+		  return line.get();
+	  } else {
+			line = lines.stream().filter(ln -> !ln.isStopLine() && ln.pointOnMe(p)).findFirst();
+			return line.orElse(null);
+	  }
+//    for(Enumeration<TrainLine> e = lines.elements(); e.hasMoreElements(); ) {
+//      TrainLine line = (TrainLine)e.nextElement();
+//      if(line.pointOnMe(p))
+//        return line;
+//    }
+//    return null;
   }
 
   String getTrainName() {

@@ -33,6 +33,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
+import javax.swing.ToolTipManager;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.data.Chart;
@@ -736,6 +737,8 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	public JToolTip createToolTip() {
 		JToolTip toolTip = new JToolTip();
 		toolTip.setFont(new Font("Dialog", 0, 12));
+		// Tooltip 显示时间延长至15s
+		ToolTipManager.sharedInstance().setDismissDelay(15000);
 		return toolTip;
 	}
 	

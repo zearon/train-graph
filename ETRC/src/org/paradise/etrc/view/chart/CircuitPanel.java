@@ -7,6 +7,8 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -135,6 +137,9 @@ public class CircuitPanel extends JPanel {
 		g.setFont(new Font("Dialog", 0, 10));
 		int x = ChartView.circuitPanelWidth
 				- g.getFontMetrics().stringWidth(stDist);
+		// 文字防锯齿
+		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, 
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		g.drawString(stDist, x, y - 2);
 		g.setFont(oldFont);
 

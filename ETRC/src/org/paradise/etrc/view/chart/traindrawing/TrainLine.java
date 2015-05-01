@@ -10,6 +10,11 @@ import java.awt.geom.Line2D;
 
 import org.paradise.etrc.view.chart.ChartView;
 
+/**
+ * TrainLine表示组成运行图中代表列车运行状态折线的每一条线段
+ * @author Jeff Gong
+ *
+ */
 public class TrainLine {
     public static final int STOP_LINE = 0;
     public static final int RUN_LINE = 1;

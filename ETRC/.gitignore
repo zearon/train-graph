@@ -1,2 +1,4 @@
 /bin/
 /htrc.prop
+/build/
+*.class

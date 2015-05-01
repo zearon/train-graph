@@ -6,11 +6,13 @@ import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -44,10 +46,14 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.JTree;
 import javax.swing.border.Border;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
 
 import org.paradise.etrc.data.Chart;
 import org.paradise.etrc.data.Circuit;
@@ -83,6 +89,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private static final long serialVersionUID = 1L;
 	
 	public JPanel mainPanel;
+	public JSplitPane navigatorSplitPane;
+	public JPanel navigatorContentPanel;
 	public JSplitPane splitPaneV;
 	public JSplitPane splitPaneH;
 	public ChartView chartView;
@@ -178,7 +186,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				// test circuitEditDialog
 				// DEBUG_ACTION(() -> circuitEditDialog.showDialog());
 				
-				DEBUG_ACTION( () -> com.apple.eawt.Application.getApplication().requestToggleFullScreen(MainFrame.this) );
+				// Set full screen mode
+				DEBUG_ACTION( () -> com.apple.eawt.Application.getApplication()
+						.requestToggleFullScreen(MainFrame.this) );
 			}
 		});
 		
@@ -216,11 +226,59 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
+
+		navigatorContentPanel = new JPanel(new CardLayout());
+		navigatorContentPanel.add(mainPanel);
+		
+		JTree tree = new JTree();
+		tree.setModel(new DefaultTreeModel(
+			new DefaultMutableTreeNode(__("Train Graph")) {
+				{
+					DefaultMutableTreeNode node_1;
+					DefaultMutableTreeNode node_2;
+					add(new DefaultMutableTreeNode(__("Comprehensive View")));
+					add(new DefaultMutableTreeNode(__("Global Settings")));
+					add(new DefaultMutableTreeNode(__("Railroad Lines")));
+					node_1 = new DefaultMutableTreeNode(__("Stations"));
+						node_1.add(new DefaultMutableTreeNode(__("Line 1")));
+						node_1.add(new DefaultMutableTreeNode(__("Line 2")));
+					add(node_1);
+					add(new DefaultMutableTreeNode(__("Train Types")));
+					node_1 = new DefaultMutableTreeNode(__("Time table"));
+						node_2 = new DefaultMutableTreeNode(__("Line 1"));
+							node_2.add(new DefaultMutableTreeNode(__("Up Going")));
+							node_2.add(new DefaultMutableTreeNode(__("Down Going")));
+							node_2.add(new DefaultMutableTreeNode(__("Train Graph")));
+						node_1.add(node_2);
+						node_2 = new DefaultMutableTreeNode(__("Line 2"));
+							node_2.add(new DefaultMutableTreeNode(__("Up Going")));
+							node_2.add(new DefaultMutableTreeNode(__("Down Going")));
+							node_2.add(new DefaultMutableTreeNode(__("Train Graph")));
+						node_1.add(node_2);
+						node_2 = new DefaultMutableTreeNode(__("Line 1 & 2 (Virtual)"));
+							node_2.add(new DefaultMutableTreeNode(__("Up Going")));
+							node_2.add(new DefaultMutableTreeNode(__("Down Going")));
+							node_2.add(new DefaultMutableTreeNode(__("Train Graph")));
+						node_1.add(node_2);
+					add(node_1);
+					add(new DefaultMutableTreeNode(__("Remarks")));
+				}
+			}
+		));
+		
+		navigatorSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, 
+				tree, navigatorContentPanel);
+		int dividerPosH0 = 200;
+		navigatorSplitPane.setDividerLocation(dividerPosH0);
+		navigatorSplitPane.setDividerSize(6);
+		navigatorSplitPane.setOneTouchExpandable(true);
+		
 		
 		//mainPanel.add(runView, BorderLayout.NORTH);
 		
 		splitPaneH = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, chartView, sheetView);
-	    int dividerPosH = Toolkit.getDefaultToolkit().getScreenSize().width - 253;
+	    int dividerPosH = Toolkit.getDefaultToolkit().getScreenSize().width
+	    		- dividerPosH0 - 253;
 		splitPaneH.setDividerLocation(dividerPosH);
 		splitPaneH.setDividerSize(6);
 		splitPaneH.setOneTouchExpandable(true);
@@ -258,7 +316,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 		contentPane.add(statusPanel, BorderLayout.SOUTH);
 		contentPane.add(loadToolBar(), BorderLayout.NORTH);
-		contentPane.add(mainPanel, BorderLayout.CENTER);
+		contentPane.add(navigatorSplitPane, BorderLayout.CENTER);
 
 		this.setTitle();
 	}
@@ -570,7 +628,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		menuTools.setMnemonic(KeyEvent.VK_T);
         menuTools.add(createMenuItem(__("Import Circuit..."), Tools_Circuit)).setMnemonic(KeyEvent.VK_C);
         menuTools.add(createMenuItem(__("Import Train..."), Tools_Train)).setMnemonic(KeyEvent.VK_R);
-
+        
         JMenu menuHelp = createMenu(__("Help"));
 		menuHelp.setMnemonic(KeyEvent.VK_H);
         menuHelp.add(createMenuItem(__("About..."), Help_About)).setMnemonic(KeyEvent.VK_A);

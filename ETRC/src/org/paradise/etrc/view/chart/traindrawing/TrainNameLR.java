@@ -2,6 +2,11 @@ package org.paradise.etrc.view.chart.traindrawing;
 
 import java.awt.Graphics;
 
+/**
+ * TrainNameLR表示绘制于运行图上指向图线用于说明车次信息的文字
+ * @author Jeff Gong
+ *
+ */
 public class TrainNameLR {
     private ChartPoint anchor;
     private String trainName;

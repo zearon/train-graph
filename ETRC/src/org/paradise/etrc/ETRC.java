@@ -5,6 +5,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -112,7 +113,7 @@ public class ETRC {
         ((TitledBorder)border).setTitleFont(font);
     }
   }
-
+  
   //Main method
   public static void main(String[] args) {
     try {

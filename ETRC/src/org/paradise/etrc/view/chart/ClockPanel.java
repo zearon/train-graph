@@ -3,7 +3,9 @@ package org.paradise.etrc.view.chart;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -114,7 +116,11 @@ public class ClockPanel extends JPanel {
 
 	public void paint(Graphics g) {
 		super.paint(g);
-
+		
+		// 文字防锯齿
+		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, 
+				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		
 		int h = chart.startHour;
 		for (int i = 0; i < 24; i++) {
 			if (h >= 24)

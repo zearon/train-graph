@@ -911,14 +911,6 @@ public class Train extends TrainGraphPart<Train, Stop> {
 	protected String getStartSectionString() { return START_SECTION_TRAIN; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_TRAIN; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return Train::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {
-		new Stop().prepareForFirstLoading();
-	}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

@@ -102,12 +102,6 @@ public class Stop extends TrainGraphPart<Stop, NullPart> {
 	protected String getStartSectionString() { return START_SECTION_STOP; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_STOP; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return Stop::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

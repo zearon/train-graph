@@ -562,14 +562,6 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	protected String getStartSectionString() { return START_SECTION_RAILINE_CHART; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_RAILINE_CHART; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return RailroadLineChart::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {
-		new TrainRef().prepareForFirstLoading();
-	}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

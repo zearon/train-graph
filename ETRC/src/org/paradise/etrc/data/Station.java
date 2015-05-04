@@ -89,12 +89,6 @@ public class Station extends TrainGraphPart<Station, NullPart> {
 	protected String getStartSectionString() { return START_SECTION_STATION; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_STATION; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return Station::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

@@ -771,14 +771,6 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	protected String getStartSectionString() { return START_SECTION_RAILROAD_LINE; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_RAILROAD_LINE; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return RailroadLine::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {
-		new Station().prepareForFirstLoading();
-	}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

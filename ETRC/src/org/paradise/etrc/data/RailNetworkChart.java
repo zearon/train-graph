@@ -52,14 +52,6 @@ extends TrainGraphPart<RailNetworkChart, RailroadLineChart> {
 	protected String getStartSectionString() { return START_SECTION_RAILNETWORK_CHART; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_RAILNETWORK_CHART; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return RailNetworkChart::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {
-		new RailroadLineChart().prepareForFirstLoading();
-	}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

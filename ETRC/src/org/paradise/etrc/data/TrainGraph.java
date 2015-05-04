@@ -3,10 +3,16 @@ package org.paradise.etrc.data;
 import java.util.Vector;
 import java.util.function.Supplier;
 
+import org.paradise.etrc.data.annotation.SimpleProperty;
+import org.paradise.etrc.data.annotation.TrainGraphElement;
 import org.paradise.etrc.data.util.Tuple;
 
+@TrainGraphElement(prefix=TrainGraphPart.START_SECTION_TRAIN_GRAPH, 
+	suffix=TrainGraphPart.END_SECTION_TRAIN_GRAPH,
+	elementType=RailNetworkChart.class)
 public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 
+	@SimpleProperty
 	public String name = "";
 	public RailNetwork railNetwork;
 	public AllTrains allTrains;
@@ -58,16 +64,6 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	protected String getStartSectionString() { return START_SECTION_TRAIN_GRAPH; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_TRAIN_GRAPH; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return TrainGraph::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {
-		new RailNetwork().prepareForFirstLoading();
-		new AllTrains().prepareForFirstLoading();
-		new RailNetworkChart().prepareForFirstLoading();
-	}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

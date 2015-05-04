@@ -35,12 +35,6 @@ public class TrainRef extends TrainGraphPart<TrainRef, NullPart> {
 	protected String getStartSectionString() { return START_SECTION_TRAIN_REF; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_TRAIN_REF; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return TrainRef::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

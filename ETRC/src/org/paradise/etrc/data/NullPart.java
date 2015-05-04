@@ -22,12 +22,6 @@ public class NullPart extends TrainGraphPart<NullPart, NullPart> {
 	protected String getStartSectionString() { return "NULL_PART {"; }
 	@Override
 	protected String getEndSectionString() { return "}"; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return NullPart::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

@@ -472,14 +472,6 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 	protected String getStartSectionString() { return START_SECTION_RAILROAD_NETWORK; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_RAILROAD_NETWORK; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return RailNetwork::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {
-		new RailroadLine().prepareForFirstLoading();
-	}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

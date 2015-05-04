@@ -168,14 +168,6 @@ implements Collection<Train>
 	protected String getStartSectionString() { return START_SECTION_ALL_TRAIN; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_ALL_TRAIN; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return AllTrains::new;
-	}
-	@Override
-	public void _prepareForFirstLoading() {
-		new Train().prepareForFirstLoading();
-	}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;

@@ -19,8 +19,8 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.Chart;
-import org.paradise.etrc.data.Circuit;
+import org.paradise.etrc.data.RailroadLineChart;
+import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
@@ -129,7 +129,7 @@ public class ChartView extends JPanel {
 		
 		// 设置MainFrame的标题和ToolTip
 		if (activeTrain != null) {
-			mainFrame.setActiceTrainName(activeTrain.getTrainName(mainFrame.chart.trunkCircuit));
+			mainFrame.setActiceTrainName(activeTrain.getTrainName(mainFrame.chart.railroadLine));
 			//ADD For SheetView
 			mainFrame.sheetView.selectTrain(activeTrain);
 			//打开ToolTip
@@ -153,7 +153,7 @@ public class ChartView extends JPanel {
 			return;
 		}
 		
-		drawingModel.updateCurrentCircuit(mainFrame.chart, mainFrame.chart.trunkCircuit, this);
+		drawingModel.updateCurrentCircuit(mainFrame.chart, mainFrame.chart.railroadLine, this);
 		drawingModel.updateUpDownTrainOption(showUpDownState);
 		drawingModel.setActiveTrain(activeTrain, showUpDownState);
 	}
@@ -202,7 +202,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getPelsY(String stationName) {
-		return getPelsY(mainFrame.chart.trunkCircuit.getStationDist(stationName));
+		return getPelsY(mainFrame.chart.railroadLine.getStationDist(stationName));
 	}
 
 	/**
@@ -215,7 +215,7 @@ public class ChartView extends JPanel {
 	}
 
 	public String getStationName(int py) {
-		return mainFrame.chart.trunkCircuit.getStationName(getDist(py));
+		return mainFrame.chart.railroadLine.getStationName(getDist(py));
 	}
 
 	public int getMinute(int px) {
@@ -337,7 +337,7 @@ public class ChartView extends JPanel {
 		int minutes = (p.x - leftMargin) / mainFrame.chart.minuteScale;
 		cornerCoordinate.setText("(" + getClockString(minutes) + ","
 				+ getDistString(dist) + ")");
-		mainFrame.statusBarMain.setText(mainFrame.chart.trunkCircuit.getStationName(dist, true));
+		mainFrame.statusBarMain.setText(mainFrame.chart.railroadLine.getStationName(dist, true));
 	}
 
 	public String getDistString(Point p) {
@@ -354,7 +354,7 @@ public class ChartView extends JPanel {
 		if (distUpDownState == SHOW_DOWN)
 			return "" + dist;
 		else
-			return "" + (mainFrame.chart.trunkCircuit.length - dist);
+			return "" + (mainFrame.chart.railroadLine.length - dist);
 	}
 	
 	private String getClockString(int minutes) {
@@ -438,7 +438,7 @@ public class ChartView extends JPanel {
 	 * 取在图chart上画的停站
 	 */
 	public Stop[] getDrawStops(Train train) {
-		Circuit circuit = mainFrame.chart.trunkCircuit;
+		RailroadLine circuit = mainFrame.chart.railroadLine;
 		Stop[] drawStops = new Stop[circuit.getStationNum()];
 
 		int iDraw = 0;
@@ -521,8 +521,8 @@ public class ChartView extends JPanel {
 
 	public void setActiveSation(int y) {
 		int dist = this.getDist(y);
-		int index = mainFrame.chart.trunkCircuit.getStationIndex(dist);
-		setActiveStation(mainFrame.chart.trunkCircuit.getStation(index));
+		int index = mainFrame.chart.railroadLine.getStationIndex(dist);
+		setActiveStation(mainFrame.chart.railroadLine.getStation(index));
 	}
 	
 	public void setActiveStation(Station station) {

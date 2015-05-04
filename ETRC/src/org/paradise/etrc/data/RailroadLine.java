@@ -13,19 +13,25 @@ import java.util.EventListener;
 import java.util.List;
 import java.util.Vector;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import org.paradise.etrc.data.util.BOMStripperInputStream;
+import org.paradise.etrc.data.util.Tuple;
 
 /**
  * 运行图的区间，可以是一整条线路，也可以是某条干线的一段
- * 一个circuit内的上下行应当一致（南京西－南京理解为下行） 
+ * 一个railroadline内的上下行应当一致（南京西－南京理解为下行） 
  * 距离一律以下行为递增方向，如沪宁线以南京（西）站为0坐标，沪杭线以上海站为0坐标
  * @author lguo@sina.com
  * @version 1.0
  * 
  */
 
-public class Circuit {
+public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
+	private static int idCounter = 0;
 //	public static int MAX_STATION_NUM = 512;
+	
 
 	public String name = "";
 
@@ -34,8 +40,10 @@ public class Circuit {
 	public int zindex = 0;
 	public float dispScale = 1.0f;
 	public boolean visible = true;
+	public boolean isProjection = false;
 	
 	public transient String dinfo = "";
+	private transient int id;
 
 	private Vector<Station> stations = new Vector<Station> (10);
 	
@@ -44,12 +52,16 @@ public class Circuit {
 	private int crossoverCount = 0;
 	private List<Station> crossoverStations = new Vector<Station> (4);
 	
-	private List<Consumer<Circuit>> circuitChangedListeners = new Vector<Consumer<Circuit>>();
+	private List<Consumer<RailroadLine>> railroadLineChangedListeners = new Vector<Consumer<RailroadLine>>();
 
-	public Circuit() {
+	public RailroadLine() {
+		this.id = ++ idCounter;
+		this.name = String.format(__("LINE %d"), this.id);
 	}
 	
-	public Circuit(String name) {
+	public RailroadLine(String name) {
+		this();
+		
 		this.name = name;
 		this.length = 30;
 		this.multiplicity = 2;
@@ -60,19 +72,40 @@ public class Circuit {
 		appendStation(new Station("Stop 2", 30, 1, false));
 	}
 
-	public Circuit copy() {
-		Circuit cir = new Circuit();
+	public RailroadLine copy() {
+		RailroadLine cir = new RailroadLine();
 
 		cir.name = this.name;
 		cir.length = this.length;
 		cir.multiplicity = this.multiplicity;
 		cir.zindex = this.zindex;
+		cir.id = this.id;
 
 		for (int i = 0; i < getStationNum(); i++)
 			cir.stations.add(stations.get(i).copy());
 		
 
 		return cir;
+	}
+	
+	
+	@Override
+	public int hashCode() {
+		return id;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (obj != null && obj instanceof RailroadLine 
+				&& ((RailroadLine) obj).id == id) ? true : false;
+	}
+
+	public int getID() {
+		return id;
+	}
+	
+	public void setName() {
+		
 	}
 	
 	public Vector<Station> getAllStations() {
@@ -137,7 +170,7 @@ public class Circuit {
 		else
 			this.length = 0;
 
-		fireCircuitChangedEvent();
+		fireStationChangedEvent();
 	}
 
 	/**
@@ -152,7 +185,7 @@ public class Circuit {
 		else
 			this.length = 0;
 		
-		fireCircuitChangedEvent();
+		fireStationChangedEvent();
 	}
 
 	public void delStation(int index) {
@@ -166,7 +199,7 @@ public class Circuit {
 		else
 			this.length = 0;
 
-		fireCircuitChangedEvent();
+		fireStationChangedEvent();
 	}
 
 	public void delStation(String name) {
@@ -181,7 +214,7 @@ public class Circuit {
 		else
 			this.length = 0;
 		
-		fireCircuitChangedEvent();
+		fireStationChangedEvent();
 	}
 	
 	public int haveTheStation(String theName) {
@@ -307,7 +340,7 @@ public class Circuit {
 		return -1;
 	}
 
-	public void loadFromFile(String file) throws IOException {
+	public void loadFromFile2(String file) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(file)),"UTF-8"));
 
 		String line;
@@ -365,7 +398,7 @@ public class Circuit {
 		
 		in.close();		
 
-		fireCircuitChangedEvent();
+		fireStationChangedEvent();
 	}
 
 	/**
@@ -593,7 +626,7 @@ public class Circuit {
 //		stationNum++;
 	}
 
-	public String toString() {
+	public String repr() {
 		StringBuffer sb = new StringBuffer(this.name);
 
 		switch (multiplicity) {
@@ -622,10 +655,16 @@ public class Circuit {
 		return sb.toString();
 	}
 
+	public static boolean SIMPLE_VERSION_TO_STRING = true;
+	@Override
+	public String toString() {
+		return SIMPLE_VERSION_TO_STRING ? this.name : repr();
+	}
+
 	public static void main(String argv[]) {
-		Circuit c = new Circuit();
+		RailroadLine c = new RailroadLine();
 		try {
-			c.loadFromFile("c:\\沪宁线.cir");
+			c.loadFromFile2("c:\\沪宁线.cir");
 			System.out.println(c.name + "共" + c.getStationNum() + "个车站，总长："
 					+ c.length);
 			for (int i = 0; i < c.getStationNum(); i++)
@@ -700,16 +739,129 @@ public class Circuit {
 		return duplicatedNames;
 	}
 	
-	public void addCircuitChangedListener(Consumer<Circuit> eventHandler) {
-		circuitChangedListeners.add(eventHandler);
+	public void addStationChangedListener(Consumer<RailroadLine> eventHandler) {
+		railroadLineChangedListeners.add(eventHandler);
 	}
 	
-	public void removeCircuitChangedListener(Consumer<Circuit> eventHandler) {
-		circuitChangedListeners.remove(eventHandler);
+	public void removeStationChangedListener(Consumer<RailroadLine> eventHandler) {
+		railroadLineChangedListeners.remove(eventHandler);
 	}
 	
-	protected void fireCircuitChangedEvent() {
-		circuitChangedListeners.stream().parallel()
+	protected void fireStationChangedEvent() {
+		railroadLineChangedListeners.stream().parallel()
 			.forEach(action->action.accept(this));
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	/**
+	 * Implements method inherited from abstract base class TrainGraphPart
+	 */
+	@Override
+	protected String getStartSectionString() { return START_SECTION_RAILROAD_LINE; }
+	@Override
+	protected String getEndSectionString() { return END_SECTION_RAILROAD_LINE; }
+	@Override
+	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
+		return RailroadLine::new;
+	}
+	@Override
+	public void _prepareForFirstLoading() {
+		new Station().prepareForFirstLoading();
+	}
+
+	/* Properties */
+	private static Tuple<String, Class<?>>[] propTuples = null;
+	@Override
+	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
+		if (propTuples == null) {
+			propTuples = new Tuple[7];
+			
+			propTuples[0] = Tuple.of("name", String.class);
+			propTuples[1] = Tuple.of("length", int.class);
+			propTuples[2] = Tuple.of("multiplicity", int.class);
+			propTuples[3] = Tuple.of("zindex", int.class);
+			propTuples[4] = Tuple.of("dispScale", float.class);
+			propTuples[5] = Tuple.of("visible", boolean.class);
+			propTuples[6] = Tuple.of("isProjection", boolean.class);
+		}
+		
+		return propTuples;
+	}
+
+	@Override
+	protected void setTGPProperty(String propName, String valueInStr) {
+		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
+		
+		if (propTuples[0].A.equals(propName)) {
+			name = valueInStr;
+		} else if (propTuples[1].A.equals(propName)) {
+			length = Integer.parseInt(valueInStr);
+		} else if (propTuples[2].A.equals(propName)) {
+			multiplicity = Integer.parseInt(valueInStr);
+		} else if (propTuples[3].A.equals(propName)) {
+			zindex = Integer.parseInt(valueInStr);
+		} else if (propTuples[4].A.equals(propName)) {
+			dispScale = Float.parseFloat(valueInStr);
+		} else if (propTuples[5].A.equals(propName)) {
+			visible = Boolean.parseBoolean(valueInStr);
+		} else if (propTuples[6].A.equals(propName)) {
+			isProjection = Boolean.parseBoolean(valueInStr);
+		}
+	}
+
+	@Override
+	protected String getTGPPropertyReprStr(int index) {
+		String value = "";
+		
+		if (index == 0) {
+			value = name;	
+		} else if (index == 1) {
+			value = length + "";
+		} else if (index == 2) {
+			value = multiplicity + "";
+		} else if (index == 3) {
+			value = zindex + "";
+		} else if (index == 4) {
+			value = dispScale + "";
+		} else if (index == 5) {
+			value = visible + "";
+		} else if (index == 6) {
+			value = isProjection + "";
+		}
+		
+		return value;
+	}
+
+	/* Element array */
+	@Override
+	protected Vector<Station> getTGPElements() {
+		return stations;
+	}
+
+	@Override
+	protected void addTGPElement(Station element) {
+		stations.add(element);
+	}
+
+	@Override
+	protected boolean isOfElementType(TrainGraphPart part) {
+		return part != null && part instanceof Station;
+	}
+	
+	/* Do complete work after all data loaded from file */
+	@Override
+	protected void loadComplete() {
+		
+	};
 }

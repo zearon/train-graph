@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.dialog.ChartSetDialog;
 
 /**
@@ -101,8 +101,8 @@ public class ControlPanel extends JPanel {
 	private void increaseMinuteGap(int i) {
 		chartView.mainFrame.chart.minuteScale += i;
 		
-		if(chartView.mainFrame.chart.minuteScale > Chart.MAX_MINUTE_SCALE) {
-			chartView.mainFrame.chart.minuteScale = Chart.MAX_MINUTE_SCALE;
+		if(chartView.mainFrame.chart.minuteScale > RailroadLineChart.MAX_MINUTE_SCALE) {
+			chartView.mainFrame.chart.minuteScale = RailroadLineChart.MAX_MINUTE_SCALE;
 			return;
 		}
 		
@@ -119,8 +119,8 @@ public class ControlPanel extends JPanel {
 	private void increaseDistGap(int i) {
 		chartView.mainFrame.chart.distScale += i;
 		
-		if(chartView.mainFrame.chart.distScale > Chart.MAX_DIST_SCALE) {
-			chartView.mainFrame.chart.distScale = Chart.MAX_DIST_SCALE;
+		if(chartView.mainFrame.chart.distScale > RailroadLineChart.MAX_DIST_SCALE) {
+			chartView.mainFrame.chart.distScale = RailroadLineChart.MAX_DIST_SCALE;
 			return;
 		}
 		

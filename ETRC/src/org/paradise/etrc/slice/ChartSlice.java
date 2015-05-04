@@ -4,16 +4,16 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.dialog.SliceDialog;
 
 public class ChartSlice {
 	public Hashtable<Train, TrainSlice> trainSlices = new Hashtable<Train, TrainSlice>();
-	Chart chart;
+	RailroadLineChart chart;
 	
-	public ChartSlice(Chart _chart) {
+	public ChartSlice(RailroadLineChart _chart) {
 		chart = _chart;
 		buildUp();
 	}
@@ -28,10 +28,10 @@ public class ChartSlice {
 				
 		//展现
 		System.out.println("\n" + train.getTrainName() + "次列车 " + train.getStartStation() + "至" + train.getTerminalStation() + 
-				           " 在" + chart.trunkCircuit.name + "上(" + train.getTrainName(chart.trunkCircuit)+ ")的运行图切片");
+				           " 在" + chart.railroadLine.name + "上(" + train.getTrainName(chart.railroadLine)+ ")的运行图切片");
 		System.out.println(events);
 		new SliceDialog("\n" + train.getTrainName() + "次列车 " + train.getStartStation() + "至" + train.getTerminalStation() + 
-		           " 在" + chart.trunkCircuit.name + "上(" + train.getTrainName(chart.trunkCircuit)+ ")的运行图切片", 
+		           " 在" + chart.railroadLine.name + "上(" + train.getTrainName(chart.railroadLine)+ ")的运行图切片", 
 		           events.toString()).showMessage();
 	}
 
@@ -41,15 +41,15 @@ public class ChartSlice {
 		Vector<ChartEvent> events = getStationEventsOfStation(station);
 		
 		//展现
-		System.out.println(chart.trunkCircuit.name + " " + station.name + "站 的运行图切片");
+		System.out.println(chart.railroadLine.name + " " + station.name + "站 的运行图切片");
 		System.out.println(events);
-		new SliceDialog(chart.trunkCircuit.name + " " + station.name + "站 的运行图切片", events.toString()).showMessage();
+		new SliceDialog(chart.railroadLine.name + " " + station.name + "站 的运行图切片", events.toString()).showMessage();
 	}
 	
 	//初始化
 	private void buildUp() {
 		for(int i=0; i<chart.getTrainNum(); i++) {
-			trainSlices.put(chart.getTrain(i), new TrainSlice(chart.getTrain(i), chart.trunkCircuit));
+			trainSlices.put(chart.getTrain(i), new TrainSlice(chart.getTrain(i), chart.railroadLine));
 		}
 	}
 	
@@ -64,7 +64,7 @@ public class ChartSlice {
 			events.addAll(trainSlice.getTrainEventsOfSameDir(anotherTrain));
 		}
 		
-		if(train.isDownTrain(chart.trunkCircuit) == Train.DOWN_TRAIN)
+		if(train.isDownTrain(chart.railroadLine) == Train.DOWN_TRAIN)
 			return ChartEvent.sortByDistAsc(events);
 		else
 			return ChartEvent.sortByDistDesc(events);
@@ -81,7 +81,7 @@ public class ChartSlice {
 			events.addAll(trainSlice.getTrainEventsOfDiffDir(anotherTrain));
 		}
 		
-		if(train.isDownTrain(chart.trunkCircuit) == Train.DOWN_TRAIN)
+		if(train.isDownTrain(chart.railroadLine) == Train.DOWN_TRAIN)
 			return ChartEvent.sortByDistAsc(events);
 		else
 			return ChartEvent.sortByDistDesc(events);
@@ -92,7 +92,7 @@ public class ChartSlice {
 		TrainSlice trainSlice = (TrainSlice) trainSlices.get(train);
 		Vector<ChartEvent> events = (trainSlice == null) ? new Vector<ChartEvent>() : trainSlice.getStationEvents();
 		
-		if(train.isDownTrain(chart.trunkCircuit) == Train.DOWN_TRAIN)
+		if(train.isDownTrain(chart.railroadLine) == Train.DOWN_TRAIN)
 			return ChartEvent.sortByDistAsc(events);
 		else
 			return ChartEvent.sortByDistDesc(events);

@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Vector;
 
-import org.paradise.etrc.data.BOMStripperInputStream;
+import org.paradise.etrc.data.util.BOMStripperInputStream;
 
 
 

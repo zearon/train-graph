@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 
 /**
  * @author lguo@sina.com
@@ -25,7 +25,7 @@ import org.paradise.etrc.data.Chart;
 public class DistancePanel extends JPanel {
 	private static final long serialVersionUID = 2449059376608773861L;
 
-	private Chart chart;
+	private RailroadLineChart chart;
 	private DynamicView dView;
 
 	public DistancePanel(DynamicView _dView) {
@@ -98,21 +98,21 @@ public class DistancePanel extends JPanel {
 	}
 	
 	private void drawGridUp(Graphics g) {
-		for (int dist = chart.trunkCircuit.length; dist >= 0 ; dist--) {
+		for (int dist = chart.railroadLine.length; dist >= 0 ; dist--) {
 			drawDistanceGrid(g, dist);
 		}
 		
 		int x = dView.getPelsX(0);
-		drawDistanceString(g, chart.trunkCircuit.length, x);
+		drawDistanceString(g, chart.railroadLine.length, x);
 	}
 
 	private void drawGridDown(Graphics g) {
-		for (int dist = 0; dist <= chart.trunkCircuit.length; dist++) {
+		for (int dist = 0; dist <= chart.railroadLine.length; dist++) {
 			drawDistanceGrid(g, dist);
 		}
 		
-		int x = dView.getPelsX(chart.trunkCircuit.length);
-		drawDistanceString(g, chart.trunkCircuit.length, x);
+		int x = dView.getPelsX(chart.railroadLine.length);
+		drawDistanceString(g, chart.railroadLine.length, x);
 	}
 	
 	private void drawDistanceGrid(Graphics g, int dist) {
@@ -124,7 +124,7 @@ public class DistancePanel extends JPanel {
 		}
 		//上行里程数
 		else {
-			drawingDist = (chart.trunkCircuit.length - dist);
+			drawingDist = (chart.railroadLine.length - dist);
 		}
 
 		int x = dView.getPelsX(dist);
@@ -167,7 +167,7 @@ public class DistancePanel extends JPanel {
 
 	public Dimension getPreferredSize() {
 		int w, h;
-		w = chart.trunkCircuit.length * dView.scale + dView.leftMargin + dView.rightMargin;
+		w = chart.railroadLine.length * dView.scale + dView.leftMargin + dView.rightMargin;
 		h = dView.ditancePanelHeight;
 		return new Dimension(w, h);
 	}

@@ -18,7 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.Circuit;
+import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.skb.ETRCLCB;
 import org.paradise.etrc.data.skb.LCBStation;
@@ -35,7 +35,7 @@ public class CircuitMakeDialog extends JDialog {
 	private String xianlu;
 	
 	private Vector<LCBStation> allStations;
-	private Circuit circuit;
+	private RailroadLine circuit;
 	
 	public CircuitMakeDialog(MainFrame _mainFrame, String _xianlu) {
 		super(_mainFrame, _xianlu, true);
@@ -55,10 +55,10 @@ public class CircuitMakeDialog extends JDialog {
 		}
 	}
 
-	private Circuit makeCircuit(Vector<LCBStation> staLCB) {
+	private RailroadLine makeCircuit(Vector<LCBStation> staLCB) {
 		System.out.println(staLCB);
 		
-		Circuit cir = new Circuit();
+		RailroadLine cir = new RailroadLine();
 		cir.name = xianlu;
 		
 		Station firstStation = (Station) staLCB.get(0);
@@ -190,7 +190,7 @@ public class CircuitMakeDialog extends JDialog {
 		return xlPanel;
 	}
 
-	public Circuit getCircuit() {
+	public RailroadLine getCircuit() {
 		Dimension dlgSize = this.getPreferredSize();
 		
 		if(mainFrame != null) {

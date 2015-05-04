@@ -12,7 +12,7 @@ import java.util.Enumeration;
 import java.util.Optional;
 import java.util.Vector;
 
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.view.chart.ChartView;
@@ -77,8 +77,8 @@ public void rebuild() {
 }
 
   private void buildUp() {
-	Chart chart = chartView.mainFrame.chart;
-    int direction = train.isDownTrain(chart.trunkCircuit);
+	RailroadLineChart chart = chartView.mainFrame.chart;
+    int direction = train.isDownTrain(chart.railroadLine);
     String trainName = getTrainName();
 
     //首先计算要画的停站
@@ -358,7 +358,7 @@ public void rebuild() {
   }
 
   String getTrainName() {
-    return train.getTrainName(chartView.mainFrame.chart.trunkCircuit);
+    return train.getTrainName(chartView.mainFrame.chart.railroadLine);
   }
 
   /**
@@ -406,16 +406,16 @@ public void rebuild() {
     if(min < 0)
       min += 24*60;
 
-	Chart chart = chartView.mainFrame.chart;
-    int dist = Math.abs(chart.trunkCircuit.getStationDist(stop[0].stationName)
-                      - chart.trunkCircuit.getStationDist(stop[stop.length-1].stationName));
+	RailroadLineChart chart = chartView.mainFrame.chart;
+    int dist = Math.abs(chart.railroadLine.getStationDist(stop[0].stationName)
+                      - chart.railroadLine.getStationDist(stop[stop.length-1].stationName));
     
     if(min == 0)
     	return train.getTrainName() + "Error!";
 
     return train.getTrainName() + "次 "
         + train.getStartStation() + "至" + train.getTerminalStation()
-        + " 在" + chart.trunkCircuit.name + "行驶" + dist + "公里 "
+        + " 在" + chart.railroadLine.name + "行驶" + dist + "公里 "
         + "耗时" + min + "分钟 旅行速度" + dist*60/min +"公里/小时";
   }
 

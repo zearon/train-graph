@@ -116,7 +116,7 @@ public class FindTrainsDialog extends JDialog {
 				instant1= Instant.now();
 			
 			trains.stream().parallel()
-				.filter(train-> (train.isDownTrain(mainFrame.chart.trunkCircuit) > 0))
+				.filter(train-> (train.isDownTrain(mainFrame.chart.railroadLine) > 0))
 				.forEach(train-> {
 					mainFrame.chart.addTrain(train);
 					msgLabel.setText(String.format(__("Importing train information %s"), train.getTrainName()));

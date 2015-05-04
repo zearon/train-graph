@@ -1,7 +1,7 @@
 // This helper class was written by sabre150 and published on 
 // http://forums.sun.com/thread.jspa?threadID=5310966
 
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.util;
 
 import java.io.IOException;
 import java.io.InputStream;

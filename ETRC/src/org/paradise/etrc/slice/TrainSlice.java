@@ -3,19 +3,19 @@ package org.paradise.etrc.slice;
 import java.awt.Point;
 import java.util.Vector;
 
-import org.paradise.etrc.data.Circuit;
+import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 
 public class TrainSlice {
 	Train train;
-	Circuit circuit;
+	RailroadLine circuit;
 	
 	Vector<ChartLine> runLines  = new Vector<ChartLine>();
 	Vector<ChartLine> stopLines = new Vector<ChartLine>();
 	
-	public TrainSlice(Train _train, Circuit _circuit) {
+	public TrainSlice(Train _train, RailroadLine _circuit) {
 		train = _train;
 		circuit = _circuit;
 		buildup();

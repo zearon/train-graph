@@ -3,6 +3,7 @@ package org.paradise.etrc;
 import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
 import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import static org.paradise.etrc.ETRCUtil.DEBUG;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
@@ -32,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 import java.util.Vector;
+import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -55,13 +57,14 @@ import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
-import org.paradise.etrc.data.Chart;
-import org.paradise.etrc.data.Circuit;
+import org.paradise.etrc.data.RailroadLineChart;
+import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.skb.ETRCLCB;
 import org.paradise.etrc.data.skb.ETRCSKB;
 import org.paradise.etrc.dialog.AboutBox;
-import org.paradise.etrc.dialog.CircuitEditDialog;
+import org.paradise.etrc.dialog.RailroadLineEditView;
 import org.paradise.etrc.dialog.CircuitMakeDialog;
 import org.paradise.etrc.dialog.DistSetDialog;
 import org.paradise.etrc.dialog.FindTrainDialog;
@@ -78,6 +81,8 @@ import org.paradise.etrc.filter.TRCFilter;
 import org.paradise.etrc.filter.TRFFilter;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.view.dynamic.DynamicView;
+import org.paradise.etrc.view.nav.Navigator;
+import org.paradise.etrc.view.nav.Navigator.NavigatorNodeType;
 import org.paradise.etrc.view.sheet.SheetView;
 
 /**
@@ -88,16 +93,22 @@ import org.paradise.etrc.view.sheet.SheetView;
 public class MainFrame extends JFrame implements ActionListener, Printable {
 	private static final long serialVersionUID = 1L;
 	
-	public JPanel mainPanel;
 	public JSplitPane navigatorSplitPane;
+	public Navigator navigator;
 	public JPanel navigatorContentPanel;
+	CardLayout navigatorContentCard;
+	public JPanel raillineChartView;
 	public JSplitPane splitPaneV;
 	public JSplitPane splitPaneH;
 	public ChartView chartView;
 	public DynamicView runView;
 	public SheetView sheetView;
 	
-	private CircuitEditDialog circuitEditDialog;
+	public RailroadLineEditView railLineEditView;
+	
+//	public J
+	
+	private RailroadLineEditView circuitEditDialog;
 	
 	private boolean isShowRun = true;
 	
@@ -118,8 +129,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private static String Properties_File = "htrc.prop";
 	
 	public boolean isNewCircuit = false;
-	public Chart chart;
+	public RailroadLineChart chart;
 	private String railNetworkName;
+	
+	public TrainGraph trainGraph;
 
 	private static final int MAX_TRAIN_SELECT_HISTORY_RECORD = 12;
 	public Vector<String> trainSelectHistory;
@@ -129,21 +142,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	//Construct the frame
 	public MainFrame() {
-		DEBUG_MSG("OS Name=%s, OS Version=%s\n", System.getProperty("os.name"), System.getProperty("os.version"));
-		// If OS is Mac OS X and Version >= 10.7, then add full screen support.
-		if ("Mac OS X".equalsIgnoreCase(System.getProperty("os.name"))) {
-			String osVersionString = System.getProperty("os.version");
-			String[] versionParts = osVersionString.split("\\.");
-			if (versionParts.length >= 2) {
-				try {
-					int versionPart1Val = Integer.parseInt(versionParts[0]);
-					int versionPart2Val = Integer.parseInt(versionParts[1]);
-					if (versionPart1Val >= 10 && versionPart2Val >= 7) {
-						com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(this,true);
-					}
-				} finally {}
-			}
-		}
+		addFullScreenModeSupportOnOSX();
 		
 		defaultProp = new Properties();
 		defaultProp.setProperty(Prop_Working_Chart, Sample_Chart_File);
@@ -169,10 +168,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 		try {
 			jbInit();
-			circuitEditDialog = new CircuitEditDialog(this, chart.allCircuits);
+//			circuitEditDialog = new RailroadLineEditView(this, chart.allCircuits);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		railLineEditView.setModel(trainGraph);
 		
 		// for DEBUG purposes
 		addWindowListener(new WindowAdapter() {
@@ -187,11 +188,84 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				// DEBUG_ACTION(() -> circuitEditDialog.showDialog());
 				
 				// Set full screen mode
-				DEBUG_ACTION( () -> com.apple.eawt.Application.getApplication()
-						.requestToggleFullScreen(MainFrame.this) );
+				DEBUG_ACTION( () -> {
+					//setFullScreenModeOnOSX(); 
+					}
+						, "Set full screen mode to false");
+				
+				// Set Navigator in terms of train Graph
+				navigator.setTrainGraph(trainGraph);
+				
+				// Setup Railroad Line Edit View
+//				railLineEditView.setModel(trainGraph);
 			}
 		});
 		
+	}
+	
+	public boolean isOSX10_7OrAbove() {
+		if ("Mac OS X".equalsIgnoreCase(System.getProperty("os.name"))) {
+			String osVersionString = System.getProperty("os.version");
+			String[] versionParts = osVersionString.split("\\.");
+			if (versionParts.length >= 2) {
+				try {
+					int versionPart1Val = Integer.parseInt(versionParts[0]);
+					int versionPart2Val = Integer.parseInt(versionParts[1]);
+					if (versionPart1Val >= 10 && versionPart2Val >= 7) {
+						return true;
+					}
+				} finally {}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * If OS is Mac OS X and Version >= 10.7, then add full screen support.
+	 */
+	public void addFullScreenModeSupportOnOSX() {
+		DEBUG_MSG("OS Name=%s, OS Version=%s\n", System.getProperty("os.name"), System.getProperty("os.version"));
+		if (!isOSX10_7OrAbove()) 
+			return;
+		
+		// com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(this,true);
+		
+		// In case of the need to compile and run on other platforms,
+		// replace the method invocation with reflection style to avoid
+		// ClassNotFound Exceptions.
+		try {
+			Class<?> clz = Class.forName("com.apple.eawt.FullScreenUtilities");
+			java.lang.reflect.Method method = clz.getMethod("setWindowCanFullScreen", java.awt.Window.class, boolean.class);
+			method.invoke(null, this, true);
+		} catch (Exception e) {
+			System.err.println("Cannot add full screen support.");
+			System.err.println(e);
+		}
+	}
+	
+	public void setFullScreenModeOnOSX() {
+		if (!isOSX10_7OrAbove()) 
+			return;
+		
+		// com.apple.eawt.Application.getApplication().requestToggleFullScreen(MainFrame.this);	
+		
+		// In case of the need to compile and run on other platforms,
+		// replace the method invocation with reflection style to avoid
+		// ClassNotFound Exceptions.
+		try {
+			Class applicationClz = Class.forName("com.apple.eawt.Application");
+			java.lang.reflect.Method getApplicationMethod = 
+					applicationClz.getMethod("getApplication");
+			Object app = getApplicationMethod.invoke(null);
+			
+			java.lang.reflect.Method requestToggleFullScreenMethod = 
+					applicationClz.getMethod("requestToggleFullScreen",java.awt.Window.class);
+			requestToggleFullScreenMethod.invoke(app, MainFrame.this);
+		} catch (Exception e) {
+			System.err.println("Cannot add full screen support.");
+			System.err.println(e);
+		}
 	}
 
 	public void doExit() {
@@ -214,6 +288,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		runView = new DynamicView(this);
 		sheetView = new SheetView(this);
 		
+		railLineEditView = new RailroadLineEditView(this);
+		
 //		tbPane = new JTabbedPane();
 //		tbPane.setFont(new Font("Dialog", Font.PLAIN, 12));
 //		tbPane.add("点单1", sheetView);
@@ -224,50 +300,25 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //		splitPane.setDividerLocation(tbPane.getPreferredSize().height);
 //		splitPane.setDividerSize(5);
 		
-		mainPanel = new JPanel();
-		mainPanel.setLayout(new BorderLayout());
-
-		navigatorContentPanel = new JPanel(new CardLayout());
-		navigatorContentPanel.add(mainPanel);
+		raillineChartView = new JPanel();
+		raillineChartView.setLayout(new BorderLayout());
 		
-		JTree tree = new JTree();
-		tree.setModel(new DefaultTreeModel(
-			new DefaultMutableTreeNode(__("Train Graph")) {
-				{
-					DefaultMutableTreeNode node_1;
-					DefaultMutableTreeNode node_2;
-					add(new DefaultMutableTreeNode(__("Comprehensive View")));
-					add(new DefaultMutableTreeNode(__("Global Settings")));
-					add(new DefaultMutableTreeNode(__("Railroad Lines")));
-					node_1 = new DefaultMutableTreeNode(__("Stations"));
-						node_1.add(new DefaultMutableTreeNode(__("Line 1")));
-						node_1.add(new DefaultMutableTreeNode(__("Line 2")));
-					add(node_1);
-					add(new DefaultMutableTreeNode(__("Train Types")));
-					node_1 = new DefaultMutableTreeNode(__("Time table"));
-						node_2 = new DefaultMutableTreeNode(__("Line 1"));
-							node_2.add(new DefaultMutableTreeNode(__("Up Going")));
-							node_2.add(new DefaultMutableTreeNode(__("Down Going")));
-							node_2.add(new DefaultMutableTreeNode(__("Train Graph")));
-						node_1.add(node_2);
-						node_2 = new DefaultMutableTreeNode(__("Line 2"));
-							node_2.add(new DefaultMutableTreeNode(__("Up Going")));
-							node_2.add(new DefaultMutableTreeNode(__("Down Going")));
-							node_2.add(new DefaultMutableTreeNode(__("Train Graph")));
-						node_1.add(node_2);
-						node_2 = new DefaultMutableTreeNode(__("Line 1 & 2 (Virtual)"));
-							node_2.add(new DefaultMutableTreeNode(__("Up Going")));
-							node_2.add(new DefaultMutableTreeNode(__("Down Going")));
-							node_2.add(new DefaultMutableTreeNode(__("Train Graph")));
-						node_1.add(node_2);
-					add(node_1);
-					add(new DefaultMutableTreeNode(__("Remarks")));
-				}
-			}
-		));
+
+		navigatorContentCard = new CardLayout();
+		navigatorContentPanel = new JPanel(navigatorContentCard);
+		navigatorContentPanel.add(NavigatorNodeType.RAILROAD_LINES.name(), 
+				railLineEditView);
+//		navigatorContentPanel.add(NavigatorNodeType.ALL_TRAINS.name(), 
+//				);
+		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLE_LINE.name(), 
+				raillineChartView);
+		// TODO: 设置主视图启动时的编辑视图
+				
+		navigator = new Navigator();
+		navigator.nodeSelectionListener = this::onNavigatorNodeChanged;
 		
 		navigatorSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, 
-				tree, navigatorContentPanel);
+				new JScrollPane(navigator), navigatorContentPanel);
 		int dividerPosH0 = 200;
 		navigatorSplitPane.setDividerLocation(dividerPosH0);
 		navigatorSplitPane.setDividerSize(6);
@@ -289,7 +340,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		splitPaneV.setDividerSize(6);
 		splitPaneV.setOneTouchExpandable(true);
 		
-		mainPanel.add(splitPaneV, BorderLayout.CENTER);
+		raillineChartView.add(splitPaneV, BorderLayout.CENTER);
 
 		this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setFont(new java.awt.Font(__("FONT_NAME"), 0, 10));
@@ -662,12 +713,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private void initChart() {
 		File chartFile = new File(prop.getProperty(Prop_Working_Chart));
 		try {
-			chart = new Chart(chartFile);
+			chart = new RailroadLineChart(chartFile);
 		} catch (IOException e) {
 			System.out.println("Load old graph from last session failed, try to load the default graph.");
 			try {
 				chartFile = new File(Sample_Chart_File);
-				chart = new Chart(chartFile);
+				chart = new RailroadLineChart(chartFile);
 			} catch (IOException e1) {
 				new MessageBox(String.format(__("Load train graph failed, please check the %s file."), Sample_Chart_File)).showMessage();
 				doExit();
@@ -676,6 +727,17 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		finally {
 			railNetworkName = chartFile.getName();
 			prop.setProperty(Prop_Working_Chart, chartFile.getAbsolutePath());
+		}
+		
+		DEBUG("载入测试文件");
+		try {
+			trainGraph = new TrainGraph();
+			trainGraph.prepareForFirstLoading();
+			trainGraph.loadFromFile("/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test.test1");
+		} catch (IOException e) {
+			e.printStackTrace();
+			new MessageBox(String.format(__("Load train graph failed, please check the %s file."), Sample_Chart_File)).showMessage();
+			doExit();
 		}
 	}
 
@@ -733,16 +795,22 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 	private void doCircuitTools() {
 		//new MessageBox(this, "todo：从里程表获取数据生成线路描述文件(.cir文件)。").showMessage();
+		
 		String xianlu = new XianluSelectDialog(this).getXianlu();
 		if(xianlu == null)
 			return;
 		
-		Circuit circuit = new CircuitMakeDialog(this, xianlu).getCircuit();
+		RailroadLine circuit = new CircuitMakeDialog(this, xianlu).getCircuit();
 		if(circuit == null)
 			return;
 		
+		// TODO: 菜单中的导入线路工具. 因为线路编辑对话框改线路编辑视图, 因此拿掉
+		DEBUG_ACTION(() -> {
+			new MessageBox(this, "待完成工作:需要把新创建的线路加入路网.待完成工作:")
+				.showMessage();
+		});
 		System.out.println(circuit);
-		circuitEditDialog.showDialogForCircuit(circuit);
+//		circuitEditDialog.showDialogForCircuit(circuit);
 		
 		this.setTitle();
 		chartView.repaint();
@@ -844,7 +912,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = chart.trunkCircuit.name + df.format(new Date());
+		String fileName = chart.railroadLine.name + df.format(new Date());
 		chooser.setSelectedFile(new File(fileName));
 
 		int returnVal = chooser.showSaveDialog(this); 
@@ -1011,7 +1079,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			System.out.println(f);
 
 			try {
-				chart.loadFromFile(f);
+				chart.loadFromFile2(f);
 				chartView.updateData();
 				chartView.resetSize();
 
@@ -1066,7 +1134,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			for (int j = 0; j < f.length; j++) {
 				loadingTrain = new Train();
 				try {
-					loadingTrain.loadFromFile(f[j].getAbsolutePath());
+					loadingTrain.loadFromFile2(f[j].getAbsolutePath());
 					prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 				} catch (IOException ex) {
 					System.err.println("Error: " + ex.getMessage());
@@ -1083,7 +1151,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //							+ Train.toTrainFormat(loadingTrain.stops[i].leave)
 //							+ " 发");
 
-				if(loadingTrain.isDownTrain(chart.trunkCircuit, false) > 0)
+				if(loadingTrain.isDownTrain(chart.railroadLine, false) > 0)
 					chart.addTrain(loadingTrain);
 			}
 
@@ -1091,7 +1159,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			//mainView.buildTrainDrawings();
 			chartView.repaint();
 			sheetView.updateData();
-			chartView.findAndMoveToTrain(loadingTrain.getTrainName(chart.trunkCircuit));
+			chartView.findAndMoveToTrain(loadingTrain.getTrainName(chart.railroadLine));
 			runView.refresh();
 			//panelChart.panelLines.repaint();
 		}
@@ -1178,6 +1246,41 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		if (isShowRun)
 			splitPaneV.setDividerLocation(runView.getPreferredSize().height);
 		prop.setProperty(Prop_Show_Run, isShowRun ? "Y" : "N");
+	}
+	
+	private void onNavigatorNodeChanged(NavigatorNodeType nodeType, 
+			int index, Object... params) {
+		DEBUG_ACTION(() -> {
+//			new MessageBox(this, 
+//					String.format("Type=%s, index=%d, params=[%s]", 
+//							nodeType.toString(), index, 
+//							Stream.of(params).map(obj->obj==null?"null":obj.toString())
+//							.reduce((a,b) -> a+", "+b).orElse("")
+//							))
+//				.showMessage();
+		});
+		
+		switch (nodeType) {
+		case RAILROAD_LINES:
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.RAILROAD_LINES.name());
+			break;
+		case RAILROAD_LINE_SPECIFIC:
+			railLineEditView.switchRailLine((RailroadLine) params[0]); 
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.RAILROAD_LINES.name());
+			break;
+		case ALL_TRAINS:
+			break;
+		case TIME_TABLE_LINE:
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.TIME_TABLE_LINE.name());
+			break;
+		default:
+			break;
+		}
+		navigatorContentPanel.revalidate();
+		
 	}
 	
 	//Overridden so we can exit when window is closed

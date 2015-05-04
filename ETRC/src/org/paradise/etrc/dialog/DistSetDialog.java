@@ -21,7 +21,7 @@ import javax.swing.border.TitledBorder;
 
 import org.paradise.etrc.MainFrame;
 //import com.borland.jbcl.layout.*;
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 
 /**
  * @author lguo@sina.com
@@ -54,8 +54,8 @@ MainFrame mainFrame = null;
   JTextField tfBold = new JTextField();
   JLabel jLabel3 = new JLabel();
 
-  Chart chart;
-  public DistSetDialog(Frame frame, Chart _chart) {
+  RailroadLineChart chart;
+  public DistSetDialog(Frame frame, RailroadLineChart _chart) {
     super(frame, __("Distance Bar Setting"), false);
 
     if(frame instanceof MainFrame) {

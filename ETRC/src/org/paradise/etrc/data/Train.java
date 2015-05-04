@@ -18,13 +18,17 @@ import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
+import org.paradise.etrc.data.util.BOMStripperInputStream;
+import org.paradise.etrc.data.util.Tuple;
 
 /**
  * @author lguo@sina.com
  * @version 1.0
  */
 
-public class Train {
+public class Train extends TrainGraphPart<Train, Stop> {
 //	public static int MAX_STOP_NUM = 100;
 
 	public String trainNameDown = "";
@@ -53,6 +57,16 @@ public class Train {
 	private Vector<Stop> stops = new Vector<Stop>(15);
 
 	public Color color = null;
+	public String getColorStr() {
+		return color == null ? "" : "#" + Integer.toHexString(color.getRGB() & 0x11ffffff);
+	}
+	public void setColorByStr(String colorStr) {
+		try {
+			color = Color.decode(colorStr);
+		} catch (Exception e) {
+			System.err.println("Invalid color string:" + colorStr);
+		}
+	}
 	
 	private List<Consumer<Train>> trainChangedListeners = new Vector<Consumer<Train>> ();
 
@@ -212,7 +226,7 @@ public class Train {
 		fireTrainChangedEvent();
 	}
 
-	public void loadFromFile(String file) throws IOException {
+	public void loadFromFile2(String file) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(file)),"UTF-8"));
 
 		String line;
@@ -419,7 +433,7 @@ public class Train {
 					trainNameUp + "/" + trainNameDown;
 	}
 
-	public String getTrainName(Circuit c) {
+	public String getTrainName(RailroadLine c) {
 		switch (isDownTrain(c)) {
 		case DOWN_TRAIN:
 			return trainNameDown == "" ? trainNameUp : trainNameDown;
@@ -496,10 +510,10 @@ public class Train {
 
 	public static final int UP_TRAIN = 2;
 
-	public int isDownTrain(Circuit c) {
+	public int isDownTrain(RailroadLine c) {
 		return isDownTrain(c, true);
 	}
-	public int isDownTrain(Circuit c, boolean isGuessByTrainName) {
+	public int isDownTrain(RailroadLine c, boolean isGuessByTrainName) {
 		int lastDist = -1;
 		for (int i = 0; i < getStopNum(); i++) {
 			int thisDist = c.getStationDist(stops.get(i).stationName);
@@ -517,7 +531,7 @@ public class Train {
 		return isGuessByTrainName?isDownTrainByTrainName(c):UNKNOWN;
 	}
 
-	private int isDownTrainByTrainName(Circuit c) {
+	private int isDownTrainByTrainName(RailroadLine c) {
 		String name = getTrainName();
 		if((name.endsWith("1")) ||
 		   (name.endsWith("3")) ||
@@ -572,7 +586,7 @@ public class Train {
 	public static void main(String argv[]) {
 		Train t = new Train();
 		try {
-			t.loadFromFile("c:\\N518_519_w.trf");
+			t.loadFromFile2("c:\\N518_519_w.trf");
 
 			System.out.println(t.getTrainName() + "次从" + t.getStartStation() + "到"
 					+ t.getTerminalStation() + "，共经停" + t.getStopNum() + "个车站");
@@ -876,4 +890,114 @@ public class Train {
 		trainChangedListeners.stream().parallel()
 			.forEach(action->action.accept(this));
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	/**
+	 * Implements method inherited from abstract base class TrainGraphPart
+	 */
+	@Override
+	protected String getStartSectionString() { return START_SECTION_TRAIN; }
+	@Override
+	protected String getEndSectionString() { return END_SECTION_TRAIN; }
+	@Override
+	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
+		return Train::new;
+	}
+	@Override
+	public void _prepareForFirstLoading() {
+		new Stop().prepareForFirstLoading();
+	}
+
+	/* Properties */
+	private static Tuple<String, Class<?>>[] propTuples = null;
+	@Override
+	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
+		if (propTuples == null) {
+			propTuples = new Tuple[6];
+			
+			propTuples[0] = Tuple.of("trainNameFull", String.class);
+			propTuples[1] = Tuple.of("trainNameDown", String.class);
+			propTuples[2] = Tuple.of("trainNameUp", String.class);
+			propTuples[3] = Tuple.of("startStation", String.class);
+			propTuples[4] = Tuple.of("terminalStation", String.class);
+			propTuples[5] = Tuple.of("color", Color.class);
+		}
+		
+		return propTuples;
+	}
+
+	@Override
+	protected void setTGPProperty(String propName, String valueInStr) {
+		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
+		
+		if (propTuples[0].A.equals(propName)) {
+			trainNameFull = valueInStr;
+		} else if (propTuples[1].A.equals(propName)) {
+			trainNameDown = valueInStr;
+		} else if (propTuples[2].A.equals(propName)) {
+			trainNameUp = valueInStr;
+		} else if (propTuples[3].A.equals(propName)) {
+			setStartStation(valueInStr);
+		} else if (propTuples[4].A.equals(propName)) {
+			setTerminalStation(valueInStr);
+		} else if (propTuples[5].A.equals(propName)) {
+			setColorByStr(valueInStr);
+		}
+	
+	}
+
+	@Override
+	protected String getTGPPropertyReprStr(int index) {
+		String value = "";
+		
+		if (index == 0) {
+			value = trainNameFull + "";	
+		} else if (index == 1) {
+			value = trainNameDown + "";
+		} else if (index == 2) {
+			value = trainNameUp + "";
+		} else if (index == 3) {
+			value = getStartStation() + "";
+		} else if (index == 4) {
+			value = getTerminalStation() + "";
+		} else if (index == 5) {
+			value = getColorStr() + "";
+		}
+		
+		return value;
+	}
+
+	/* Element array */
+	@Override
+	protected Vector<Stop> getTGPElements() {
+		return stops;
+	}
+
+	@Override
+	protected void addTGPElement(Stop element) {
+		stops.add(element);
+	}
+
+	@Override
+	protected boolean isOfElementType(TrainGraphPart part) {
+		return part != null && part instanceof Stop;
+	}
+	
+	/* Do complete work after all data loaded from file */
+	@Override
+	protected void loadComplete() {
+		
+	};
 }

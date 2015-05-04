@@ -419,7 +419,7 @@ public class TrainDialog extends JDialog {
 
 			Train loadingTrain = new Train();
 			try {
-				loadingTrain.loadFromFile(f.getAbsolutePath());
+				loadingTrain.loadFromFile2(f.getAbsolutePath());
 				mainFrame.prop.setProperty(
 						MainFrame.Prop_Recent_Open_File_Path, chooser
 								.getSelectedFile().getParentFile()

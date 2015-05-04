@@ -1,6 +1,6 @@
 package org.paradise.etrc.view.sheet;
 
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
@@ -8,8 +8,8 @@ import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 public class SheetModel extends DefaultJEditTableModel {
 	private static final long serialVersionUID = 6767541225039467460L;
 
-	public Chart chart;
-	public SheetModel(Chart _chart) {
+	public RailroadLineChart chart;
+	public SheetModel(RailroadLineChart _chart) {
 		chart = _chart;
 	}
 	
@@ -18,12 +18,12 @@ public class SheetModel extends DefaultJEditTableModel {
 	}
 
 	public int getRowCount() {
-		return chart.trunkCircuit.getStationNum() * 2;
+		return chart.railroadLine.getStationNum() * 2;
 	}
 
 	public Object getValueAt(int rowIndex, int colIndex) {
 		Train theTrain = chart.getTrain(colIndex);
-		String staName = chart.trunkCircuit.getStation(rowIndex / 2).name;
+		String staName = chart.railroadLine.getStation(rowIndex / 2).name;
 		Stop stop = findStop(theTrain, staName);
 		
 		return stop;		
@@ -45,7 +45,7 @@ public class SheetModel extends DefaultJEditTableModel {
 	}
 
 	public String getColumnName(int conIndex) {
-		return chart.getTrain(conIndex).getTrainName(chart.trunkCircuit);
+		return chart.getTrain(conIndex).getTrainName(chart.railroadLine);
 	}
 	
 	public Class<?> getColumnClass(int columnIndex) {
@@ -60,7 +60,7 @@ public class SheetModel extends DefaultJEditTableModel {
 	//此处需要处理添加、删除停站的操作
 	public void setValueAt(Object aValue, int rowIndex, int colIndex)  {
 		Train theTrain = chart.getTrain(colIndex);
-		String staName = chart.trunkCircuit.getStation(rowIndex / 2).name;
+		String staName = chart.railroadLine.getStation(rowIndex / 2).name;
 		Stop stop = (Stop) aValue;
 		
 		if(stop != null) {
@@ -94,7 +94,7 @@ public class SheetModel extends DefaultJEditTableModel {
 	public boolean nextCellIsBelow(int row, int column, int increment) {
 		Train theTrain = chart.getTrain(column);
 		
-		if (theTrain.isDownTrain(chart.trunkCircuit) == Train.DOWN_TRAIN)
+		if (theTrain.isDownTrain(chart.railroadLine) == Train.DOWN_TRAIN)
 			return true;
 		else
 			return false;

@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 
 /**
  * @author lguo@sina.com
@@ -25,10 +25,10 @@ import org.paradise.etrc.data.Chart;
 public class ClockPanel extends JPanel {
 	private static final long serialVersionUID = 2449059376608773861L;
 
-	private Chart chart;
+	private RailroadLineChart chart;
 	private ChartView chartView;
 
-	public ClockPanel(Chart _chart, ChartView _view) {
+	public ClockPanel(RailroadLineChart _chart, ChartView _view) {
 		chart = _chart;
 		chartView = _view;
 		try {
@@ -99,8 +99,8 @@ public class ClockPanel extends JPanel {
 	private void increaseMinuteGap(int i) {
 		chartView.mainFrame.chart.minuteScale += i;
 		
-		if(chartView.mainFrame.chart.minuteScale > Chart.MAX_MINUTE_SCALE) {
-			chartView.mainFrame.chart.minuteScale = Chart.MAX_MINUTE_SCALE;
+		if(chartView.mainFrame.chart.minuteScale > RailroadLineChart.MAX_MINUTE_SCALE) {
+			chartView.mainFrame.chart.minuteScale = RailroadLineChart.MAX_MINUTE_SCALE;
 			return;
 		}
 		

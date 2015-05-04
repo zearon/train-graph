@@ -36,7 +36,7 @@ import javax.swing.table.TableRowSorter;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.view.chart.ChartView;
@@ -50,7 +50,7 @@ import org.paradise.etrc.view.widget.JEditTable;
 public class TrainsDialog extends JDialog {
 	private static final long serialVersionUID = -6188814889727919832L;
 
-	Chart chart;
+	RailroadLineChart chart;
 
 	MainFrame mainFrame;
 
@@ -314,7 +314,7 @@ public class TrainsDialog extends JDialog {
 					super.paint(g);
 				}
 			};
-			colorButton.setText(chart.getTrain(table.convertRowIndexToModel(row)).getTrainName(chart.trunkCircuit));
+			colorButton.setText(chart.getTrain(table.convertRowIndexToModel(row)).getTrainName(chart.railroadLine));
 			colorButton.setForeground(currentColor);
 			colorButton.setBackground(Color.white);
 

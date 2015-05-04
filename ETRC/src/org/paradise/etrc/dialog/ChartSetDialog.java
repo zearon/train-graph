@@ -26,7 +26,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.view.chart.ChartView;
 
 public class ChartSetDialog extends JDialog {
@@ -56,7 +56,7 @@ public class ChartSetDialog extends JDialog {
 	private void init() {
 		tbPane = new JTabbedPane();
 		
-		Chart chart = mainFrame.chart;
+		RailroadLineChart chart = mainFrame.chart;
 		
 		d0 = createJTextField("" + chart.distScale);
 		d1 = createJTextField("" + chart.displayLevel);
@@ -283,7 +283,7 @@ public class ChartSetDialog extends JDialog {
 	}
 	
 	private void setValues() {
-		Chart chart = mainFrame.chart;
+		RailroadLineChart chart = mainFrame.chart;
 		
 	    String stDistScale = d0.getText();
 	    String stDisplay = d1.getText();

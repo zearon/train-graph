@@ -9,13 +9,19 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.paradise.etrc.data.event.RailroadLineChangeType;
+import org.paradise.etrc.data.util.BOMStripperInputStream;
+import org.paradise.etrc.data.util.Tuple;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -25,24 +31,22 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * @author Jeff Gong
  *
  */
-public class RailNetwork {
-	protected  String name;
-	protected Vector<Circuit> circuits;
+public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
+	
+	public String name = "";
+	protected Vector<RailroadLine> railroadLines;
 
-	protected Vector<Station> virtualCircuit;
+	protected Vector<Station> virtualRailroadLine;
 	protected Vector<Station> crossoverStations;
 
 	Vector<Station> tempStations;
-	
-	public enum CircuitChangeType {
-		ADD, REMOVE, UPDATE
-	}
-	private List<BiConsumer<Optional<Circuit>, CircuitChangeType>> circuitChangedListeners = 
-			new Vector<BiConsumer<Optional<Circuit>, CircuitChangeType>>();
+		
+	private List<BiConsumer<RailroadLine, RailroadLineChangeType>> circuitChangedListeners = 
+			new Vector<BiConsumer<RailroadLine, RailroadLineChangeType>>();
 
 	public RailNetwork() {
-		circuits = new Vector<>(8);
-		virtualCircuit = new Vector<>(100);
+		railroadLines = new Vector<>(8);
+		virtualRailroadLine = new Vector<>(100);
 		crossoverStations = new Vector<>(20);
 		tempStations = new Vector<>(100);
 	}
@@ -59,53 +63,94 @@ public class RailNetwork {
 		this.name = name;
 	}
 
-	public Vector<Circuit> getCircuits() {
-		return circuits;
+	public Vector<RailroadLine> getAllRailroadLines() {
+		return railroadLines;
 	}
 	
-	public void addCircuit(Circuit circuit) {
-		circuits.add(circuit);
-		fireCircuitChangedEvent(circuit, CircuitChangeType.ADD);
-		circuit.addCircuitChangedListener(this::onCircuitChange);
+	public void addRailroadLine(RailroadLine line) {
+		railroadLines.add(line);
+		fireRailroadLineChangedEvent(line, RailroadLineChangeType.ADD);
+		line.addStationChangedListener(this::onRailroadLineChange);
 	}
 	
-	public void insertCircuit(Circuit circuit, int index) {
-		circuits.insertElementAt(circuit, index);
-		fireCircuitChangedEvent(circuit, CircuitChangeType.ADD);
-		circuit.addCircuitChangedListener(this::onCircuitChange);
+	public void insertRailroadLine(RailroadLine line, int index) {
+		railroadLines.insertElementAt(line, index);
+		fireRailroadLineChangedEvent(line, RailroadLineChangeType.ADD);
+		line.addStationChangedListener(this::onRailroadLineChange);
 	}
 	
-	public void removeCircuit(Circuit circuit) {
-		circuits.remove(circuit);
-		fireCircuitChangedEvent(circuit, CircuitChangeType.REMOVE);
-		circuit.removeCircuitChangedListener(this::onCircuitChange);
+	public void removeRailroadLine(RailroadLine line) {
+		railroadLines.remove(line);
+		fireRailroadLineChangedEvent(line, RailroadLineChangeType.REMOVE);
+		line.removeStationChangedListener(this::onRailroadLineChange);
 	}
 	
-	public void removeCircuit(int index) {
-		Circuit circuit = circuits.remove(index);
-		fireCircuitChangedEvent(circuit, CircuitChangeType.REMOVE);
-		circuit.removeCircuitChangedListener(this::onCircuitChange);
+	public void removeRailroadLine(int index) {
+		RailroadLine circuit = railroadLines.remove(index);
+		fireRailroadLineChangedEvent(circuit, RailroadLineChangeType.REMOVE);
+		circuit.removeStationChangedListener(this::onRailroadLineChange);
+	}
+	
+	public void clearRailroadLines() {
+		railroadLines.clear();
+		fireRailroadLineChangedEvent(null, RailroadLineChangeType.UPDATE);
+	}
+	
+	public void replaceAllRailroadLines(Collection<RailroadLine> railines) {
+		railroadLines.clear();
+		railroadLines.addAll(railines);
+		fireRailroadLineChangedEvent(null, RailroadLineChangeType.UPDATE);
+	}
+	
+	public RailroadLine getRailroadLine(int index) {
+		return railroadLines.get(index);
+	}
+
+	public RailroadLine setRailroadLine(int index, RailroadLine element) {
+		return railroadLines.set(index, element);
+	}
+	
+	public int getRailrodeLineCount() {
+		return railroadLines.size();
+	}
+
+	public String repr() {
+		StringBuffer sb = new StringBuffer(this.name);
+		
+		sb.append(String.format(__("There are %d railroad lines in total.\n"),
+				getAllRailroadLines().size()));
+
+		for (RailroadLine line : getAllRailroadLines())
+			sb.append(line.toString());
+
+		return sb.toString();
+	}
+
+	public static boolean SIMPLE_VERSION_TO_STRING = true;
+	@Override
+	public String toString() {
+		return SIMPLE_VERSION_TO_STRING ? this.name : repr();
 	}
 
 	public Vector<Station> getCrossoverStations() {
 		return crossoverStations;
 	}
 	
-	public void addCircuitChangedListener(BiConsumer<Optional<Circuit>, CircuitChangeType> eventHandler) {
+	public void addRailroadLineChangedListener(BiConsumer<RailroadLine, RailroadLineChangeType> eventHandler) {
 		circuitChangedListeners.add(eventHandler);
 	}
 	
-	public void removeCircuitChangedListener(BiConsumer<Optional<Circuit>, CircuitChangeType> eventHandler) {
+	public void removeRailroadLineChangedListener(BiConsumer<RailroadLine, RailroadLineChangeType> eventHandler) {
 		circuitChangedListeners.remove(eventHandler);
 	}
 	
-	public void fireCircuitChangedEvent(Circuit circuit, CircuitChangeType changeType) {
+	public void fireRailroadLineChangedEvent(RailroadLine line, RailroadLineChangeType changeType) {
 		circuitChangedListeners.stream().parallel()
-			.forEach(action->action.accept(Optional.ofNullable(circuit), changeType));
+			.forEach(action->action.accept(line, changeType));
 	}
 	
-	protected void onCircuitChange(Circuit circuit) {
-		fireCircuitChangedEvent(circuit, CircuitChangeType.UPDATE);
+	protected void onRailroadLineChange(RailroadLine line) {
+		fireRailroadLineChangedEvent(line, RailroadLineChangeType.UPDATE);
 	}
 
 	public void addProjectionNode() {
@@ -116,24 +161,24 @@ public class RailNetwork {
 		throw new NotImplementedException();
 	}
 
-	public Circuit getProjectionCircuit() {
+	public RailroadLine getProjectionCircuit() {
 		throw new NotImplementedException();
 	}
 
-	public Circuit getVirtualCircuit() {
+	public RailroadLine getVirtualRailroadLine() {
 		throw new NotImplementedException();
 	}
 
 	public List<String> findCrossoverStations() {
 		
-		List<String>[] duplicateStationsInCircuit = new List [circuits.size()];
+		List<String>[] duplicateStationsInLine = new List [railroadLines.size()];
 		
-		for (int ci = 0; ci < circuits.size(); ++ci) {
-			Circuit circuit = circuits.get(ci);
+		for (int ci = 0; ci < railroadLines.size(); ++ci) {
+			RailroadLine circuit = railroadLines.get(ci);
 			circuit.calIndex = ci;
 
 			Vector<Station> stations = circuit.getAllStations();
-			duplicateStationsInCircuit[ci]= circuit.getDuplicatedStationNames();
+			duplicateStationsInLine[ci]= circuit.getDuplicatedStationNames();
 			
 
 			// Find crossover stations
@@ -151,7 +196,7 @@ public class RailNetwork {
 			}
 		}
 		
-		List<String> errMsg = Stream.of(duplicateStationsInCircuit)
+		List<String> errMsg = Stream.of(duplicateStationsInLine)
 				.map((List<String> list)->list.size()<1?null:String.format(__("There are duplicate stations on circuit: %s"), 
 						list.stream().reduce("", (a, b)->a.length() > 0 ? a+", "+b : b)))
 				.collect(Collectors.toList());
@@ -163,7 +208,7 @@ public class RailNetwork {
 	 * 
 	 * @return Error messages
 	 */
-	public List<String> scaleUpCircuits() {
+	public List<String> scaleUpRailroadLines() {
 		crossoverStations.clear();
 		tempStations.clear();
 
@@ -174,10 +219,10 @@ public class RailNetwork {
 		}
 
 		// Update crossover station status for each circuit
-		circuits.stream().flatMap(circuit -> circuit.getAllStations().stream())
+		railroadLines.stream().flatMap(circuit -> circuit.getAllStations().stream())
 				.filter(crossoverStations::contains)
 				.forEach(station -> station.isCrossover = true);
-		circuits.stream().parallel()
+		railroadLines.stream().parallel()
 				.forEach(circuit -> circuit.updateStations());
 
 		/*
@@ -186,19 +231,19 @@ public class RailNetwork {
 		 * it at list head. 2. Circuits with crossover stations are in front of
 		 * those without. 3. Respect the original circuit order as possible.
 		 */
-		List<Circuit> sortedCircuits = circuits.stream()
-				.sorted(this::compareCircuit).collect(Collectors.toList());
+		List<RailroadLine> sortedCircuits = railroadLines.stream()
+				.sorted(this::compareRailroadLine).collect(Collectors.toList());
 
 		// Calculate
-		virtualCircuit.clear();
-		errMsgs = new ArrayList<String> (circuits.size());
+		virtualRailroadLine.clear();
+		errMsgs = new ArrayList<String> (railroadLines.size());
 		for (int ci = 0; ci < sortedCircuits.size(); ++ci) {
-			Circuit circuit = circuits.get(ci);
+			RailroadLine circuit = railroadLines.get(ci);
 			circuit.calIndex = ci;
 
 			if (!isScaleNeeded(circuit)) {
 				// For the trunk circuit or those circuits without any crossover stations.
-				virtualCircuit.addAll(circuit.getAllStations());
+				virtualRailroadLine.addAll(circuit.getAllStations());
 				circuit.getAllStations().stream()
 						.forEach(station -> station.scaledDist = station.dist);
 				
@@ -219,16 +264,16 @@ public class RailNetwork {
 				case 1: {
 					// Apply an offset of the crossover station on each station on the circuit
 					Station station = circuit.getCrossoverStation(0);
-					Optional<Station> stationOnVCircuit = findStationOnVirtualCircuit(station);
+					Optional<Station> stationOnVCircuit = findStationOnVirtualRailLine(station);
 					if (!stationOnVCircuit.isPresent())
-						virtualCircuit.add(station);
+						virtualRailroadLine.add(station);
 					int offset = stationOnVCircuit.orElse(station).dist
 							- station.dist;
 					
 					stations.stream().filter(sta->! station.equals(sta))
 						.forEach(sta -> {
 							sta.scaledDist = sta.dist + offset;
-							virtualCircuit.add(sta);
+							virtualRailroadLine.add(sta);
 						});
 					
 					if (DEBUG())
@@ -247,8 +292,8 @@ public class RailNetwork {
 					for (int csindex = 0; csindex < crossoverCount - 1; ++ csindex) {
 						Tuple<Station, Integer> cstation = circuit.getCrossoverStationTuple(csindex);
 						Tuple<Station, Integer> cstation2 = circuit.getCrossoverStationTuple(csindex + 1);
-						Optional<Station> cstationOnVCircuit = findStationOnVirtualCircuit(cstation.A);
-						Optional<Station> cstation2OnVCircuit = findStationOnVirtualCircuit(cstation2.A);
+						Optional<Station> cstationOnVCircuit = findStationOnVirtualRailLine(cstation.A);
+						Optional<Station> cstation2OnVCircuit = findStationOnVirtualRailLine(cstation2.A);
 
 						// The crossover station is met at the first time. No need to process. Skip it.
 						if (!cstationOnVCircuit.isPresent())
@@ -302,7 +347,7 @@ public class RailNetwork {
 		return errMsgs;
 	}
 
-	public boolean isScaleNeeded(Circuit circuit) {
+	public boolean isScaleNeeded(RailroadLine circuit) {
 		// The trunk circuit is considered as the standard for scale.
 		if (circuit.calIndex == 0)
 			return false;
@@ -310,7 +355,7 @@ public class RailNetwork {
 		return circuit.hasCrossover();
 	}
 
-	int compareCircuit(Circuit c1, Circuit c2) {
+	int compareRailroadLine(RailroadLine c1, RailroadLine c2) {
 		if (c1.calIndex == 0)
 			return -1;
 
@@ -324,10 +369,10 @@ public class RailNetwork {
 		}
 	}
 
-	Optional<Station> findStationOnVirtualCircuit(Station station) {
-		int index = virtualCircuit.indexOf(station);
+	Optional<Station> findStationOnVirtualRailLine(Station station) {
+		int index = virtualRailroadLine.indexOf(station);
 		if (index >= 0)
-			return Optional.of(virtualCircuit.get(index));
+			return Optional.of(virtualRailroadLine.get(index));
 		else {
 			return Optional.empty();
 		}
@@ -341,14 +386,14 @@ public class RailNetwork {
 		// for (Circuit circuit : circuits) {
 		// printCircuit(out, circuit);
 		// }
-		Stream<Circuit> stream = circuits.stream();
+		Stream<RailroadLine> stream = railroadLines.stream();
 		if (sorted)
-			stream = stream.sorted(this::compareCircuit);
+			stream = stream.sorted(this::compareRailroadLine);
 
-		stream.forEachOrdered(circuit -> printCircuit(out, circuit));
+		stream.forEachOrdered(circuit -> printRailroadLine(out, circuit));
 	}
 
-	public void printCircuit(PrintStream out, Circuit circuit) {
+	public void printRailroadLine(PrintStream out, RailroadLine circuit) {
 		String multiplicity = (circuit.multiplicity + "线").replace("1", "单").replace("2", "复").replace("4", "四");
 		out.printf(
 				"% 2d. %s %s, (%dkm), zIndex: % 2d. %s Phase:****%s****. It has the following stations: %n",
@@ -366,15 +411,15 @@ public class RailNetwork {
 				station.scaledDist, station.level, station.hide ? "Hidden" : "");
 	}
 
-	public void loadFromFile(String file) throws IOException {
+	public void loadFromFile2(String file) throws IOException {
 		BufferedReader in = null;
-		Vector<Circuit> loadedCircuits = new Vector<Circuit>(8); // in most
+		Vector<RailroadLine> loadedCircuits = new Vector<RailroadLine>(8); // in most
 																	// cases,
 																	// there are
 																	// no more
 																	// than 8
 																	// circuits.
-		Circuit circuit = null;
+		RailroadLine railline = null;
 		int lineNum = 0;
 		try {
 			in = new BufferedReader(new InputStreamReader(
@@ -382,12 +427,12 @@ public class RailNetwork {
 					"UTF-8"));
 			String line = null;
 			while ((line = in.readLine()) != null) {
-				if (line.equalsIgnoreCase(Chart.circuitPattern)) {
-					circuit = new Circuit();
-					loadedCircuits.add(circuit);
+				if (line.equalsIgnoreCase(RailroadLineChart.circuitPattern)) {
+					railline = new RailroadLine();
+					loadedCircuits.add(railline);
 					lineNum = 0;
 				} else {
-					circuit.parseLine(line, lineNum++);
+					railline.parseLine(line, lineNum++);
 				}
 			}
 
@@ -395,8 +440,8 @@ public class RailNetwork {
 				throw new IOException(__("Loaded circuits are empty."));
 			}
 
-			circuits.clear();
-			circuits.addAll(loadedCircuits);
+			railroadLines.clear();
+			railroadLines.addAll(loadedCircuits);
 			loadedCircuits.clear();
 
 		} catch (IOException ex) {
@@ -410,5 +455,111 @@ public class RailNetwork {
 		}
 
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
+	/**
+	 * Implements method inherited from abstract base class TrainGraphPart
+	 */
+	@Override
+	protected String getStartSectionString() { return START_SECTION_RAILROAD_NETWORK; }
+	@Override
+	protected String getEndSectionString() { return END_SECTION_RAILROAD_NETWORK; }
+	@Override
+	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
+		return RailNetwork::new;
+	}
+	@Override
+	public void _prepareForFirstLoading() {
+		new RailroadLine().prepareForFirstLoading();
+	}
+
+	/* Properties */
+	private static Tuple<String, Class<?>>[] propTuples = null;
+	@Override
+	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
+		if (propTuples == null) {
+			propTuples = new Tuple[1];
+			
+			propTuples[0] = Tuple.of("name", String.class);
+//			propTuples[1] = Tuple.of("length", int.class);
+//			propTuples[2] = Tuple.of("multiplicity", int.class);
+//			propTuples[3] = Tuple.of("zindex", int.class);
+//			propTuples[4] = Tuple.of("dispScale", float.class);
+//			propTuples[5] = Tuple.of("visible", boolean.class);
+		}
+		
+		return propTuples;
+	}
+
+	@Override
+	protected void setTGPProperty(String propName, String valueInStr) {
+		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
+		
+		if (propTuples[0].A.equals(propName)) {
+			name = valueInStr;
+		}
+//		else if (propTuples[1].A.equals(propName)) {
+//			length = Integer.parseInt(valueInStr);
+//		} else if (propTuples[2].A.equals(propName)) {
+//			multiplicity = Integer.parseInt(valueInStr);
+//		} else if (propTuples[3].A.equals(propName)) {
+//			zindex = Integer.parseInt(valueInStr);
+//		} else if (propTuples[4].A.equals(propName)) {
+//			dispScale = Float.parseFloat(valueInStr);
+//		} else if (propTuples[5].A.equals(propName)) {
+//			visible = Boolean.parseBoolean(valueInStr);
+//		}
+	}
+
+	@Override
+	protected String getTGPPropertyReprStr(int index) {
+		String value = "";
+		
+		if (index == 0) {
+			value = name;	
+		} 
+//		else if (index == 1) {
+//			value = length + "";
+//		} else if (index == 2) {
+//			value = multiplicity + "";
+//		} else if (index == 3) {
+//			value = zindex + "";
+//		} else if (index == 4) {
+//			value = dispScale + "";
+//		} else if (index == 5) {
+//			value = visible + "";
+//		}
+		
+		return value;
+	}
+
+	/* Element array */
+	@Override
+	protected Vector<RailroadLine> getTGPElements() {
+		return railroadLines;
+	}
+
+	@Override
+	protected void addTGPElement(RailroadLine element) {
+		railroadLines.add(element);
+	}
+
+	@Override
+	protected boolean isOfElementType(TrainGraphPart part) {
+		return part != null && part instanceof RailroadLine;
+	}
+	
+	/* Do complete work after all data loaded from file */
+	@Override
+	protected void loadComplete() {
+		
+	};
 }

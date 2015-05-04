@@ -1,6 +1,4 @@
-package org.paradise.etrc.data;
-
-import com.sun.org.apache.bcel.internal.generic.NEW;
+package org.paradise.etrc.data.util;
 
 public class Tuple <T1, T2> {
 	

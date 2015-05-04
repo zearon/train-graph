@@ -71,6 +71,24 @@ public class ETRCUtil {
 		  }
 		  
 		  return isDebug;
+	  }	  
+
+	  
+	  /**
+	   * Check if it is running in debug mode. If yes, then print a message
+	   * and do an action.
+	   * @param action The action to be done if in debug mode.
+	   * @param msgFormat The string format of message to be printed if in debug mode.
+	   * @param msgArgs	 The arguments of the message format.
+	   * @return true if in debug mode and false if else.
+	   */
+	  public static boolean DEBUG_ACTION(DebugAction action, String msgFormat, Object... msgArgs) {
+		  if (isDebug) {
+			  _printMsg("DEBUG ACTION:", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
+			  action.doAction();
+		  }
+		  
+		  return isDebug;
 	  }
 	  
 	  /**

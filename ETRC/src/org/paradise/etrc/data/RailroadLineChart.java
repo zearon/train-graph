@@ -16,10 +16,12 @@ import java.util.Optional;
 import java.util.Vector;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
-import org.paradise.etrc.data.RailNetwork.CircuitChangeType;
+import org.paradise.etrc.data.util.BOMStripperInputStream;
+import org.paradise.etrc.data.util.Tuple;
 
-public class Chart {
+public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRef> {
 	//Y轴（距离）显示参数
 	public float distScale = 3; //每公里像素数
 	public static final float MAX_DIST_SCALE = 10f;
@@ -33,13 +35,18 @@ public class Chart {
 	public int timeInterval = 10; //时间轴间隔（必须是60的约数，即可以是5，6，10等，但不能是7分钟）
 
 	//本运行图的线路
-	public Circuit trunkCircuit;
-	public Vector<Circuit> allCircuits = new Vector<Circuit>(6);
+	public RailroadLine railroadLine;
+	// 用于序列化时引用RailNetwork中的线路
+	String railroadLineName = "";
+	public Vector<RailroadLine> allCircuits = new Vector<RailroadLine>(6);
 
 	//本运行图所包含的车次，最多600趟
 //	public static final int MAX_TRAIN_NUM = 6000;
 //	private Train _trains[] = new Train[MAX_TRAIN_NUM];
-	private Vector<Train> trains = new Vector<Train> (100);
+	public Vector<Train> trains = new Vector<Train> (100);
+	
+	//由于车次跨多条线路,因此序列化线路运行图时只保留途径该线路的车次的引用
+	Vector<TrainRef> trainRefs = new Vector<TrainRef> ();
 
 	//本运行图的车次总数
 //	private int trainNum = 0;
@@ -49,14 +56,16 @@ public class Chart {
 	public int uNum = 0;
 	
 
-	private List<Consumer<Chart>> chartChangedListeners = new Vector<Consumer<Chart>> ();
+	private List<Consumer<RailroadLineChart>> chartChangedListeners = new Vector<Consumer<RailroadLineChart>> ();
 
-	public Chart(File f) throws IOException {
-		loadFromFile(f);
+	public RailroadLineChart() {}
+	
+	public RailroadLineChart(File f) throws IOException {
+		loadFromFile2(f);
 	}
 	
-	public Chart(Circuit cir) {
-		trunkCircuit = cir;
+	public RailroadLineChart(RailroadLine cir) {
+		railroadLine = cir;
 	}
 	
 	public Train getTrain(int index) {
@@ -83,7 +92,7 @@ public class Chart {
 //		this._trains[getTrainNum()] = loadingTrain;
 		trains.add(loadingTrain);
 
-		switch (loadingTrain.isDownTrain(trunkCircuit)) {
+		switch (loadingTrain.isDownTrain(railroadLine)) {
 		case Train.DOWN_TRAIN:
 			dNum++;
 			break;
@@ -112,7 +121,7 @@ public class Chart {
 	
 	public Train findTrain(String trainName) {
 		for(int i=0; i<getTrainNum(); i++) {
-			if(trains.get(i).getTrainName(trunkCircuit).equals(trainName))
+			if(trains.get(i).getTrainName(railroadLine).equals(trainName))
 				return trains.get(i);
 		}
 		
@@ -242,7 +251,7 @@ public class Chart {
 		out.close();
 	}
 
-	public void loadFromFile(File f) throws IOException {
+	public void loadFromFile2(File f) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(f)),"UTF-8"));
 
 		//读取文件状态
@@ -262,14 +271,14 @@ public class Chart {
 
 //		Circuit readingCircuit = new Circuit();
 //		Train readingTrains[] = new Train[MAX_TRAIN_NUM];
-		Vector<Circuit> readingCircuits = new Vector<Circuit>(7);
+		Vector<RailroadLine> readingCircuits = new Vector<RailroadLine>(7);
 		Vector<Train> readingTrains = new Vector<Train>(20);
 //		int readTrainNum = 0;
 
 		while (line != null) {
 			if (line.equalsIgnoreCase(circuitPattern)) {
 				reading_state = READING_CIRCUIT;
-				readingCircuits.add(new Circuit());
+				readingCircuits.add(new RailroadLine());
 				lineNum = 0;
 			} else if (line.equalsIgnoreCase(trainPattern)) {
 				reading_state = READING_TRAIN;
@@ -310,7 +319,7 @@ public class Chart {
 			line = in.readLine();
 		}
 
-		this.trunkCircuit=readingCircuits.get(0);
+		this.railroadLine=readingCircuits.get(0);
 		this.allCircuits = readingCircuits;
 
 		trains.clear();
@@ -375,15 +384,15 @@ public class Chart {
 	
 	  //测试用
 	  public static void main(String argv[]) {
-	    Chart chart = null;
+	    RailroadLineChart chart = null;
 	    try {
-	      chart = new Chart(new File("d:\\huning2.trc"));
+	      chart = new RailroadLineChart(new File("d:\\huning2.trc"));
 	    }
 	    catch (IOException ex) {
 	      System.out.println("Error:" + ex.getMessage());
 	    }
 	    
-	    System.out.print(chart.trunkCircuit.toString());
+	    System.out.print(chart.railroadLine.toString());
 	    for (int i = 0; i < chart.getTrainNum(); i++) {
 			System.out.print("==== " + i + " ==== (");
 			System.out.println(chart.trains.get(i).color.getRed() + "," + 
@@ -419,7 +428,7 @@ public class Chart {
 	}
 
 	public void insertNewStopToTrain(Train theTrain, Stop stop) {
-		if (theTrain.isDownTrain(trunkCircuit) == Train.DOWN_TRAIN) {
+		if (theTrain.isDownTrain(railroadLine) == Train.DOWN_TRAIN) {
 			insertNewStopToTrainDown(theTrain, stop);
 		} else
 			insertNewStopToTrainUp(theTrain, stop);
@@ -430,37 +439,37 @@ public class Chart {
 	}
 
 	private void insertNewStopToTrainUp(Train theTrain, Stop stop) {
-		int newDist = this.trunkCircuit.getStationDist(stop.stationName);
+		int newDist = this.railroadLine.getStationDist(stop.stationName);
 		
 		//不在本线 返回 null
 		if(newDist < 0)
 			return;
 		
 		//新站在theTrain在本线的第一个停靠站之前 插在第一个站之前
-		Station firstStop = this.trunkCircuit.getFirstStopOnMe(theTrain);
+		Station firstStop = this.railroadLine.getFirstStopOnMe(theTrain);
 		if (firstStop == null) {
 			theTrain.insertStop(stop, 0);
 		}
 		else {
-			int firstDist = this.trunkCircuit.getStationDist(firstStop.name);
+			int firstDist = this.railroadLine.getStationDist(firstStop.name);
 			if(newDist > firstDist)
 				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
 		}
 		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
-		Station lastStop = this.trunkCircuit.getLastStopOnMe(theTrain);
+		Station lastStop = this.railroadLine.getLastStopOnMe(theTrain);
 		if (lastStop == null) {
 			theTrain.appendStop(stop);
 		}
 		else {
-			int lastDist = this.trunkCircuit.getStationDist(lastStop.name);
+			int lastDist = this.railroadLine.getStationDist(lastStop.name);
 			if(newDist < lastDist)
 				theTrain.appendStop(stop);
 		}
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
 		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = trunkCircuit.getStationDist(theTrain.getStop(i).stationName);
-			int dist2 = trunkCircuit.getStationDist(theTrain.getStop(i+1).stationName);
+			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).stationName);
+			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).stationName);
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
@@ -470,39 +479,39 @@ public class Chart {
 	}
 
 	private void insertNewStopToTrainDown(Train theTrain, Stop stop) {
-		int newDist = this.trunkCircuit.getStationDist(stop.stationName);
+		int newDist = this.railroadLine.getStationDist(stop.stationName);
 		
 		//不在本线 返回 null
 		if(newDist < 0)
 			return;
 		
 		//新站在theTrain在本线的第一个停靠站之前 插在第一个站之前
-		Station firstStop = this.trunkCircuit.getFirstStopOnMe(theTrain);
+		Station firstStop = this.railroadLine.getFirstStopOnMe(theTrain);
 		if (firstStop == null) {
 			theTrain.insertStop(stop, 0);
 		}
 		else
 		{
-			int firstDist = this.trunkCircuit.getStationDist(firstStop.name);
+			int firstDist = this.railroadLine.getStationDist(firstStop.name);
 			if(newDist < firstDist)
 				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
 		}
 		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
-		Station lastStop = this.trunkCircuit.getLastStopOnMe(theTrain);
+		Station lastStop = this.railroadLine.getLastStopOnMe(theTrain);
 		if (lastStop == null) {
 			theTrain.appendStop(stop);
 		}
 		else
 		{
-			int lastDist = this.trunkCircuit.getStationDist(lastStop.name);
+			int lastDist = this.railroadLine.getStationDist(lastStop.name);
 			if(newDist > lastDist)
 				theTrain.appendStop(stop);
 		}
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
 		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = trunkCircuit.getStationDist(theTrain.getStop(i).stationName);
-			int dist2 = trunkCircuit.getStationDist(theTrain.getStop(i+1).stationName);
+			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).stationName);
+			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).stationName);
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
@@ -513,11 +522,11 @@ public class Chart {
 	
 
 	
-	public void addChartChangedListener(Consumer<Chart> eventHandler) {
+	public void addChartChangedListener(Consumer<RailroadLineChart> eventHandler) {
 		chartChangedListeners.add(eventHandler);
 	}
 	
-	public void removeChartChangedListener(Consumer<Chart> eventHandler) {
+	public void removeChartChangedListener(Consumer<RailroadLineChart> eventHandler) {
 		chartChangedListeners.remove(eventHandler);
 	}
 	
@@ -533,4 +542,120 @@ public class Chart {
 	protected void onCircuitChanged() {
 		fireChartChangedEvent();
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
+	
+	/**
+	 * Implements method inherited from abstract base class TrainGraphPart
+	 */
+	@Override
+	protected String getStartSectionString() { return START_SECTION_RAILINE_CHART; }
+	@Override
+	protected String getEndSectionString() { return END_SECTION_RAILINE_CHART; }
+	@Override
+	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
+		return RailroadLineChart::new;
+	}
+	@Override
+	public void _prepareForFirstLoading() {
+		new TrainRef().prepareForFirstLoading();
+	}
+
+	/* Properties */
+	private static Tuple<String, Class<?>>[] propTuples = null;
+	@Override
+	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
+		if (propTuples == null) {
+			propTuples = new Tuple[7];
+			
+			propTuples[0] = Tuple.of("railroadLineName", String.class);
+			propTuples[1] = Tuple.of("distScale", float.class);
+			propTuples[2] = Tuple.of("displayLevel", int.class);
+			propTuples[3] = Tuple.of("boldLevel", int.class);
+			propTuples[4] = Tuple.of("startHour", int.class);
+			propTuples[5] = Tuple.of("minuteScale", int.class);
+			propTuples[6] = Tuple.of("timeInterval", int.class);
+		}
+		
+		return propTuples;
+	}
+
+	@Override
+	protected void setTGPProperty(String propName, String valueInStr) {
+		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
+		
+		if (propTuples[0].A.equals(propName)) {
+			railroadLineName = valueInStr;
+		} else if (propTuples[1].A.equals(propName)) {
+			distScale = Float.parseFloat(valueInStr);
+		} else if (propTuples[2].A.equals(propName)) {
+			displayLevel = Integer.parseInt(valueInStr);
+		} else if (propTuples[3].A.equals(propName)) {
+			boldLevel = Integer.parseInt(valueInStr);
+		} else if (propTuples[4].A.equals(propName)) {
+			startHour = Integer.parseInt(valueInStr);
+		} else if (propTuples[5].A.equals(propName)) {
+			minuteScale = Integer.parseInt(valueInStr);
+		} else if (propTuples[6].A.equals(propName)) {
+			timeInterval = Integer.parseInt(valueInStr);
+		}
+	}
+
+	@Override
+	protected String getTGPPropertyReprStr(int index) {
+		String value = "";
+		
+		if (index == 0) {
+			railroadLineName = railroadLine.name;
+			value = railroadLineName;	
+		} else if (index == 1) {
+			value = distScale + "";
+		} else if (index == 2) {
+			value = displayLevel + "";
+		} else if (index == 3) {
+			value = boldLevel + "";
+		} else if (index == 4) {
+			value = startHour + "";
+		} else if (index == 5) {
+			value = minuteScale + "";
+		} else if (index == 6) {
+			value = timeInterval + "";
+		}
+		
+		return value;
+	}
+
+	/* Element array */
+	@Override
+	protected Vector<TrainRef> getTGPElements() {
+		trainRefs.clear();
+		trains.stream().map(train->new TrainRef(train.trainNameFull))
+			.forEachOrdered(trainRefs::add);
+		return trainRefs;
+	}
+
+	@Override
+	protected void addTGPElement(TrainRef element) {
+		trainRefs.add(element);
+	}
+
+	@Override
+	protected boolean isOfElementType(TrainGraphPart part) {
+		return part != null && part instanceof TrainRef;
+	}
+	
+	/* Do complete work after all data loaded from file */
+	@Override
+	protected void loadComplete() {
+	};
 }

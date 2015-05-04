@@ -21,7 +21,7 @@ import javax.swing.border.TitledBorder;
 
 import org.paradise.etrc.MainFrame;
 //import com.borland.jbcl.layout.*;
-import org.paradise.etrc.data.Chart;
+import org.paradise.etrc.data.RailroadLineChart;
 
 /**
  * @author lguo@sina.com
@@ -54,8 +54,8 @@ public class TimeSetDialog extends JDialog implements ActionListener {
   JLabel lbStart = new JLabel();
   JLabel jLabel3 = new JLabel();
 
-  Chart chart;
-  public TimeSetDialog(Frame frame, Chart _chart) {
+  RailroadLineChart chart;
+  public TimeSetDialog(Frame frame, RailroadLineChart _chart) {
     super(frame, __("Timeline Settings"), false);
 
     if(frame instanceof MainFrame) {

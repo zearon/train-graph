@@ -15,8 +15,8 @@ import java.util.Vector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.paradise.etrc.data.BOMStripperInputStream;
-import org.paradise.etrc.data.Circuit;
+import org.paradise.etrc.data.util.BOMStripperInputStream;
+import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
@@ -140,7 +140,7 @@ public class ETRCSKB {
 		};
 	}
 	
-	public List<Train> findTrains(Stream<Circuit> circuits) {
+	public List<Train> findTrains(Stream<RailroadLine> circuits) {
 		Instant instant1 = null, instant2 = null, instant3 = null;
 		if (DEBUG())
 			instant1= Instant.now();
@@ -169,7 +169,7 @@ public class ETRCSKB {
 	/**
 	 * 查找经过某个circuit的车次
 	 */
-	public Vector<Train> findTrains(Circuit cir) {
+	public Vector<Train> findTrains(RailroadLine cir) {
 		Vector<Train> trains = new Vector<Train>();
 		
 		for(int i=0; i<cir.getStationNum(); i++) {
@@ -317,8 +317,8 @@ public class ETRCSKB {
 			
 //			System.out.println(data.findTrains("南通"));
 			
-			Circuit cir = new Circuit();
-			cir.loadFromFile("C:\\trains\\沪杭线.cir");
+			RailroadLine cir = new RailroadLine();
+			cir.loadFromFile2("C:\\trains\\沪杭线.cir");
 			Vector<Train> trains = data.findTrains(cir);
 			System.out.println("沪杭线：" + trains.size() + "\r\n");
 //			System.in.read();

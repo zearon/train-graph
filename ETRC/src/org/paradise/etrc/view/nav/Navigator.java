@@ -179,6 +179,9 @@ public class Navigator extends JTree {
 			return;
 		
 		TreePath path = e.getNewLeadSelectionPath();
+		if (path == null)
+			return;
+		
 		Object node = path.getLastPathComponent();
 		NavigatorNodeType nodeType = NavigatorNodeType.UNKNOWN;
 		int index = -1;

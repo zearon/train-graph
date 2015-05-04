@@ -1,4 +1,4 @@
-package org.paradise.etrc.dialog;
+package org.paradise.etrc.view.alltrains;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -39,6 +39,9 @@ import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.dialog.TrainDialog;
+import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.view.widget.JEditTable;
 
@@ -47,38 +50,37 @@ import org.paradise.etrc.view.widget.JEditTable;
  * @version 1.0
  */
 
-public class TrainsDialog extends JDialog {
+public class TrainListView extends JPanel {
 	private static final long serialVersionUID = -6188814889727919832L;
 
-	RailroadLineChart chart;
+	TrainGraph trainGraph;
 
-	MainFrame mainFrame;
+	MainFrame mainFrame = MainFrame.getInstance();
 
 	TrainsTable table;
 
 	JCheckBox cbUnderColor;
-
-	public TrainsDialog(MainFrame _mainFrame) {
-		super(_mainFrame, __("Train Information"), true);
-		
-		mainFrame = _mainFrame;
-		chart = mainFrame.chart;
-		
+	
+	public TrainListView() {
 		table = new TrainsTable();
 
 		try {
 			jbInit();
-			pack();
+//			pack();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public void setModel(TrainGraph trainGraph) {
+		this.trainGraph = trainGraph;
+		table.setRowSorter(new TableRowSorter<TrainsTableModel> ((TrainsTableModel)table.getModel()));
 	}
 
 	private void jbInit() throws Exception {
 		table.setModel(new TrainsTableModel());
 		table.setDefaultRenderer(Color.class, new ColorCellRenderer());
 		table.setDefaultEditor(Color.class, new ColorCellEditor());
-		table.setRowSorter(new TableRowSorter<TrainsTableModel> ((TrainsTableModel)table.getModel()));
 
 		table.setFont(new Font("Dialog", 0, 12));
 		table.getTableHeader().setFont(new Font("Dialog", 0, 12));
@@ -108,14 +110,14 @@ public class TrainsDialog extends JDialog {
 		colorPanel.add(spColorTable, BorderLayout.CENTER);
 		colorPanel.add(underColorPanel, BorderLayout.SOUTH);
 
-		JButton btOK = new JButton(__("OK"));
-		btOK.setFont(new Font("dialog", 0, 12));
-		btOK.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-//				mainFrame.mainView.repaint();
-				TrainsDialog.this.setVisible(false);
-			}
-		});
+//		JButton btOK = new JButton(__("OK"));
+//		btOK.setFont(new Font("dialog", 0, 12));
+//		btOK.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+////				mainFrame.mainView.repaint();
+//				TrainListView.this.setVisible(false);
+//			}
+//		});
 
 //		JButton btCancel = new JButton("取 消");
 //		btCancel.setFont(new Font("dialog", 0, 12));
@@ -148,7 +150,7 @@ public class TrainsDialog extends JDialog {
 //				TrainsDialog.this.setVisible(false);
 				if(table.getSelectedRow() < 0)
 					return;
-				doEditTrain(chart.getTrain(table.convertRowIndexToModel(table.getSelectedRow())));
+				doEditTrain(trainGraph.allTrains.get(table.convertRowIndexToModel(table.getSelectedRow())));
 			}
 		});
 		
@@ -162,7 +164,7 @@ public class TrainsDialog extends JDialog {
 				int[] selectedRows = table.getSelectedRows();
 				Arrays.sort(selectedRows);
 				for (int i = selectedRows.length - 1; i>=0; --i) {
-					chart.delTrain(selectedRows[i]);
+					trainGraph.allTrains.remove(selectedRows[i]);
 				}
 
 				table.revalidate();
@@ -176,14 +178,14 @@ public class TrainsDialog extends JDialog {
 		buttonPanel.add(btAdd);
 		buttonPanel.add(btEdit);
 		buttonPanel.add(btDel);
-		buttonPanel.add(btOK);
+//		buttonPanel.add(btOK);
 
-		JPanel rootPanel = new JPanel();
-		rootPanel.setLayout(new BorderLayout());
-		rootPanel.add(colorPanel, BorderLayout.CENTER);
-		rootPanel.add(buttonPanel, BorderLayout.SOUTH);
+//		JPanel rootPanel = new JPanel();
+		setLayout(new BorderLayout());
+		add(colorPanel, BorderLayout.CENTER);
+		add(buttonPanel, BorderLayout.SOUTH);
 
-		getContentPane().add(rootPanel);
+//		getContentPane().add(rootPanel);
 	}
 
 	protected void doEditTrain(Train train) {
@@ -194,18 +196,16 @@ public class TrainsDialog extends JDialog {
 		if(!dialog.isCanceled) {
 			Train editedTrain = dialog.getTrain();
 			//没有改车次的情况，更新
-			if(chart.isLoaded(editedTrain)) {
-				chart.updateTrain(editedTrain);
+			if(trainGraph.allTrains.contains(editedTrain)) {
+				trainGraph.allTrains.updateTrain(editedTrain);
 			}
 			//改了车次的情况，删掉原来的，增加新的
 			else {
-				chart.delTrain(train);
-				chart.addTrain(editedTrain);
+				trainGraph.allTrains.remove(train);
+				trainGraph.allTrains.add(editedTrain);
 			}
 			
 			table.revalidate();
-			mainFrame.chartView.repaint();
-	        mainFrame.runView.refresh();
 		}
 	}
 	
@@ -227,17 +227,15 @@ public class TrainsDialog extends JDialog {
 		
 		if(!dialog.isCanceled) {
 			Train addingTrain = dialog.getTrain();
-			if(chart.isLoaded(addingTrain)) {
+			if(trainGraph.allTrains.contains(addingTrain)) {
 				if(new YesNoBox(mainFrame, String.format(__("%s is already in the graph. Overwrite?"), addingTrain.getTrainName())).askForYes())
-					chart.updateTrain(addingTrain);
+					trainGraph.allTrains.updateTrain(addingTrain);
 			}
 			else {
-				chart.addTrain(addingTrain);
+				trainGraph.allTrains.add(addingTrain);
 			}
 			
 			table.revalidate();
-			mainFrame.chartView.repaint();
-	        mainFrame.runView.refresh();
 		}
 	}
 
@@ -263,7 +261,7 @@ public class TrainsDialog extends JDialog {
 
 			//Set up the dialog that the button brings up.
 			colorChooser = new JColorChooser();
-			dialog = JColorChooser.createDialog(TrainsDialog.this, "Select the color for the line",
+			dialog = JColorChooser.createDialog(TrainListView.this, "Select the color for the line",
 					true, //modal
 					colorChooser, this, //OK button handler
 					null); //no CANCEL button handler
@@ -314,7 +312,9 @@ public class TrainsDialog extends JDialog {
 					super.paint(g);
 				}
 			};
-			colorButton.setText(chart.getTrain(table.convertRowIndexToModel(row)).getTrainName(chart.railroadLine));
+			colorButton.setText(trainGraph.allTrains.get(
+					table.convertRowIndexToModel(row))
+					.getTrainName());
 			colorButton.setForeground(currentColor);
 			colorButton.setBackground(Color.white);
 
@@ -353,27 +353,34 @@ public class TrainsDialog extends JDialog {
 			final boolean selected = isSelected;
 			final Color background = table.getSelectionBackground();
 
-			JLabel colorLabel = new JLabel() {
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = -3994087135150899720L;
-
-				public void paint(Graphics g) {
-					Rectangle clip = g.getClipBounds();
-					if (selected) {
-						g.setColor(background);
-						g.fillRect(clip.x, clip.y, clip.width, clip.height);
-					}
-					g.setColor(color);
-					g.drawLine(clip.x, clip.y + clip.height - 3, clip.x
-							+ clip.width, clip.y + clip.height - 3);
-					super.paint(g);
-				}
-			};
+			JLabel colorLabel = new JLabel();
+//			{
+//				/**
+//				 * 
+//				 */
+//				private static final long serialVersionUID = -3994087135150899720L;
+//				
+//				{
+//					setForeground(color);
+//				}
+//
+//				public void paint(Graphics g) {
+//					super.paint(g);
+//					Rectangle cellRect = table.getCellRect(row, column, false);
+//					Rectangle clip = g.getClipBounds();
+//					if (selected) {
+//						g.setColor(background);
+//						g.fillRect(clip.x, clip.y, clip.width, clip.height);
+//					}
+//					
+//					g.setColor(color);
+//					g.drawLine(clip.x, clip.y + clip.height - 3, clip.x
+//							+ clip.width, clip.y + clip.height - 3);
+//				}
+//			};
 			int trainIndex = table.convertRowIndexToModel(row);
 			String trainName = (String) table.getRowSorter().getModel().getValueAt(trainIndex, 0);
-			colorLabel.setText(trainName);
+			colorLabel.setText(String.format("<html><u>%s</u></html>", trainName));
 			colorLabel.setForeground(color);
 			colorLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			colorLabel.setVerticalAlignment(SwingConstants.CENTER);
@@ -406,7 +413,7 @@ public class TrainsDialog extends JDialog {
 		 * @return int
 		 */
 		public int getRowCount() {
-			return chart.getTrainNum();
+			return trainGraph.allTrains.count();
 		}
 
 		/**
@@ -449,13 +456,13 @@ public class TrainsDialog extends JDialog {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return chart.getTrain(rowIndex).getTrainName();
+				return trainGraph.allTrains.get(rowIndex).getTrainName();
 			case 1:
-				return chart.getTrain(rowIndex).getStartStation();
+				return trainGraph.allTrains.get(rowIndex).getStartStation();
 			case 2:
-				return chart.getTrain(rowIndex).getTerminalStation();
+				return trainGraph.allTrains.get(rowIndex).getTerminalStation();
 			case 3:
-				return chart.getTrain(rowIndex).color;
+				return trainGraph.allTrains.get(rowIndex).color;
 			default:
 				return null;
 			}
@@ -470,7 +477,7 @@ public class TrainsDialog extends JDialog {
 		 */
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			if (columnIndex == 3) {
-				chart.getTrain(rowIndex).color = (Color) aValue;
+				trainGraph.allTrains.get(rowIndex).color = (Color) aValue;
 				//System.out.println("SET: " + ((Color)aValue));
 				fireTableCellUpdated(rowIndex, columnIndex);
 			}
@@ -527,7 +534,7 @@ public class TrainsDialog extends JDialog {
 				public void mouseClicked(MouseEvent e) {
 					if   (e.getClickCount()   ==   2){ //双击  
 	                    int row = getSelectedRow();
-	                    doEditTrain(chart.getTrain(convertRowIndexToModel(row)));
+	                    doEditTrain(trainGraph.allTrains.get(convertRowIndexToModel(row)));
 					}
 				}
 			});

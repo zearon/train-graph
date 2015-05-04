@@ -64,7 +64,6 @@ import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.skb.ETRCLCB;
 import org.paradise.etrc.data.skb.ETRCSKB;
 import org.paradise.etrc.dialog.AboutBox;
-import org.paradise.etrc.dialog.RailroadLineEditView;
 import org.paradise.etrc.dialog.CircuitMakeDialog;
 import org.paradise.etrc.dialog.DistSetDialog;
 import org.paradise.etrc.dialog.FindTrainDialog;
@@ -72,15 +71,17 @@ import org.paradise.etrc.dialog.FindTrainsDialog;
 import org.paradise.etrc.dialog.MarginSetDialog;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.TimeSetDialog;
-import org.paradise.etrc.dialog.TrainsDialog;
 import org.paradise.etrc.dialog.XianluSelectDialog;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.GIFFilter;
 import org.paradise.etrc.filter.TRCFilter;
 import org.paradise.etrc.filter.TRFFilter;
+import org.paradise.etrc.view.alltrains.AllTrainsView;
+import org.paradise.etrc.view.alltrains.TrainListView;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.view.dynamic.DynamicView;
+import org.paradise.etrc.view.lineedit.RailroadLineEditView;
 import org.paradise.etrc.view.nav.Navigator;
 import org.paradise.etrc.view.nav.Navigator.NavigatorNodeType;
 import org.paradise.etrc.view.sheet.SheetView;
@@ -105,6 +106,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public SheetView sheetView;
 	
 	public RailroadLineEditView railLineEditView;
+	public AllTrainsView allTrainsView;
 	
 //	public J
 	
@@ -140,8 +142,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	private boolean firstTimeLoading = true;
 	
+	public static MainFrame instance;
+	public static MainFrame getInstance() { return instance; }
 	//Construct the frame
 	public MainFrame() {
+		if (instance == null)
+			instance = this;
+		
+		
 		addFullScreenModeSupportOnOSX();
 		
 		defaultProp = new Properties();
@@ -173,7 +181,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			e.printStackTrace();
 		}
 
-		railLineEditView.setModel(trainGraph);
+		setModel(trainGraph);
 		
 		// for DEBUG purposes
 		addWindowListener(new WindowAdapter() {
@@ -190,17 +198,18 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				// Set full screen mode
 				DEBUG_ACTION( () -> {
 					//setFullScreenModeOnOSX(); 
-					}
-						, "Set full screen mode to false");
-				
-				// Set Navigator in terms of train Graph
-				navigator.setTrainGraph(trainGraph);
-				
-				// Setup Railroad Line Edit View
-//				railLineEditView.setModel(trainGraph);
+					} , "Set full screen mode to false");
 			}
 		});
 		
+	}
+	
+	public void setModel(TrainGraph trainGraph) {
+		
+		// Set Navigator in terms of train Graph
+		navigator.setTrainGraph(trainGraph);
+		railLineEditView.setModel(trainGraph);
+		allTrainsView.setModel(trainGraph);
 	}
 	
 	public boolean isOSX10_7OrAbove() {
@@ -289,6 +298,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		sheetView = new SheetView(this);
 		
 		railLineEditView = new RailroadLineEditView(this);
+		allTrainsView = new AllTrainsView();
 		
 //		tbPane = new JTabbedPane();
 //		tbPane.setFont(new Font("Dialog", Font.PLAIN, 12));
@@ -308,8 +318,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		navigatorContentPanel = new JPanel(navigatorContentCard);
 		navigatorContentPanel.add(NavigatorNodeType.RAILROAD_LINES.name(), 
 				railLineEditView);
-//		navigatorContentPanel.add(NavigatorNodeType.ALL_TRAINS.name(), 
-//				);
+		navigatorContentPanel.add(NavigatorNodeType.ALL_TRAINS.name(), 
+				allTrainsView);
 		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLE_LINE.name(), 
 				raillineChartView);
 		// TODO: 设置主视图启动时的编辑视图
@@ -820,27 +830,27 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	private void doEditTrains() {
-		TrainsDialog dlg = new TrainsDialog(this);
-		Dimension dlgSize = dlg.getPreferredSize();
-		Dimension frmSize = getSize();
-		Point loc = getLocation();
-		dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
-				(frmSize.height - dlgSize.height) / 2 + loc.y);
-		dlg.setModal(true);
-		dlg.pack();
-		dlg.setVisible(true);
-
-		chartView.repaint();
-		sheetView.updateData();
-		runView.refresh();
+//		TrainListView dlg = new TrainListView(this);
+//		Dimension dlgSize = dlg.getPreferredSize();
+//		Dimension frmSize = getSize();
+//		Point loc = getLocation();
+//		dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
+//				(frmSize.height - dlgSize.height) / 2 + loc.y);
+//		dlg.setModal(true);
+//		dlg.pack();
+//		dlg.setVisible(true);
+//
+//		chartView.repaint();
+//		sheetView.updateData();
+//		runView.refresh();
 	}
 
 	private void doEditCircuit() {
-		circuitEditDialog.showDialog();
-		
-		this.setTitle();
-		chartView.repaint();
-		runView.refresh();
+//		circuitEditDialog.showDialog();
+//		
+//		this.setTitle();
+//		chartView.repaint();
+//		runView.refresh();
 	}
 
 	/**
@@ -1271,6 +1281,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 					NavigatorNodeType.RAILROAD_LINES.name());
 			break;
 		case ALL_TRAINS:
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.ALL_TRAINS.name());
 			break;
 		case TIME_TABLE_LINE:
 			navigatorContentCard.show(navigatorContentPanel, 

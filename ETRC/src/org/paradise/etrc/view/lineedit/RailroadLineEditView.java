@@ -1,4 +1,4 @@
-package org.paradise.etrc.dialog;
+package org.paradise.etrc.view.lineedit;
 
 import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.DEBUG;
@@ -51,13 +51,13 @@ import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.dialog.CircuitMakeDialog;
+import org.paradise.etrc.dialog.InfoDialog;
+import org.paradise.etrc.dialog.MessageBox;
+import org.paradise.etrc.dialog.XianluSelectDialog;
 import org.paradise.etrc.filter.CIRFilter;
 import org.paradise.etrc.filter.CRSFilter;
 import org.paradise.etrc.filter.CSVFilter;
-import org.paradise.etrc.table.RailroadLineTable;
-import org.paradise.etrc.table.RailroadLineTableModel;
-import org.paradise.etrc.table.StationTable;
-import org.paradise.etrc.table.StationTableModel;
 
 public class RailroadLineEditView extends JPanel {
 	private static final long serialVersionUID = 8501387955756137148L;

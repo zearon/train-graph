@@ -232,6 +232,7 @@ public class ChartView extends JPanel {
 //		SimpleDateFormat dfMinute = new SimpleDateFormat("m");
 		
 //		int h = time.getHours() - mainFrame.chart.startHour;
+		try {
 		int h = Integer.parseInt(time.split(":")[0]) 
 				- mainFrame.chart.startHour;
 		if (h < 0)
@@ -241,6 +242,10 @@ public class ChartView extends JPanel {
 		int m = Integer.parseInt(time.split(":")[1]);
 
 		return h * 60 + m;
+		} catch (RuntimeException e) {
+			e.printStackTrace();
+			throw e;
+		}
 	}
 
 	public static final int SHOW_NONE = 0; //0000

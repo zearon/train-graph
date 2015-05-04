@@ -1,4 +1,4 @@
-package org.paradise.etrc.table;
+package org.paradise.etrc.view.lineedit;
 
 import java.awt.Dimension;
 

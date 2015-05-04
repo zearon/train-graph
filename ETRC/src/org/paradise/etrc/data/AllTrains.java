@@ -50,9 +50,28 @@ implements Collection<Train>
 			}
 	}
 
+	public void updateTrain(Train newTrain) {
+		for (int i = 0; i < trains.size(); i++) {
+			if (newTrain.equals(trains.get(i))) {
+				if(newTrain.color == null)
+					newTrain.color = trains.get(i).color;
+				trains.set(i, newTrain);
+			}
+		}
+	}
+	
+
 	
 	public Train findTrain(String trainNameFull) {
 		return trainDict.get(trainNameFull);
+	}
+	
+	public Train get(int index) {
+		return trains.get(index);
+	}
+	
+	public int count() {
+		return size();
 	}
 
 	@Override

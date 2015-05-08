@@ -19,6 +19,7 @@ public class AllTrainsView extends JPanel {
 	
 	TrainGraph trainGraph;
 	TrainListView trainListView;
+	TrainView trainView;
 	
 	/**
 	 * Create the panel.
@@ -38,10 +39,13 @@ public class AllTrainsView extends JPanel {
 		
 		JSplitPane splitPane = new JSplitPane();
 		add(splitPane, BorderLayout.CENTER);
-		
-		trainListView = new TrainListView();
-		splitPane.setLeftComponent(trainListView);
 
+		trainView = new TrainView();
+		trainListView = new TrainListView();
+		trainListView.setTrainView(trainView);
+		
+		splitPane.setLeftComponent(trainListView);
+		splitPane.setRightComponent(trainView);
 	}
 	
 	public void setModel(TrainGraph trainGraph) {

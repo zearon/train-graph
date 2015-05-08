@@ -40,7 +40,6 @@ import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraph;
-import org.paradise.etrc.dialog.TrainDialog;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.view.widget.JEditTable;
@@ -60,6 +59,7 @@ public class TrainListView extends JPanel {
 	TrainsTable table;
 
 	JCheckBox cbUnderColor;
+	TrainView trainView;
 	
 	public TrainListView() {
 		table = new TrainsTable();
@@ -70,6 +70,10 @@ public class TrainListView extends JPanel {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public void setTrainView(TrainView trainView) {
+		this.trainView = trainView;
 	}
 	
 	public void setModel(TrainGraph trainGraph) {
@@ -189,12 +193,9 @@ public class TrainListView extends JPanel {
 	}
 
 	protected void doEditTrain(Train train) {
-		TrainDialog dialog = new TrainDialog(mainFrame, train);
+		trainView.setModel(train);
 
-		dialog.editTrain();
-		
-		if(!dialog.isCanceled) {
-			Train editedTrain = dialog.getTrain();
+		trainView.editTrain(editedTrain -> {
 			//没有改车次的情况，更新
 			if(trainGraph.allTrains.contains(editedTrain)) {
 				trainGraph.allTrains.updateTrain(editedTrain);
@@ -206,7 +207,22 @@ public class TrainListView extends JPanel {
 			}
 			
 			table.revalidate();
-		}
+		});
+		
+//		if(!dialog.isCanceled) {
+//			Train editedTrain = dialog.getTrain();
+//			//没有改车次的情况，更新
+//			if(trainGraph.allTrains.contains(editedTrain)) {
+//				trainGraph.allTrains.updateTrain(editedTrain);
+//			}
+//			//改了车次的情况，删掉原来的，增加新的
+//			else {
+//				trainGraph.allTrains.remove(train);
+//				trainGraph.allTrains.add(editedTrain);
+//			}
+//			
+//			table.revalidate();
+//		}
 	}
 	
 	protected void doNewTrain() {
@@ -221,12 +237,11 @@ public class TrainListView extends JPanel {
 		newTrain.appendStop(new Stop(__("Departure"), "00:00", "00:00", false));
 		newTrain.appendStop(new Stop(__("Middle"), "00:00", "00:00", false));
 		newTrain.appendStop(new Stop(__("Terminal"), "00:00", "00:00", false));
-		TrainDialog dialog = new TrainDialog(mainFrame, newTrain);
-
-		dialog.editTrain();
 		
-		if(!dialog.isCanceled) {
-			Train addingTrain = dialog.getTrain();
+
+		trainView.setModel(newTrain);
+
+		trainView.editTrain(addingTrain -> {
 			if(trainGraph.allTrains.contains(addingTrain)) {
 				if(new YesNoBox(mainFrame, String.format(__("%s is already in the graph. Overwrite?"), addingTrain.getTrainName())).askForYes())
 					trainGraph.allTrains.updateTrain(addingTrain);
@@ -236,7 +251,20 @@ public class TrainListView extends JPanel {
 			}
 			
 			table.revalidate();
-		}
+		});
+		
+//		if(!dialog.isCanceled) {
+//			Train addingTrain = dialog.getTrain();
+//			if(trainGraph.allTrains.contains(addingTrain)) {
+//				if(new YesNoBox(mainFrame, String.format(__("%s is already in the graph. Overwrite?"), addingTrain.getTrainName())).askForYes())
+//					trainGraph.allTrains.updateTrain(addingTrain);
+//			}
+//			else {
+//				trainGraph.allTrains.add(addingTrain);
+//			}
+//			
+//			table.revalidate();
+//		}
 	}
 
 	public class ColorCellEditor extends AbstractCellEditor implements

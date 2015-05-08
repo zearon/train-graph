@@ -40,9 +40,10 @@ import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
-import org.paradise.etrc.dialog.TrainDialog;
+import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.slice.ChartSlice;
+import org.paradise.etrc.view.alltrains.TrainView;
 import org.paradise.etrc.view.chart.traindrawing.TrainDrawing;
 import org.paradise.etrc.view.chart.traindrawing.TrainLine;
 import org.paradise.etrc.view.sheet.SheetTable;
@@ -639,27 +640,30 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 //	}
 
 	private void doEditActiveTrain() {
-		TrainDialog dialog = new TrainDialog(chartView.mainFrame, chartView.activeTrain);
-
-		dialog.editTrain();
-		
-		if(!dialog.isCanceled) {
-			Train editedTrain = dialog.getTrain();
-			RailroadLineChart chart = chartView.mainFrame.chart;
-			//没有改车次的情况，更新
-			if(chart.isLoaded(editedTrain)) {
-				chart.updateTrain(editedTrain);
-			}
-			//改了车次的情况，删掉原来的，增加新的
-			else {
-				chart.delTrain(chartView.activeTrain);
-				chart.addTrain(editedTrain);
-			}
-			
-			chartView.setActiveTrain(editedTrain);
-			chartView.mainFrame.sheetView.updateData();
-			chartView.mainFrame.runView.refresh();
-		}
+		DEBUG_ACTION(()->{
+			new MessageBox("Function removed").showMessage();;
+		}, "Function 'edit active train in chart view' is removed");
+//		TrainDialog dialog = new TrainDialog(chartView.mainFrame, chartView.activeTrain);
+//
+//		dialog.editTrain();
+//		
+//		if(!dialog.isCanceled) {
+//			Train editedTrain = dialog.getTrain();
+//			RailroadLineChart chart = chartView.mainFrame.chart;
+//			//没有改车次的情况，更新
+//			if(chart.isLoaded(editedTrain)) {
+//				chart.updateTrain(editedTrain);
+//			}
+//			//改了车次的情况，删掉原来的，增加新的
+//			else {
+//				chart.delTrain(chartView.activeTrain);
+//				chart.addTrain(editedTrain);
+//			}
+//			
+//			chartView.setActiveTrain(editedTrain);
+//			chartView.mainFrame.sheetView.updateData();
+//			chartView.mainFrame.runView.refresh();
+//		}
 	}
 
 	private void doDeleteActiveTrain() {

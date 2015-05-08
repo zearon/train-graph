@@ -1,4 +1,4 @@
-package org.paradise.etrc.dialog;
+package org.paradise.etrc.view.alltrains;
 
 import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.DEBUG;
@@ -23,6 +23,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +45,7 @@ import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.TRFFilter;
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
@@ -54,7 +56,7 @@ import org.paradise.etrc.view.widget.JEditTable;
  * @version 1.0
  */
 
-public class TrainDialog extends JDialog {
+public class TrainView extends JPanel {
 	private static final long serialVersionUID = 4016578609920190434L;
 
 	private TrainTable table;
@@ -62,24 +64,62 @@ public class TrainDialog extends JDialog {
 	private JTextField tfNameD;
 	private JTextField tfName;
 
-	private MainFrame mainFrame;
+	private MainFrame mainFrame;	
 
-	public boolean isCanceled = false;
+	Consumer<Train> editCallback = null;
+	Train originalTrain;
 
-	public TrainDialog(MainFrame _mainFrame, Train _train) {
-		super(_mainFrame, _train.getTrainName(), true);
+//	public boolean isCanceled = false;
+	
+	private static Train empty_train;
+	
+	static {
+		empty_train = new Train();
+		empty_train.trainNameFull = __("");
+	}
 
-		mainFrame = _mainFrame;
+	public TrainView() {
+//		super(_mainFrame, _train.getTrainName(), true);
+
+		mainFrame = MainFrame.getInstance();
 
 		table = new TrainTable();
-		table.setModel(new TrainTableModel(_train));
+		table.setModel(new TrainTableModel(empty_train));
 
 		try {
 			jbInit();
-			pack();
+//			pack();
+			
+			setModel(empty_train);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public void setModel(Train _train) {
+		if (_train == null) {
+			originalTrain = empty_train;
+//			setEnabled(false);
+		} else {
+			originalTrain = _train;
+//			setEnabled(true);
+		}
+		
+		loadModel();
+	}
+	
+	private void loadModel() {		
+		table.setModel(new TrainTableModel(originalTrain));
+//		((TrainTableModel) table.getModel()).setTrain(originalTrain);
+		
+		tfNameU.setText(((TrainTableModel) table.getModel()).myTrain.trainNameUp);
+		tfNameD.setText(((TrainTableModel) table.getModel()).myTrain.trainNameDown);
+		tfName.setText(((TrainTableModel) table.getModel()).myTrain
+				.getTrainName());
+		
+//		((TrainTableModel) table.getModel()).fireTableDataChanged();
+
+		revalidate();
 	}
 
 	public Train getTrain() {
@@ -157,9 +197,13 @@ public class TrainDialog extends JDialog {
 				train.trainNameUp = tfNameU.getText().trim();
 				train.trainNameFull = tfName.getText().trim();
 
-				isCanceled = false;
+//				isCanceled = false;
 				// TrainDialog.this.setVisible(false);
-				TrainDialog.this.dispose();
+//				TrainDialog.this.dispose();
+				
+				if (editCallback != null) {
+					editCallback.accept(train);
+				}
 			}
 		});
 
@@ -167,9 +211,13 @@ public class TrainDialog extends JDialog {
 		btCancel.setFont(new Font("dialog", 0, 12));
 		btCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				isCanceled = true;
+//				isCanceled = true;
 				// TrainDialog.this.setVisible(false);
-				TrainDialog.this.dispose();
+//				TrainDialog.this.dispose();
+
+				if (editCallback != null) {
+					loadModel();
+				}
 			}
 		});
 
@@ -203,7 +251,7 @@ public class TrainDialog extends JDialog {
 					Train loadingTrain = doLoadTrainFromWeb(
 							tfName.getText().trim(), proxyAddress, proxyPort0);
 
-					if (TrainDialog.this.isVisible()) {
+					if (TrainView.this.isVisible()) {
 						if (loadingTrain != null ) {
 							if (loadingTrain.color == null) {
 								Color c = ((TrainTableModel) table.getModel()).myTrain.color;
@@ -249,12 +297,12 @@ public class TrainDialog extends JDialog {
 		buttonPanel.add(btCancel);
 		buttonPanel.add(btWeb);
 
-		JPanel rootPanel = new JPanel();
-		rootPanel.setLayout(new BorderLayout());
-		rootPanel.add(buildTrainPanel(), BorderLayout.CENTER);
-		rootPanel.add(buttonPanel, BorderLayout.SOUTH);
+//		JPanel rootPanel = new JPanel();
+		setLayout(new BorderLayout());
+		add(buildTrainPanel(), BorderLayout.CENTER);
+		add(buttonPanel, BorderLayout.SOUTH);
 
-		getContentPane().add(rootPanel);
+//		getContentPane().add(rootPanel);
 	}
 
 	private JPanel buildTrainPanel() {
@@ -321,14 +369,14 @@ public class TrainDialog extends JDialog {
 
 		tfNameU = new JTextField(4);
 		tfNameU.setFont(new Font("dialog", 0, 12));
-		tfNameU.setText(((TrainTableModel) table.getModel()).myTrain.trainNameUp);
+//		tfNameU.setText(((TrainTableModel) table.getModel()).myTrain.trainNameUp);
 		tfNameD = new JTextField(4);
 		tfNameD.setFont(new Font("dialog", 0, 12));
-		tfNameD.setText(((TrainTableModel) table.getModel()).myTrain.trainNameDown);
+//		tfNameD.setText(((TrainTableModel) table.getModel()).myTrain.trainNameDown);
 		tfName = new JTextField(12);
 		tfName.setFont(new Font("dialog", 0, 12));
-		tfName.setText(((TrainTableModel) table.getModel()).myTrain
-				.getTrainName());
+//		tfName.setText(((TrainTableModel) table.getModel()).myTrain
+//				.getTrainName());
 
 		JPanel namePanel = new JPanel();
 		namePanel.setBorder(new EmptyBorder(1, 1, 1, 1));
@@ -634,13 +682,15 @@ public class TrainDialog extends JDialog {
 		dialog.setVisible(true);
 	}
 
-	public void editTrain() {
-		Dimension dlgSize = getPreferredSize();
-		Dimension frmSize = mainFrame.getSize();
-		Point loc = mainFrame.getLocation();
-		setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
-				(frmSize.height - dlgSize.height) / 2 + loc.y);
-		setVisible(true);
+	public void editTrain(Consumer<Train> editCallback) {
+//		Dimension dlgSize = getPreferredSize();
+//		Dimension frmSize = mainFrame.getSize();
+//		Point loc = mainFrame.getLocation();
+//		setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
+//				(frmSize.height - dlgSize.height) / 2 + loc.y);
+//		setVisible(true);
+		
+		this.editCallback = editCallback;
 	}
 
 	public class TrainTableModel extends DefaultJEditTableModel {
@@ -651,8 +701,16 @@ public class TrainDialog extends JDialog {
 
 		Train myTrain;
 
+		TrainTableModel() {
+		}
+
 		TrainTableModel(Train _train) {
+			setTrain(_train);
+		}
+		
+		public void setTrain(Train _train) {
 			myTrain = _train.copy();
+			fireTableDataChanged();
 		}
 
 		/**

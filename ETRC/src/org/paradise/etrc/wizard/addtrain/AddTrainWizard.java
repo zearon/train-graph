@@ -7,8 +7,8 @@ import java.util.Vector;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.dialog.MessageBox;
-import org.paradise.etrc.dialog.TrainDialog;
 import org.paradise.etrc.dialog.YesNoBox;
+import org.paradise.etrc.view.alltrains.TrainView;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.wizard.Wizard;
 import org.paradise.etrc.wizard.WizardDialog;
@@ -56,7 +56,7 @@ public class AddTrainWizard extends Wizard {
 						catch (NumberFormatException ex) {
 						    proxyPort = 0;
 						}
-						train = TrainDialog.doLoadTrainFromWeb(fullName, proxyAddress, proxyPort);
+						train = TrainView.doLoadTrainFromWeb(fullName, proxyAddress, proxyPort);
 						if (train == null) 
 						{
 							new MessageBox(chartView.mainFrame, String.format(__("Unable to get train information for the train %s from web."), fullName)).showMessage();

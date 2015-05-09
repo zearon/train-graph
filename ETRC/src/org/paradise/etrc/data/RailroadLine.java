@@ -52,6 +52,12 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	private List<Consumer<RailroadLine>> railroadLineChangedListeners = new Vector<Consumer<RailroadLine>>();
 
 	RailroadLine() {
+	}
+	
+	RailroadLine(String name) {
+		this();
+		setName(name);
+		
 		this.length = 30;
 		this.multiplicity = 2;
 		this.zindex = 1;
@@ -61,11 +67,6 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 				.setProperties(0, 1, false));
 		appendStation(TrainGraphFactory.createInstance(Station.class, "Stop 2")
 				.setProperties(30, 1, false));
-	}
-	
-	RailroadLine(String name) {
-		this();
-		setName(name);
 	}
 
 	public RailroadLine copy() {

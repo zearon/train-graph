@@ -86,6 +86,7 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	protected abstract Supplier<? extends TrainGraphPart> getConstructionFunc();	
 	public abstract void _prepareForFirstLoading();
 	void initTGP() {}
+	void setToDefault() {}
 	
 	/* Properties */
 	protected abstract Tuple<String, Class<?>>[] getSimpleTGPProperties();
@@ -306,7 +307,9 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 			if (loadingNode != null && partClassTuple.A.isInstance(loadingNode)) {
 				return loadingNode;
 			} else {
-				return partClassTuple.B.get();
+				TrainGraphPart obj = partClassTuple.B.get();
+				obj.initTGP();
+				return obj;
 			}
 		} else {
 			return null;

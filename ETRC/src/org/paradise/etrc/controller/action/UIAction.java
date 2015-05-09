@@ -44,7 +44,7 @@ public abstract class UIAction {
 	public abstract String repr();
 	
 	protected void log(String str, Object... params) {
-//		DEBUG_ACTION( () -> System.err.println(String.format(str, params)) );
+		DEBUG_ACTION( () -> System.err.println(String.format(str, params)) );
 	}
 	
 	@Override

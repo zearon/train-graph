@@ -32,6 +32,9 @@ public class TableEditAction extends UIAction {
 
 	@Override
 	public void undoAction() {
+		table.setRowSelectionInterval(row, row);
+		table.setColumnSelectionInterval(column, column);
+		
 		TableCellEditor editor = table.getCellEditor(row, column);
 		if (editor != null)
 			editor.stopCellEditing();
@@ -43,6 +46,9 @@ public class TableEditAction extends UIAction {
 
 	@Override
 	public void redoAction() {
+		table.setRowSelectionInterval(row, row);
+		table.setColumnSelectionInterval(column, column);
+		
 		TableCellEditor editor = table.getCellEditor(row, column);
 		if (editor != null)
 			editor.stopCellEditing();
@@ -75,7 +81,7 @@ public class TableEditAction extends UIAction {
 					__("Set %s cell value [%d,%d]=%s. Old value is %s"),
 					tableName, row, column, newValue, oldValue);
 		} else {
-			return String.format(__("Set %s table cell value [%d,%d]=%s"),
+			return String.format(__("Set %s cell value [%d,%d]=%s"),
 					tableName, row, column, newValue);
 		}
 	}

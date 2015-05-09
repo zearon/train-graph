@@ -138,7 +138,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private static String Properties_File = "htrc.prop";
 	
 	public boolean isNewCircuit = false;
-	private String railNetworkName;
+	private String workingFileName;
 	
 	public TrainGraph trainGraph;
 	RailNetworkChart currentNetworkChart;
@@ -218,6 +218,17 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		navigator.setTrainGraph(trainGraph);
 		railLineEditView.setModel(trainGraph);
 		allTrainsView.setModel(trainGraph);
+		
+
+		chartView.updateData();
+		chartView.resetSize();
+
+		sheetView.updateData();
+		sheetView.refresh();
+		
+		runView.refresh();
+		
+		setTitle();
 	}
 	
 	static Boolean isOSX = null;
@@ -471,13 +482,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	public String getRailNetworkName() {
-		if (railNetworkName == null)
+		if (workingFileName == null)
 			return "";
 		
-		if (railNetworkName.endsWith(TRCFilter.suffix))
-			railNetworkName = railNetworkName.replace(TRCFilter.suffix, "");
+		if (workingFileName.endsWith(TRCFilter.suffix))
+			workingFileName = workingFileName.replace(TRCFilter.suffix, "");
 		
-		return railNetworkName;
+		return workingFileName;
 		
 //		String circuitName = "";
 //		if (chart.trunkCircuit.name.equalsIgnoreCase(""))
@@ -795,7 +806,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			currentNetworkChart = trainGraph.getCharts().get(0);
 			currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
 			
-			railNetworkName = chartFile.getName();
+			workingFileName = chartFile.getName();
 		}
 	}
 
@@ -1065,7 +1076,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		}
 		else {
 			try {
-				currentLineChart.saveToFile(savingFile);
+				trainGraph.saveToFile(savingFile.getAbsolutePath());
+//				currentLineChart.saveToFile(savingFile);
 			} catch (IOException ex) {
 				System.err.println("Err:" + ex.getMessage());
 				this.statusBarMain.setText(__("Unable to save the graph."));
@@ -1092,7 +1104,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		} catch (Exception e) {}
 		
 		// SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = railNetworkName;
+		String fileName = workingFileName;
 		chooser.setSelectedFile(new File(fileName));
 
 		int returnVal = chooser.showSaveDialog(this); 
@@ -1101,11 +1113,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			if (!f.getAbsolutePath().endsWith(".trc")) {
 				f = new File(f.getAbsolutePath() + ".trc");
 			}
-			railNetworkName = f.getName();
+			workingFileName = f.getName();
 			//System.out.println(f);
 
 			try {
-				currentLineChart.saveToFile(f);
+				trainGraph.saveToFile(f.getAbsolutePath());
+//				currentLineChart.saveToFile(f);
 				
 				setTitle();
 				prop.setProperty(Prop_Working_Chart, f.getAbsolutePath());
@@ -1139,25 +1152,26 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
 			System.out.println(f);
-
+			
 			try {
-				currentLineChart.loadFromFile2(f);
-				chartView.updateData();
-				chartView.resetSize();
-
-				sheetView.updateData();
-				sheetView.refresh();
+				TrainGraphFactory.resetIDCounters();
+				trainGraph = TrainGraphFactory.loadTrainGraphFromFile(
+						f.getAbsolutePath());
 				
-				runView.refresh();
+				setModel(trainGraph);
 				
-				railNetworkName = f.getName();				
-				setTitle();
+				workingFileName = f.getName();		
+				currentNetworkChart = trainGraph.getCharts().get(0);
+				currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
 				
 				prop.setProperty(Prop_Working_Chart, f.getAbsolutePath());
 				prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
-			} catch (IOException ex) {
-				System.err.println("Err:" + ex.getMessage());
-				statusBarMain.setText(__("Unable to load the graph."));
+			} catch (IOException ioe) {
+				System.out.println("Loading graph failed.");
+				ioe.printStackTrace();
+				new MessageBox(String.format(__("Load train graph failed. Please check the %s file."
+						+ "\nReason:%s\nDetail:%s"), Sample_Chart_File, ioe.getMessage(), 
+						ioe.getCause() )).showMessage();
 			}
 		}
 	}

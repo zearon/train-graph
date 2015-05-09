@@ -112,8 +112,8 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 		}
 	}
 
-	protected UIAction getAction(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createTableEditAction(__("railroad line table"), 
+	protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
+		return ActionFactory.createTableEditActionAndDoIt(__("railroad line table"), 
 				table, this, rowIndex, columnIndex, aValue);
 	}
 	

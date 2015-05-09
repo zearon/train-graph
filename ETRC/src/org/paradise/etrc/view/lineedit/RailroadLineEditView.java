@@ -46,6 +46,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailroadLine;
@@ -936,14 +937,10 @@ public class RailroadLineEditView extends JPanel {
 					.showMessage();
 			return;
 		}
-		Station stationMoved = stationTableModel.railroadLine.getAllStations()
-				.remove(selectedStatonIndex);
-		stationTableModel.railroadLine.getAllStations().insertElementAt(
-				stationMoved, selectedStatonIndex - 1);
-
-		stationTable.setRowSelectionInterval(selectedStatonIndex - 1,
-				selectedStatonIndex - 1);
-		stationTable.updateUI();
+		
+		ActionFactory.createTableElementMoveActionAndDoIt(__("station table"), 
+				stationTable, stationTableModel.railroadLine.getAllStations(), 
+				selectedStatonIndex, selectedStatonIndex - 1, true);
 	}
 
 	private void doCircuit_MoveDownStation() {
@@ -956,14 +953,10 @@ public class RailroadLineEditView extends JPanel {
 					.showMessage();
 			return;
 		}
-		Station stationMoved = stationTableModel.railroadLine.getAllStations()
-				.remove(selectedStatonIndex);
-		stationTableModel.railroadLine.getAllStations().insertElementAt(
-				stationMoved, selectedStatonIndex + 1);
-
-		stationTable.setRowSelectionInterval(selectedStatonIndex + 1,
-				selectedStatonIndex + 1);
-		stationTable.updateUI();
+		
+		ActionFactory.createTableElementMoveActionAndDoIt(__("station table"), 
+				stationTable, stationTableModel.railroadLine.getAllStations(), 
+				selectedStatonIndex, selectedStatonIndex + 1, true);
 	}
 
 	protected void doCircuit_RevertStation() {
@@ -1098,14 +1091,10 @@ public class RailroadLineEditView extends JPanel {
 			;
 			return;
 		}
-		RailroadLine circuitMoved = railroadLineTableModel.raillines
-				.remove(selectedCircuitIndex);
-		railroadLineTableModel.raillines.insertElementAt(circuitMoved,
-				selectedCircuitIndex - 1);
-
-		railroadLineTable.setRowSelectionInterval(selectedCircuitIndex - 1,
-				selectedCircuitIndex - 1);
-		railroadLineTable.updateUI();
+		
+		ActionFactory.createTableElementMoveActionAndDoIt(__("railroad line table"), 
+				railroadLineTable, railroadLineTableModel.raillines, 
+				selectedCircuitIndex, selectedCircuitIndex - 1, true);
 	}
 
 	private void doCircuits_MoveDownCircuit() {
@@ -1117,14 +1106,10 @@ public class RailroadLineEditView extends JPanel {
 					.showMessage();
 			return;
 		}
-		RailroadLine circuitMoved = railroadLineTableModel.raillines
-				.remove(selectedCircuitIndex);
-		railroadLineTableModel.raillines.insertElementAt(circuitMoved,
-				selectedCircuitIndex + 1);
-
-		railroadLineTable.setRowSelectionInterval(selectedCircuitIndex + 1,
-				selectedCircuitIndex + 1);
-		railroadLineTable.updateUI();
+		
+		ActionFactory.createTableElementMoveActionAndDoIt(__("railroad line table"), 
+				railroadLineTable, railroadLineTableModel.raillines, 
+				selectedCircuitIndex, selectedCircuitIndex + 1, true);
 	}
 
 	private void doCircuits_RemoveCircuit() {

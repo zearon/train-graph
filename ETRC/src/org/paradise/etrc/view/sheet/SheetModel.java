@@ -63,8 +63,8 @@ public class SheetModel extends DefaultJEditTableModel {
 		return true;
 	}
 
-	protected UIAction getAction(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createTableEditAction(__("stop table"), 
+	protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
+		return ActionFactory.createTableEditActionAndDoIt(__("stop table"), 
 				table, this, rowIndex, columnIndex, aValue);
 	}
 	

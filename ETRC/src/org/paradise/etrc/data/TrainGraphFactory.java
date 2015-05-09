@@ -112,8 +112,11 @@ public class TrainGraphFactory {
 		
 		// Initialize the object
 		int id = TrainGraph._objectIdMap.get(className);
+		
 		obj._id = ++ id;
 		obj.initTGP();
+		obj.setToDefault();
+		
 		TrainGraph._objectIdMap.put(className, id);
 		if (name == null) {
 			name = obj.createTGPNameById(id);

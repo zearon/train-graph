@@ -29,15 +29,13 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 	public DefaultJEditTableModel() {
 	}
 	
-	protected abstract UIAction getAction(Object aValue, int rowIndex, int columnIndex);
+	protected abstract UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex);
 	
 	public abstract void _setValueAt(Object aValue, int rowIndex, int columnIndex);
 	
 	@Override
 	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		UIAction action = getAction(aValue, rowIndex, columnIndex);
-		
-		ActionManager.getInstance().addActionAndDoIt(action);
+		UIAction action = getActionAndDoIt(aValue, rowIndex, columnIndex);
 	}	
 	
 	public abstract boolean columnIsTimeString(int column);

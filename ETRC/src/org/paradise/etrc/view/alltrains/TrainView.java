@@ -795,8 +795,8 @@ public class TrainView extends JPanel {
 			}
 		}
 
-		protected UIAction getAction(Object aValue, int rowIndex, int columnIndex) {
-			return ActionFactory.createTableEditAction(__("train table"), 
+		protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
+			return ActionFactory.createTableEditActionAndDoIt(__("train table"), 
 					table, this, rowIndex, columnIndex, aValue);
 		}
 

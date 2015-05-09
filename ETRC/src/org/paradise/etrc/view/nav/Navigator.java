@@ -88,7 +88,7 @@ public class Navigator extends JTree {
 		railroadLinesNode = new DefaultMutableTreeNode(__("Railroad Lines"));
 		trainTypesNode = new DefaultMutableTreeNode(__("Train Types"));
 		allTrainsNode = new DefaultMutableTreeNode(__("All Trains"));
-		timeTablesNode = new DefaultMutableTreeNode(__("Time tables"));
+		timeTablesNode = new DefaultMutableTreeNode(__("Timetables"));
 		remarksNode = new DefaultMutableTreeNode(__("Remarks"));
 		
 		

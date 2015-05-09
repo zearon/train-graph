@@ -60,7 +60,7 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	}
 	
 	@Override
-	void initTGP() {
+	void setToDefault() {
 		this.length = 30;
 		this.multiplicity = 2;
 		this.zindex = 1;

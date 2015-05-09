@@ -1,6 +1,7 @@
 package org.paradise.etrc.controller.action;
 
 import java.util.Vector;
+import java.util.function.Consumer;
 
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -48,5 +49,16 @@ public class ActionFactory {
 		ActionManager.getInstance().addActionAndDoIt(action);
 
 		return action;
+	}
+	
+	public static UIAction createSetValueActionAndDoIt(String valueDesc, Object oldValue, Object newValue,
+			Consumer<Object> valueSetter) {
+
+		UIAction action = new SetValueAction(valueDesc, oldValue, newValue, valueSetter);
+
+		ActionManager.getInstance().addActionAndDoIt(action);
+
+		return action;
+		
 	}
 }

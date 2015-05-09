@@ -156,10 +156,10 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 
 	/**
 	 * 在index前插入新的车站
-	 * @param station Station
 	 * @param index int
+	 * @param station Station
 	 */
-	public void insertStation(Station station, int index) {
+	public void insertStation(int index, Station station) {
 		if ((index < 0) /* || (index >= MAX_STATION_NUM) */ )
 			return;
 
@@ -673,8 +673,8 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 
 			delStation(j);
 			delStation(i);
-			insertStation(station2, i);
-			insertStation(station1, j);
+			insertStation(i, station2);
+			insertStation(j, station1);
 		}
 	}
 

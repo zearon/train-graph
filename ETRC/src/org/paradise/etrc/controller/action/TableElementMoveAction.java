@@ -9,13 +9,13 @@ import javax.swing.table.TableCellEditor;
 
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
+import org.paradise.etrc.view.widget.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.*;
 
-public class TableElementMoveAction extends UIAction {
+public class TableElementMoveAction extends TableAction {
 	String tableName;
-	JTable table;
 	Vector list;
 	int oldIndex;
 	int newIndex;
@@ -24,26 +24,12 @@ public class TableElementMoveAction extends UIAction {
 	TableElementMoveAction(String tableName, JTable table, Vector list,
 			int oldIndex, int newIndex, boolean vertical) {
 		
+		super(table);
 		this.tableName = tableName;
-		this.table = table;
 		this.list = list;
 		this.oldIndex = oldIndex;
 		this.newIndex = newIndex;
 		this.vertical = vertical;
-	}
-
-	@Override
-	public void undoAction() {
-		_undoAction();
-
-		log("Undo action: %s", repr());
-	}
-
-	@Override
-	public void redoAction() {
-		_doAction();
-
-		log("Undo action: %s", repr());
 	}
 
 	@Override
@@ -62,6 +48,7 @@ public class TableElementMoveAction extends UIAction {
 		
 		Object element = list.remove(oldIndex);
 		list.insertElementAt(element, newIndex);
+		fireTableChanged(vertical, oldIndex, newIndex);
 		
 		editor = null;
 		if (vertical) {
@@ -96,6 +83,7 @@ public class TableElementMoveAction extends UIAction {
 		
 		Object element = list.remove(newIndex);
 		list.insertElementAt(element, oldIndex);
+		fireTableChanged(vertical, oldIndex, newIndex);
 		
 		editor = null;
 		if (vertical) {

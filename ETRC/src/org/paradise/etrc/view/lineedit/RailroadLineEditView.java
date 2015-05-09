@@ -991,14 +991,20 @@ public class RailroadLineEditView extends JPanel {
 			stationTable.getCellEditor().stopCellEditing();
 
 		int[] selectedRows = stationTable.getSelectedRows();
-		for (int i = selectedRows.length - 1; i >= 0; --i) {
-			((StationTableModel) stationTable.getModel()).railroadLine
-					.delStation(selectedRows[i]);
-		}
-		// System.out.println(((StationTableModel)table.getModel()).circuit);
-
-		stationTable.revalidate();
-		stationTable.updateUI();
+		RailroadLine line = ((StationTableModel) stationTable.getModel()).railroadLine;
+		
+		ActionFactory.createRemoveTableElementAction(__("station table"), 
+				stationTable, true, selectedRows, line::getStation, 
+				line::insertStation, line::delStation, stationTable::revalidate);
+		
+		
+//		for (int i = selectedRows.length - 1; i >= 0; --i) {
+//			((StationTableModel) stationTable.getModel()).railroadLine
+//					.delStation(selectedRows[i]);
+//		}
+//
+//		stationTable.revalidate();
+//		stationTable.updateUI();
 	}
 
 	private void doRailline_MoveUpStation() {
@@ -1078,48 +1084,40 @@ public class RailroadLineEditView extends JPanel {
 
 	private void doRailline_InsertStation() {
 		// table.getCellEditor().stopCellEditing();
-		RailroadLine cir = stationTableModel.railroadLine;
+		RailroadLine line = stationTableModel.railroadLine;
 		int selectedIndex = stationTable.getSelectedRow();
 		if (selectedIndex < 0) {
 			new MessageBox(__("Please choose a station first.")).showMessage();
-			;
 			return;
 		}
 
-		String name = __("Station");
-		int dist = cir.getStation(selectedIndex).dist;
-		int level = cir.getStation(selectedIndex).level;
-		boolean hide = false;
-		cir.insertStation(TrainGraphFactory.createInstance(Station.class, name)
-				.setProperties(dist, level, hide), 
-				selectedIndex);
-		// System.out.println(cir);
-
-		stationTable.revalidate();
-		stationTable.updateUI();
+		int dist = line.getStation(selectedIndex).dist;
+		int level = line.getStation(selectedIndex).level;
+		Station station = TrainGraphFactory.createInstance(Station.class)
+				.setProperties(dist, level, false);
+		
+		ActionFactory.createAddTableElementActionAndDoIt(__("station table"), 
+				stationTable, true, selectedIndex, station, line::insertStation, 
+				line::delStation, stationTable::revalidate);
 	}
 
 	private void doRailline_AddStation() {
 		// table.getCellEditor().stopCellEditing();
-		RailroadLine cir = stationTableModel.railroadLine;
+		RailroadLine line = stationTableModel.railroadLine;
 		int selectedIndex = stationTable.getSelectedRow();
 		if (selectedIndex < 0) {
 			new MessageBox(__("Please choose a station first.")).showMessage();
-			;
 			return;
 		}
 
-		String name = __("Station");
-		int dist = cir.getStation(selectedIndex).dist;
-		int level = cir.getStation(selectedIndex).level;
-		boolean hide = false;
-		cir.insertStation(TrainGraphFactory.createInstance(Station.class, name)
-				.setProperties(dist, level, hide),
-				selectedIndex + 1);
-		// System.out.println(cir);
-
-		stationTable.revalidate();
-		stationTable.updateUI();
+		int dist = line.getStation(selectedIndex).dist;
+		int level = line.getStation(selectedIndex).level;
+		Station station = TrainGraphFactory.createInstance(Station.class)
+				.setProperties(dist, level, false);
+		
+		ActionFactory.createAddTableElementActionAndDoIt(__("station table"), 
+				stationTable, true, selectedIndex + 1, station, line::insertStation, 
+				line::delStation, stationTable::revalidate);
 	}
 
 	private void doRailNetwork_AddCircuit() {

@@ -5,13 +5,13 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
+import org.paradise.etrc.view.widget.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.*;
 
-public class TableCellEditAction extends UIAction {
+public class TableCellEditAction extends TableAction {
 	String tableName;
-	JTable table;
 	DefaultJEditTableModel tableModel;
 	int row;
 	int column;
@@ -22,8 +22,8 @@ public class TableCellEditAction extends UIAction {
 			DefaultJEditTableModel tableModel, int row, int column,
 			Object newValue) {
 
+		super(table);
 		this.tableName = tableName;
-		this.table = table;
 		this.tableModel = tableModel;
 		this.row = row;
 		this.column = column;
@@ -33,12 +33,7 @@ public class TableCellEditAction extends UIAction {
 
 	@Override
 	public void undoAction() {
-		table.setRowSelectionInterval(row, row);
-		table.setColumnSelectionInterval(column, column);
-
-		TableCellEditor editor = table.getCellEditor(row, column);
-		if (editor != null)
-			editor.stopCellEditing();
+		stopCellEditing(true);
 
 		_undoAction();
 
@@ -47,12 +42,7 @@ public class TableCellEditAction extends UIAction {
 
 	@Override
 	public void redoAction() {
-		table.setRowSelectionInterval(row, row);
-		table.setColumnSelectionInterval(column, column);
-
-		TableCellEditor editor = table.getCellEditor(row, column);
-		if (editor != null)
-			editor.stopCellEditing();
+		stopCellEditing(true);
 
 		_doAction();
 

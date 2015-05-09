@@ -1,7 +1,9 @@
 package org.paradise.etrc.controller.action;
 
 import java.util.Vector;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 
 import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
@@ -67,6 +69,32 @@ public class ActionFactory {
 			StationTableModel tableModel) {
 
 		UIAction action = new RevertRaillineAction(table, tableModel);
+
+		ActionManager.getInstance().addActionAndDoIt(action);
+
+		return action;
+	}
+
+	public static <T> UIAction createAddTableElementActionAndDoIt(
+			String tableName, JTable table, boolean vertical, int index,
+			T element, BiConsumer<Integer, T> adder, Consumer<Integer> remover,
+			Runnable callback) {
+
+		UIAction action = new AddTableElementAction<T>(tableName, table,
+				vertical, index, element, adder, remover, callback);
+
+		ActionManager.getInstance().addActionAndDoIt(action);
+
+		return action;
+	}
+
+	public static <T> UIAction createRemoveTableElementAction(String tableName,
+			JTable table, boolean vertical, int[] indeces,
+			IntFunction<T> getter, BiConsumer<Integer, T> adder,
+			Consumer<Integer> remover, Runnable callback) {
+
+		UIAction action = new RemoveTableElementAction<>(tableName, table,
+				vertical, indeces, getter, adder, remover, callback);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 

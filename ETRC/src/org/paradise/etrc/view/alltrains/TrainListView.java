@@ -535,22 +535,6 @@ public class TrainListView extends JPanel {
 				return null;
 			}
 		}
-
-		/**
-		 * addTableModelListener
-		 *
-		 * @param l TableModelListener
-		 */
-		public void addTableModelListener(TableModelListener l) {
-		}
-
-		/**
-		 * removeTableModelListener
-		 *
-		 * @param l TableModelListener
-		 */
-		public void removeTableModelListener(TableModelListener l) {
-		}
 	}
 
 	public class TrainsTable extends JTable {

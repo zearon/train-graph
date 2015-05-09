@@ -18,6 +18,7 @@ import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -54,10 +55,12 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.data.RailNetworkChart;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailroadLine;
@@ -217,7 +220,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		allTrainsView.setModel(trainGraph);
 	}
 	
+	static Boolean isOSX = null;
 	public boolean isOSX10_7OrAbove() {
+		if (isOSX != null) {
+			return isOSX;
+		}
+		
+		isOSX = false;
 		if ("Mac OS X".equalsIgnoreCase(System.getProperty("os.name"))) {
 			String osVersionString = System.getProperty("os.version");
 			String[] versionParts = osVersionString.split("\\.");
@@ -226,13 +235,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 					int versionPart1Val = Integer.parseInt(versionParts[0]);
 					int versionPart2Val = Integer.parseInt(versionParts[1]);
 					if (versionPart1Val >= 10 && versionPart2Val >= 7) {
-						return true;
+						isOSX = true;
 					}
 				} finally {}
 			}
 		}
 		
-		return false;
+		return isOSX;
 	}
 	
 	/**
@@ -509,6 +518,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		jToolBar.add(jbSaveFile);
 		jToolBar.add(jbSaveAs);
 		
+		//撤销,重做
+		JButton jbUndo = createTBButton("undo", __("Undo"), Edit_Undo);
+		JButton jbRedo  = createTBButton("redo", __("Redo"), Edit_Redo);
+		ActionManager.getInstance().setToolbarButton(jbUndo, jbRedo);
+		jToolBar.addSeparator();
+		jToolBar.add(jbUndo);
+		jToolBar.add(jbRedo);
+		
 		//车次、线路编辑
 		JButton jbCircuitEdit = createTBButton("circuit", __("Edit Circuit"), Edit_Circuit);
 		JButton jbTrainsEdit  = createTBButton("trains", __("Edit Train Information"), Edit_Trains);
@@ -655,6 +672,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private final String File_Export = "File_Export";
 	private final String File_Exit = "File_Exit";
 
+	private final String Edit_Undo = "Edit_Undo";
+	private final String Edit_Redo = "Edit_Redo";
+	private final String Edit_Action_History = "Edit_Action_History";
 	private final String Edit_FindTrain = "Edit_FindTrain";
 	private final String Edit_Circuit = "Edit_Circuit";
 	private final String Edit_Trains = "Edit_Trains";
@@ -695,6 +715,24 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
         JMenu menuEdit = createMenu(__("EditMenu"));
 		menuEdit.setMnemonic(KeyEvent.VK_E);
+		JMenuItem undoMenuItem = menuEdit.add(createMenuItem(__("Undo"), Edit_Undo));
+		JMenuItem redoMenuItem = menuEdit.add(createMenuItem(__("Redo"), Edit_Redo));
+		if (isOSX10_7OrAbove()) {
+			undoMenuItem.setAccelerator(
+					KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.META_DOWN_MASK));
+			redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 
+	    				InputEvent.META_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
+		} else {
+			undoMenuItem.setAccelerator(
+					KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
+			redoMenuItem.setAccelerator(
+					KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
+		}
+		JMenu actionHistoryMenuItem = createMenu(__("Action History"));
+		menuEdit.add(actionHistoryMenuItem);
+		ActionManager.getInstance().setMenuItem(undoMenuItem, redoMenuItem, actionHistoryMenuItem);
+		
+		menuEdit.addSeparator();
         menuEdit.add(createMenuItem(__("Circuit..."), Edit_Circuit)).setMnemonic(KeyEvent.VK_C);
         menuEdit.add(createMenuItem(__("Train..."), Edit_Trains)).setMnemonic(KeyEvent.VK_R);
 		menuEdit.addSeparator();
@@ -751,6 +789,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 					+ "\nReason:%s\nDetail:%s"), Sample_Chart_File, ioe.getMessage(), 
 					ioe.getCause() )).showMessage();
 			
+			TrainGraphFactory.resetIDCounters();
 			trainGraph = TrainGraphFactory.createDefaultTrainGraph();
 		} finally {
 			currentNetworkChart = trainGraph.getCharts().get(0);
@@ -775,6 +814,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			this.doTimeSet();
 		} else if (command.equalsIgnoreCase(Setup_Dist)) {
 			this.doDistSet();
+		} else if (command.equalsIgnoreCase(Edit_Undo)) {
+			ActionManager.getInstance().undo();
+		} else if (command.equalsIgnoreCase(Edit_Redo)) {
+			ActionManager.getInstance().redo();
 		} else if (command.equalsIgnoreCase(Edit_Circuit)) {
 			this.doEditCircuit();
 		} else if (command.equalsIgnoreCase(Edit_Trains)) {

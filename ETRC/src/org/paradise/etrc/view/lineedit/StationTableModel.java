@@ -2,8 +2,11 @@ package org.paradise.etrc.view.lineedit;
 
 import static org.paradise.etrc.ETRC.__;
 
+import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 
+import org.paradise.etrc.controller.action.ActionFactory;
+import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
@@ -14,9 +17,11 @@ public class StationTableModel extends DefaultJEditTableModel {
 	 */
 	private static final long serialVersionUID = -6136704973824924463L;
 
+	private JTable table;
 	public RailroadLine railroadLine;
 
-	public StationTableModel(RailroadLine line) {
+	public StationTableModel(JTable table, RailroadLine line) {
+		this.table = table;
 		setRailroadLine(line);
 	}
 	
@@ -109,6 +114,11 @@ public class StationTableModel extends DefaultJEditTableModel {
 		}
 	}
 
+	protected UIAction getAction(Object aValue, int rowIndex, int columnIndex) {
+		return ActionFactory.createStationTableEditAction(table, this, 
+				rowIndex, columnIndex, aValue);
+	}
+
 	/**
 	 * setValueAt
 	 *
@@ -119,7 +129,7 @@ public class StationTableModel extends DefaultJEditTableModel {
 	 * @param columnIndex
 	 *            int
 	 */
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+	public void _setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 0:
 			railroadLine.getStation(rowIndex).name = (String) aValue;
@@ -173,23 +183,6 @@ public class StationTableModel extends DefaultJEditTableModel {
 		}
 	}
 
-	/**
-	 * addTableModelListener
-	 *
-	 * @param l
-	 *            TableModelListener
-	 */
-	public void addTableModelListener(TableModelListener l) {
-	}
-
-	/**
-	 * removeTableModelListener
-	 *
-	 * @param l
-	 *            TableModelListener
-	 */
-	public void removeTableModelListener(TableModelListener l) {
-	}
 
 	@Override
 	public boolean nextCellIsBelow(int row, int column, int increment) {

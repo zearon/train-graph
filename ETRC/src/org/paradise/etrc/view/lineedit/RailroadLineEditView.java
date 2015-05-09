@@ -1,7 +1,7 @@
 package org.paradise.etrc.view.lineedit;
 
 import static org.paradise.etrc.ETRC.__;
-import static org.paradise.etrc.ETRCUtil.DEBUG;
+import static org.paradise.etrc.ETRCUtil.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -499,7 +499,7 @@ public class RailroadLineEditView extends JPanel {
 		railroadLineTable.setFont(new Font("Dialog", 0, 12));
 		railroadLineTable.getTableHeader().setFont(new Font("Dialog", 0, 12));
 
-		railroadLineTableModel = new RailroadLineTableModel(null);
+		railroadLineTableModel = new RailroadLineTableModel(railroadLineTable, null);
 		railroadLineTable.setModel(railroadLineTableModel);
 		railroadLineTable.getColumnModel().getColumn(0).setPreferredWidth(30);
 		railroadLineTable.getColumnModel().getColumn(1).setPreferredWidth(160);
@@ -708,7 +708,7 @@ public class RailroadLineEditView extends JPanel {
 		stationTable.setFont(new Font("Dialog", 0, 12));
 		stationTable.getTableHeader().setFont(new Font("Dialog", 0, 12));
 
-		stationTableModel = new StationTableModel(null);
+		stationTableModel = new StationTableModel(stationTable, null);
 		stationTable.setModel(stationTableModel);
 		// stationTable.setPreferredSize(new Dimension(300,
 		// stationTable.getRowHeight() * 20));
@@ -1210,7 +1210,7 @@ public class RailroadLineEditView extends JPanel {
 					.map(station -> (crossoverStations.get(station.name) - station.dist))
 					.toArray(Integer[]::new);
 
-			if (DEBUG())
+			if (IS_DEBUG())
 				for (int i = 0; i < offsets.length; ++i) {
 					DEBUG("Offset at crossover station %s on circuit %s is %d",
 							crossoverStationsInCircuit[i].name, circuit.name,

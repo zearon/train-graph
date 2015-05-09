@@ -3,6 +3,7 @@ package org.paradise.etrc.view.lineedit;
 import java.awt.Dimension;
 
 import javax.swing.ListSelectionModel;
+import javax.swing.event.TableModelListener;
 
 import org.paradise.etrc.view.widget.JEditTable;
 

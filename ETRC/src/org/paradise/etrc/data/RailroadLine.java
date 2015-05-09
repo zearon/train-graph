@@ -57,7 +57,10 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	RailroadLine(String name) {
 		this();
 		setName(name);
-		
+	}
+	
+	@Override
+	void initTGP() {
 		this.length = 30;
 		this.multiplicity = 2;
 		this.zindex = 1;
@@ -768,7 +771,8 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	protected String getStartSectionString() { return START_SECTION_RAILROAD_LINE; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_RAILROAD_LINE; }
-	@Override String createTGPNameById(int id) { 
+	@Override 
+	String createTGPNameById(int id) { 
 		return String.format(__("Line %d"), id);
 	}
 	@Override

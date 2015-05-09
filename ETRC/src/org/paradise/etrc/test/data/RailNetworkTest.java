@@ -39,7 +39,8 @@ public class RailNetworkTest {
 		railNetwork.name = "Test Railroad Network";
 		
 		File chartFile = new File("/Users/zhiyuangong/Hobby/Railroad/sample.trc");
-		RailroadLineChart chart = new RailroadLineChart(chartFile);	
+		RailroadLineChart chart = TrainGraphFactory.createInstance(RailroadLineChart.class);
+		chart.loadFromFile2(chartFile);	
 
 		
 		trainGraph = TrainGraphFactory.createInstance(TrainGraph.class);

@@ -30,7 +30,7 @@ public class ETRCUtil {
 	 * Define DEBUG environment variable to 'true' to activate debug mode.
 	 * @return true if it is running in debug mode.
 	 */
-	  public static boolean DEBUG() {
+	  public static boolean IS_DEBUG() {
 		  return isDebug;
 	  }
 	  
@@ -41,7 +41,7 @@ public class ETRCUtil {
 	   */
 	  public static boolean DEBUG(String msg) {
 		  if (isDebug)
-			  _printMsg("DEBUG: ", msg, true, true, true, true, true, 0);
+			  _printMsg("\r\nDEBUG: ", msg, true, true, true, true, true, 0);
 		  
 		  return isDebug;
 	  }
@@ -54,7 +54,7 @@ public class ETRCUtil {
 	   */
 	  public static boolean DEBUG(String msgFormat, Object... msgArgs) {
 		  if (isDebug)
-			  _printMsg("DEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
+			  _printMsg("\r\nDEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
 		  
 		  return isDebug;
 	  }
@@ -66,7 +66,7 @@ public class ETRCUtil {
 	   */
 	  public static boolean DEBUG_ACTION(DebugAction action) {
 		  if (isDebug) {
-			  _printMsg("DEBUG ACTION:", "", true, true, false, true, true, 0);
+			  _printMsg("\r\nDEBUG ACTION:", "", true, true, false, true, true, 0);
 			  action.doAction();
 		  }
 		  
@@ -84,7 +84,7 @@ public class ETRCUtil {
 	   */
 	  public static boolean DEBUG_ACTION(DebugAction action, String msgFormat, Object... msgArgs) {
 		  if (isDebug) {
-			  _printMsg("DEBUG ACTION:", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
+			  _printMsg("\r\nDEBUG ACTION:", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
 			  action.doAction();
 		  }
 		  
@@ -97,7 +97,7 @@ public class ETRCUtil {
 	   */
 	  public static void DEBUG_MSG(String msgFormat, Object... msgArgs) {
 		  if (isDebug)
-			  _printMsg("DEBUG_MSG: ", String.format(msgFormat, msgArgs), false, false, false, false, false, 0);
+			  _printMsg("\r\nDEBUG_MSG: ", String.format(msgFormat, msgArgs), false, false, false, false, false, 0);
 	  }
 	  
 	  /**
@@ -106,7 +106,7 @@ public class ETRCUtil {
 	   */
 	  public static void DEBUG_STACKTRACE(int level, String msgFormat, Object... msgArgs) {
 		  if (isDebug)
-			  _printMsg("DEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, false, level);
+			  _printMsg("\r\nDEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, false, level);
 	  }
 	  
 	  private static void _printMsg(String prefix, String msg, boolean printTime, boolean printInvoker, 
@@ -129,7 +129,9 @@ public class ETRCUtil {
 				  notSameInvoker = true;
 				  lastInvoker = invoker.toString();
 			  } else {
-				  notSameInvoker = false;
+//				  notSameInvoker = false;
+				  notSameInvoker = true;
+				  lastInvoker = invoker.toString();
 			  }
 		  }
 		  

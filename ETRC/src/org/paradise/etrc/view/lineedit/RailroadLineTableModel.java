@@ -4,8 +4,12 @@ import static org.paradise.etrc.ETRC.__;
 
 import java.util.Vector;
 
+import javax.swing.JTable;
 import javax.swing.event.TableModelListener;
 
+import org.paradise.etrc.controller.ActionManager;
+import org.paradise.etrc.controller.action.ActionFactory;
+import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 
@@ -15,9 +19,11 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 	 * 
 	 */
 	private static final long serialVersionUID = 5316084320996309203L;
+	private JTable table;
 	public Vector<RailroadLine> raillines;
 
-	public RailroadLineTableModel(Vector<RailroadLine> existingRailLines) {
+	public RailroadLineTableModel(JTable table, Vector<RailroadLine> existingRailLines) {
+		this.table = table;
 		setRailLines(existingRailLines);
 	}
 	
@@ -106,20 +112,14 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 		}
 	}
 
-	/**
-	 * setValueAt
-	 *
-	 * @param aValue
-	 *            Object
-	 * @param rowIndex
-	 *            int
-	 * @param columnIndex
-	 *            int
-	 */
-	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+	protected UIAction getAction(Object aValue, int rowIndex, int columnIndex) {
+		return ActionFactory.createRailroadLineTableEditAction(table, this, 
+				rowIndex, columnIndex, aValue);
+	}
+	
+	public void _setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 1:
-			// circuit.getStation(rowIndex).name = (String) aValue;
 			break;
 		case 2:
 			raillines.get(rowIndex).zindex = ((Number) aValue).intValue();
@@ -151,15 +151,6 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 		default:
 			return null;
 		}
-	}
-
-	/**
-	 * addTableModelListener
-	 *
-	 * @param l
-	 *            TableModelListener
-	 */
-	public void addTableModelListener(TableModelListener l) {
 	}
 
 	/**

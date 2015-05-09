@@ -18,8 +18,12 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	protected Vector<RailNetworkChart> charts;
 	
 	TrainGraph() {
-		railNetwork = new RailNetwork();
-		allTrains = new AllTrains();
+	}
+	
+	@Override
+	void initTGP() {
+		railNetwork = TrainGraphFactory.createInstance(RailNetwork.class);
+		allTrains = TrainGraphFactory.createInstance(AllTrains.class);
 		charts = new Vector<RailNetworkChart> ();
 	}
 	
@@ -48,7 +52,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 				
 				charts.forEach(networkChart ->
 					networkChart.getRailLineCharts()
-					.add(new RailroadLineChart(line)) );
+					.add(TrainGraphFactory.createInstance(RailroadLineChart.class).setProperties(line)) );
 			});
 	}
 

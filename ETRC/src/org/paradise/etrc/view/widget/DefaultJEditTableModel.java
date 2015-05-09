@@ -7,6 +7,9 @@ import java.util.Optional;
 
 import javax.swing.table.AbstractTableModel;
 
+import org.paradise.etrc.controller.ActionManager;
+import org.paradise.etrc.controller.action.ActionFactory;
+import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.Stop;
 
 /**
@@ -25,6 +28,17 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 
 	public DefaultJEditTableModel() {
 	}
+	
+	protected abstract UIAction getAction(Object aValue, int rowIndex, int columnIndex);
+	
+	public abstract void _setValueAt(Object aValue, int rowIndex, int columnIndex);
+	
+	@Override
+	public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		UIAction action = getAction(aValue, rowIndex, columnIndex);
+		
+		ActionManager.getInstance().addActionAndDoIt(action);
+	}	
 	
 	public abstract boolean columnIsTimeString(int column);
 	

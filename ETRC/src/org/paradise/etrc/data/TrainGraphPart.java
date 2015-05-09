@@ -85,6 +85,7 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	String createTGPNameById(int id) { return null; }
 	protected abstract Supplier<? extends TrainGraphPart> getConstructionFunc();	
 	public abstract void _prepareForFirstLoading();
+	void initTGP() {}
 	
 	/* Properties */
 	protected abstract Tuple<String, Class<?>>[] getSimpleTGPProperties();

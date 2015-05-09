@@ -61,12 +61,15 @@ public class TrainGraphFactory {
 		TrainGraph tg = createTrainGraph();
 		
 		// Add a default railroad line rail network
-		RailroadLine line = new RailroadLine();
+		RailroadLine line = createInstance(RailroadLine.class);
 		tg.railNetwork.addRailroadLine(line);
 		
 		// Add a default time table
-		RailroadLineChart lineChart = new RailroadLineChart(line);
-		RailNetworkChart networkChart = new RailNetworkChart();
+		RailroadLineChart lineChart = TrainGraphFactory
+				.createInstance(RailroadLineChart.class).setProperties(line);
+		RailNetworkChart networkChart = TrainGraphFactory
+				.createInstance(RailNetworkChart.class);
+		networkChart.getRailLineCharts().add(lineChart);
 		tg.charts.add(networkChart);
 		
 		tg.syncLineChartsWithRailNetworks();
@@ -110,6 +113,7 @@ public class TrainGraphFactory {
 		// Initialize the object
 		int id = TrainGraph._objectIdMap.get(className);
 		obj._id = ++ id;
+		obj.initTGP();
 		TrainGraph._objectIdMap.put(className, id);
 		if (name == null) {
 			name = obj.createTGPNameById(id);
@@ -124,7 +128,7 @@ public class TrainGraphFactory {
 	/**
 	 * Reset id counters for all train graph part sub-classes.
 	 */
-	public void resetIDCounters() {
+	public static void resetIDCounters() {
 		resetIDCounterForClass(null);
 	}
 	
@@ -133,7 +137,7 @@ public class TrainGraphFactory {
 	 * @param clazz The class whose id counter is to be reset. 
 	 * If clazz is null, then reset id counters for all TrainGraphPart sub-classes.
 	 */
-	public void resetIDCounterForClass(Class<? extends TrainGraphPart> clazz) {
+	public static void resetIDCounterForClass(Class<? extends TrainGraphPart> clazz) {
 		if (clazz == null) {
 			TrainGraphPart._objectIdMap.entrySet().forEach(entry->entry.setValue(0));
 		} else {

@@ -43,6 +43,8 @@ import javax.swing.table.AbstractTableModel;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.controller.action.ActionFactory;
+import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraphFactory;
@@ -793,6 +795,11 @@ public class TrainView extends JPanel {
 			}
 		}
 
+		protected UIAction getAction(Object aValue, int rowIndex, int columnIndex) {
+			return ActionFactory.createStationTableEditAction(table, this, 
+					rowIndex, columnIndex, aValue);
+		}
+
 		/**
 		 * setValueAt
 		 *
@@ -803,7 +810,7 @@ public class TrainView extends JPanel {
 		 * @param columnIndex
 		 *            int
 		 */
-		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+		public void _setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			// SimpleDateFormat df = new SimpleDateFormat("H:mm");
 			// try {
 			switch (columnIndex) {
@@ -850,24 +857,6 @@ public class TrainView extends JPanel {
 			default:
 				return null;
 			}
-		}
-
-		/**
-		 * addTableModelListener
-		 *
-		 * @param l
-		 *            TableModelListener
-		 */
-		public void addTableModelListener(TableModelListener l) {
-		}
-
-		/**
-		 * removeTableModelListener
-		 *
-		 * @param l
-		 *            TableModelListener
-		 */
-		public void removeTableModelListener(TableModelListener l) {
 		}
 
 		@Override

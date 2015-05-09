@@ -1,7 +1,7 @@
 package org.paradise.etrc.dialog;
 
 import static org.paradise.etrc.ETRC.__;
-import static org.paradise.etrc.ETRCUtil.DEBUG;
+import static org.paradise.etrc.ETRCUtil.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -112,7 +112,7 @@ public class FindTrainsDialog extends JDialog {
 			List<Train> trains = skb.findTrains(mainFrame.currentLineChart.allCircuits.stream());		//skb.findTrains(mainFrame.chart.trunkCircuit);
 
 			Instant instant1 = null, instant2 = null;
-			if (DEBUG())
+			if (IS_DEBUG())
 				instant1= Instant.now();
 			
 			trains.stream().parallel()
@@ -122,7 +122,7 @@ public class FindTrainsDialog extends JDialog {
 					msgLabel.setText(String.format(__("Importing train information %s"), train.getTrainName()));
 				});
 			
-			if (DEBUG())
+			if (IS_DEBUG())
 				instant2= Instant.now();
 			
 			DEBUG("Benchmark: [import circuit]: %d", instant2.toEpochMilli() - instant1.toEpochMilli());

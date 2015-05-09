@@ -43,7 +43,7 @@ public class SheetTable extends JEditTable {
 		getTableHeader().setFont(new Font("Dialog", 0, 12));
 
 		//设置数据
-		setModel(new SheetModel(sheetView.mainFrame.currentLineChart));
+		setModel(new SheetModel(this, sheetView.mainFrame.currentLineChart));
 
 		//设置渲染器
 		setDefaultRenderer(Stop.class, new SheetCellRanderer());

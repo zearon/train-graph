@@ -239,7 +239,7 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 				circuit.getAllStations().stream()
 						.forEach(station -> station.scaledDist = station.dist);
 				
-				if (DEBUG())
+				if (IS_DEBUG())
 					circuit.dinfo = "IF-clause";
 				
 				errMsgs.add(null);
@@ -268,7 +268,7 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 							virtualRailroadLine.add(sta);
 						});
 					
-					if (DEBUG())
+					if (IS_DEBUG())
 						circuit.dinfo = "Case 1";
 
 					errMsgs.add(null);
@@ -304,7 +304,7 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 							});
 							alignedAtFirstCrossover = true;
 							
-							if (DEBUG())
+							if (IS_DEBUG())
 								circuit.dinfo = "Case 2-Step 2";
 						}
 
@@ -464,7 +464,8 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 	protected String getStartSectionString() { return START_SECTION_RAILROAD_NETWORK; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_RAILROAD_NETWORK; }
-	@Override String createTGPNameById(int id) { 
+	@Override 
+	String createTGPNameById(int id) { 
 		return String.format(__("Railroad Network %d"), id);
 	}
 	@Override

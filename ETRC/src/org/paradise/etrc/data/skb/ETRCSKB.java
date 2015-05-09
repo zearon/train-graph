@@ -144,14 +144,14 @@ public class ETRCSKB {
 	
 	public List<Train> findTrains(Stream<RailroadLine> circuits) {
 		Instant instant1 = null, instant2 = null, instant3 = null;
-		if (DEBUG())
+		if (IS_DEBUG())
 			instant1= Instant.now();
 		HashSet<String> allStationsOnCircuits = 
 				circuits.flatMap(cir->cir.getAllStations().stream()).distinct()
 				.map(station->station.name.toLowerCase())
 				.collect(Collectors.toCollection(HashSet::new));
 
-		if (DEBUG())
+		if (IS_DEBUG())
 			instant2= Instant.now();
 		List<Train> trains = 
 				tk.stream().parallel()
@@ -160,7 +160,7 @@ public class ETRCSKB {
 				.map(tkinfo->getTrainByFullName(tkinfo[0]))
 				.collect(Collectors.toList());
 		
-		if (DEBUG())
+		if (IS_DEBUG())
 			instant3= Instant.now();
 		
 		DEBUG("Benchmark: [find for circuit]: GetName:%d, GetTrain:%d", instant2.toEpochMilli() - instant1.toEpochMilli(), instant3.toEpochMilli() - instant2.toEpochMilli());

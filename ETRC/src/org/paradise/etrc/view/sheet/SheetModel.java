@@ -1,5 +1,9 @@
 package org.paradise.etrc.view.sheet;
 
+import javax.swing.JTable;
+
+import org.paradise.etrc.controller.action.ActionFactory;
+import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
@@ -7,9 +11,10 @@ import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 
 public class SheetModel extends DefaultJEditTableModel {
 	private static final long serialVersionUID = 6767541225039467460L;
-
+	private JTable table;
 	public RailroadLineChart chart;
-	public SheetModel(RailroadLineChart _chart) {
+	public SheetModel(JTable table, RailroadLineChart _chart) {
+		this.table = table;
 		chart = _chart;
 	}
 	
@@ -55,10 +60,15 @@ public class SheetModel extends DefaultJEditTableModel {
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
 		return true;
 	}
+
+	protected UIAction getAction(Object aValue, int rowIndex, int columnIndex) {
+		return ActionFactory.createStationTableEditAction(table, this, 
+				rowIndex, columnIndex, aValue);
+	}
 	
 	//修改到发点时间不需要特殊处理，在CellEditor里面就处理好了
 	//此处需要处理添加、删除停站的操作
-	public void setValueAt(Object aValue, int rowIndex, int colIndex)  {
+	public void _setValueAt(Object aValue, int rowIndex, int colIndex)  {
 		Train theTrain = chart.getTrain(colIndex);
 		String staName = chart.railroadLine.getStation(rowIndex / 2).name;
 		Stop stop = (Stop) aValue;

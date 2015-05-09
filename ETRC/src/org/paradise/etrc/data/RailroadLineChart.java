@@ -58,14 +58,15 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 
 	private List<Consumer<RailroadLineChart>> chartChangedListeners = new Vector<Consumer<RailroadLineChart>> ();
 
-	public RailroadLineChart() {}
+	RailroadLineChart() {}
 	
-	public RailroadLineChart(File f) throws IOException {
-		loadFromFile2(f);
-	}
+//	RailroadLineChart(RailroadLine cir) {
+//		railroadLine = cir;
+//	}
 	
-	public RailroadLineChart(RailroadLine cir) {
-		railroadLine = cir;
+	public RailroadLineChart setProperties(RailroadLine line) {
+		this.railroadLine = line;
+		return this;
 	}
 	
 	public Train getTrain(int index) {
@@ -386,7 +387,8 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	  public static void main(String argv[]) {
 	    RailroadLineChart chart = null;
 	    try {
-	      chart = new RailroadLineChart(new File("d:\\huning2.trc"));
+	      chart = new RailroadLineChart();
+	      chart.loadFromFile2(new File("d:\\huning2.trc"));
 	    }
 	    catch (IOException ex) {
 	      System.out.println("Error:" + ex.getMessage());

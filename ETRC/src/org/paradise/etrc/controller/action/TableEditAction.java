@@ -9,7 +9,7 @@ import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.*;
 
-public abstract class TableEditAction extends UIAction {
+public class TableEditAction extends UIAction {
 	String tableName;
 	JTable table;
 	DefaultJEditTableModel tableModel;
@@ -72,7 +72,7 @@ public abstract class TableEditAction extends UIAction {
 	public String repr() {
 		if (IS_DEBUG()) {
 			return String.format(
-					__("Set %s table cell value [%d,%d]=%s. Old value is %s"),
+					__("Set %s cell value [%d,%d]=%s. Old value is %s"),
 					tableName, row, column, newValue, oldValue);
 		} else {
 			return String.format(__("Set %s table cell value [%d,%d]=%s"),

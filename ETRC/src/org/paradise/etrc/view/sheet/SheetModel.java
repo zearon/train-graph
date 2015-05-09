@@ -1,5 +1,7 @@
 package org.paradise.etrc.view.sheet;
 
+import static org.paradise.etrc.ETRC.__;
+
 import javax.swing.JTable;
 
 import org.paradise.etrc.controller.action.ActionFactory;
@@ -62,8 +64,8 @@ public class SheetModel extends DefaultJEditTableModel {
 	}
 
 	protected UIAction getAction(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createStationTableEditAction(table, this, 
-				rowIndex, columnIndex, aValue);
+		return ActionFactory.createTableEditAction(__("stop table"), 
+				table, this, rowIndex, columnIndex, aValue);
 	}
 	
 	//修改到发点时间不需要特殊处理，在CellEditor里面就处理好了

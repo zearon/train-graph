@@ -10,19 +10,11 @@ import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 
 public class ActionFactory {
 
-	public static UIAction createRailroadLineTableEditAction(JTable table,
-			DefaultJEditTableModel tableModel, int row, int column,
-			Object newValue) {
+	public static UIAction createTableEditAction(String tableName,
+			JTable table, DefaultJEditTableModel tableModel, int row,
+			int column, Object newValue) {
 
-		return new RailroadLineTableEditAction(table, tableModel, row, column,
-				newValue);
-	}
-
-	public static UIAction createStationTableEditAction(JTable table,
-			DefaultJEditTableModel tableModel, int row, int column,
-			Object newValue) {
-
-		return new StationTableEditAction(table, tableModel, row, column,
+		return new TableEditAction(tableName, table, tableModel, row, column,
 				newValue);
 	}
 }

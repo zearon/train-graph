@@ -113,8 +113,8 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 	}
 
 	protected UIAction getAction(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createRailroadLineTableEditAction(table, this, 
-				rowIndex, columnIndex, aValue);
+		return ActionFactory.createTableEditAction(__("railroad line table"), 
+				table, this, rowIndex, columnIndex, aValue);
 	}
 	
 	public void _setValueAt(Object aValue, int rowIndex, int columnIndex) {

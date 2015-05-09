@@ -1033,29 +1033,31 @@ public class RailroadLineEditView extends JPanel {
 	}
 
 	protected void doRailline_RevertStation() {
-		// TODO: Revert station
-		RailroadLine circuit = stationTableModel.railroadLine;
-		int stationCount = circuit.getStationNum();
-
-		for (int i = 0, j = stationCount - 1; i < j; ++i, --j) {
-			Station station1 = circuit.getStation(i);
-			Station station2 = circuit.getStation(j);
-			int tempDist = station2.dist;
-			station2.dist = station1.dist;
-			station1.dist = tempDist;
-
-			circuit.delStation(j);
-			circuit.delStation(i);
-			circuit.insertStation(station2, i);
-			circuit.insertStation(station1, j);
-		}
-
-		int rowSelection = stationTable.getSelectedRow();
-		if (rowSelection >= 0) {
-			rowSelection = stationCount - 1 - rowSelection;
-			stationTable.setRowSelectionInterval(rowSelection, rowSelection);
-		}
-		stationTable.updateUI();
+		ActionFactory.createRevertRaillineActionAndDoIt(stationTable, stationTableModel);
+		
+//		// TODO: Revert station
+//		RailroadLine circuit = stationTableModel.railroadLine;
+//		int stationCount = circuit.getStationNum();
+//
+//		for (int i = 0, j = stationCount - 1; i < j; ++i, --j) {
+//			Station station1 = circuit.getStation(i);
+//			Station station2 = circuit.getStation(j);
+//			int tempDist = station2.dist;
+//			station2.dist = station1.dist;
+//			station1.dist = tempDist;
+//
+//			circuit.delStation(j);
+//			circuit.delStation(i);
+//			circuit.insertStation(station2, i);
+//			circuit.insertStation(station1, j);
+//		}
+//
+//		int rowSelection = stationTable.getSelectedRow();
+//		if (rowSelection >= 0) {
+//			rowSelection = stationCount - 1 - rowSelection;
+//			stationTable.setRowSelectionInterval(rowSelection, rowSelection);
+//		}
+//		stationTable.updateUI();
 	}
 
 	protected void doRailline_NormalizeDistance() {

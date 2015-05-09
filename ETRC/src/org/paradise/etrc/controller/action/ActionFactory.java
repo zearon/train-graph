@@ -8,6 +8,7 @@ import javax.swing.table.AbstractTableModel;
 
 import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.data.RailroadLine;
+import org.paradise.etrc.view.lineedit.StationTableModel;
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 import org.paradise.etrc.view.widget.JEditTable;
 
@@ -50,15 +51,25 @@ public class ActionFactory {
 
 		return action;
 	}
-	
-	public static UIAction createSetValueActionAndDoIt(String valueDesc, Object oldValue, Object newValue,
-			Consumer<Object> valueSetter) {
 
-		UIAction action = new SetValueAction(valueDesc, oldValue, newValue, valueSetter);
+	public static UIAction createSetValueActionAndDoIt(String valueDesc,
+			Object oldValue, Object newValue, Consumer<Object> valueSetter) {
+
+		UIAction action = new SetValueAction(valueDesc, oldValue, newValue,
+				valueSetter);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 
 		return action;
-		
+	}
+
+	public static UIAction createRevertRaillineActionAndDoIt(JTable table,
+			StationTableModel tableModel) {
+
+		UIAction action = new RevertRaillineAction(table, tableModel);
+
+		ActionManager.getInstance().addActionAndDoIt(action);
+
+		return action;
 	}
 }

@@ -659,6 +659,23 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	@Override
 	public String toString() {
 		return SIMPLE_VERSION_TO_STRING ? this.name : repr();
+	}	
+	
+	public void revertStations() {
+		int stationCount = getStationNum();
+
+		for (int i = 0, j = stationCount - 1; i < j; ++i, --j) {
+			Station station1 = getStation(i);
+			Station station2 = getStation(j);
+			int tempDist = station2.dist;
+			station2.dist = station1.dist;
+			station1.dist = tempDist;
+
+			delStation(j);
+			delStation(i);
+			insertStation(station2, i);
+			insertStation(station1, j);
+		}
 	}
 
 	public static void main(String argv[]) {

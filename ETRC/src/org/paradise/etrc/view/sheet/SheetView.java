@@ -20,6 +20,8 @@ import org.paradise.etrc.data.Train;
 //import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.slice.ChartSlice;
 
+import static org.paradise.etrc.ETRC.__;
+
 public class SheetView extends JPanel {
 	private static final long serialVersionUID = -341968803023065919L;
 
@@ -36,7 +38,7 @@ public class SheetView extends JPanel {
 	public SheetView(MainFrame _mainFrame) {
 		mainFrame = _mainFrame;
 
-		table = new SheetTable(this);
+		table = new SheetTable(__("timetable"), this);
 		rowHeader = buildeRowHeader(table);
 		
 		JScrollPane spTable = table.getScrollPane();

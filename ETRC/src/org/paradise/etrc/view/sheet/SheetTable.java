@@ -26,8 +26,8 @@ public class SheetTable extends JEditTable {
 	private static final long serialVersionUID = 1L;
 	
 	private SheetView sheetView;
-	public SheetTable(SheetView _sheetView) {
-		super();
+	public SheetTable(String tableName, SheetView _sheetView) {
+		super(tableName);
 		sheetView = _sheetView;
 
 		initTable();

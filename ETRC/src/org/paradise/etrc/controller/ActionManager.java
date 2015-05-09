@@ -62,25 +62,30 @@ public class ActionManager {
 		if (action.shouldSkip())
 			return;
 
-		if (actionCount == MAX_ACTION_COUNT) {
-			actionList.removeFirst();
-			actionList.addLast(action);
-
-			// actionHistoryMenuItem.remove(actionCount - 1);
-			// actionHistoryMenuItem.add(createMenuItem(action), 0);
-		} else {
-			actionList.addLast(action);
-			++actionCount;
-
-			// actionHistoryMenuItem.add(createMenuItem(action), 0);
-		}
-
 		action.doAction();
-
-		undoneActionList.clear();
-
-		// undoneActionItemList.clear();
-
+		
+		UIAction lastAction = actionList.peekLast();
+		if (lastAction != null && lastAction.canMerge(action)) {
+			lastAction.merge(action);
+		} else {
+			if (actionCount == MAX_ACTION_COUNT) {
+				actionList.removeFirst();
+				actionList.addLast(action);
+	
+				// actionHistoryMenuItem.remove(actionCount - 1);
+				// actionHistoryMenuItem.add(createMenuItem(action), 0);
+			} else {
+				actionList.addLast(action);
+				++actionCount;
+	
+				// actionHistoryMenuItem.add(createMenuItem(action), 0);
+			}
+	
+			undoneActionList.clear();
+	
+			// undoneActionItemList.clear();
+		}
+		
 		updateUI();
 	}
 

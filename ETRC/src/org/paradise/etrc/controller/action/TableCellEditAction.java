@@ -9,7 +9,7 @@ import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.*;
 
-public class TableEditAction extends UIAction {
+public class TableCellEditAction extends UIAction {
 	String tableName;
 	JTable table;
 	DefaultJEditTableModel tableModel;
@@ -18,8 +18,9 @@ public class TableEditAction extends UIAction {
 	Object oldValue;
 	Object newValue;
 
-	TableEditAction(String tableName, JTable table,
-			DefaultJEditTableModel tableModel, int row, int column, Object newValue) {
+	TableCellEditAction(String tableName, JTable table,
+			DefaultJEditTableModel tableModel, int row, int column,
+			Object newValue) {
 
 		this.tableName = tableName;
 		this.table = table;
@@ -34,7 +35,7 @@ public class TableEditAction extends UIAction {
 	public void undoAction() {
 		table.setRowSelectionInterval(row, row);
 		table.setColumnSelectionInterval(column, column);
-		
+
 		TableCellEditor editor = table.getCellEditor(row, column);
 		if (editor != null)
 			editor.stopCellEditing();
@@ -48,7 +49,7 @@ public class TableEditAction extends UIAction {
 	public void redoAction() {
 		table.setRowSelectionInterval(row, row);
 		table.setColumnSelectionInterval(column, column);
-		
+
 		TableCellEditor editor = table.getCellEditor(row, column);
 		if (editor != null)
 			editor.stopCellEditing();
@@ -81,8 +82,8 @@ public class TableEditAction extends UIAction {
 					__("Set %s cell value [%d,%d]=%s. Old value is %s"),
 					tableName, row, column, newValue, oldValue);
 		} else {
-			return String.format(__("Set %s cell value [%d,%d]=%s"),
-					tableName, row, column, newValue);
+			return String.format(__("Set %s cell value [%d,%d]=%s"), tableName,
+					row, column, newValue);
 		}
 	}
 

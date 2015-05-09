@@ -59,6 +59,8 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.JTextComponent;
 
+import org.paradise.etrc.controller.action.ActionFactory;
+
 /**
  * A table suitable for massive data input.
  * 
@@ -96,53 +98,66 @@ public class JEditTable extends JTable {
 	private boolean parentListenerAdded = false;
 	private MouseAdapter contextMenuAdapter;
 	private MouseWheelListener wheelAdapter;
+	
+	private String tableName;
 
 	static {
 		onColor = Color.decode("0xB3FBAD");
 		offColor = Color.decode("0xFF9BB1");
 	}
 
-	public JEditTable() {
-		this(false);
+	public JEditTable(String tableName) {
+		this(tableName, false);
 	}
 
-	public JEditTable(boolean continuousEdit) {
+	public JEditTable(String tableName, boolean continuousEdit) {
 		this.isContinuousEditMode = continuousEdit;
+		setTableName(tableName);
 		initUI();
 	}
 
-	public JEditTable(JEditTableModel dm) {
+	public JEditTable(String tableName, JEditTableModel dm) {
 		super(dm);
+		setTableName(tableName);
 		incrementalModel = dm;
 		initUI();
 	}
 
-	public JEditTable(JEditTableModel dm, TableColumnModel cm) {
+	public JEditTable(String tableName, JEditTableModel dm, TableColumnModel cm) {
 		super(dm, cm);
+		setTableName(tableName);
 		incrementalModel = dm;
 		initUI();
 	}
 
-	public JEditTable(int numRows, int numColumns) {
+	public JEditTable(String tableName, int numRows, int numColumns) {
 		super(numRows, numColumns);
+		setTableName(tableName);
 		initUI();
 	}
 
-	public JEditTable(Vector rowData, Vector columnNames) {
+	public JEditTable(String tableName, Vector rowData, Vector columnNames) {
 		super(rowData, columnNames);
+		setTableName(tableName);
 		initUI();
 	}
 
-	public JEditTable(Object[][] rowData, Object[] columnNames) {
+	public JEditTable(String tableName, Object[][] rowData, Object[] columnNames) {
 		super(rowData, columnNames);
+		setTableName(tableName);
 		initUI();
 	}
 
-	public JEditTable(JEditTableModel dm, TableColumnModel cm,
+	public JEditTable(String tableName, JEditTableModel dm, TableColumnModel cm,
 			ListSelectionModel sm) {
 		super(dm, cm, sm);
+		setTableName(tableName);
 		incrementalModel = dm;
 		initUI();
+	}
+	
+	protected void setTableName(String tableName) {
+		this.tableName = tableName;
 	}
 
 	/**
@@ -206,7 +221,7 @@ public class JEditTable extends JTable {
 					&& startColumn < getColumnCount()) {
 				int increment = Integer.parseInt(tfIncrement.getText());
 				doContinuousIncreaseCell(startRow, startColumn, increment,
-						false);
+						false, false);
 			}
 		});
 
@@ -328,7 +343,7 @@ public class JEditTable extends JTable {
 					int increment = e.getWheelRotation();
 					int row = getEditingRow(), column = getEditingColumn();
 					if (row >= 0 && column >= 0)
-						doContinuousIncreaseCell(row, column, increment, false);
+						doContinuousIncreaseCell(row, column, increment, false, true);
 					e.consume();
 				} else
 					getParent().dispatchEvent(e);
@@ -743,7 +758,7 @@ public class JEditTable extends JTable {
 
 //		DEBUG("EDIT Stoped: CELL(%d,%d) = %s, oldValue=%s, inc=%d", row, column, newCellValue, origCellValue, increment);
 		if (increment != 0)
-			doContinuousIncreaseCell(row, column, increment, true);		
+			doContinuousIncreaseCell(row, column, increment, true, false);		
 
 		cellChanged = true;
 	}
@@ -763,9 +778,18 @@ public class JEditTable extends JTable {
 	 * @param startColumn
 	 * @param increment
 	 * @param skipTheFirst
+	 * @param mouseAction
 	 */
 	public void doContinuousIncreaseCell(int startRow, int startColumn,
-			int increment, boolean skipTheFirst) {
+			int increment, boolean skipTheFirst, boolean mouseAction) {
+		
+		ActionFactory.createTableCellIncrementActionAndDoIt(tableName, 
+				this, startRow, startColumn, increment, skipTheFirst, 
+				isContinuousEditMode, mouseAction);
+	}
+	
+	public void _doContinuousIncreaseCell(int startRow, int startColumn,
+			int increment, boolean skipTheFirst, boolean isContinuousEditMode) {
 		boolean valueChanged = false;
 
 		if (!skipTheFirst) {

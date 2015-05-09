@@ -5,6 +5,7 @@ import java.awt.Dimension;
 import javax.swing.ListSelectionModel;
 
 import org.paradise.etrc.view.widget.JEditTable;
+import static org.paradise.etrc.ETRC.__;
 
 public class StationTable extends JEditTable {
 		/**
@@ -13,6 +14,7 @@ public class StationTable extends JEditTable {
 		private static final long serialVersionUID = 8627865729136595002L;
 
 		public StationTable() {
+			super(__("station table"));
 			setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
 		}
 

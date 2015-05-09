@@ -8,6 +8,7 @@ import javax.swing.table.AbstractTableModel;
 import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
+import org.paradise.etrc.view.widget.JEditTable;
 
 public class ActionFactory {
 
@@ -15,7 +16,7 @@ public class ActionFactory {
 			JTable table, DefaultJEditTableModel tableModel, int row,
 			int column, Object newValue) {
 
-		UIAction action = new TableEditAction(tableName, table, tableModel,
+		UIAction action = new TableCellEditAction(tableName, table, tableModel,
 				row, column, newValue);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
@@ -29,6 +30,20 @@ public class ActionFactory {
 
 		UIAction action = new TableElementMoveAction(tableName, table, list,
 				oldIndex, newIndex, vertical);
+
+		ActionManager.getInstance().addActionAndDoIt(action);
+
+		return action;
+	}
+
+	public static UIAction createTableCellIncrementActionAndDoIt(
+			String tableName, JEditTable table, int startRow, int startColumn,
+			int increment, boolean skipTheFirst, boolean isContinuousEditMode,
+			boolean mouseAction) {
+
+		UIAction action = new TableCellIncrementAction(tableName, table,
+				startRow, startColumn, increment, skipTheFirst,
+				isContinuousEditMode, mouseAction);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 

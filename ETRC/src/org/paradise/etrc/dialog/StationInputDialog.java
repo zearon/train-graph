@@ -31,7 +31,7 @@ import org.paradise.etrc.view.widget.JEditTable;
 public class StationInputDialog extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 9065758632068382095L;
 	JPanel panel = new JPanel();
-	JTable jTable1 = new JEditTable();
+	JTable jTable1 = new JEditTable(__("station table"));
 	JPanel panel2 = new JPanel();
 	JPanel panel3 = new JPanel();
 	JLabel lbStationName = new JLabel();

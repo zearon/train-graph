@@ -41,6 +41,9 @@ public abstract class UIAction {
 	
 	protected abstract boolean _shouldSkip();
 	
+	public boolean canMerge(UIAction action2) { return false; }
+	public void merge(UIAction action2) {}
+	
 	public abstract String repr();
 	
 	protected void log(String str, Object... params) {

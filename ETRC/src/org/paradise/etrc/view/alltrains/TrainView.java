@@ -877,6 +877,7 @@ public class TrainView extends JPanel {
 		private static final long serialVersionUID = 2242015871442153005L;
 
 		public TrainTable() {
+			super(__("train table"));
 			setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		}
 

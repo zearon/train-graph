@@ -91,7 +91,7 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 		
 		Integer val = (Integer) getValueAt(row, column);
 		val = val + increment;
-		setValueAt(val, row, column);		
+		_setValueAt(val, row, column);		
 		fireTableCellUpdated(row, column);
 		
 		return true;
@@ -104,7 +104,7 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 		String timeStr = (String) getValueAt(row, column);
 		timeStr = increaseTime(timeStr, increment);
 		
-		setValueAt(timeStr, row, column);		
+		_setValueAt(timeStr, row, column);		
 		fireTableCellUpdated(row, column);
 		
 		return true;
@@ -147,7 +147,7 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 		/* Do not need to set the value, since the object reference keep 
 		 * unchanged. Only its fields get changed.
 		 */
-		//		setValueAt(stop, row, column);
+		//		_setValueAt(stop, row, column);
 		fireTableCellUpdated(row, column);
 		
 		return true;

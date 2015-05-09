@@ -6,6 +6,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelListener;
 
 import org.paradise.etrc.view.widget.JEditTable;
+import static org.paradise.etrc.ETRC.__;
 
 public class RailroadLineTable extends JEditTable {
 		/**
@@ -14,6 +15,7 @@ public class RailroadLineTable extends JEditTable {
 		private static final long serialVersionUID = -3790451911367790284L;
 
 		public RailroadLineTable() {
+			super(__("railroad line table"));
 			setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 //			setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		}

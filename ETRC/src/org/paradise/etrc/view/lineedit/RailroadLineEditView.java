@@ -51,6 +51,7 @@ import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.CircuitMakeDialog;
 import org.paradise.etrc.dialog.InfoDialog;
 import org.paradise.etrc.dialog.MessageBox;
@@ -149,7 +150,7 @@ public class RailroadLineEditView extends JPanel {
 			File f = chooser.getSelectedFile();
 			// System.out.println(f);
 
-			RailroadLine c = new RailroadLine();
+			RailroadLine c = TrainGraphFactory.createInstance(RailroadLine.class);
 			try {
 				c.loadFromFile2(f.getAbsolutePath());
 				mainFrame.prop.setProperty(
@@ -211,7 +212,7 @@ public class RailroadLineEditView extends JPanel {
 				String line = null;
 				while ((line = in.readLine()) != null) {
 					if (line.equalsIgnoreCase(RailroadLineChart.circuitPattern)) {
-						circuit = new RailroadLine();
+						circuit = TrainGraphFactory.createInstance(RailroadLine.class);
 						loadedCircuits.add(circuit);
 						lineNum = 0;
 					} else {
@@ -1021,7 +1022,9 @@ public class RailroadLineEditView extends JPanel {
 		int dist = cir.getStation(selectedIndex).dist;
 		int level = cir.getStation(selectedIndex).level;
 		boolean hide = false;
-		cir.insertStation(new Station(name, dist, level, hide), selectedIndex);
+		cir.insertStation(TrainGraphFactory.createInstance(Station.class, name)
+				.setProperties(dist, level, hide), 
+				selectedIndex);
 		// System.out.println(cir);
 
 		stationTable.revalidate();
@@ -1042,7 +1045,8 @@ public class RailroadLineEditView extends JPanel {
 		int dist = cir.getStation(selectedIndex).dist;
 		int level = cir.getStation(selectedIndex).level;
 		boolean hide = false;
-		cir.insertStation(new Station(name, dist, level, hide),
+		cir.insertStation(TrainGraphFactory.createInstance(Station.class, name)
+				.setProperties(dist, level, hide),
 				selectedIndex + 1);
 		// System.out.println(cir);
 
@@ -1052,7 +1056,8 @@ public class RailroadLineEditView extends JPanel {
 
 	private void doCircutis_AddCircuit() {
 		// Add a circuit
-		RailroadLine newCircuit = new RailroadLine("New Circuit " + circuitNum++);
+		RailroadLine newCircuit = TrainGraphFactory.createInstance(RailroadLine.class, 
+				"New Circuit " + circuitNum++);
 		railroadLineTableModel.raillines.add(newCircuit.copy());
 
 		int circuitIndex = railroadLineTableModel.raillines.size() - 1;
@@ -1143,7 +1148,8 @@ public class RailroadLineEditView extends JPanel {
 
 	private void doCircuits_NewCircuit() {
 		// Create new circuits with only one circuit
-		RailroadLine newCircuit = new RailroadLine("New Circuit " + circuitNum++);
+		RailroadLine newCircuit = TrainGraphFactory.createInstance(RailroadLine.class,
+				"New Circuit " + circuitNum++);
 		railroadLineTableModel.raillines.clear();
 		railroadLineTableModel.raillines.add(newCircuit);
 		railroadLineTable.updateUI();
@@ -1257,9 +1263,9 @@ public class RailroadLineEditView extends JPanel {
 	}
 
 	private void doCircuits_Complete() {
-		mainFrame.chart.allCircuits.clear();
-		mainFrame.chart.allCircuits.addAll(railroadLineTableModel.raillines);
-		mainFrame.chart.railroadLine = railroadLineTableModel.raillines.get(0);
+		mainFrame.currentLineChart.allCircuits.clear();
+		mainFrame.currentLineChart.allCircuits.addAll(railroadLineTableModel.raillines);
+		mainFrame.currentLineChart.railroadLine = railroadLineTableModel.raillines.get(0);
 		
 		mainFrame.trainGraph.railNetwork.replaceAllRailroadLines(
 				railroadLineTableModel.raillines);

@@ -99,33 +99,33 @@ public class ControlPanel extends JPanel {
 
 	private int[] minuteGrids = {20,10,10,10,10,5,5,5,5,5};
 	private void increaseMinuteGap(int i) {
-		chartView.mainFrame.chart.minuteScale += i;
+		chartView.mainFrame.currentLineChart.minuteScale += i;
 		
-		if(chartView.mainFrame.chart.minuteScale > RailroadLineChart.MAX_MINUTE_SCALE) {
-			chartView.mainFrame.chart.minuteScale = RailroadLineChart.MAX_MINUTE_SCALE;
+		if(chartView.mainFrame.currentLineChart.minuteScale > RailroadLineChart.MAX_MINUTE_SCALE) {
+			chartView.mainFrame.currentLineChart.minuteScale = RailroadLineChart.MAX_MINUTE_SCALE;
 			return;
 		}
 		
-		if(chartView.mainFrame.chart.minuteScale < 1) {
-			chartView.mainFrame.chart.minuteScale = 1;
+		if(chartView.mainFrame.currentLineChart.minuteScale < 1) {
+			chartView.mainFrame.currentLineChart.minuteScale = 1;
 			return;
 		}
 		
-		chartView.mainFrame.chart.timeInterval = minuteGrids[chartView.mainFrame.chart.minuteScale-1];
+		chartView.mainFrame.currentLineChart.timeInterval = minuteGrids[chartView.mainFrame.currentLineChart.minuteScale-1];
 		chartView.resetSize();
 		chartView.panelLines.updateBuffer();
 	}
 
 	private void increaseDistGap(int i) {
-		chartView.mainFrame.chart.distScale += i;
+		chartView.mainFrame.currentLineChart.distScale += i;
 		
-		if(chartView.mainFrame.chart.distScale > RailroadLineChart.MAX_DIST_SCALE) {
-			chartView.mainFrame.chart.distScale = RailroadLineChart.MAX_DIST_SCALE;
+		if(chartView.mainFrame.currentLineChart.distScale > RailroadLineChart.MAX_DIST_SCALE) {
+			chartView.mainFrame.currentLineChart.distScale = RailroadLineChart.MAX_DIST_SCALE;
 			return;
 		}
 		
-		if(chartView.mainFrame.chart.distScale < 1) {
-			chartView.mainFrame.chart.distScale = 1;
+		if(chartView.mainFrame.currentLineChart.distScale < 1) {
+			chartView.mainFrame.currentLineChart.distScale = 1;
 			return;
 		}
 

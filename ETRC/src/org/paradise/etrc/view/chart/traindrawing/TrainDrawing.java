@@ -77,7 +77,7 @@ public void rebuild() {
 }
 
   private void buildUp() {
-	RailroadLineChart chart = chartView.mainFrame.chart;
+	RailroadLineChart chart = chartView.mainFrame.currentLineChart;
     int direction = train.isDownTrain(chart.railroadLine);
     String trainName = getTrainName();
 
@@ -96,8 +96,8 @@ public void rebuild() {
       String leaveClock = drawStops[i].leave;
       int x1 = chartView.getPelsX(leaveClock);
 
-      int y0 = chartView.getPelsY(drawStops[i].stationName);
-      int y1 = chartView.getPelsY(drawStops[i].stationName);
+      int y0 = chartView.getPelsY(drawStops[i].name);
+      int y1 = chartView.getPelsY(drawStops[i].name);
 
       ChartPoint p0 = new ChartPoint(this, x0, y0, ChartPoint.STOP_ARRIVE, drawStops[i].isPassenger);
       ChartPoint p1 = new ChartPoint(this, x1, y1, ChartPoint.STOP_LEAVE, drawStops[i].isPassenger);
@@ -105,7 +105,7 @@ public void rebuild() {
       //第一个停站的到达点，判断p0是入图还是始发
       if (i == 0) {
         //始发
-        if (drawStops[i].stationName.equalsIgnoreCase(train.getStartStation())) {
+        if (drawStops[i].name.equalsIgnoreCase(train.getStartStation())) {
           p0.type = ChartPoint.START;
           firstRect = new TrainNameRect(p0, trainName, direction);
         }
@@ -119,7 +119,7 @@ public void rebuild() {
       //最后一个停站的出发点，判断p1是出图还是终到
       if (i == drawStops.length - 1) {
         //终到
-        if (drawStops[i].stationName.equalsIgnoreCase(train.getTerminalStation())) {
+        if (drawStops[i].name.equalsIgnoreCase(train.getTerminalStation())) {
           p1.type = ChartPoint.TERMINAL;
           lastRect = new TrainNameRect(p1, trainName, direction);
         }
@@ -157,7 +157,7 @@ public void rebuild() {
         if (chartView.getPelsX(drawStops[i + 1].arrive) < x1) {
           int x2 = chartView.getPelsX(drawStops[i + 1].arrive) +
               24 * 60 * chart.minuteScale;
-          int y2 = chartView.getPelsY(drawStops[i + 1].stationName);
+          int y2 = chartView.getPelsY(drawStops[i + 1].name);
 
           //计算右边界点坐标
           int bx = chartView.getPelsX(24 * 60);
@@ -358,7 +358,7 @@ public void rebuild() {
   }
 
   String getTrainName() {
-    return train.getTrainName(chartView.mainFrame.chart.railroadLine);
+    return train.getTrainName(chartView.mainFrame.currentLineChart.railroadLine);
   }
 
   /**
@@ -406,9 +406,9 @@ public void rebuild() {
     if(min < 0)
       min += 24*60;
 
-	RailroadLineChart chart = chartView.mainFrame.chart;
-    int dist = Math.abs(chart.railroadLine.getStationDist(stop[0].stationName)
-                      - chart.railroadLine.getStationDist(stop[stop.length-1].stationName));
+	RailroadLineChart chart = chartView.mainFrame.currentLineChart;
+    int dist = Math.abs(chart.railroadLine.getStationDist(stop[0].name)
+                      - chart.railroadLine.getStationDist(stop[stop.length-1].name));
     
     if(min == 0)
     	return train.getTrainName() + "Error!";

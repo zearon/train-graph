@@ -158,7 +158,8 @@ public class Navigator extends JTree {
 			railroadLinesNode.add(nodeInRailroadLines);
 			
 			timeTableNodes.forEach(timeTableNode -> {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(line);
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(
+						line);
 				railroadLineTimeTableNodes.add(node);
 				timeTableNode.add(node);
 				

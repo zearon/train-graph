@@ -103,22 +103,22 @@ public class FindTrainsDialog extends JDialog {
 	class LoadingThread implements Runnable {
 		public void run() {
 			hold(500);
-			mainFrame.chart.clearTrains();
+			mainFrame.currentLineChart.clearTrains();
 			mainFrame.chartView.repaint();
 			
 			msgLabel.setText(__("Please wait while imporing train information..."));
 			
 			ETRCSKB skb = mainFrame.getSKB();
-			List<Train> trains = skb.findTrains(mainFrame.chart.allCircuits.stream());		//skb.findTrains(mainFrame.chart.trunkCircuit);
+			List<Train> trains = skb.findTrains(mainFrame.currentLineChart.allCircuits.stream());		//skb.findTrains(mainFrame.chart.trunkCircuit);
 
 			Instant instant1 = null, instant2 = null;
 			if (DEBUG())
 				instant1= Instant.now();
 			
 			trains.stream().parallel()
-				.filter(train-> (train.isDownTrain(mainFrame.chart.railroadLine) > 0))
+				.filter(train-> (train.isDownTrain(mainFrame.currentLineChart.railroadLine) > 0))
 				.forEach(train-> {
-					mainFrame.chart.addTrain(train);
+					mainFrame.currentLineChart.addTrain(train);
 					msgLabel.setText(String.format(__("Importing train information %s"), train.getTrainName()));
 				});
 			

@@ -1,6 +1,7 @@
 package org.paradise.etrc.data.skb;
 
 import static org.paradise.etrc.ETRCUtil.*;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -20,6 +21,7 @@ import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraphFactory;
 
 public class ETRCSKB {
 	private String path;
@@ -243,7 +245,7 @@ public class ETRCSKB {
 	 * @return
 	 */
 	private Train getTrainByFullName(String trainName) {
-		Train train = new Train();
+		Train train = TrainGraphFactory.createInstance(Train.class);
 		
 		Enumeration<String []> en = tk.elements();
 		while(en.hasMoreElements()) {
@@ -286,9 +288,9 @@ public class ETRCSKB {
 		
 //		train.startStation = train.stops[0].stationName;
 //		train.terminalStation = train.stops[train.stopNum - 1].stationName;
-		train.trainNameFull = trainName;
+		train.name = trainName;
 		
-		String names[] = train.trainNameFull.split("/");
+		String names[] = train.name.split("/");
 		for(int i=0; i<names.length; i++) {
 			if(names[i].endsWith("A") || names[i].endsWith("B"))
 				names[i] = names[i].substring(0, names[i].length()-1);
@@ -317,7 +319,7 @@ public class ETRCSKB {
 			
 //			System.out.println(data.findTrains("南通"));
 			
-			RailroadLine cir = new RailroadLine();
+			RailroadLine cir = TrainGraphFactory.createInstance(RailroadLine.class); //new RailroadLine();
 			cir.loadFromFile2("C:\\trains\\沪杭线.cir");
 			Vector<Train> trains = data.findTrains(cir);
 			System.out.println("沪杭线：" + trains.size() + "\r\n");

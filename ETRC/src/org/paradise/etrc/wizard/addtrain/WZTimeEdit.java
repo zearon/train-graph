@@ -19,6 +19,7 @@ import javax.swing.text.DefaultCaret;
 
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.wizard.WizardDialog;
 
 public class WZTimeEdit extends WizardDialog {
@@ -85,7 +86,8 @@ public class WZTimeEdit extends WizardDialog {
 					table.getCellEditor().stopCellEditing();
 
 				int row = table.getSelectedRow();
-				model.myTrain.insertStop(new Stop(__("Station"), "00:00", "00:00", false), row);
+				model.myTrain.insertStop(TrainGraphFactory.createInstance(Stop.class, __("Station"))
+						.setProperties("00:00", "00:00", false), row);
 				model.fireTableDataChanged();
 				
 				table.getSelectionModel().setSelectionInterval(row, row);
@@ -97,7 +99,8 @@ public class WZTimeEdit extends WizardDialog {
 					table.getCellEditor().stopCellEditing();
 
 				int row = table.getSelectedRow() + 1;
-				model.myTrain.insertStop(new Stop(__("Station"), "00:00", "00:00", false), row);
+				model.myTrain.insertStop(TrainGraphFactory.createInstance(Stop.class, __("Station"))
+						.setProperties("00:00", "00:00", false), row);
 				model.fireTableDataChanged();
 				
 				table.getSelectionModel().setSelectionInterval(row, row);

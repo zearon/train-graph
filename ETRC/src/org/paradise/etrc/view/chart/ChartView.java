@@ -85,8 +85,8 @@ public class ChartView extends JPanel {
 
 	public ChartView(MainFrame _mainFrame) {
 		mainFrame = _mainFrame;
-		panelCircuit = new CircuitPanel(mainFrame.chart, this);
-		panelClock = new ClockPanel(mainFrame.chart, this);
+		panelCircuit = new CircuitPanel(mainFrame.currentLineChart, this);
+		panelClock = new ClockPanel(mainFrame.currentLineChart, this);
 		panelLines = new LinesPanel(this);
 		
 		try {
@@ -129,7 +129,7 @@ public class ChartView extends JPanel {
 		
 		// 设置MainFrame的标题和ToolTip
 		if (activeTrain != null) {
-			mainFrame.setActiceTrainName(activeTrain.getTrainName(mainFrame.chart.railroadLine));
+			mainFrame.setActiceTrainName(activeTrain.getTrainName(mainFrame.currentLineChart.railroadLine));
 			//ADD For SheetView
 			mainFrame.sheetView.selectTrain(activeTrain);
 			//打开ToolTip
@@ -153,7 +153,7 @@ public class ChartView extends JPanel {
 			return;
 		}
 		
-		drawingModel.updateCurrentCircuit(mainFrame.chart, mainFrame.chart.railroadLine, this);
+		drawingModel.updateCurrentCircuit(mainFrame.currentLineChart, mainFrame.currentLineChart.railroadLine, this);
 		drawingModel.updateUpDownTrainOption(showUpDownState);
 		drawingModel.setActiveTrain(activeTrain, showUpDownState);
 	}
@@ -175,7 +175,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getPelsX(int coordinate) {
-		return coordinate * mainFrame.chart.minuteScale + leftMargin;
+		return coordinate * mainFrame.currentLineChart.minuteScale + leftMargin;
 	}
 
 	/**
@@ -193,7 +193,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getPelsY(int dist) {
-		return Math.round(dist * mainFrame.chart.distScale) + topMargin;
+		return Math.round(dist * mainFrame.currentLineChart.distScale) + topMargin;
 	}
 
 	/**
@@ -202,7 +202,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getPelsY(String stationName) {
-		return getPelsY(mainFrame.chart.railroadLine.getStationDist(stationName));
+		return getPelsY(mainFrame.currentLineChart.railroadLine.getStationDist(stationName));
 	}
 
 	/**
@@ -211,15 +211,15 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getDist(int py) {
-		return Math.round((py - topMargin) / mainFrame.chart.distScale);
+		return Math.round((py - topMargin) / mainFrame.currentLineChart.distScale);
 	}
 
 	public String getStationName(int py) {
-		return mainFrame.chart.railroadLine.getStationName(getDist(py));
+		return mainFrame.currentLineChart.railroadLine.getStationName(getDist(py));
 	}
 
 	public int getMinute(int px) {
-		return (px - leftMargin) / mainFrame.chart.minuteScale;
+		return (px - leftMargin) / mainFrame.currentLineChart.minuteScale;
 	}
 
 	/**
@@ -234,7 +234,7 @@ public class ChartView extends JPanel {
 //		int h = time.getHours() - mainFrame.chart.startHour;
 		try {
 		int h = Integer.parseInt(time.split(":")[0]) 
-				- mainFrame.chart.startHour;
+				- mainFrame.currentLineChart.startHour;
 		if (h < 0)
 			h += 24;
 
@@ -338,20 +338,20 @@ public class ChartView extends JPanel {
 	}
 
 	public void setCoordinateCorner(Point p) {
-		int dist = Math.round((p.y - topMargin) / mainFrame.chart.distScale);
-		int minutes = (p.x - leftMargin) / mainFrame.chart.minuteScale;
+		int dist = Math.round((p.y - topMargin) / mainFrame.currentLineChart.distScale);
+		int minutes = (p.x - leftMargin) / mainFrame.currentLineChart.minuteScale;
 		cornerCoordinate.setText("(" + getClockString(minutes) + ","
 				+ getDistString(dist) + ")");
-		mainFrame.statusBarMain.setText(mainFrame.chart.railroadLine.getStationName(dist, true));
+		mainFrame.statusBarMain.setText(mainFrame.currentLineChart.railroadLine.getStationName(dist, true));
 	}
 
 	public String getDistString(Point p) {
-		int dist = Math.round((p.y - topMargin) / mainFrame.chart.distScale);
+		int dist = Math.round((p.y - topMargin) / mainFrame.currentLineChart.distScale);
 		return getDistString(dist);
 	}
 	
 	public String getClockString(Point p) {
-		int minutes = (p.x - leftMargin) / mainFrame.chart.minuteScale;
+		int minutes = (p.x - leftMargin) / mainFrame.currentLineChart.minuteScale;
 		return getClockString(minutes);
 	}
 
@@ -359,7 +359,7 @@ public class ChartView extends JPanel {
 		if (distUpDownState == SHOW_DOWN)
 			return "" + dist;
 		else
-			return "" + (mainFrame.chart.railroadLine.length - dist);
+			return "" + (mainFrame.currentLineChart.railroadLine.length - dist);
 	}
 	
 	private String getClockString(int minutes) {
@@ -372,7 +372,7 @@ public class ChartView extends JPanel {
 		String strMinute = clockMinute < 10 ? "0" + clockMinute : ""
 				+ clockMinute;
 
-		int clockHour = mainFrame.chart.startHour + hours;
+		int clockHour = mainFrame.currentLineChart.startHour + hours;
 		if (clockHour < 0)
 			clockHour += 24;
 		if (clockHour >= 24)
@@ -443,12 +443,12 @@ public class ChartView extends JPanel {
 	 * 取在图chart上画的停站
 	 */
 	public Stop[] getDrawStops(Train train) {
-		RailroadLine circuit = mainFrame.chart.railroadLine;
+		RailroadLine circuit = mainFrame.currentLineChart.railroadLine;
 		Stop[] drawStops = new Stop[circuit.getStationNum()];
 
 		int iDraw = 0;
 		for (int i = 0; i < train.getStopNum(); i++) {
-			if (circuit.getStationDist(train.getStop(i).stationName) >= 0) {
+			if (circuit.getStationDist(train.getStop(i).name) >= 0) {
 				drawStops[iDraw] = train.getStop(i);
 				iDraw++;
 			}
@@ -466,7 +466,7 @@ public class ChartView extends JPanel {
 		Stop[] drawStops = getDrawStops(train);
 
 		for (int i = 0; i < drawStops.length; i++) {
-			if (drawStops[i].stationName.equalsIgnoreCase(stationName))
+			if (drawStops[i].name.equalsIgnoreCase(stationName))
 				return i;
 		}
 
@@ -526,8 +526,8 @@ public class ChartView extends JPanel {
 
 	public void setActiveSation(int y) {
 		int dist = this.getDist(y);
-		int index = mainFrame.chart.railroadLine.getStationIndex(dist);
-		setActiveStation(mainFrame.chart.railroadLine.getStation(index));
+		int index = mainFrame.currentLineChart.railroadLine.getStationIndex(dist);
+		setActiveStation(mainFrame.currentLineChart.railroadLine.getStation(index));
 	}
 	
 	public void setActiveStation(Station station) {
@@ -547,7 +547,7 @@ public class ChartView extends JPanel {
 	}
 
 	public void addTrain(Train train) {
-		mainFrame.chart.addTrain(train);
+		mainFrame.currentLineChart.addTrain(train);
 		mainFrame.sheetView.updateData();
 		
 		this.setActiveTrain(train);

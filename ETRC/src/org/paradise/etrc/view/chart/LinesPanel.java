@@ -40,6 +40,7 @@ import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.slice.ChartSlice;
@@ -79,7 +80,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 
 	public LinesPanel(ChartView _mainView) {
 		chartView = _mainView;
-		chartView.mainFrame.chart.addChartChangedListener(chart->this.updateBuffer());
+		chartView.mainFrame.currentLineChart.addChartChangedListener(chart->this.updateBuffer());
 		
 		try {
 			jbInit();
@@ -289,7 +290,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 			drawClockLine(g, i);
 		}
 
-		RailroadLineChart chart = chartView.mainFrame.chart;
+		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
 		if (chart.railroadLine != null) {
 			for (int i = 0; i < chart.railroadLine.getStationNum(); i++) {
 				drawStationLine(g, chart.railroadLine.getStation(i), chart.distScale);
@@ -351,7 +352,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	}
 
 	public Dimension getPreferredSize() {
-		RailroadLineChart chart = chartView.mainFrame.chart;
+		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
 		int w, h;
 		
 		w = 60 * 24 * chart.minuteScale 
@@ -369,7 +370,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	}
 	
 	public void getBuffersize(int[] widthNHeight) {
-		RailroadLineChart chart = chartView.mainFrame.chart;
+		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
 		int w, h;
 		
 		w = 60 * 24 * 3//Chart.MAX_MINUTE_SCALE 
@@ -398,7 +399,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		Color oldColor = g.getColor();
 		g.setColor(chartView.gridColor);
 
-		RailroadLineChart chart = chartView.mainFrame.chart;
+		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
 		int start = clock * 60 * chart.minuteScale + chartView.leftMargin;
 		int h = Math.round(chart.railroadLine.length * chart.distScale);
 		
@@ -434,7 +435,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		if (st.hide)
 			return;
 
-		RailroadLineChart chart = chartView.mainFrame.chart;
+		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
 
 		// 设置坐标线颜色
 		Color oldColor = g.getColor();
@@ -505,7 +506,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		Train nearTrain[] = findTrains(p);
 		for (int i = 0; i < nearTrain.length; i++)
 			chartView.mainFrame.statusBarMain.setText(
-					nearTrain[i].getTrainName(chartView.mainFrame.chart.railroadLine) + "次 " 
+					nearTrain[i].getTrainName(chartView.mainFrame.currentLineChart.railroadLine) + "次 " 
 					+ chartView.mainFrame.statusBarMain.getText());
 	}
 
@@ -562,8 +563,9 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 				theTrain.setLeave(staName, theTime);
 		}
 		else {
-			Stop stop = new Stop(staName, theTime, theTime, false);
-			chartView.mainFrame.chart.insertNewStopToTrain(theTrain, stop);
+			Stop stop = TrainGraphFactory.createInstance(Stop.class, staName)
+					.setProperties(theTime, theTime, false);
+			chartView.mainFrame.currentLineChart.insertNewStopToTrain(theTrain, stop);
 //			Stop prevStop = chartView.mainFrame.chart.findPrevStop(theTrain, stop.stationName);
 //			if(prevStop == null)
 //				theTrain.appendStop(stop);
@@ -667,7 +669,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	}
 
 	private void doDeleteActiveTrain() {
-		RailroadLineChart chart = chartView.mainFrame.chart;
+		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
 		chart.delTrain(chartView.activeTrain);
 		chartView.setActiveTrain(null);
 		chartView.mainFrame.sheetView.updateData();
@@ -846,7 +848,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		MenuItem miTrainSlice = new MenuItem(__("Train Slice"));
 		miTrainSlice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new ChartSlice(chartView.mainFrame.chart).makeTrainSlice(chartView.activeTrain);
+				new ChartSlice(chartView.mainFrame.currentLineChart).makeTrainSlice(chartView.activeTrain);
 			}
 		});
 		/*		MenuItem miSaveAs = new MenuItem("另存为...");
@@ -877,10 +879,10 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 			if(train == null)
 				return;
 			
-			RailroadLineChart chart = chartView.mainFrame.chart;
+			RailroadLineChart chart = chartView.mainFrame.currentLineChart;
 			if(chart.containTrain(train)) {
 				if(new YesNoBox(chartView.mainFrame, String.format(__("Train %s is already in the graph, overwrite?"), train.getTrainName())).askForYes()) {
-					chartView.mainFrame.chart.delTrain(train);
+					chartView.mainFrame.currentLineChart.delTrain(train);
 					chartView.addTrain(train);
 				}
 			}

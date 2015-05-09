@@ -9,17 +9,10 @@ import org.paradise.etrc.data.util.Tuple;
 
 public class RailNetworkChart 
 extends TrainGraphPart<RailNetworkChart, RailroadLineChart> {
-
-	public String name;
-	
-	public transient int id;
-	protected static int idCount = 0;
 	
 	protected Vector<RailroadLineChart> railLineCharts = new Vector<RailroadLineChart> ();
 	
-	public RailNetworkChart() {
-		id = ++ idCount;
-		name = String.format(__("Train Graph %d"), id);
+	RailNetworkChart() {
 	}
 	
 	public Vector<RailroadLineChart> getRailLineCharts() {
@@ -52,6 +45,9 @@ extends TrainGraphPart<RailNetworkChart, RailroadLineChart> {
 	protected String getStartSectionString() { return START_SECTION_RAILNETWORK_CHART; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_RAILNETWORK_CHART; }
+	@Override String createTGPNameById(int id) { 
+		return String.format(__("Timetable v%d"), id);
+	}
 	@Override
 	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
 		return RailNetworkChart::new;

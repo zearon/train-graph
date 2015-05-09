@@ -43,7 +43,7 @@ public class SheetTable extends JEditTable {
 		getTableHeader().setFont(new Font("Dialog", 0, 12));
 
 		//设置数据
-		setModel(new SheetModel(sheetView.mainFrame.chart));
+		setModel(new SheetModel(sheetView.mainFrame.currentLineChart));
 
 		//设置渲染器
 		setDefaultRenderer(Stop.class, new SheetCellRanderer());
@@ -123,9 +123,9 @@ public class SheetTable extends JEditTable {
 //							   + sheetView.mainFrame.chart.circuit.name
 //							   + " 所有车站的停靠、通过（推算）时刻表。 ").showMessage();
 					
-					Train train = sheetView.mainFrame.chart.findTrain(trainName);
+					Train train = sheetView.mainFrame.currentLineChart.findTrain(trainName);
 
-					new ChartSlice(sheetView.mainFrame.chart).makeTrainSlice(train);
+					new ChartSlice(sheetView.mainFrame.currentLineChart).makeTrainSlice(train);
 				}
 			}
 		});

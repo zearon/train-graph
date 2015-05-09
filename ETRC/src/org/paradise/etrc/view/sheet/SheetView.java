@@ -81,7 +81,7 @@ public class SheetView extends JPanel {
 //	}
 		
 	private JList<?> buildeRowHeader(final JTable table) {
-		RowHeaderModel listModel = new RowHeaderModel(mainFrame.chart);
+		RowHeaderModel listModel = new RowHeaderModel(mainFrame.currentLineChart);
         JList<?> rowHeader = new JList<Object>(listModel);
         rowHeader.setFixedCellWidth(80);
         rowHeader.setFixedCellHeight(table.getRowHeight());
@@ -96,12 +96,12 @@ public class SheetView extends JPanel {
 				if(me.getClickCount() >= 2 && me.getButton() == MouseEvent.BUTTON1) {
 					String rowHeaderName = (String) ((JList<?>)me.getSource()).getSelectedValue();
 					String staName = rowHeaderName.substring(0, rowHeaderName.length()-3);
-					Station station = mainFrame.chart.railroadLine.getStation(staName);
+					Station station = mainFrame.currentLineChart.railroadLine.getStation(staName);
 //					new MessageBox(mainFrame, "TODO: 给出 "
 //							   + station.name
 //							   + "站 所有列车停靠、通过（推算）时刻表。 ").showMessage();
 					
-					new ChartSlice(mainFrame.chart).makeStationSlice(station);
+					new ChartSlice(mainFrame.currentLineChart).makeStationSlice(station);
 				}
 			}
         });
@@ -118,7 +118,7 @@ public class SheetView extends JPanel {
 	}
 
 	public void selectStation(Station station) {
-		RailroadLine circuit = mainFrame.chart.railroadLine;
+		RailroadLine circuit = mainFrame.currentLineChart.railroadLine;
 		for(int i=0; i<circuit.getStationNum(); i++) {
 			if(station.equals(circuit.getStation(i)))
 				rowHeader.setSelectedIndex(i*2);
@@ -127,7 +127,7 @@ public class SheetView extends JPanel {
 	
 	public void selectTrain(Train train) {
 		for(int i=0; i<table.getColumnCount(); i++) {
-			if(table.getColumnName(i).equals(train.getTrainName(mainFrame.chart.railroadLine))) {
+			if(table.getColumnName(i).equals(train.getTrainName(mainFrame.currentLineChart.railroadLine))) {
 				int row = table.getSelectedRow();
 				table.changeSelection(row, i, false, false);
 				table.editCellAt(row, i);
@@ -144,7 +144,7 @@ public class SheetView extends JPanel {
 	}
 
 	public void updateData() {
-		conner.setText("D:" + mainFrame.chart.dNum + " U:" + mainFrame.chart.uNum + "");
+		conner.setText("D:" + mainFrame.currentLineChart.dNum + " U:" + mainFrame.currentLineChart.uNum + "");
 		
 		SheetModel model = (SheetModel) table.getModel();
 		model.fireTableDataChanged();

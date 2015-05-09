@@ -439,7 +439,7 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	}
 
 	private void insertNewStopToTrainUp(Train theTrain, Stop stop) {
-		int newDist = this.railroadLine.getStationDist(stop.stationName);
+		int newDist = this.railroadLine.getStationDist(stop.name);
 		
 		//不在本线 返回 null
 		if(newDist < 0)
@@ -468,8 +468,8 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
 		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).stationName);
-			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).stationName);
+			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).name);
+			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).name);
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
@@ -479,7 +479,7 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	}
 
 	private void insertNewStopToTrainDown(Train theTrain, Stop stop) {
-		int newDist = this.railroadLine.getStationDist(stop.stationName);
+		int newDist = this.railroadLine.getStationDist(stop.name);
 		
 		//不在本线 返回 null
 		if(newDist < 0)
@@ -510,8 +510,8 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
 		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).stationName);
-			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).stationName);
+			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).name);
+			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).name);
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
@@ -639,7 +639,7 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	@Override
 	protected Vector<TrainRef> getTGPElements() {
 		trainRefs.clear();
-		trains.stream().map(train->new TrainRef(train.trainNameFull))
+		trains.stream().map(train->new TrainRef(train.name))
 			.forEachOrdered(trainRefs::add);
 		return trainRefs;
 	}

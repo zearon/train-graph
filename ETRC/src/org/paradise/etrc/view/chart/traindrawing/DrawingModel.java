@@ -93,12 +93,12 @@ public class DrawingModel {
 				break;
 			case Train.UP_TRAIN:
 				upTrainDrawings.add(trainDrawing);
-				upTrainNames.add(train.trainNameFull);
+				upTrainNames.add(train.name);
 				upTrainNames.add(train.trainNameUp);
 				break;
 			case Train.DOWN_TRAIN:
 				downTrainDrawings.add(trainDrawing);
-				downTrainNames.add(train.trainNameFull);
+				downTrainNames.add(train.name);
 				downTrainNames.add(train.trainNameDown);
 				break;
 			default:
@@ -115,10 +115,10 @@ public class DrawingModel {
 				activeTrainDrawing.setUnderDrawing(true);
 				break;
 			case ChartView.SHOW_UP:
-				activeTrainDrawing.setUnderDrawing(!upTrainNames.contains(activeTrainDrawing.train.trainNameFull));
+				activeTrainDrawing.setUnderDrawing(!upTrainNames.contains(activeTrainDrawing.train.name));
 				break;
 			case ChartView.SHOW_DOWN:
-				activeTrainDrawing.setUnderDrawing(!downTrainNames.contains(activeTrainDrawing.train.trainNameFull));
+				activeTrainDrawing.setUnderDrawing(!downTrainNames.contains(activeTrainDrawing.train.name));
 				break;
 			case ChartView.SHOW_ALL:
 				activeTrainDrawing.setUnderDrawing(false);

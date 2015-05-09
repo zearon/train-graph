@@ -55,7 +55,7 @@ public class CircuitPanel extends JPanel {
 					chartView.setActiveSation(e.getPoint().y + 12);
 					if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2)
 						if(chartView.activeStation != null)
-							new ChartSlice(chartView.mainFrame.chart).makeStationSlice(chartView.activeStation);
+							new ChartSlice(chartView.mainFrame.currentLineChart).makeStationSlice(chartView.activeStation);
 					chartView.panelLines.updateBuffer();
 				}
 			}

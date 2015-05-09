@@ -5,8 +5,9 @@ import java.util.function.Supplier;
 
 import org.paradise.etrc.data.util.Tuple;
 
+import static org.paradise.etrc.ETRC.__;
+
 public class Station extends TrainGraphPart<Station, NullPart> {
-	public String name = "";
 	public boolean hide = false;
 	public int level = 0;
 	public int dist = 0;
@@ -15,30 +16,35 @@ public class Station extends TrainGraphPart<Station, NullPart> {
 	public int scaledDist = 0;
 	public boolean isLoopStation = false;
 	
-	public Station() {}
+	Station() {}
 
-	public Station(String _name, int _dist, int _level, boolean _hide) {
+	protected Station(String _name) {
 		this();
-		name = _name;
-		level = _level;
-		dist = _dist;
-		hide = _hide;
+		setName(_name);
+	}
+	
+	/**
+	 * Set properties of the station object
+	 * @param dist
+	 * @param level
+	 * @param hide
+	 * @return current object, for convenience of link-style invocation
+	 */
+	public Station setProperties(int dist, int level, boolean hide) {
+		this.level = level;
+		this.dist = dist;
+		this.hide = hide;
+		
+		return this;
 	}
 
 	public Station copy() {
-		Station newStation = new Station(this.name, this.dist, this.level, this.hide);
+		Station newStation = new Station(this.name);
+		newStation.setProperties(this.dist, this.level, this.hide);
 		newStation.isCrossover = isCrossover;
 		newStation.scaledDist = scaledDist;
 		newStation.isLoopStation = isLoopStation;
 		return newStation;
-	}
-
-	public Station(String _name, int _dist, int _level) {
-		this(_name, _dist, _level, false);
-	}
-
-	public Station(String _name, int _dist) {
-		this(_name, _dist, 0, false);
 	}
 
 	public String getOneName() {
@@ -89,6 +95,10 @@ public class Station extends TrainGraphPart<Station, NullPart> {
 	protected String getStartSectionString() { return START_SECTION_STATION; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_STATION; }
+	@Override 
+	String createTGPNameById(int id) { 
+		return String.format(__("Station %d"), id);
+	}
 	@Override
 	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
 		return Station::new;

@@ -37,7 +37,7 @@ public class SheetModel extends DefaultJEditTableModel {
 
 	private Stop findStop(Train theTrain, String staName) {
 		for(int i=0; i<theTrain.getStopNum(); i++) {
-			if(theTrain.getStop(i).stationName.equalsIgnoreCase(staName)) {
+			if(theTrain.getStop(i).name.equalsIgnoreCase(staName)) {
 				return theTrain.getStop(i);
 			}
 		}
@@ -66,14 +66,14 @@ public class SheetModel extends DefaultJEditTableModel {
 		if(stop != null) {
 //			System.out.println(theTrain.trainNameFull + " VV " + stop.stationName + "|" + stop.arrive + "|" + stop.leave);
 			//stop的站名非空，表示原来就有这条数据
-			if(stop.stationName != null) {
+			if(stop.name != null) {
 				//到发点只要有一个为"DEL"就认为要删除这个停站
 				if(stop.arrive.equals("DEL") || stop.leave.equals("DEL"))
-					theTrain.delStop(stop.stationName);
+					theTrain.delStop(stop.name);
 			}
 			//stop站名为空，表示原来没有这条数据，是CellEditor接收到输入后new出来的新的停站数据
 			else {
-				stop.stationName = staName;
+				stop.name = staName;
 //				Stop prevStop = chart.findPrevStop(theTrain, stop.stationName);
 //				theTrain.insertStopAfter(prevStop, stop);
 				

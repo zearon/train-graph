@@ -66,13 +66,12 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 		Tuple<Class<? extends TrainGraphPart>, Supplier<? extends TrainGraphPart>>> _partClassMap = 
 			new HashMap<String, Tuple<Class<? extends TrainGraphPart>,Supplier<? extends TrainGraphPart>>> ();
 
-
-	public void prepareForFirstLoading() {		
-		_partClassMap.putIfAbsent(getStartSectionString().trim(), 
-				Tuple.of(getClass(), getConstructionFunc()) );
-		
-		_prepareForFirstLoading();
-	}
+	static HashMap<String, Integer> _objectIdMap = new HashMap<String, Integer> ();
+	
+	protected int _id;
+	public String name;
+	public String getName() { return name; }
+	public void setName(String name) { this.name = name; }
 	
 	/**************************************************************************
 	 * Methods need to be implemented.
@@ -80,8 +79,10 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	 **************************************************************************/
 	
 
+	
 	protected abstract String getStartSectionString();
 	protected abstract String getEndSectionString();
+	String createTGPNameById(int id) { return null; }
 	protected abstract Supplier<? extends TrainGraphPart> getConstructionFunc();	
 	public abstract void _prepareForFirstLoading();
 	
@@ -105,7 +106,17 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	protected abstract void loadComplete();
 	
 	/**************************End of Abstract Methods*********************/
-	
+
+	public void prepareForFirstLoading() {		
+		_partClassMap.putIfAbsent(getStartSectionString().trim(), 
+				Tuple.of(getClass(), getConstructionFunc()) );
+		_partClassMap.putIfAbsent(getClass().getName(), 
+				Tuple.of(getClass(), getConstructionFunc()) );
+		
+		_objectIdMap.putIfAbsent(getClass().getName(), 0);
+		
+		_prepareForFirstLoading();
+	}
 	
 	public void saveToFile(String fileName) throws IOException {
 		FileWriter writer = null;
@@ -180,29 +191,38 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 		return string;
 	}
 	
+//	/**
+//	 * 第一次调用本函数前,应先调用prepareForFirstLoading.
+//	 * @param fileName
+//	 * @return
+//	 * @throws IOException
+//	 */
+//	protected T _loadFromFile(String fileName) throws IOException {
+//		FileReader reader0 = null;
+//		try {
+//			reader0 = new FileReader(fileName);
+//			return (T) TrainGraphPart.loadFromReader(reader0, this.getClass(), this);
+//		} catch (IOException ioe) {
+//			throw ioe;
+//		} catch (Exception e) {
+//			throw new IOException("运行图文件格式错误!", e);
+//		} finally {
+//			if (reader0 != null) {
+//				try { reader0.close(); } catch (Exception e) {}
+//			}
+//		}
+//	}
+	
 	/**
-	 * 第一次调用本函数前,应先调用prepareForFirstLoading.
-	 * @param fileName
-	 * @return
+	 * Load a train graph part from a reader.
+	 * @param reader0
+	 * @param clazz The top level train graph part to be loaded.
+	 * @param loadingNode The top level train graph part instance to be loaded into.
+	 * Users should initialize or reset the instance by themsleves on need.
+	 * @return The loaded instance. 
 	 * @throws IOException
 	 */
-	public T loadFromFile(String fileName) throws IOException {
-		FileReader reader0 = null;
-		try {
-			reader0 = new FileReader(fileName);
-			return (T) TrainGraphPart.loadFromReader(reader0, this.getClass(), this);
-		} catch (IOException ioe) {
-			throw ioe;
-		} catch (Exception e) {
-			throw new IOException("运行图文件格式错误!", e);
-		} finally {
-			if (reader0 != null) {
-				try { reader0.close(); } catch (Exception e) {}
-			}
-		}
-	}
-	
-	public static TrainGraphPart loadFromReader(Reader reader0,
+	static TrainGraphPart loadFromReader(Reader reader0,
 			Class<? extends TrainGraphPart> clazz, TrainGraphPart loadingNode)
 			throws IOException {
 		

@@ -40,6 +40,7 @@ import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -57,10 +58,12 @@ import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
+import org.paradise.etrc.data.RailNetworkChart;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.skb.ETRCLCB;
 import org.paradise.etrc.data.skb.ETRCSKB;
 import org.paradise.etrc.dialog.AboutBox;
@@ -101,6 +104,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public JPanel raillineChartView;
 	public JSplitPane splitPaneV;
 	public JSplitPane splitPaneH;
+	
 	public ChartView chartView;
 	public DynamicView runView;
 	public SheetView sheetView;
@@ -110,7 +114,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 //	public J
 	
-	private RailroadLineEditView circuitEditDialog;
+//	private RailroadLineEditView circuitEditDialog;
 	
 	private boolean isShowRun = true;
 	
@@ -131,10 +135,11 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private static String Properties_File = "htrc.prop";
 	
 	public boolean isNewCircuit = false;
-	public RailroadLineChart chart;
 	private String railNetworkName;
 	
 	public TrainGraph trainGraph;
+	RailNetworkChart currentNetworkChart;
+	public RailroadLineChart currentLineChart;
 
 	private static final int MAX_TRAIN_SELECT_HISTORY_RECORD = 12;
 	public Vector<String> trainSelectHistory;
@@ -278,7 +283,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	public void doExit() {
-		if(chart != null)
+		if(currentLineChart != null)
 			if(new YesNoBox(this, __("The train graph is has changed.\nDo you want to save the changes?")).askForYes())
 				doSaveChart(); 
 		
@@ -491,6 +496,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public JToggleButton jtButtonDown;
 	public JToggleButton jtButtonShowRun;
 	public JToggleButton jtButtonUp;
+	public JToggleButton jtButtonShowWatermark;
 
 	private JToolBar loadToolBar() {
 		JToolBar jToolBar = new JToolBar();
@@ -547,10 +553,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		//上下行显示选择
 		ImageIcon imageDown = new ImageIcon(this.getClass().getResource("/pic/down.png"));
 		ImageIcon imageUp = new ImageIcon(this.getClass().getResource("/pic/up.png"));
+		ImageIcon imageWatermark = new ImageIcon(this.getClass().getResource("/pic/showAsWatermark.png"));
 		jtButtonDown = new JToggleButton(imageDown);
 		jtButtonUp = new JToggleButton(imageUp);
+		jtButtonShowWatermark = new JToggleButton(imageWatermark);
 		jtButtonUp.setToolTipText(__("Display Up-going Trains"));
 		jtButtonDown.setToolTipText(__("Display Down-going Trains"));
+		jtButtonShowWatermark.setToolTipText(__("Show undisplayed trains as watermarks"));
 		jtButtonDown.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				chartView.changeShowDown();
@@ -560,6 +569,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			public void actionPerformed(ActionEvent e) {
 				chartView.changShownUp();
 			}
+		});
+		jtButtonShowWatermark.addActionListener(e->{
+			if (jtButtonShowWatermark.isSelected())
+				chartView.underDrawingColor = ChartView.DEFAULT_UNDER_COLOR;
+			else
+				chartView.underDrawingColor = null;
+			
+			chartView.repaint();
 		});
 		
 		//读配置文件设置上下行状态按钮
@@ -582,6 +599,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		jToolBar.addSeparator();
 		jToolBar.add(jtButtonDown);
 		jToolBar.add(jtButtonUp);
+		jToolBar.add(jtButtonShowWatermark);
 		
 		//历史记录
 		cbTrainSelectHistory.setFont(new Font("Dialog", Font.PLAIN, 12));
@@ -722,32 +740,23 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 	private void initChart() {
 		File chartFile = new File(prop.getProperty(Prop_Working_Chart));
+
 		try {
-			chart = new RailroadLineChart(chartFile);
-		} catch (IOException e) {
-			System.out.println("Load old graph from last session failed, try to load the default graph.");
-			try {
-				chartFile = new File(Sample_Chart_File);
-				chart = new RailroadLineChart(chartFile);
-			} catch (IOException e1) {
-				new MessageBox(String.format(__("Load train graph failed, please check the %s file."), Sample_Chart_File)).showMessage();
-				doExit();
-			}
-		}
-		finally {
-			railNetworkName = chartFile.getName();
+			trainGraph = TrainGraphFactory.loadTrainGraphFromFile(
+					chartFile.getAbsolutePath());
 			prop.setProperty(Prop_Working_Chart, chartFile.getAbsolutePath());
-		}
-		
-		DEBUG("载入测试文件");
-		try {
-			trainGraph = new TrainGraph();
-			trainGraph.prepareForFirstLoading();
-			trainGraph.loadFromFile("/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test.test1");
-		} catch (IOException e) {
-			e.printStackTrace();
-			new MessageBox(String.format(__("Load train graph failed, please check the %s file."), Sample_Chart_File)).showMessage();
-			doExit();
+		} catch (IOException ioe) {
+			System.out.println("Load old graph from last session failed, try to load the default graph.");
+			new MessageBox(String.format(__("Load train graph failed. Use default graph. Please check the %s file."
+					+ "\nReason:%s\nDetail:%s"), Sample_Chart_File, ioe.getMessage(), 
+					ioe.getCause() )).showMessage();
+			
+			trainGraph = TrainGraphFactory.createDefaultTrainGraph();
+		} finally {
+			currentNetworkChart = trainGraph.getCharts().get(0);
+			currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
+			
+			railNetworkName = chartFile.getName();
 		}
 	}
 
@@ -902,7 +911,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	 * doClearChart
 	 */
 	private void doClearChart() {
-		chart.clearTrains();
+		currentLineChart.clearTrains();
 		chartView.repaint();
 		sheetView.updateData();
 		runView.refresh();
@@ -922,7 +931,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = chart.railroadLine.name + df.format(new Date());
+		String fileName = currentLineChart.railroadLine.name + df.format(new Date());
 		chooser.setSelectedFile(new File(fileName));
 
 		int returnVal = chooser.showSaveDialog(this); 
@@ -1013,7 +1022,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		}
 		else {
 			try {
-				chart.saveToFile(savingFile);
+				currentLineChart.saveToFile(savingFile);
 			} catch (IOException ex) {
 				System.err.println("Err:" + ex.getMessage());
 				this.statusBarMain.setText(__("Unable to save the graph."));
@@ -1053,7 +1062,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			//System.out.println(f);
 
 			try {
-				chart.saveToFile(f);
+				currentLineChart.saveToFile(f);
 				
 				setTitle();
 				prop.setProperty(Prop_Working_Chart, f.getAbsolutePath());
@@ -1089,7 +1098,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			System.out.println(f);
 
 			try {
-				chart.loadFromFile2(f);
+				currentLineChart.loadFromFile2(f);
 				chartView.updateData();
 				chartView.resetSize();
 
@@ -1142,7 +1151,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 			Train loadingTrain = null;
 			for (int j = 0; j < f.length; j++) {
-				loadingTrain = new Train();
+				loadingTrain = TrainGraphFactory.createInstance(Train.class);
 				try {
 					loadingTrain.loadFromFile2(f[j].getAbsolutePath());
 					prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
@@ -1161,15 +1170,15 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //							+ Train.toTrainFormat(loadingTrain.stops[i].leave)
 //							+ " 发");
 
-				if(loadingTrain.isDownTrain(chart.railroadLine, false) > 0)
-					chart.addTrain(loadingTrain);
+				if(loadingTrain.isDownTrain(currentLineChart.railroadLine, false) > 0)
+					currentLineChart.addTrain(loadingTrain);
 			}
 
 			//System.out.println("1.Move to: "+loadingTrain.getTrainName());
 			//mainView.buildTrainDrawings();
 			chartView.repaint();
 			sheetView.updateData();
-			chartView.findAndMoveToTrain(loadingTrain.getTrainName(chart.railroadLine));
+			chartView.findAndMoveToTrain(loadingTrain.getTrainName(currentLineChart.railroadLine));
 			runView.refresh();
 			//panelChart.panelLines.repaint();
 		}
@@ -1180,7 +1189,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	 * doDistSet
 	 */
 	private void doDistSet() {
-		DistSetDialog dlg = new DistSetDialog(this, chart);
+		DistSetDialog dlg = new DistSetDialog(this, currentLineChart);
 		Dimension dlgSize = dlg.getPreferredSize();
 		Dimension frmSize = getSize();
 		Point loc = getLocation();
@@ -1195,7 +1204,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	 * doTimeSet
 	 */
 	private void doTimeSet() {
-		TimeSetDialog dlg = new TimeSetDialog(this, chart);
+		TimeSetDialog dlg = new TimeSetDialog(this, currentLineChart);
 		Dimension dlgSize = dlg.getPreferredSize();
 		Dimension frmSize = getSize();
 		Point loc = getLocation();
@@ -1285,6 +1294,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 					NavigatorNodeType.ALL_TRAINS.name());
 			break;
 		case TIME_TABLE_LINE:
+			currentLineChart = (RailroadLineChart) params[0];
+			currentNetworkChart = (RailNetworkChart) params[1];
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.TIME_TABLE_LINE.name());
 			break;

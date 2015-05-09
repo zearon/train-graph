@@ -16,6 +16,7 @@ import javax.swing.table.TableCellEditor;
 
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraphFactory;
 
 public class SheetCellEditor extends AbstractCellEditor implements
 		TableCellEditor {
@@ -119,7 +120,8 @@ public class SheetCellEditor extends AbstractCellEditor implements
 		if (stop == null) {
 			// 原来没有数据，并且用户输入了时间－－设置标志，通知DataModel加入
 			if (!time.equals("")) {
-				stop = new Stop(null, time, time, false);
+				stop = TrainGraphFactory.createInstance(Stop.class, null)
+						.setProperties(time, time, false);
 			}
 			// 原来没有数据，并且没有输入时间则直接返回空值（什么也不做，让stop=null返回）
 		} else {

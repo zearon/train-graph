@@ -1,37 +1,55 @@
 package org.paradise.etrc.data;
 
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import javafx.scene.shape.Line;
 
 import org.paradise.etrc.data.util.Tuple;
 
+import static org.paradise.etrc.ETRC.__;
+
 public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 
-	public String name = "";
 	public RailNetwork railNetwork;
 	public AllTrains allTrains;
 	protected Vector<RailNetworkChart> charts;
 	
-	public TrainGraph() {
+	TrainGraph() {
 		railNetwork = new RailNetwork();
 		allTrains = new AllTrains();
 		charts = new Vector<RailNetworkChart> ();
-		charts.add(new RailNetworkChart());
 	}
 	
-	public static TrainGraph getDefaultInstance() {
-		TrainGraph tg = new TrainGraph ();
+	public void syncLineChartsWithRailNetworks() {
 		
-		// Add a default railroad line rail network
-		RailroadLine line = new RailroadLine();
-		tg.railNetwork.addRailroadLine(line);
-		
-		// Add a default time table
-		RailroadLineChart lineChart = new RailroadLineChart(line);
-		RailNetworkChart networkChart = new RailNetworkChart();
-		tg.charts.add(networkChart);
-		
-		return tg;
+		// Remove line charts in every network chart, which does not match 
+		// any railroad line in the rail network.
+		charts.forEach(networkChart -> {
+			for(Iterator<RailroadLineChart> iter = networkChart.railLineCharts.iterator(); 
+					iter.hasNext(); ) {
+				
+				RailroadLineChart lineChart = iter.next();
+				if (railNetwork.getAllRailroadLines().stream()
+						.noneMatch(line->line.equals(lineChart.railroadLine))) {
+					iter.remove();
+				}
+			}
+		});
+
+		// Create empty line charts in every network chart for railroad lines
+		// that have no corresponding line charts.
+		railNetwork.getAllRailroadLines().stream()
+			.filter(line -> charts.get(0).getRailLineCharts().stream()
+					.noneMatch(lineChart->lineChart.railroadLine.equals(line)))
+			.forEachOrdered(line -> {
+				
+				charts.forEach(networkChart ->
+					networkChart.getRailLineCharts()
+					.add(new RailroadLineChart(line)) );
+			});
 	}
 
 	public Vector<RailNetworkChart> getCharts () {
@@ -58,6 +76,9 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	protected String getStartSectionString() { return START_SECTION_TRAIN_GRAPH; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_TRAIN_GRAPH; }
+	@Override String createTGPNameById(int id) { 
+		return String.format(__("Train Graph %d"), id);
+	}
 	@Override
 	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
 		return TrainGraph::new;
@@ -151,7 +172,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 				// Set trains in terms of trainRefs
 				railineChart.trains.clear();
 				railineChart.trainRefs.stream()
-					.map(trainRef->allTrains.findTrain(trainRef.trainNameFull))
+					.map(trainRef->allTrains.findTrain(trainRef.name))
 					.forEachOrdered(railineChart.trains::add);
 			});
 		});

@@ -28,6 +28,7 @@ import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.wizard.WizardDialog;
 
 public class WZOutPointSet extends WizardDialog {
@@ -221,7 +222,8 @@ public class WZOutPointSet extends WizardDialog {
 			return;
 		else {
 			//TODO: train.xstop.setTime;
-			Stop stop = new Stop(curStation.name, time, time, false);
+			Stop stop = TrainGraphFactory.createInstance(Stop.class, curStation.name)
+					.setProperties(time, time, false);
 			chart.insertNewStopToTrain(train, stop);
 			
 			super.doFinish();

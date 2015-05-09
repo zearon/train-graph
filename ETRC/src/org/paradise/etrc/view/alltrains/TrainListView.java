@@ -40,6 +40,7 @@ import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.view.widget.JEditTable;
@@ -58,7 +59,7 @@ public class TrainListView extends JPanel {
 
 	TrainsTable table;
 
-	JCheckBox cbUnderColor;
+//	JCheckBox cbUnderColor;
 	TrainView trainView;
 	
 	public TrainListView() {
@@ -89,25 +90,25 @@ public class TrainListView extends JPanel {
 		table.setFont(new Font("Dialog", 0, 12));
 		table.getTableHeader().setFont(new Font("Dialog", 0, 12));
 		JScrollPane spColorTable = new JScrollPane(table);
-
-		cbUnderColor = new JCheckBox();
-		cbUnderColor.setFont(new java.awt.Font("Dialog", 0, 12));
-		cbUnderColor.setText(__("Display opposite direction train using watermark"));
-		cbUnderColor.setSelected(!(mainFrame.chartView.underDrawingColor == null));
-		cbUnderColor.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent e) {
-				if (((JCheckBox) e.getSource()).isSelected())
-					mainFrame.chartView.underDrawingColor = ChartView.DEFAULT_UNDER_COLOR;
-				else
-					mainFrame.chartView.underDrawingColor = null;
-				
-				mainFrame.chartView.repaint();
-			}
-		});
+//
+//		cbUnderColor = new JCheckBox();
+//		cbUnderColor.setFont(new java.awt.Font("Dialog", 0, 12));
+//		cbUnderColor.setText(__("Display opposite direction train using watermark"));
+//		cbUnderColor.setSelected(!(mainFrame.chartView.underDrawingColor == null));
+//		cbUnderColor.addChangeListener(new ChangeListener() {
+//			public void stateChanged(ChangeEvent e) {
+//				if (((JCheckBox) e.getSource()).isSelected())
+//					mainFrame.chartView.underDrawingColor = ChartView.DEFAULT_UNDER_COLOR;
+//				else
+//					mainFrame.chartView.underDrawingColor = null;
+//				
+//				mainFrame.chartView.repaint();
+//			}
+//		});
 
 		JPanel underColorPanel = new JPanel();
 		underColorPanel.setLayout(new BorderLayout());
-		underColorPanel.add(cbUnderColor, BorderLayout.WEST);
+//		underColorPanel.add(cbUnderColor, BorderLayout.WEST);
 
 		JPanel colorPanel = new JPanel();
 		colorPanel.setLayout(new BorderLayout());
@@ -172,8 +173,8 @@ public class TrainListView extends JPanel {
 				}
 
 				table.revalidate();
-				mainFrame.chartView.repaint();
-		        mainFrame.runView.refresh();
+//				mainFrame.chartView.repaint();
+//		        mainFrame.runView.refresh();
 			}
 		});
 		
@@ -226,17 +227,20 @@ public class TrainListView extends JPanel {
 	}
 	
 	protected void doNewTrain() {
-		Train newTrain = new Train();
-		newTrain.trainNameFull = "XXXX/YYYY";
+		Train newTrain = TrainGraphFactory.createInstance(Train.class);
+		newTrain.name = "XXXX/YYYY";
 		newTrain.trainNameDown = "DDDD";
 		newTrain.trainNameUp   = "UUUU";
 //		newTrain.stopNum = 3;
 //		newTrain.getStops()[0] = new Stop(_("Departure"), "00:00", "00:00", false);
 //		newTrain.getStops()[1] = new Stop(_("Middle"), "00:00", "00:00", false);
 //		newTrain.getStops()[2] = new Stop(_("Terminal"), "00:00", "00:00", false);
-		newTrain.appendStop(new Stop(__("Departure"), "00:00", "00:00", false));
-		newTrain.appendStop(new Stop(__("Middle"), "00:00", "00:00", false));
-		newTrain.appendStop(new Stop(__("Terminal"), "00:00", "00:00", false));
+		newTrain.appendStop(TrainGraphFactory.createInstance(Stop.class, __("Departure"))
+				.setProperties("00:00", "00:00", false));
+		newTrain.appendStop(TrainGraphFactory.createInstance(Stop.class, __("Middle"))
+				.setProperties("00:00", "00:00", false));
+		newTrain.appendStop(TrainGraphFactory.createInstance(Stop.class, __("Terminal"))
+				.setProperties("00:00", "00:00", false));
 		
 
 		trainView.setModel(newTrain);

@@ -18,8 +18,10 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.data.RailNetwork;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.skb.ETRCLCB;
 import org.paradise.etrc.data.skb.LCBStation;
 
@@ -58,7 +60,7 @@ public class CircuitMakeDialog extends JDialog {
 	private RailroadLine makeCircuit(Vector<LCBStation> staLCB) {
 		System.out.println(staLCB);
 		
-		RailroadLine cir = new RailroadLine();
+		RailroadLine cir = TrainGraphFactory.createInstance(RailroadLine.class);
 		cir.name = xianlu;
 		
 		Station firstStation = (Station) staLCB.get(0);

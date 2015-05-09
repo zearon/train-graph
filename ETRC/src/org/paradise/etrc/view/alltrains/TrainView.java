@@ -45,6 +45,7 @@ import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.TRFFilter;
@@ -74,8 +75,8 @@ public class TrainView extends JPanel {
 	private static Train empty_train;
 	
 	static {
-		empty_train = new Train();
-		empty_train.trainNameFull = __("");
+		empty_train = TrainGraphFactory.createInstance(Train.class);
+		empty_train.name = __("");
 	}
 
 	public TrainView() {
@@ -128,7 +129,7 @@ public class TrainView extends JPanel {
 		// train.terminalStation = train.stops[train.stopNum - 1].stationName;
 		train.trainNameDown = tfNameD.getText().trim();
 		train.trainNameUp = tfNameU.getText().trim();
-		train.trainNameFull = tfName.getText().trim();
+		train.name = tfName.getText().trim();
 		return train;
 	}
 
@@ -179,7 +180,7 @@ public class TrainView extends JPanel {
 				Train savingTrain = ((TrainTableModel) table.getModel()).myTrain;
 				savingTrain.trainNameDown = tfNameD.getText().trim();
 				savingTrain.trainNameUp = tfNameU.getText().trim();
-				savingTrain.trainNameFull = tfName.getText().trim();
+				savingTrain.name = tfName.getText().trim();
 
 				doSaveTrain(savingTrain);
 			}
@@ -195,7 +196,7 @@ public class TrainView extends JPanel {
 				Train train = ((TrainTableModel) table.getModel()).myTrain;
 				train.trainNameDown = tfNameD.getText().trim();
 				train.trainNameUp = tfNameU.getText().trim();
-				train.trainNameFull = tfName.getText().trim();
+				train.name = tfName.getText().trim();
 
 //				isCanceled = false;
 				// TrainDialog.this.setVisible(false);
@@ -329,7 +330,8 @@ public class TrainView extends JPanel {
 				String arrive = "00:00";
 				String leave = "00:00";
 				((TrainTableModel) table.getModel()).myTrain.insertStop(
-						new Stop(name, arrive, leave, false),
+						TrainGraphFactory.createInstance(Stop.class, name)
+							.setProperties(arrive, leave, false),
 						table.getSelectedRow());
 
 				table.revalidate();
@@ -349,7 +351,9 @@ public class TrainView extends JPanel {
 				String arrive = "00:00";
 				String leave = "00:00";
 				((TrainTableModel) table.getModel()).myTrain.insertStop(
-						new Stop(name, arrive, leave, false), curIndex + 1);
+						TrainGraphFactory.createInstance(Stop.class, name)
+							.setProperties(arrive, leave, false), 
+						curIndex + 1);
 
 				table.revalidate();
 			}
@@ -465,7 +469,7 @@ public class TrainView extends JPanel {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
 
-			Train loadingTrain = new Train();
+			Train loadingTrain = TrainGraphFactory.createInstance(Train.class);
 			try {
 				loadingTrain.loadFromFile2(f.getAbsolutePath());
 				mainFrame.prop.setProperty(
@@ -493,8 +497,8 @@ public class TrainView extends JPanel {
 	 */
 	public static Train doLoadTrainFromWeb(String code, String proxyAddress,
 			int proxyPort) {
-		Train train = new Train();
-		train.trainNameFull = "";
+		Train train = TrainGraphFactory.createInstance(Train.class);
+		train.name = "";
 		Date now = new Date();
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 		String date = format.format(now);
@@ -538,21 +542,21 @@ public class TrainView extends JPanel {
 					Pattern trainNamePattern = Pattern.compile(">([^>]*?)次列车");   // <td width="100%">1112/1113次列车<br>
 					Matcher trainNameMather = trainNamePattern.matcher(inputLine);
 					trainName = trainNameMather.find() ? trainNameMather.group(1) : null;
-					train.trainNameFull = trainName;
+					train.name = trainName;
 				}
 				
 				Pattern stopPattern = Pattern.compile("第\\d+站：(.*?)<br>(.*?)到；(.*?)开");   // <td width="100%">第1站：青岛<br>15:04到；15:05开<br>
 				Matcher stopMather = stopPattern.matcher(inputLine);
 				while (stopMather.find()) {
-					Stop stop = new Stop(stopMather.group(1),
-							stopMather.group(2), stopMather.group(3), true);
+					Stop stop = TrainGraphFactory.createInstance(Stop.class, stopMather.group(1))
+							.setProperties(stopMather.group(2), stopMather.group(3), true);
 					train.appendStop(stop);
 				}
 
 			}
 			in.close();
 
-			String[] names = train.trainNameFull.split("/");
+			String[] names = train.name.split("/");
 			for (int i = 0; i < names.length; ++i) {
 				if ((names[i].charAt(names[i].length() - 1) - '0') % 2 == 0) {
 					train.trainNameUp = names[i];
@@ -574,8 +578,8 @@ public class TrainView extends JPanel {
 
 	public static Train doLoadTrainFromWeb_12306(String code,
 			String proxyAddress, int proxyPort) {
-		Train train = new Train();
-		train.trainNameFull = "";
+		Train train = TrainGraphFactory.createInstance(Train.class);
+		train.name = "";
 		Date now = new Date();
 		SimpleDateFormat format = new SimpleDateFormat("yyyyMMdd");
 		String date = format.format(now);
@@ -615,8 +619,8 @@ public class TrainView extends JPanel {
 					String[] items = inputLine.split(",");
 					// if (items[4].indexOf("----") != -1) items[4] = items[5];
 					// if (items[5].indexOf("----") != -1) items[5] = items[4];
-					Stop stop = new Stop(items[2].split("\\^")[0].trim(),
-							items[4].trim(), items[5].trim(), true);
+					Stop stop = TrainGraphFactory.createInstance(Stop.class, items[2].split("\\^")[0].trim())
+							.setProperties(items[4].trim(), items[5].trim(), true);
 					train.appendStop(stop);
 					String c = items[3].trim();
 					if ((c.charAt(c.length() - 1) - '0') % 2 == 0) {
@@ -626,18 +630,18 @@ public class TrainView extends JPanel {
 						if (train.trainNameDown.equals(""))
 							train.trainNameDown = c;
 					}
-					if (train.trainNameFull.indexOf(c) == -1) {
-						if (train.trainNameFull.equals("")) {
-							train.trainNameFull = c;
+					if (train.name.indexOf(c) == -1) {
+						if (train.name.equals("")) {
+							train.name = c;
 						} else {
-							train.trainNameFull += ("/" + c);
+							train.name += ("/" + c);
 						}
 					}
 				}
 			}
 			in.close();
 
-			String[] names = train.trainNameFull.split("/");
+			String[] names = train.name.split("/");
 			for (int i = 0; i < names.length; ++i) {
 				if ((names[i].charAt(names[i].length() - 1) - '0') % 2 == 0) {
 					train.trainNameUp = names[i];
@@ -777,7 +781,7 @@ public class TrainView extends JPanel {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return myTrain.getStop(rowIndex).stationName;
+				return myTrain.getStop(rowIndex).name;
 			case 1:
 				return myTrain.getStop(rowIndex).arrive;
 			case 2:
@@ -804,7 +808,7 @@ public class TrainView extends JPanel {
 			// try {
 			switch (columnIndex) {
 			case 0:
-				myTrain.getStop(rowIndex).stationName = (String) aValue;
+				myTrain.getStop(rowIndex).name = (String) aValue;
 				break;
 			case 1:
 				// train.stops[rowIndex].arrive = df.parse((String) aValue);

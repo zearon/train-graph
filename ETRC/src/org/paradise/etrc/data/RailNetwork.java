@@ -33,7 +33,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 	
-	public String name = "";
 	protected Vector<RailroadLine> railroadLines;
 
 	protected Vector<Station> virtualRailroadLine;
@@ -44,23 +43,16 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 	private List<BiConsumer<RailroadLine, RailroadLineChangeType>> circuitChangedListeners = 
 			new Vector<BiConsumer<RailroadLine, RailroadLineChangeType>>();
 
-	public RailNetwork() {
+	RailNetwork() {
 		railroadLines = new Vector<>(8);
 		virtualRailroadLine = new Vector<>(100);
 		crossoverStations = new Vector<>(20);
 		tempStations = new Vector<>(100);
 	}
 
-	public RailNetwork(String name) {
+	RailNetwork(String name) {
 		this();
-		this.name = name;
-	}
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+		setName(name);
 	}
 
 	public Vector<RailroadLine> getAllRailroadLines() {
@@ -472,6 +464,9 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 	protected String getStartSectionString() { return START_SECTION_RAILROAD_NETWORK; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_RAILROAD_NETWORK; }
+	@Override String createTGPNameById(int id) { 
+		return String.format(__("Railroad Network %d"), id);
+	}
 	@Override
 	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
 		return RailNetwork::new;

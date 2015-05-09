@@ -27,26 +27,26 @@ implements Collection<Train>
 	protected void updateTrainDict() {
 		trainDict.clear();
 		for (Train train : trains) {
-			trainDict.put(train.trainNameFull, train);
+			trainDict.put(train.name, train);
 		}
 	}
 	protected void addItemToTrainDict(Train train, Collection<? extends Train> c) {
 		if (train != null)
-			trainDict.put(train.trainNameFull, train);
+			trainDict.put(train.name, train);
 
 		if (c != null)
 			for (Train e : c) {
-				trainDict.put(e.trainNameFull, e);
+				trainDict.put(e.name, e);
 			}
 	}
 	protected void removeItemFromTrainDict(Object train, Collection<?> c) {
 		if (train != null && train instanceof Train)
-			trainDict.remove(((Train) train).trainNameFull);
+			trainDict.remove(((Train) train).name);
 
 		if (c != null)
 			for (Object e : c) {
 				if (e instanceof Train)
-					trainDict.remove(((Train) e).trainNameFull);
+					trainDict.remove(((Train) e).name);
 			}
 	}
 

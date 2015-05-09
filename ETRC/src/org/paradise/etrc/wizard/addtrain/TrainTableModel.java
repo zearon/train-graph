@@ -60,7 +60,7 @@ public class TrainTableModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			return (myTrain == null) ? "" : myTrain.getStop(rowIndex).stationName;
+			return (myTrain == null) ? "" : myTrain.getStop(rowIndex).name;
 		case 1:
 			return (myTrain == null) ? null : myTrain.getStop(rowIndex);
 		case 2:
@@ -78,7 +78,7 @@ public class TrainTableModel extends AbstractTableModel {
 		
 		switch (columnIndex) {
 		case 0:
-			myTrain.getStop(rowIndex).stationName = (String) aValue;
+			myTrain.getStop(rowIndex).name = (String) aValue;
 			break;
 		case 1:
 			myTrain.setStop(rowIndex, (Stop) aValue);

@@ -98,7 +98,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 	 * @return int
 	 */
 	public int getPelsX(String stationName) {
-		return getPelsX(mainFrame.chart.railroadLine.getStationDist(stationName));
+		return getPelsX(mainFrame.currentLineChart.railroadLine.getStationDist(stationName));
 	}
 
 	/**
@@ -116,7 +116,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 	 * @return int
 	 */
 	public String getStationName(int px) {
-		return mainFrame.chart.railroadLine.getStationName(getDist(px));
+		return mainFrame.currentLineChart.railroadLine.getStationName(getDist(px));
 	}
 
 	/*

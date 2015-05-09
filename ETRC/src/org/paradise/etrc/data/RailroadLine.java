@@ -32,9 +32,6 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	private static int idCounter = 0;
 //	public static int MAX_STATION_NUM = 512;
 	
-
-	public String name = "";
-
 	public int length = 0;
 	public int multiplicity = 2;
 	public int zindex = 0;
@@ -54,22 +51,21 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	
 	private List<Consumer<RailroadLine>> railroadLineChangedListeners = new Vector<Consumer<RailroadLine>>();
 
-	public RailroadLine() {
-		this.id = ++ idCounter;
-		this.name = String.format(__("LINE %d"), this.id);
-	}
-	
-	public RailroadLine(String name) {
-		this();
-		
-		this.name = name;
+	RailroadLine() {
 		this.length = 30;
 		this.multiplicity = 2;
 		this.zindex = 1;
 		this.dispScale = 1.0f;
 		
-		appendStation(new Station("Stop 1", 0, 1, false));
-		appendStation(new Station("Stop 2", 30, 1, false));
+		appendStation(TrainGraphFactory.createInstance(Station.class, "Stop 1")
+				.setProperties(0, 1, false));
+		appendStation(TrainGraphFactory.createInstance(Station.class, "Stop 2")
+				.setProperties(30, 1, false));
+	}
+	
+	RailroadLine(String name) {
+		this();
+		setName(name);
 	}
 
 	public RailroadLine copy() {
@@ -97,7 +93,7 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	@Override
 	public boolean equals(Object obj) {
 		return (obj != null && obj instanceof RailroadLine 
-				&& ((RailroadLine) obj).id == id) ? true : false;
+				&& ((RailroadLine) obj).name == name) ? true : false;
 	}
 
 	public int getID() {
@@ -257,13 +253,13 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 
 			//t1 == t2时通过或者始发、终到，不作为停靠处理
 			if(t1<= myTime && t2 >= myTime && t1 != t2) {
-				int d = getStationDist(train.getStop(i).stationName);
+				int d = getStationDist(train.getStop(i).name);
 //				System.out.println(train.getTrainName() + "^" + time + "~" + train.stops[i].stationName + 
 //						"~" + t1 + "~" + train.stops[i].arrive + 
 //						"~" + t2 + "~" + train.stops[i].leave +
 //						"~" + d);
 				if(d >= 0)
-					return train.getStop(i).stationName;
+					return train.getStop(i).name;
 			}
 		}
 		
@@ -297,7 +293,7 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 //				System.out.println(train.getTrainName() + "^" + time + "~" + train.stops[i].stationName + 
 //						"~" + t1 + "~" + train.stops[i].arrive + 
 //						"~" + t2 + "~" + train.stops[i].leave);
-				int d = getStationDist(train.getStop(i).stationName);
+				int d = getStationDist(train.getStop(i).name);
 				
 				if(d >= 0)
 					return d;
@@ -309,8 +305,8 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 			Stop s1 = train.getStop(i);
 			Stop s2 = train.getStop(i+1);
 			
-			int d1 = getStationDist(s1.stationName);
-			int d2 = getStationDist(s2.stationName);
+			int d1 = getStationDist(s1.name);
+			int d2 = getStationDist(s2.name);
 			
 			int t1 = Train.trainTimeToInt(s1.leave);
 			int t2 = Train.trainTimeToInt(s2.arrive);
@@ -620,7 +616,7 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 				throw new IOException(String.format(__("Invalid hidden type data for station %s"), stName));
 		}
 
-		Station st = new Station(stName, dist, level, hide);
+		Station st = TrainGraphFactory.createInstance(Station.class, stName).setProperties(dist, level, hide); //new Station(stName, dist, level, hide);
 		stations.add(st);
 //		_stations[stationNum] = st;
 //		stationNum++;
@@ -692,7 +688,7 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 
 	public Station getFirstStopOnMe(Train train) {
 		for(int i=0; i<train.getStopNum(); i++) {
-			Station sta = getStation(train.getStop(i).stationName);
+			Station sta = getStation(train.getStop(i).name);
 			if(sta != null)
 				return sta;
 		}
@@ -702,7 +698,7 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	
 	public Station getLastStopOnMe(Train train) {
 		for(int i=train.getStopNum() - 1; i>=0; i--) {
-			Station sta = getStation(train.getStop(i).stationName);
+			Station sta = getStation(train.getStop(i).name);
 			if(sta != null)
 				return sta;
 		}
@@ -771,6 +767,9 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	protected String getStartSectionString() { return START_SECTION_RAILROAD_LINE; }
 	@Override
 	protected String getEndSectionString() { return END_SECTION_RAILROAD_LINE; }
+	@Override String createTGPNameById(int id) { 
+		return String.format(__("Line %d"), id);
+	}
 	@Override
 	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
 		return RailroadLine::new;

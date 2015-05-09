@@ -42,7 +42,7 @@ public class RunningPanel extends JPanel {
 
 	public RunningPanel(DynamicView _dView) {
 		dView = _dView;
-		chart = _dView.mainFrame.chart;
+		chart = _dView.mainFrame.currentLineChart;
 
 		try {
 			jbInit();

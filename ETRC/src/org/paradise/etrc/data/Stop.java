@@ -9,21 +9,26 @@ import java.util.function.Supplier;
 import org.paradise.etrc.data.util.Tuple;
 
 public class Stop extends TrainGraphPart<Stop, NullPart> {
-	public String stationName;
+
 	public String arrive;
 	public String leave;
 	
 	//20070224新增，是否图定
 	public boolean isPassenger;
 	
-	public Stop() {}
+	Stop() {}
 
-	public Stop(String _name, String _arrive, String _leave, boolean _schedular) {
+	Stop(String _name) {
 		this();
-		stationName = _name;
-		arrive = _arrive;
-		leave = _leave;
-		isPassenger = _schedular;
+		setName(_name);
+	}
+	
+	public Stop setProperties(String arrive, String leave, boolean schedular) {
+		this.arrive = arrive;
+		this.leave = leave;
+		this.isPassenger = schedular;
+		
+		return this;
 	}
 
 //	public Stop(String _name, String _arrive, String _leave) {
@@ -31,7 +36,7 @@ public class Stop extends TrainGraphPart<Stop, NullPart> {
 //	}
 
 	public Stop copy() {
-		Stop st = new Stop(this.stationName, this.arrive, this.leave, this.isPassenger);
+		Stop st = new Stop(this.name).setProperties(this.arrive, this.leave, this.isPassenger);
 		
 		return st;
 	}
@@ -43,7 +48,7 @@ public class Stop extends TrainGraphPart<Stop, NullPart> {
 		if (!(obj instanceof Stop))
 			return false;
 
-		return ((Stop) obj).stationName.equalsIgnoreCase(this.stationName);
+		return ((Stop) obj).name.equalsIgnoreCase(this.name);
 	}
 	
 	public static Stop makeStop(String theName, String strArrive, String strLeave, boolean isSchedular) {
@@ -77,7 +82,7 @@ public class Stop extends TrainGraphPart<Stop, NullPart> {
 		else
 			myLeave = df.format(theLeave);
 		
-		return new Stop(theName, myArrive, myLeave, isSchedular);
+		return new Stop(theName).setProperties(myArrive, myLeave, isSchedular);
 	}
 	
 	
@@ -116,7 +121,7 @@ public class Stop extends TrainGraphPart<Stop, NullPart> {
 		if (propTuples == null) {
 			propTuples = new Tuple[4];
 			
-			propTuples[0] = Tuple.of("stationName", String.class);
+			propTuples[0] = Tuple.of("name", String.class);
 			propTuples[1] = Tuple.of("arrive", String.class);
 			propTuples[2] = Tuple.of("leave", String.class);
 			propTuples[3] = Tuple.of("isPassenger", boolean.class);
@@ -130,7 +135,7 @@ public class Stop extends TrainGraphPart<Stop, NullPart> {
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(porpName)) {
-			stationName = valueInStr;
+			name = valueInStr;
 		} else if (propTuples[1].A.equals(porpName)) {
 			arrive = valueInStr;
 		} else if (propTuples[2].A.equals(porpName)) {
@@ -145,7 +150,7 @@ public class Stop extends TrainGraphPart<Stop, NullPart> {
 		String value = "";
 		
 		if (index == 0) {
-			value = stationName;	
+			value = name;	
 		} else if (index == 1) {
 			value = arrive;
 		} else if (index == 2) {

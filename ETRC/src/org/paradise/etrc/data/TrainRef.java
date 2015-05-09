@@ -7,14 +7,13 @@ import org.paradise.etrc.data.util.Tuple;
 
 public class TrainRef extends TrainGraphPart<TrainRef, NullPart> {
 
-	public String trainNameFull = "";
 	
-	public TrainRef() {
+	TrainRef() {
 	}
 	
-	public TrainRef(String trainNameFull) {
+	TrainRef(String name) {
 		this();
-		this.trainNameFull = trainNameFull;
+		setName(name);;
 	}
 
 	
@@ -49,7 +48,7 @@ public class TrainRef extends TrainGraphPart<TrainRef, NullPart> {
 		if (propTuples == null) {
 			propTuples = new Tuple[1];
 			
-			propTuples[0] = Tuple.of("trainNameFull", String.class);
+			propTuples[0] = Tuple.of("name", String.class);
 		}
 		
 		return propTuples;
@@ -60,7 +59,7 @@ public class TrainRef extends TrainGraphPart<TrainRef, NullPart> {
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(porpName)) {
-			trainNameFull = valueInStr;
+			name = valueInStr;
 		}
 	}
 
@@ -69,7 +68,7 @@ public class TrainRef extends TrainGraphPart<TrainRef, NullPart> {
 		String value = "";
 		
 		if (index == 0) {
-			value = trainNameFull;	
+			value = name;	
 		} 
 		
 		return value;

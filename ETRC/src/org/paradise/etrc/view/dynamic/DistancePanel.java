@@ -30,7 +30,7 @@ public class DistancePanel extends JPanel {
 
 	public DistancePanel(DynamicView _dView) {
 		dView = _dView;
-		chart = _dView.mainFrame.chart;
+		chart = _dView.mainFrame.currentLineChart;
 
 		try {
 			jbInit();

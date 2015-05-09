@@ -19,7 +19,9 @@ import org.paradise.etrc.data.AllTrains;
 import org.paradise.etrc.data.RailNetworkChart;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailNetwork;
+import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.TrainGraphPart;
 
 public class RailNetworkTest {
@@ -32,7 +34,7 @@ public class RailNetworkTest {
 
 	@BeforeClass
 	public static void setUpClass() throws Exception {
-		railNetwork = new RailNetwork();
+		railNetwork = TrainGraphFactory.createInstance(RailNetwork.class);
 		railNetwork.loadFromFile2("/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test.crs");
 		railNetwork.name = "Test Railroad Network";
 		
@@ -40,12 +42,12 @@ public class RailNetworkTest {
 		RailroadLineChart chart = new RailroadLineChart(chartFile);	
 
 		
-		trainGraph = new TrainGraph();
+		trainGraph = TrainGraphFactory.createInstance(TrainGraph.class);
 		trainGraph.name = "Test Train Graph";
 		trainGraph.railNetwork = railNetwork;
 		trainGraph.allTrains = new AllTrains();
 		trainGraph.allTrains.trains.addAll(chart.trains);
-		RailNetworkChart railNetworkChart = new RailNetworkChart();
+		RailNetworkChart railNetworkChart = TrainGraphFactory.createInstance(RailNetworkChart.class);;
 		railNetworkChart.getRailLineCharts().add(chart);
 		trainGraph.getCharts().add(railNetworkChart);
 		
@@ -102,8 +104,8 @@ public class RailNetworkTest {
 	@Test
 	public void testLoadTrainGraph() throws IOException {
 		System.out.println("\n------------testLoadTrainGraph-----------");
-		TrainGraph graph2 = new TrainGraph();
-		graph2.loadFromFile("/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test.test1");
+		TrainGraph graph2 = TrainGraphFactory.loadTrainGraphFromFile(
+				"/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test.test1");
 		
 		graph2.print(System.out);
 	}

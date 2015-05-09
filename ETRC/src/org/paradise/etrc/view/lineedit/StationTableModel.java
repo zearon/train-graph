@@ -5,6 +5,7 @@ import static org.paradise.etrc.ETRC.__;
 import javax.swing.event.TableModelListener;
 
 import org.paradise.etrc.data.RailroadLine;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 
 public class StationTableModel extends DefaultJEditTableModel {
@@ -23,7 +24,7 @@ public class StationTableModel extends DefaultJEditTableModel {
 		if (line != null)
 			railroadLine = line.copy();
 		else
-			railroadLine = new RailroadLine();
+			railroadLine = TrainGraphFactory.createInstance(RailroadLine.class);
 	}
 
 	/**

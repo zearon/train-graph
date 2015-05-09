@@ -18,8 +18,8 @@ public class AllTrainsView extends JPanel {
 	
 	
 	TrainGraph trainGraph;
-	TrainListView trainListView;
-	TrainView trainView;
+	public TrainListView trainListView;
+	public TrainView trainView;
 	
 	/**
 	 * Create the panel.

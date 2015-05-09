@@ -6,6 +6,7 @@ import java.util.Vector;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.view.alltrains.TrainView;
@@ -77,8 +78,8 @@ public class AddTrainWizard extends Wizard {
 						//找到了几条数据，TODO 如果是多条的话应当选择。
 						if(trains.size() == 0) {
 							new MessageBox(chartView.mainFrame, String.format(__("Unable to find information for the train %s, please input manually."), fullName)).showMessage();
-							train = new Train();
-							train.trainNameFull = fullName;
+							train = TrainGraphFactory.createInstance(Train.class);
+							train.name = fullName;
 							train.trainNameDown = downName;
 							train.trainNameUp = upName;
 					    }
@@ -94,8 +95,8 @@ public class AddTrainWizard extends Wizard {
 						}
 					}
 					else if (train == null) {
-						train = new Train();
-						train.trainNameFull = fullName;
+						train = TrainGraphFactory.createInstance(Train.class);
+						train.name = fullName;
 						train.trainNameDown = downName;
 						train.trainNameUp = upName;
 					}
@@ -120,11 +121,11 @@ public class AddTrainWizard extends Wizard {
 				System.out.println(train);
 				break;
 			case 3:
-				step3.setData(chartView.mainFrame.chart, train);
+				step3.setData(chartView.mainFrame.currentLineChart, train);
 				rt = step3.doModal();
 				break;
 			case 4:
-				step4.setData(chartView.mainFrame.chart, train);
+				step4.setData(chartView.mainFrame.currentLineChart, train);
 				rt = step4.doModal();
 				break;
 			}

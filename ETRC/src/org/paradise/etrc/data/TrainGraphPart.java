@@ -35,6 +35,9 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	public static final String START_SECTION_TRAIN_GRAPH	 	= "TrainGraph {\r\n";
 	public static final String END_SECTION_TRAIN_GRAPH		 	= "} TrainGraph\r\n";	
 	
+	public static final String START_SECTION_GLOBAL_SETTINGS 	= "GlobalSettings {\r\n";
+	public static final String END_SECTION_GLOBAL_SETTINGS	 	= "} GlobalSettings\r\n";
+	
 	public static final String START_SECTION_RAILROAD_NETWORK 	= "RailNetwork {\r\n";
 	public static final String END_SECTION_RAILROAD_NETWORK 	= "} RailNetwork\r\n";
 	public static final String START_SECTION_RAILROAD_LINE 		= "RailLine {\r\n";
@@ -51,8 +54,8 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	
 	public static final String START_SECTION_RAILNETWORK_CHART	= "RailNetwork Chart {\r\n";
 	public static final String END_SECTION_RAILNETWORK_CHART	= "} RailNetwork Chart\r\n";
-	public static final String START_SECTION_RAILINE_CHART				= "RailLine Chart {\r\n";
-	public static final String END_SECTION_RAILINE_CHART				= "} RailLine Chart\r\n";
+	public static final String START_SECTION_RAILINE_CHART		= "RailLine Chart {\r\n";
+	public static final String END_SECTION_RAILINE_CHART		= "} RailLine Chart\r\n";
 	public static final String START_SECTION_TRAIN_REF			= "Train Ref {";
 	public static final String END_SECTION_TRAIN_REF			= "}\r\n";
 	
@@ -72,6 +75,18 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	public String name;
 	public String getName() { return name; }
 	public void setName(String name) { this.name = name; }
+	
+	@Override
+	public boolean equals(Object o) {
+		return o != null && o instanceof TrainGraphPart && ((TrainGraphPart) o)._id == _id &&
+				((TrainGraphPart) o).getStartSectionString().equals(getStartSectionString());
+				
+	}
+	
+	@Override
+	public int hashCode() {
+		return _id;
+	}
 	
 	/**************************************************************************
 	 * Methods need to be implemented.
@@ -308,6 +323,7 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 				return loadingNode;
 			} else {
 				TrainGraphPart obj = partClassTuple.B.get();
+				TrainGraphFactory.setID(partClassTuple.A, obj);
 				obj.initTGP();
 				return obj;
 			}

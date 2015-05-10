@@ -13,6 +13,7 @@ import static org.paradise.etrc.ETRC.__;
 
 public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 
+	public GlobalSettings settings;
 	public RailNetwork railNetwork;
 	public AllTrains allTrains;
 	protected Vector<RailNetworkChart> charts;
@@ -22,6 +23,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	
 	@Override
 	void initTGP() {
+		settings = TrainGraphFactory.createInstance(GlobalSettings.class);
 		railNetwork = TrainGraphFactory.createInstance(RailNetwork.class);
 		allTrains = TrainGraphFactory.createInstance(AllTrains.class);
 		charts = new Vector<RailNetworkChart> ();
@@ -89,6 +91,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	}
 	@Override
 	public void _prepareForFirstLoading() {
+		new GlobalSettings().prepareForFirstLoading();
 		new RailNetwork().prepareForFirstLoading();
 		new AllTrains().prepareForFirstLoading();
 		new RailNetworkChart().prepareForFirstLoading();
@@ -131,13 +134,16 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	@Override
 	protected void getObjectTGPProperties() {
 		objectProperties.clear();
+		objectProperties.add(settings);
 		objectProperties.add(railNetwork);
 		objectProperties.add(allTrains);
 	}
 	
 	@Override
 	protected void setObjectTGPProperties(TrainGraphPart part) {
-		if (part instanceof RailNetwork) {
+		if (part instanceof GlobalSettings) {
+			settings = (GlobalSettings) part;
+		} else if (part instanceof RailNetwork) {
 			railNetwork.getAllRailroadLines().clear();
 			railNetwork = (RailNetwork) part;
 		} else if (part instanceof AllTrains) {

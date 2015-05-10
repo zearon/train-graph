@@ -20,8 +20,10 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.data.GlobalSettings;
 //import com.borland.jbcl.layout.*;
 import org.paradise.etrc.data.RailroadLineChart;
+import org.paradise.etrc.data.TrainGraph;
 
 /**
  * @author lguo@sina.com
@@ -54,15 +56,19 @@ MainFrame mainFrame = null;
   JTextField tfBold = new JTextField();
   JLabel jLabel3 = new JLabel();
 
-  RailroadLineChart chart;
-  public DistSetDialog(Frame frame, RailroadLineChart _chart) {
-    super(frame, __("Distance Bar Setting"), false);
+private GlobalSettings settings;
 
+//  RailroadLineChart chart;
+  public DistSetDialog(Frame frame, TrainGraph trainGraph) {
+    super(frame, __("Distance Bar Setting"), false);
+    
     if(frame instanceof MainFrame) {
       mainFrame = (MainFrame) frame;
     }
     
-    chart = _chart;
+    setModel(trainGraph);
+    
+//    chart = _chart;
 
     try {
       jbInit();
@@ -72,6 +78,10 @@ MainFrame mainFrame = null;
       ex.printStackTrace();
     }
   }
+	
+	public void setModel(TrainGraph trainGraph) {
+		this.settings = trainGraph.settings;
+	}
 
   private void jbInit() throws Exception {
     titledBorder1 = new TitledBorder("");
@@ -89,7 +99,7 @@ MainFrame mainFrame = null;
 
     tfDistScale.setMinimumSize(new Dimension(12, 22));
     tfDistScale.setPreferredSize(new Dimension(20, 22));
-    tfDistScale.setText(chart.distScale+"");
+    tfDistScale.setText(settings.distScale+"");
     tfDistScale.setColumns(0);
 
     lbDistScale.setText(__("Lowest display station level:"));
@@ -101,7 +111,7 @@ MainFrame mainFrame = null;
 
     tfDisplay.setMinimumSize(new Dimension(24, 22));
     tfDisplay.setPreferredSize(new Dimension(20, 22));
-    tfDisplay.setText(chart.displayLevel+"");
+    tfDisplay.setText(settings.displayLevel+"");
 
     btOK.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     btOK.setText(__("Set"));
@@ -145,7 +155,7 @@ MainFrame mainFrame = null;
     lbBold.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     lbBold.setText(__("Highest station level to show blod line:"));
 
-    tfBold.setText(chart.boldLevel+"");
+    tfBold.setText(settings.boldLevel+"");
     tfBold.setPreferredSize(new Dimension(20, 22));
     tfBold.setMinimumSize(new Dimension(24, 22));
 
@@ -244,9 +254,9 @@ MainFrame mainFrame = null;
       }
       else{
         if(this.mainFrame != null) {
-          chart.distScale = distScale;
-          chart.displayLevel = display;
-          chart.boldLevel = bold;
+        	settings.distScale = distScale;
+        	settings.displayLevel = display;
+        	settings.boldLevel = bold;
 
           mainFrame.validate();
           mainFrame.chartView.resetSize();

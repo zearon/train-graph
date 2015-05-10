@@ -10,6 +10,7 @@ import javax.swing.event.TableModelListener;
 import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
+import org.paradise.etrc.data.RailNetwork;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 
@@ -22,20 +23,15 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 	private JTable table;
 	public Vector<RailroadLine> raillines;
 
-	public RailroadLineTableModel(JTable table, Vector<RailroadLine> existingRailLines) {
+	public RailroadLineTableModel(JTable table, RailNetwork railNetwork) {
 		this.table = table;
-		setRailLines(existingRailLines);
+		setRailNetwork(railNetwork);
 	}
 	
-	public void setRailLines(Vector<RailroadLine> existingRailLines) {
-		if (existingRailLines == null) {
-			raillines = new Vector<RailroadLine>(8);
-		} else {
-			raillines = new Vector<RailroadLine>(existingRailLines.size() + 8);
-			for (RailroadLine line : existingRailLines) {
-				raillines.add(line.copy());
-			}
-		}
+	public void setRailNetwork(RailNetwork railNetwork) {
+		if (railNetwork != null)
+			this.raillines = railNetwork.getAllRailroadLines();
+		fireTableDataChanged();
 	}
 
 	/**

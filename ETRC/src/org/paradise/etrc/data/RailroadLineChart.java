@@ -22,18 +22,9 @@ import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.data.util.Tuple;
 
 public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRef> {
-	//Y轴（距离）显示参数
-	public float distScale = 3; //每公里像素数
 	public static final float MAX_DIST_SCALE = 10f;
-	public int displayLevel = 4; //最低可显示车站等级
-	public int boldLevel = 2; //最低粗线显示车站等级（特等为0）
-
-	//X轴（时间）显示参数
-	public int startHour = 18; //0坐标时刻（0-23）
-	public int minuteScale = 2; //每分钟像素数
 	public static final int  MAX_MINUTE_SCALE = 10;
-	public int timeInterval = 10; //时间轴间隔（必须是60的约数，即可以是5，6，10等，但不能是7分钟）
-
+	
 	//本运行图的线路
 	public RailroadLine railroadLine;
 	// 用于序列化时引用RailNetwork中的线路
@@ -67,6 +58,11 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	public RailroadLineChart setProperties(RailroadLine line) {
 		this.railroadLine = line;
 		return this;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format(__("%s"), railroadLine.getName());
 	}
 	
 	public Train getTrain(int index) {
@@ -212,44 +208,44 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	public static final String setupPattern = "...Setup...";
 
 	public void saveToFile(File f) throws IOException {
-		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
-
-		//线路
-		for (int i = 0; i < allCircuits.size(); ++ i) {
-			out.write(circuitPattern);
-			out.newLine();
-			allCircuits.get(i).writeTo(out);
-		}
-		
-		//车次
-		for (int i = 0; i < getTrainNum(); i++) {
-			out.write(trainPattern);
-			out.newLine();
-			trains.get(i).writeTo(out);
-		}
-		//颜色
-		out.write(colorPattern);
-		out.newLine();
-		for (int i = 0; i < getTrainNum(); i++) {
-			out.write(trains.get(i).getTrainName());
-			out.write("," + trains.get(i).color.getRed());
-			out.write("," + trains.get(i).color.getGreen());
-			out.write("," + trains.get(i).color.getBlue());
-			out.newLine();
-		}
-		//设置
-		out.write(setupPattern);
-		out.newLine();
-		out.write(distScale + "," +
-				  displayLevel + "," +
-				  boldLevel + "," +
-				  startHour + "," +
-				  minuteScale + "," +
-				  timeInterval);
-		out.newLine();
-
-		out.flush();
-		out.close();
+//		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
+//
+//		//线路
+//		for (int i = 0; i < allCircuits.size(); ++ i) {
+//			out.write(circuitPattern);
+//			out.newLine();
+//			allCircuits.get(i).writeTo(out);
+//		}
+//		
+//		//车次
+//		for (int i = 0; i < getTrainNum(); i++) {
+//			out.write(trainPattern);
+//			out.newLine();
+//			trains.get(i).writeTo(out);
+//		}
+//		//颜色
+//		out.write(colorPattern);
+//		out.newLine();
+//		for (int i = 0; i < getTrainNum(); i++) {
+//			out.write(trains.get(i).getTrainName());
+//			out.write("," + trains.get(i).color.getRed());
+//			out.write("," + trains.get(i).color.getGreen());
+//			out.write("," + trains.get(i).color.getBlue());
+//			out.newLine();
+//		}
+//		//设置
+//		out.write(setupPattern);
+//		out.newLine();
+//		out.write(___GLOBAL_SETTINGS_.distScale + "," +
+//				  ___GLOBAL_SETTINGS_.displayLevel + "," +
+//				  ___GLOBAL_SETTINGS_.boldLevel + "," +
+//				  ___GLOBAL_SETTINGS_.startHour + "," +
+//				  ___GLOBAL_SETTINGS_.minuteScale + "," +
+//				  ___GLOBAL_SETTINGS_.timeInterval);
+//		out.newLine();
+//
+//		out.flush();
+//		out.close();
 	}
 
 	public void loadFromFile2(File f) throws IOException {
@@ -338,18 +334,18 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	}
 
 	private void parseSetup(String line) throws IOException {
-		String setup[] = line.split(",");
-		try {
-			distScale = Float.parseFloat(setup[0]);
-			displayLevel = Integer.parseInt(setup[1]);
-			boldLevel = Integer.parseInt(setup[2]);
-			startHour = Integer.parseInt(setup[3]);
-			minuteScale = Integer.parseInt(setup[4]);
-			timeInterval = Integer.parseInt(setup[5]);
-
-		} catch (Exception e) {
-			throw new IOException(__("Unable to read chart settings."));
-		}
+//		String setup[] = line.split(",");
+//		try {
+//			___GLOBAL_SETTINGS_.distScale = Float.parseFloat(setup[0]);
+//			___GLOBAL_SETTINGS_.displayLevel = Integer.parseInt(setup[1]);
+//			___GLOBAL_SETTINGS_.boldLevel = Integer.parseInt(setup[2]);
+//			___GLOBAL_SETTINGS_.startHour = Integer.parseInt(setup[3]);
+//			___GLOBAL_SETTINGS_.minuteScale = Integer.parseInt(setup[4]);
+//			___GLOBAL_SETTINGS_.timeInterval = Integer.parseInt(setup[5]);
+//
+//		} catch (Exception e) {
+//			throw new IOException(__("Unable to read chart settings."));
+//		}
 	}
 	
 	/**
@@ -385,38 +381,38 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	
 	  //测试用
 	  public static void main(String argv[]) {
-	    RailroadLineChart chart = null;
-	    try {
-	      chart = new RailroadLineChart();
-	      chart.loadFromFile2(new File("d:\\huning2.trc"));
-	    }
-	    catch (IOException ex) {
-	      System.out.println("Error:" + ex.getMessage());
-	    }
-	    
-	    System.out.print(chart.railroadLine.toString());
-	    for (int i = 0; i < chart.getTrainNum(); i++) {
-			System.out.print("==== " + i + " ==== (");
-			System.out.println(chart.trains.get(i).color.getRed() + "," + 
-					           chart.trains.get(i).color.getGreen() + "," + 
-					           chart.trains.get(i).color.getBlue() + ") ====");
-			System.out.print(chart.trains.get(i).toString());
-		}
-	    System.out.println("\nSettings: " + 
-	    		  chart.distScale + "," +
-	    		  chart.displayLevel + "," +
-	    		  chart.boldLevel + "," +
-	    		  chart.startHour + "," +
-	    		  chart.minuteScale + "," +
-	    		  chart.timeInterval);
-	    
-	    chart.distScale ++;
-	    
-	    try {
-			chart.saveToFile(new File("d:\\huning3.trc"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//	    RailroadLineChart chart = null;
+//	    try {
+//	      chart = new RailroadLineChart();
+//	      chart.loadFromFile2(new File("d:\\huning2.trc"));
+//	    }
+//	    catch (IOException ex) {
+//	      System.out.println("Error:" + ex.getMessage());
+//	    }
+//	    
+//	    System.out.print(chart.railroadLine.toString());
+//	    for (int i = 0; i < chart.getTrainNum(); i++) {
+//			System.out.print("==== " + i + " ==== (");
+//			System.out.println(chart.trains.get(i).color.getRed() + "," + 
+//					           chart.trains.get(i).color.getGreen() + "," + 
+//					           chart.trains.get(i).color.getBlue() + ") ====");
+//			System.out.print(chart.trains.get(i).toString());
+//		}
+//	    System.out.println("\nSettings: " + 
+//	    		  chart.___GLOBAL_SETTINGS_.distScale + "," +
+//	    		  chart.___GLOBAL_SETTINGS_.displayLevel + "," +
+//	    		  chart.___GLOBAL_SETTINGS_.boldLevel + "," +
+//	    		  chart.___GLOBAL_SETTINGS_.startHour + "," +
+//	    		  chart.___GLOBAL_SETTINGS_.minuteScale + "," +
+//	    		  chart.___GLOBAL_SETTINGS_.timeInterval);
+//	    
+//	    chart.___GLOBAL_SETTINGS_.distScale ++;
+//	    
+//	    try {
+//			chart.saveToFile(new File("d:\\huning3.trc"));
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	    
 	  }
 
@@ -578,15 +574,9 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	@Override
 	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
 		if (propTuples == null) {
-			propTuples = new Tuple[7];
+			propTuples = new Tuple[1];
 			
 			propTuples[0] = Tuple.of("railroadLineName", String.class);
-			propTuples[1] = Tuple.of("distScale", float.class);
-			propTuples[2] = Tuple.of("displayLevel", int.class);
-			propTuples[3] = Tuple.of("boldLevel", int.class);
-			propTuples[4] = Tuple.of("startHour", int.class);
-			propTuples[5] = Tuple.of("minuteScale", int.class);
-			propTuples[6] = Tuple.of("timeInterval", int.class);
 		}
 		
 		return propTuples;
@@ -598,19 +588,7 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 		
 		if (propTuples[0].A.equals(propName)) {
 			railroadLineName = valueInStr;
-		} else if (propTuples[1].A.equals(propName)) {
-			distScale = Float.parseFloat(valueInStr);
-		} else if (propTuples[2].A.equals(propName)) {
-			displayLevel = Integer.parseInt(valueInStr);
-		} else if (propTuples[3].A.equals(propName)) {
-			boldLevel = Integer.parseInt(valueInStr);
-		} else if (propTuples[4].A.equals(propName)) {
-			startHour = Integer.parseInt(valueInStr);
-		} else if (propTuples[5].A.equals(propName)) {
-			minuteScale = Integer.parseInt(valueInStr);
-		} else if (propTuples[6].A.equals(propName)) {
-			timeInterval = Integer.parseInt(valueInStr);
-		}
+		} 
 	}
 
 	@Override
@@ -620,18 +598,6 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 		if (index == 0) {
 			railroadLineName = railroadLine.name;
 			value = railroadLineName;	
-		} else if (index == 1) {
-			value = distScale + "";
-		} else if (index == 2) {
-			value = displayLevel + "";
-		} else if (index == 3) {
-			value = boldLevel + "";
-		} else if (index == 4) {
-			value = startHour + "";
-		} else if (index == 5) {
-			value = minuteScale + "";
-		} else if (index == 6) {
-			value = timeInterval + "";
 		}
 		
 		return value;

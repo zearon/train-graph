@@ -91,6 +91,8 @@ import org.paradise.etrc.view.lineedit.RailroadLineEditView;
 import org.paradise.etrc.view.nav.Navigator;
 import org.paradise.etrc.view.nav.Navigator.NavigatorNodeType;
 import org.paradise.etrc.view.sheet.SheetView;
+import org.paradise.etrc.view.timetables.TimetableListTableModel;
+import org.paradise.etrc.view.timetables.TimetableListView;
 
 /**
  * @author lguo@sina.com
@@ -114,6 +116,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	public RailroadLineEditView railLineEditView;
 	public AllTrainsView allTrainsView;
+	public TimetableListView timetableListView;
 	
 //	public J
 	
@@ -218,6 +221,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		navigator.setTrainGraph(trainGraph);
 		railLineEditView.setModel(trainGraph);
 		allTrainsView.setModel(trainGraph);
+		timetableListView.setModel(trainGraph);
 		
 
 		chartView.updateData();
@@ -318,12 +322,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	//Component initialization
 	private void jbInit() throws Exception {
 		
-		chartView = new ChartView(this);
-		runView = new DynamicView(this);
-		sheetView = new SheetView(this);
+		chartView = new ChartView(trainGraph, currentLineChart, this);
+		runView = new DynamicView(trainGraph, currentLineChart, this);
+		sheetView = new SheetView(trainGraph, currentLineChart, this);
 		
 		railLineEditView = new RailroadLineEditView(this);
 		allTrainsView = new AllTrainsView();
+		timetableListView = new TimetableListView(trainGraph);
 		
 //		tbPane = new JTabbedPane();
 //		tbPane.setFont(new Font("Dialog", Font.PLAIN, 12));
@@ -345,6 +350,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				railLineEditView);
 		navigatorContentPanel.add(NavigatorNodeType.ALL_TRAINS.name(), 
 				allTrainsView);
+		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLES.name(),
+				timetableListView);
 		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLE_LINE.name(), 
 				raillineChartView);
 		// TODO: 设置主视图启动时的编辑视图
@@ -707,7 +714,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		menuFile.add(createMenuItem(__("New"), File_Clear_Chart)).setMnemonic(KeyEvent.VK_N);
 		menuFile.add(createMenuItem(__("Open..."), File_Load_Chart)).setMnemonic(KeyEvent.VK_O);
 		menuFile.addSeparator();
-		menuFile.add(createMenuItem(__("SaveMenu"), File_Save_Chart)).setMnemonic(KeyEvent.VK_S);
+		menuFile.add(createMenuItem(__("Save"), File_Save_Chart)).setMnemonic(KeyEvent.VK_S);
 		menuFile.add(createMenuItem(__("Save As..."), File_Save_Chart_As)).setMnemonic(KeyEvent.VK_A);
 		menuFile.addSeparator();
 //		menuFile.add(createMenuItem("更改线路...", File_Circuit)); //Bug:更改线路后没有清空车次
@@ -965,10 +972,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	 * doClearChart
 	 */
 	private void doClearChart() {
-		currentLineChart.clearTrains();
-		chartView.repaint();
-		sheetView.updateData();
-		runView.refresh();
+		TrainGraphFactory.resetIDCounters();
+		trainGraph = TrainGraphFactory.createDefaultTrainGraph();
+		
+		setModel(trainGraph);
 	}
 
 	/**
@@ -1246,7 +1253,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	 * doDistSet
 	 */
 	private void doDistSet() {
-		DistSetDialog dlg = new DistSetDialog(this, currentLineChart);
+		DistSetDialog dlg = new DistSetDialog(this, trainGraph);
 		Dimension dlgSize = dlg.getPreferredSize();
 		Dimension frmSize = getSize();
 		Point loc = getLocation();
@@ -1261,7 +1268,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	 * doTimeSet
 	 */
 	private void doTimeSet() {
-		TimeSetDialog dlg = new TimeSetDialog(this, currentLineChart);
+		TimeSetDialog dlg = new TimeSetDialog(trainGraph.settings, this);
 		Dimension dlgSize = dlg.getPreferredSize();
 		Dimension frmSize = getSize();
 		Point loc = getLocation();
@@ -1350,9 +1357,18 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.ALL_TRAINS.name());
 			break;
+		case TIME_TABLES:
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.TIME_TABLES.name());
+			break;
 		case TIME_TABLE_LINE:
 			currentLineChart = (RailroadLineChart) params[0];
 			currentNetworkChart = (RailNetworkChart) params[1];
+
+			chartView.setModel(trainGraph, currentLineChart);
+			runView.setModel(trainGraph, currentLineChart);
+			sheetView.setModel(trainGraph, currentLineChart);
+
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.TIME_TABLE_LINE.name());
 			break;

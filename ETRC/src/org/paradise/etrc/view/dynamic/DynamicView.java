@@ -14,6 +14,9 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.RailroadLineChart;
+import org.paradise.etrc.data.TrainGraph;
 
 /**
  * @author lguo@sina.com
@@ -47,6 +50,12 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 
 	public MainFrame mainFrame;
 	public int scale = DEFAULT_SCALE;
+
+	private RailroadLineChart activeChart;
+
+	private GlobalSettings settings;
+
+	private boolean ui_inited;
 	private static final int DEFAULT_SCALE = 5;
 	private static final int MIN_SCALE = 3;
 	private static final int MAX_SCALE = 10;
@@ -66,21 +75,35 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 		refresh();
 	}
 
-	public DynamicView(MainFrame _mainFrame) {
+	public DynamicView(TrainGraph trainGraph, RailroadLineChart activeChart, MainFrame _mainFrame) {
 		mainFrame = _mainFrame;
+		setModel(trainGraph, activeChart);
 		
 		panelDistance = new DistancePanel(this);
 		panelClock = new ClockPanel(this);
-		panelRunning = new RunningPanel(this);
+		panelRunning = new RunningPanel(trainGraph, activeChart, this);
 
 		try {
 			jbInit();
+			ui_inited = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
 		
 		Thread thr = new Thread(this);
 		thr.start();
+	}
+	
+	public void setModel(TrainGraph trainGraph, RailroadLineChart activeChart) {
+		this.activeChart = activeChart;
+		this.settings = trainGraph.settings;
+		
+		if (ui_inited) {
+			panelRunning.setModel(trainGraph, activeChart);
+			panelDistance.setModel(activeChart);
+			
+			refresh();
+		}
 	}
 
 	/**

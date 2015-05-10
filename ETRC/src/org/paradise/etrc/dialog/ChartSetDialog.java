@@ -26,7 +26,9 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
+import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.view.chart.ChartView;
 
 public class ChartSetDialog extends JDialog {
@@ -43,14 +45,21 @@ public class ChartSetDialog extends JDialog {
 	private JTextField t0;
 	private JTextField t1;
 	private JTextField t2;
+
+	private GlobalSettings settings;
 	
 	private static String defaultStatus = __("Settings for Train Graph");
 
-	public ChartSetDialog(MainFrame _mainFrame) {
+	public ChartSetDialog(GlobalSettings settings, MainFrame _mainFrame) {
 		super(_mainFrame, __("Settings for Train Graph"), false);
 		mainFrame = _mainFrame;
+		setModel(settings);
 
 		init();
+	}
+	
+	public void setModel(GlobalSettings settings) {
+		this.settings = settings;
 	}
 
 	private void init() {
@@ -58,13 +67,13 @@ public class ChartSetDialog extends JDialog {
 		
 		RailroadLineChart chart = mainFrame.currentLineChart;
 		
-		d0 = createJTextField("" + chart.distScale);
-		d1 = createJTextField("" + chart.displayLevel);
-		d2 = createJTextField("" + chart.boldLevel);
+		d0 = createJTextField("" + settings.distScale);
+		d1 = createJTextField("" + settings.displayLevel);
+		d2 = createJTextField("" + settings.boldLevel);
 		
-		t0 = createJTextField("" + chart.startHour);
-		t1 = createJTextField("" + chart.minuteScale);
-		t2 = createJTextField("" + chart.timeInterval);
+		t0 = createJTextField("" + settings.startHour);
+		t1 = createJTextField("" + settings.minuteScale);
+		t2 = createJTextField("" + settings.timeInterval);
 		
 		JPanel distPanel = creatJPanel(
                 createJLabelL(__("Pixels per km:")), d0, createJLabelR(" "),
@@ -337,13 +346,13 @@ public class ChartSetDialog extends JDialog {
 	      }
 	      
 	      else{
-	          chart.distScale = distScale;
-	          chart.displayLevel = display;
-	          chart.boldLevel = bold;
+	          settings.distScale = distScale;
+	          settings.displayLevel = display;
+	          settings.boldLevel = bold;
 
-	          chart.startHour = start;
-	          chart.minuteScale = minScale;
-	          chart.timeInterval = interval;
+	          settings.startHour = start;
+	          settings.minuteScale = minScale;
+	          settings.timeInterval = interval;
 
 	          mainFrame.chartView.resetSize();
 	          mainFrame.runView.refresh();

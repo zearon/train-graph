@@ -20,9 +20,10 @@ public class TableElementMoveAction extends TableAction {
 	int oldIndex;
 	int newIndex;
 	boolean vertical;
+	Runnable callback;
 
 	TableElementMoveAction(String tableName, JTable table, Vector list,
-			int oldIndex, int newIndex, boolean vertical) {
+			int oldIndex, int newIndex, boolean vertical, Runnable callback) {
 		
 		super(table);
 		this.tableName = tableName;
@@ -30,6 +31,7 @@ public class TableElementMoveAction extends TableAction {
 		this.oldIndex = oldIndex;
 		this.newIndex = newIndex;
 		this.vertical = vertical;
+		this.callback = callback;
 	}
 
 	@Override
@@ -65,6 +67,9 @@ public class TableElementMoveAction extends TableAction {
 
 		if (editor != null)
 			editor.stopCellEditing();
+		
+		if (callback != null)
+			callback.run();
 	}
 
 	@Override
@@ -100,6 +105,9 @@ public class TableElementMoveAction extends TableAction {
 		
 		if (editor != null)
 			editor.stopCellEditing();
+		
+		if (callback != null)
+			callback.run();
 	}
 
 	@Override

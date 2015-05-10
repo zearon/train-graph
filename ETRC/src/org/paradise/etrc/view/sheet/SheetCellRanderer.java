@@ -18,7 +18,9 @@ public class SheetCellRanderer extends JLabel implements TableCellRenderer {
         setHorizontalAlignment(CENTER);
 	}
 
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+	public Component getTableCellRendererComponent(JTable table, Object value, 
+			boolean isSelected, boolean hasFocus, int row, int column) {
+		
 		boolean isArriveLine = row % 2 == 0;
 		Stop stop = (Stop) value;
 		

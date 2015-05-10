@@ -19,11 +19,13 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.view.chart.traindrawing.DrawingModel;
 import org.paradise.etrc.view.chart.traindrawing.TrainDrawing;
 
@@ -78,21 +80,50 @@ public class ChartView extends JPanel {
 	public Color gridColor = new Color(0xE0E0E0); //MOD Color.GRAY;
 	public Color activeGridColor = Color.DARK_GRAY;
 	
+
+	public TrainGraph trainGraph;
+	public GlobalSettings settings;
+	public RailroadLineChart activeLineChart;
+	
 	public Train activeTrain;
 	public Station activeStation;
 	
 	public MainFrame mainFrame;
 
-	public ChartView(MainFrame _mainFrame) {
+	private boolean ui_inited;
+
+	public ChartView(TrainGraph trainGraph, RailroadLineChart activeChart, MainFrame _mainFrame) {
 		mainFrame = _mainFrame;
-		panelCircuit = new CircuitPanel(mainFrame.currentLineChart, this);
-		panelClock = new ClockPanel(mainFrame.currentLineChart, this);
-		panelLines = new LinesPanel(this);
+		
+		setModel(trainGraph, activeChart);
+		
+		panelCircuit = new CircuitPanel(trainGraph, activeLineChart, this);
+		panelClock = new ClockPanel(trainGraph, this);
+		panelLines = new LinesPanel(trainGraph, activeLineChart, this);
 		
 		try {
 			jbInit();
+			ui_inited = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	public void setModel(TrainGraph trainGraph, RailroadLineChart activeLineChart) {
+		this.trainGraph = trainGraph;
+		this.settings = trainGraph.settings;
+		this.activeLineChart = activeLineChart;
+		
+		activeTrain = null;
+		
+		if (ui_inited) {
+			panelCircuit.setModel(trainGraph, activeLineChart);
+			panelClock.setModel(trainGraph);
+			panelLines.setModel(trainGraph, activeLineChart);
+			cornerControl.setModel(trainGraph);
+		
+			shouldUpdateDrawingModel = true;
+			repaint();
 		}
 	}
 
@@ -153,7 +184,7 @@ public class ChartView extends JPanel {
 			return;
 		}
 		
-		drawingModel.updateCurrentCircuit(mainFrame.currentLineChart, mainFrame.currentLineChart.railroadLine, this);
+		drawingModel.updateCurrentCircuit(activeLineChart, activeLineChart.railroadLine, settings, this);
 		drawingModel.updateUpDownTrainOption(showUpDownState);
 		drawingModel.setActiveTrain(activeTrain, showUpDownState);
 	}
@@ -175,7 +206,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getPelsX(int coordinate) {
-		return coordinate * mainFrame.currentLineChart.minuteScale + leftMargin;
+		return Math.round (coordinate * settings.minuteScale) + leftMargin;
 	}
 
 	/**
@@ -193,7 +224,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getPelsY(int dist) {
-		return Math.round(dist * mainFrame.currentLineChart.distScale) + topMargin;
+		return Math.round(dist * settings.distScale) + topMargin;
 	}
 
 	/**
@@ -211,7 +242,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getDist(int py) {
-		return Math.round((py - topMargin) / mainFrame.currentLineChart.distScale);
+		return Math.round((py - topMargin) / settings.distScale);
 	}
 
 	public String getStationName(int py) {
@@ -219,7 +250,7 @@ public class ChartView extends JPanel {
 	}
 
 	public int getMinute(int px) {
-		return (px - leftMargin) / mainFrame.currentLineChart.minuteScale;
+		return Math.round ((px - leftMargin) / settings.minuteScale);
 	}
 
 	/**
@@ -234,7 +265,7 @@ public class ChartView extends JPanel {
 //		int h = time.getHours() - mainFrame.chart.startHour;
 		try {
 		int h = Integer.parseInt(time.split(":")[0]) 
-				- mainFrame.currentLineChart.startHour;
+				- settings.startHour;
 		if (h < 0)
 			h += 24;
 
@@ -338,20 +369,20 @@ public class ChartView extends JPanel {
 	}
 
 	public void setCoordinateCorner(Point p) {
-		int dist = Math.round((p.y - topMargin) / mainFrame.currentLineChart.distScale);
-		int minutes = (p.x - leftMargin) / mainFrame.currentLineChart.minuteScale;
+		int dist = Math.round((p.y - topMargin) / settings.distScale);
+		int minutes = Math.round( ((p.x - leftMargin) / settings.minuteScale) );
 		cornerCoordinate.setText("(" + getClockString(minutes) + ","
 				+ getDistString(dist) + ")");
 		mainFrame.statusBarMain.setText(mainFrame.currentLineChart.railroadLine.getStationName(dist, true));
 	}
 
 	public String getDistString(Point p) {
-		int dist = Math.round((p.y - topMargin) / mainFrame.currentLineChart.distScale);
+		int dist = Math.round((p.y - topMargin) / settings.distScale);
 		return getDistString(dist);
 	}
 	
 	public String getClockString(Point p) {
-		int minutes = (p.x - leftMargin) / mainFrame.currentLineChart.minuteScale;
+		int minutes = Math.round( (p.x - leftMargin) / settings.minuteScale );
 		return getClockString(minutes);
 	}
 
@@ -372,7 +403,7 @@ public class ChartView extends JPanel {
 		String strMinute = clockMinute < 10 ? "0" + clockMinute : ""
 				+ clockMinute;
 
-		int clockHour = mainFrame.currentLineChart.startHour + hours;
+		int clockHour = settings.startHour + hours;
 		if (clockHour < 0)
 			clockHour += 24;
 		if (clockHour >= 24)
@@ -428,7 +459,7 @@ public class ChartView extends JPanel {
 		
 		//在左下角显示上行车次数和下行车次数－－放到sheetView的左上角去
 		//左下角改放快速缩放控制按钮
-		cornerControl = new ControlPanel(this);
+		cornerControl = new ControlPanel(trainGraph, this);
 		spLines.setCorner(JScrollPane.LOWER_LEFT_CORNER, cornerControl);
 
 		//永远显示横竖滚动条，以便右下角的“上下行”状态显示能出现

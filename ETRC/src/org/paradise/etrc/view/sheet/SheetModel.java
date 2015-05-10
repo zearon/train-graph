@@ -15,13 +15,14 @@ public class SheetModel extends DefaultJEditTableModel {
 	private static final long serialVersionUID = 6767541225039467460L;
 	private JTable table;
 	public RailroadLineChart chart;
+	
 	public SheetModel(JTable table, RailroadLineChart _chart) {
 		this.table = table;
 		chart = _chart;
 	}
 	
 	public int getColumnCount() {
-		return chart.getTrainNum();
+		return chart.getTrainNum() + 1;
 	}
 
 	public int getRowCount() {
@@ -29,6 +30,9 @@ public class SheetModel extends DefaultJEditTableModel {
 	}
 
 	public Object getValueAt(int rowIndex, int colIndex) {
+		if (colIndex == chart.getTrainNum())
+			return null;
+			
 		Train theTrain = chart.getTrain(colIndex);
 		String staName = chart.railroadLine.getStation(rowIndex / 2).name;
 		Stop stop = findStop(theTrain, staName);
@@ -52,6 +56,9 @@ public class SheetModel extends DefaultJEditTableModel {
 	}
 
 	public String getColumnName(int conIndex) {
+		if (conIndex == chart.getTrainNum())
+			return "*";
+		
 		return chart.getTrain(conIndex).getTrainName(chart.railroadLine);
 	}
 	
@@ -60,6 +67,9 @@ public class SheetModel extends DefaultJEditTableModel {
 	}
 	
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
+		if (columnIndex == chart.getTrainNum())
+			return false;
+		
 		return true;
 	}
 
@@ -71,6 +81,9 @@ public class SheetModel extends DefaultJEditTableModel {
 	//修改到发点时间不需要特殊处理，在CellEditor里面就处理好了
 	//此处需要处理添加、删除停站的操作
 	public void _setValueAt(Object aValue, int rowIndex, int colIndex)  {
+		if (colIndex == chart.getTrainNum())
+			return;
+		
 		Train theTrain = chart.getTrain(colIndex);
 		String staName = chart.railroadLine.getStation(rowIndex / 2).name;
 		Stop stop = (Stop) aValue;
@@ -104,6 +117,9 @@ public class SheetModel extends DefaultJEditTableModel {
 
 	@Override
 	public boolean nextCellIsBelow(int row, int column, int increment) {
+		if (column == chart.getTrainNum())
+			return true;
+		
 		Train theTrain = chart.getTrain(column);
 		
 		if (theTrain.isDownTrain(chart.railroadLine) == Train.DOWN_TRAIN)

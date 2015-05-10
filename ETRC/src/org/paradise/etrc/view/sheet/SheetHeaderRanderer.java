@@ -22,7 +22,9 @@ public class SheetHeaderRanderer extends JLabel implements TableCellRenderer {
 		setBackground(SheetView.headerBK);
 	}
 	
-	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+	public Component getTableCellRendererComponent(JTable table, Object value, 
+			boolean isSelected, boolean hasFocus, int row, int column) {
+		
 		String trainName = (value == null) ? "" : value.toString();
 		
 		setText(trainName);

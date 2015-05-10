@@ -66,9 +66,9 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 		this.zindex = 1;
 		this.dispScale = 1.0f;
 		
-		appendStation(TrainGraphFactory.createInstance(Station.class, "Stop 1")
+		appendStation(TrainGraphFactory.createInstance(Station.class)
 				.setProperties(0, 1, false));
-		appendStation(TrainGraphFactory.createInstance(Station.class, "Stop 2")
+		appendStation(TrainGraphFactory.createInstance(Station.class)
 				.setProperties(30, 1, false));
 	}
 
@@ -88,17 +88,17 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 		return cir;
 	}
 	
-	
-	@Override
-	public int hashCode() {
-		return id;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return (obj != null && obj instanceof RailroadLine 
-				&& ((RailroadLine) obj).name == name) ? true : false;
-	}
+//	
+//	@Override
+//	public int hashCode() {
+//		return id;
+//	}
+//
+//	@Override
+//	public boolean equals(Object obj) {
+//		return (obj != null && obj instanceof RailroadLine 
+//				&& ((RailroadLine) obj).name == name) ? true : false;
+//	}
 
 	public int getID() {
 		return id;

@@ -11,7 +11,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
+import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.dialog.ChartSetDialog;
 
 /**
@@ -24,13 +26,21 @@ public class ControlPanel extends JPanel {
 
 	private ChartView chartView;
 
-	public ControlPanel(ChartView _chartView) {
+	private GlobalSettings settings;
+
+	public ControlPanel(TrainGraph trainGraph, ChartView _chartView) {
 		chartView = _chartView;
+		setModel(trainGraph);
+		
 		try {
 			jbInit();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public void setModel(TrainGraph trainGraph) {
+		this.settings = trainGraph.settings;
 	}
 
 	void jbInit() throws Exception {
@@ -99,33 +109,34 @@ public class ControlPanel extends JPanel {
 
 	private int[] minuteGrids = {20,10,10,10,10,5,5,5,5,5};
 	private void increaseMinuteGap(int i) {
-		chartView.mainFrame.currentLineChart.minuteScale += i;
+		settings.minuteScale += i;
 		
-		if(chartView.mainFrame.currentLineChart.minuteScale > RailroadLineChart.MAX_MINUTE_SCALE) {
-			chartView.mainFrame.currentLineChart.minuteScale = RailroadLineChart.MAX_MINUTE_SCALE;
+		if(settings.minuteScale > RailroadLineChart.MAX_MINUTE_SCALE) {
+			settings.minuteScale = RailroadLineChart.MAX_MINUTE_SCALE;
 			return;
 		}
 		
-		if(chartView.mainFrame.currentLineChart.minuteScale < 1) {
-			chartView.mainFrame.currentLineChart.minuteScale = 1;
+		if(settings.minuteScale < 1) {
+			settings.minuteScale = 1;
 			return;
 		}
 		
-		chartView.mainFrame.currentLineChart.timeInterval = minuteGrids[chartView.mainFrame.currentLineChart.minuteScale-1];
+		// TODO: settings.minuteScale 改为浮点
+		settings.timeInterval = minuteGrids[(int) settings.minuteScale-1];
 		chartView.resetSize();
 		chartView.panelLines.updateBuffer();
 	}
 
 	private void increaseDistGap(int i) {
-		chartView.mainFrame.currentLineChart.distScale += i;
+		settings.distScale += i;
 		
-		if(chartView.mainFrame.currentLineChart.distScale > RailroadLineChart.MAX_DIST_SCALE) {
-			chartView.mainFrame.currentLineChart.distScale = RailroadLineChart.MAX_DIST_SCALE;
+		if(settings.distScale > RailroadLineChart.MAX_DIST_SCALE) {
+			settings.distScale = RailroadLineChart.MAX_DIST_SCALE;
 			return;
 		}
 		
-		if(chartView.mainFrame.currentLineChart.distScale < 1) {
-			chartView.mainFrame.currentLineChart.distScale = 1;
+		if(settings.distScale < 1) {
+			settings.distScale = 1;
 			return;
 		}
 
@@ -134,7 +145,7 @@ public class ControlPanel extends JPanel {
 	}
 	
 	private void setup() {
-		ChartSetDialog dlg = new ChartSetDialog(chartView.mainFrame);
+		ChartSetDialog dlg = new ChartSetDialog(settings, chartView.mainFrame);
 		dlg.editSettings();
 	}
 

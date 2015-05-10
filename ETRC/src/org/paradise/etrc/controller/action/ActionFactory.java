@@ -33,7 +33,19 @@ public class ActionFactory {
 			int newIndex, boolean vertical) {
 
 		UIAction action = new TableElementMoveAction(tableName, table, list,
-				oldIndex, newIndex, vertical);
+				oldIndex, newIndex, vertical, null);
+
+		ActionManager.getInstance().addActionAndDoIt(action);
+
+		return action;
+	}
+
+	public static UIAction createTableElementMoveActionAndDoIt(
+			String tableName, JTable table, Vector list, int oldIndex,
+			int newIndex, boolean vertical, Runnable callback) {
+
+		UIAction action = new TableElementMoveAction(tableName, table, list,
+				oldIndex, newIndex, vertical, callback);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 
@@ -88,7 +100,7 @@ public class ActionFactory {
 		return action;
 	}
 
-	public static <T> UIAction createRemoveTableElementAction(String tableName,
+	public static <T> UIAction createRemoveTableElementActionAndDoIt(String tableName,
 			JTable table, boolean vertical, int[] indeces,
 			IntFunction<T> getter, BiConsumer<Integer, T> adder,
 			Consumer<Integer> remover, Runnable callback) {
@@ -99,5 +111,18 @@ public class ActionFactory {
 		ActionManager.getInstance().addActionAndDoIt(action);
 
 		return action;
+	}
+
+	public static UIAction createTableRowColumnIncrementActionAndDoIt(
+			String repr, String tableName, JEditTable table, int increment,
+			int start, int end, int coord, boolean vertical) {
+
+		UIAction action = new TableRowColumnIncrementAction(repr, tableName,
+				table, increment, start, end, coord, vertical);
+
+		ActionManager.getInstance().addActionAndDoIt(action);
+
+		return action;
+
 	}
 }

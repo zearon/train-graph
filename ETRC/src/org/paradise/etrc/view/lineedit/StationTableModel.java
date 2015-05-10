@@ -27,7 +27,7 @@ public class StationTableModel extends DefaultJEditTableModel {
 	
 	public void setRailroadLine(RailroadLine line) {
 		if (line != null)
-			railroadLine = line.copy();
+			railroadLine = line;
 		else
 			railroadLine = TrainGraphFactory.createInstance(RailroadLine.class);
 	}

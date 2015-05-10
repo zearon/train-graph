@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Vector;
 
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Train;
@@ -34,6 +35,8 @@ public class DrawingModel {
 	protected Vector<TrainDrawing> normalDrawings = new Vector<TrainDrawing>();
 	protected Vector<TrainDrawing> underDrawings  = new Vector<TrainDrawing>();
 
+	private GlobalSettings settings;
+
 	public TrainDrawing getActiveTrainDrawing() {
 		return activeTrainDrawing;
 	}
@@ -52,9 +55,11 @@ public class DrawingModel {
 	}
 	
 
-	public void buildTrainDrawings(RailroadLineChart chart, ChartView chartView) {
+	public void buildTrainDrawings(GlobalSettings settings, RailroadLineChart chart, 
+			ChartView chartView) {
+		this.settings = settings;
 		isLastActiveTrainDrawingInUnderMode = chartView.showUpDownState == ChartView.SHOW_NONE;
-		updateCurrentCircuit(chart, currentCircuit, chartView);
+		updateCurrentCircuit(chart, currentCircuit, settings, chartView);
 		updateUpDownTrainOption(3);
 	}
 	
@@ -63,7 +68,8 @@ public class DrawingModel {
 	 * @param chart
 	 * @param currentCircuit
 	 */
-	public void updateCurrentCircuit(RailroadLineChart chart, RailroadLine currentCircuit, ChartView chartView) {
+	public void updateCurrentCircuit(RailroadLineChart chart, RailroadLine currentCircuit, 
+			GlobalSettings settings, ChartView chartView) {
 		// 更新当前线路以及Train列表
 		this.currentCircuit = currentCircuit;
 		
@@ -79,7 +85,7 @@ public class DrawingModel {
 		for (int i = 0; i < chart.getTrainNum(); i++) {
 			Train train = chart.getTrain(i);
 			
-			TrainDrawing trainDrawing = new TrainDrawing(chartView, train, false, true); // active=false, under=true
+			TrainDrawing trainDrawing = new TrainDrawing(chartView, settings, train, false, true); // active=false, under=true
 			allTrainDrawings.add(trainDrawing);
 			if (!"".equals(train.trainNameUp))
 				trainDrawingIndex.put(trainDrawing.train.trainNameUp, i);

@@ -36,10 +36,12 @@ import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
 import org.paradise.etrc.ETRC;
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.YesNoBox;
@@ -78,14 +80,32 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	private boolean shouldRepaint = true;
 	private BufferedImage bufferedImage;
 
-	public LinesPanel(ChartView _mainView) {
-		chartView = _mainView;
+	GlobalSettings settings;
+	private RailroadLineChart chart;
+
+	private boolean ui_inited;
+
+	public LinesPanel(TrainGraph trainGraph, RailroadLineChart activeChart, ChartView chartView) {
+		this.chartView = chartView;
+		setModel(trainGraph, activeChart);
+		
 		chartView.mainFrame.currentLineChart.addChartChangedListener(chart->this.updateBuffer());
 		
 		try {
 			jbInit();
+			
+			ui_inited = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	public void setModel(TrainGraph trainGraph, RailroadLineChart activeChart) {
+		this.chart = activeChart;
+		this.settings = trainGraph.settings;
+		
+		if (ui_inited) {
+			repaint();
 		}
 	}
 
@@ -290,10 +310,9 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 			drawClockLine(g, i);
 		}
 
-		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
 		if (chart.railroadLine != null) {
 			for (int i = 0; i < chart.railroadLine.getStationNum(); i++) {
-				drawStationLine(g, chart.railroadLine.getStation(i), chart.distScale);
+				drawStationLine(g, chart.railroadLine.getStation(i), settings.distScale);
 			}
 		}
 
@@ -355,12 +374,11 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
 		int w, h;
 		
-		w = 60 * 24 * chart.minuteScale 
-		  + chartView.leftMargin 
-		  + chartView.rightMargin;
+		w = Math.round( 60 * 24 * settings.minuteScale 
+		  + chartView.leftMargin + chartView.rightMargin );
 		
 		if (chart.railroadLine != null)
-			h = Math.round(chart.railroadLine.length * chart.distScale )
+			h = Math.round(chart.railroadLine.length * settings.distScale )
 			  + chartView.topMargin
 			  + chartView.bottomMargin;
 		else
@@ -400,8 +418,8 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		g.setColor(chartView.gridColor);
 
 		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
-		int start = clock * 60 * chart.minuteScale + chartView.leftMargin;
-		int h = Math.round(chart.railroadLine.length * chart.distScale);
+		int start = Math.round( clock * 60 * settings.minuteScale + chartView.leftMargin );
+		int h = Math.round(chart.railroadLine.length * settings.distScale);
 		
 		// 0～23点整点竖线
 		g.drawLine(start, 0, 
@@ -410,8 +428,8 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 				   start + 1, h + chartView.topMargin + chartView.bottomMargin);
 		
 		// 整点之间的timeInterval分钟间隔竖线
-		for (int i = 1; i < 60 / chart.timeInterval; i++) {
-			int x = start + chart.timeInterval * chart.minuteScale * i;
+		for (int i = 1; i < 60 / settings.timeInterval; i++) {
+			int x = Math.round( start + settings.timeInterval * settings.minuteScale * i );
 			int y1 = chartView.topMargin;
 			int y2 = y1 + h;
 			g.drawLine(x, y1, x, y2);
@@ -419,7 +437,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 
 		// 24点整点竖线
 		if (clock == 23) {
-			int end = 24 * 60 * chart.minuteScale + chartView.leftMargin;
+			int end = Math.round( 24 * 60 * settings.minuteScale + chartView.leftMargin );
 			
 			g.drawLine(end, 0, 
 					   end, h + chartView.topMargin + chartView.bottomMargin);
@@ -447,13 +465,12 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 
 		// 画坐标线
 		int y = Math.round(st.dist * scale) + chartView.topMargin;
-		int w = 60 * 24 * chart.minuteScale 
-		        + chartView.leftMargin
-				+ chartView.rightMargin;
+		int w = Math.round( 60 * 24 * settings.minuteScale 
+		        + chartView.leftMargin + chartView.rightMargin );
 
-		if (st.level <= chart.displayLevel) {
+		if (st.level <= settings.displayLevel) {
 			g.drawLine(0, y, w, y);
-			if (st.level <= chart.boldLevel) {
+			if (st.level <= settings.boldLevel) {
 				g.drawLine(0, y + 1, w, y + 1);
 			}
 		}

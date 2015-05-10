@@ -20,6 +20,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.data.GlobalSettings;
 //import com.borland.jbcl.layout.*;
 import org.paradise.etrc.data.RailroadLineChart;
 
@@ -55,13 +56,17 @@ public class TimeSetDialog extends JDialog implements ActionListener {
   JLabel jLabel3 = new JLabel();
 
   RailroadLineChart chart;
-  public TimeSetDialog(Frame frame, RailroadLineChart _chart) {
+
+private GlobalSettings settings;
+  public TimeSetDialog(GlobalSettings settings, Frame frame) {
     super(frame, __("Timeline Settings"), false);
 
     if(frame instanceof MainFrame) {
       mainFrame = (MainFrame) frame;
     }
-    chart = _chart;
+//    chart = _chart;
+    setModel(settings);
+    
     try {
       jbInit();
       pack();
@@ -70,6 +75,10 @@ public class TimeSetDialog extends JDialog implements ActionListener {
       ex.printStackTrace();
     }
   }
+	
+	public void setModel(GlobalSettings settings) {
+		this.settings = settings;
+	}
 
   private void jbInit() throws Exception {
     titledBorder1 = new TitledBorder("");
@@ -91,7 +100,7 @@ public class TimeSetDialog extends JDialog implements ActionListener {
 
     tfMinScale.setMinimumSize(new Dimension(12, 22));
     tfMinScale.setPreferredSize(new Dimension(20, 22));
-    tfMinScale.setText(chart.minuteScale+"");
+    tfMinScale.setText(settings.minuteScale+"");
     tfMinScale.setColumns(0);
 
     lbInterval.setText(__("Y-axis gap (min):"));
@@ -103,7 +112,7 @@ public class TimeSetDialog extends JDialog implements ActionListener {
 
     tfInterval.setMinimumSize(new Dimension(24, 22));
     tfInterval.setPreferredSize(new Dimension(20, 22));
-    tfInterval.setText(chart.timeInterval+"");
+    tfInterval.setText(settings.timeInterval+"");
 
     btOK.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     btOK.setText(__("Set"));
@@ -142,7 +151,7 @@ public class TimeSetDialog extends JDialog implements ActionListener {
     jLabel2.setHorizontalTextPosition(SwingConstants.LEFT);
 
     tfStart.setColumns(0);
-    tfStart.setText(chart.startHour+"");
+    tfStart.setText(settings.startHour+"");
     tfStart.setPreferredSize(new Dimension(20, 22));
     tfStart.setMinimumSize(new Dimension(12, 22));
 
@@ -256,9 +265,9 @@ public class TimeSetDialog extends JDialog implements ActionListener {
       }
       else{
         if(this.mainFrame != null) {
-          chart.startHour = start;
-          chart.minuteScale = minScale;
-          chart.timeInterval = interval;
+        	settings.startHour = start;
+        	settings.minuteScale = minScale;
+        	settings.timeInterval = interval;
 
           mainFrame.validate();
           mainFrame.chartView.resetSize();

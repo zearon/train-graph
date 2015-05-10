@@ -7,7 +7,7 @@ import org.paradise.etrc.data.RailroadLineChart;
 public class RowHeaderModel extends AbstractListModel<Object> {
 	private static final long serialVersionUID = 547009998890792058L;
 	
-	private RailroadLineChart chart;
+	RailroadLineChart chart;
 	
 	public RowHeaderModel(RailroadLineChart _chart) {
 		chart = _chart;

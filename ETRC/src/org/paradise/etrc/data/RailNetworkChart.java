@@ -19,6 +19,11 @@ extends TrainGraphPart<RailNetworkChart, RailroadLineChart> {
 		return railLineCharts;
 	}
 	
+	public RailroadLineChart findRailLineChart(RailroadLine line) {
+		return railLineCharts.stream().filter(chart -> chart.railroadLine.equals(line))
+				.findFirst().orElse(null);
+	}
+	
 	
 	@Override
 	public String toString() {

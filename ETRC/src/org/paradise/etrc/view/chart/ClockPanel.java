@@ -15,7 +15,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
+import org.paradise.etrc.data.TrainGraph;
 
 /**
  * @author lguo@sina.com
@@ -25,16 +27,28 @@ import org.paradise.etrc.data.RailroadLineChart;
 public class ClockPanel extends JPanel {
 	private static final long serialVersionUID = 2449059376608773861L;
 
-	private RailroadLineChart chart;
 	private ChartView chartView;
+	private GlobalSettings settings;
 
-	public ClockPanel(RailroadLineChart _chart, ChartView _view) {
-		chart = _chart;
-		chartView = _view;
+	private boolean ui_inited;
+
+	public ClockPanel(TrainGraph trainGraph, ChartView chartView) {
+		this.chartView = chartView;
+		setModel(trainGraph);
+		
 		try {
 			jbInit();
+			ui_inited = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
+		}
+	}
+	
+	public void setModel(TrainGraph trainGraph) {
+		this.settings = trainGraph.settings;
+		
+		if (ui_inited) {
+			repaint();
 		}
 	}
 
@@ -55,11 +69,11 @@ public class ClockPanel extends JPanel {
 				if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() == 2) {
 					int x = e.getPoint().x;
 					
-					double h = chart.startHour + ((x - chartView.leftMargin)/chart.minuteScale)/60.0;
+					double h = settings.startHour + ((x - chartView.leftMargin)/settings.minuteScale)/60.0;
 	
-					if(Math.abs(h - Math.round(h)) < 16.0/chart.minuteScale/60.0) {
+					if(Math.abs(h - Math.round(h)) < 16.0/settings.minuteScale/60.0) {
 						int theHour = (int) (Math.round(h) >= 24 ? Math.round(h) - 24 : Math.round(h));
-						chart.startHour = theHour;
+						settings.startHour = theHour;
 						chartView.scrollToLeft();
 						chartView.repaint();
 					}
@@ -97,19 +111,20 @@ public class ClockPanel extends JPanel {
 	
 	private int[] minuteGrids = {20,10,10,10,10,5,5,5,5,5};
 	private void increaseMinuteGap(int i) {
-		chartView.mainFrame.currentLineChart.minuteScale += i;
+		settings.minuteScale += i;
 		
-		if(chartView.mainFrame.currentLineChart.minuteScale > RailroadLineChart.MAX_MINUTE_SCALE) {
-			chartView.mainFrame.currentLineChart.minuteScale = RailroadLineChart.MAX_MINUTE_SCALE;
+		if(settings.minuteScale > RailroadLineChart.MAX_MINUTE_SCALE) {
+			settings.minuteScale = RailroadLineChart.MAX_MINUTE_SCALE;
 			return;
 		}
 		
-		if(chartView.mainFrame.currentLineChart.minuteScale < 1) {
-			chartView.mainFrame.currentLineChart.minuteScale = 1;
+		if(settings.minuteScale < 1) {
+			settings.minuteScale = 1;
 			return;
 		}
 		
-		chartView.mainFrame.currentLineChart.timeInterval = minuteGrids[chartView.mainFrame.currentLineChart.minuteScale-1];
+		// TODO: settings.minuteScale 改为浮点
+		settings.timeInterval = minuteGrids[(int) settings.minuteScale-1];
 		chartView.resetSize();
 		chartView.panelLines.updateBuffer();
 	}
@@ -121,7 +136,7 @@ public class ClockPanel extends JPanel {
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, 
 				RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		
-		int h = chart.startHour;
+		int h = settings.startHour;
 		for (int i = 0; i < 24; i++) {
 			if (h >= 24)
 				h -= 24;
@@ -131,15 +146,16 @@ public class ClockPanel extends JPanel {
 			h++;
 		}
 
-		if (chart.startHour == 0)
+		if (settings.startHour == 0)
 			DrawEndHour(g, 24);
 		else
-			DrawEndHour(g, chart.startHour);
+			DrawEndHour(g, settings.startHour);
 	}
 
 	public Dimension getPreferredSize() {
 		int w, h;
-		w = 60 * 24 * chart.minuteScale + chartView.leftMargin + chartView.rightMargin;
+		w = Math.round( 60 * 24 * settings.minuteScale + chartView.leftMargin 
+				+ chartView.rightMargin );
 		h = ChartView.clockPanelHeight;
 		return new Dimension(w, h);
 	}
@@ -152,19 +168,19 @@ public class ClockPanel extends JPanel {
 	private void DrawHour(Graphics g, int clock) {
 		int coordinate = getCoordinate(clock);
 
-		int startPos = coordinate * 60 * chart.minuteScale + chartView.leftMargin - 12;
+		int startPos = Math.round( coordinate * 60 * settings.minuteScale + chartView.leftMargin - 12 );
 		String stClock = clock + ":00";
 		g.drawString(stClock, startPos, ChartView.clockPanelHeight - 2);
 	}
 
 	private void DrawEndHour(Graphics g, int clock) {
-		int start = 24 * 60 * chart.minuteScale + chartView.leftMargin - 12;
+		int start = Math.round( 24 * 60 * settings.minuteScale + chartView.leftMargin - 12 );
 		String stClock = clock + ":00";
 		g.drawString(stClock, start, ChartView.clockPanelHeight - 2);
 	}
 
 	private int getCoordinate(int clock) {
-		int drawClock = clock - chart.startHour;
+		int drawClock = clock - settings.startHour;
 		if (drawClock < 0)
 			drawClock += 24;
 

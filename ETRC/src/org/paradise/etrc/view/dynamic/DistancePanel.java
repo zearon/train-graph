@@ -28,15 +28,25 @@ public class DistancePanel extends JPanel {
 	private RailroadLineChart chart;
 	private DynamicView dView;
 
+	private boolean ui_inited = false;
+
 	public DistancePanel(DynamicView _dView) {
 		dView = _dView;
 		chart = _dView.mainFrame.currentLineChart;
 
 		try {
 			jbInit();
+			ui_inited  = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public void setModel(RailroadLineChart chart) {
+		this.chart = chart;
+		
+		if (ui_inited)
+			repaint();
 	}
 
 	void jbInit() throws Exception {

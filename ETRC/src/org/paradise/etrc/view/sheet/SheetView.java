@@ -14,9 +14,12 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLine;
+import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraph;
 //import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.slice.ChartSlice;
 
@@ -35,8 +38,16 @@ public class SheetView extends JPanel {
 	JList<?> rowHeader;
 	SheetHeaderRanderer conner;
 
-	public SheetView(MainFrame _mainFrame) {
+	private boolean ui_inited;
+
+	private GlobalSettings settings;
+
+	private RailroadLineChart activeLineChart;
+
+	public SheetView(TrainGraph trainGraph, RailroadLineChart activeChart, MainFrame _mainFrame) {
 		mainFrame = _mainFrame;
+		
+		setModel(trainGraph, activeChart);
 
 		table = new SheetTable(__("timetable"), this);
 		rowHeader = buildeRowHeader(table);
@@ -56,6 +67,28 @@ public class SheetView extends JPanel {
 
 //		JPanel controlPanel = buildeControlPanel();
 //		add(controlPanel, BorderLayout.SOUTH);
+		
+		ui_inited = true;
+	}
+	
+	public void setModel(TrainGraph trainGraph, RailroadLineChart activeLineChart) {
+//		this.trainGraph = trainGraph;
+		this.settings = trainGraph.settings;
+		this.activeLineChart = activeLineChart;
+		
+		if (ui_inited) {
+			SheetModel model = (SheetModel) table.getModel();
+			model.chart = activeLineChart;
+
+			// Reset row headers
+			rowHeader = buildeRowHeader(table);
+			JScrollPane spTable = table.getScrollPane();
+			spTable.setRowHeaderView(rowHeader);
+		
+			// repaint sheet
+			model.fireTableStructureChanged();
+			table.setupColumnWidth();
+		}
 	}
 	
 	

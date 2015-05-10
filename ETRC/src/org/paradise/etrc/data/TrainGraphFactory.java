@@ -111,21 +111,29 @@ public class TrainGraphFactory {
 		T obj = (T) tuple.B.get();
 		
 		// Initialize the object
-		int id = TrainGraph._objectIdMap.get(className);
-		
-		obj._id = ++ id;
+		setID(clazz, obj);
 		obj.initTGP();
 		obj.setToDefault();
 		
-		TrainGraph._objectIdMap.put(className, id);
 		if (name == null) {
-			name = obj.createTGPNameById(id);
+			name = obj.createTGPNameById(obj._id);
 		}
 		if (name != null) {
 			obj.setName(name);
 		}
 		
 		return obj;
+	}
+	
+	public static synchronized void setID(Class<? extends TrainGraphPart> clazz, 
+			TrainGraphPart instance) {
+		
+		String className = clazz.getName();
+		int id = TrainGraph._objectIdMap.get(className);
+		
+		instance._id = ++ id;
+		
+		TrainGraph._objectIdMap.put(className, id);
 	}
 	
 	/**

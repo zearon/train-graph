@@ -23,9 +23,11 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.TrainGraph;
 
 
 public class RunningPanel extends JPanel {
@@ -38,17 +40,24 @@ public class RunningPanel extends JPanel {
 	private DynamicView dView;
 	private JPopupMenu popupMenu;
 	private JMenuItem popupMenuStation;
+
+	private GlobalSettings settings;
 	
 
-	public RunningPanel(DynamicView _dView) {
+	public RunningPanel(TrainGraph trainGraph, RailroadLineChart activeChart, DynamicView _dView) {
 		dView = _dView;
-		chart = _dView.mainFrame.currentLineChart;
+		setModel(trainGraph, activeChart);
 
 		try {
 			jbInit();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public void setModel(TrainGraph trainGraph, RailroadLineChart activeChart) {
+		this.settings = trainGraph.settings;
+		this.chart = activeChart;
 	}
 
 	void jbInit() throws Exception {
@@ -186,10 +195,10 @@ public class RunningPanel extends JPanel {
 		int y1 = 0;
 		int y2 = getHeight();
 
-		if (station.level <= chart.displayLevel) {
+		if (station.level <= settings.displayLevel) {
 			Color oldColor = g.getColor();
 			//设置坐标线颜色
-			if (station.level <= chart.boldLevel) {
+			if (station.level <= settings.boldLevel) {
 				g.setColor(new Color(64, 64, 64));
 			}
 			else {

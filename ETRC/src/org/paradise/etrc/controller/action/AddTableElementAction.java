@@ -55,8 +55,8 @@ public class AddTableElementAction<T> extends TableAction {
 	@Override
 	protected void _undoAction() {
 		stopCellEditing(false);
-		selectElement(index, vertical);
 		remover.accept(index);
+		selectElement(index, vertical);
 		stopCellEditing(false);
 
 		callback.run();

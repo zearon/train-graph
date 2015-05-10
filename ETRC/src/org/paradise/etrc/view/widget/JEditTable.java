@@ -837,6 +837,30 @@ public class JEditTable extends JTable {
 		if (valueChanged)
 			updateUI();
 	}
+	
+	/**
+	 * Change a batch of values in the table
+	 * @param increment How much to be changed on cells in the table.
+	 * @param start Start index.
+	 * @param end End index.
+	 * @param coord 
+	 * @param vertical If true then start and end are row indexes and coord are column index.
+	 * Otherwise, start and end are column indexes and coord are row index.
+	 */
+	public void batchChangeValue(int increment, int start, int end, int coord,
+			boolean vertical) {
+		
+		IncrementalCellTableModel model = getIncrementalModel();
+		if (vertical) {
+			for (int row = start; row <= end; ++ row) {
+				model.increaseCell(row, coord, increment, false);
+			}
+		} else {
+			for (int column = start; column <= end; ++ column) {
+				model.increaseCell(coord, column, increment, false);
+			}
+		}
+	}
 
 	protected boolean increaseCell(int row, int column, int startRow,
 			int startColumn, int increment) {

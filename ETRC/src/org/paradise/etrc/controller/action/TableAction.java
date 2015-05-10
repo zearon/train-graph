@@ -35,10 +35,23 @@ public abstract class TableAction extends UIAction {
 	}
 	
 	protected void selectElement(int index, boolean vertical) {
-		if (vertical)
+		if (vertical) {
+			int rowCount = table.getRowCount();
+			if (index < 0)
+				index = 0;
+			if (index >= rowCount)
+				index = rowCount - 1;
+				
 			selectRow(index);
-		else
+		} else {
+			int columnCount = table.getColumnCount();
+			if (index < 0)
+				index = 0;
+			if (index >= columnCount)
+				index = columnCount - 1;
+			
 			selectColumn(index);
+		}
 	}
 	
 	protected void fireTableChanged() {

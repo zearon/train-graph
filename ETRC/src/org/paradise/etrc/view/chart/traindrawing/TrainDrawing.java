@@ -12,6 +12,7 @@ import java.util.Enumeration;
 import java.util.Optional;
 import java.util.Vector;
 
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
@@ -46,6 +47,8 @@ public class TrainDrawing {
   boolean isActive = false;
   //是否是反向车次
   private boolean isUnderDrawing = false;
+
+private GlobalSettings settings;
   
 //  private static final Color selectedColor = Color.black;
   static final Color notSchedularColor = new Color(192, 192, 0);
@@ -62,8 +65,11 @@ public boolean isUnderDrawing() {
 	return isUnderDrawing;
 }
 
-public TrainDrawing(ChartView _chartView, Train _train, boolean _active, boolean _under) {
+public TrainDrawing(ChartView _chartView, GlobalSettings settings, 
+		Train _train, boolean _active, boolean _under) {
+	
     chartView = _chartView;
+    this.settings = settings;
     train = _train;
     isActive = _active;
     isUnderDrawing = _under;
@@ -155,8 +161,8 @@ public void rebuild() {
       else {
         //下一到站将过边界：停车线正常，但下段的行车线要先画一半到边界
         if (chartView.getPelsX(drawStops[i + 1].arrive) < x1) {
-          int x2 = chartView.getPelsX(drawStops[i + 1].arrive) +
-              24 * 60 * chart.minuteScale;
+          int x2 = Math.round( chartView.getPelsX(drawStops[i + 1].arrive) +
+              24 * 60 * settings.minuteScale );
           int y2 = chartView.getPelsY(drawStops[i + 1].name);
 
           //计算右边界点坐标

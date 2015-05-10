@@ -1,6 +1,7 @@
 package org.paradise.etrc.view.nav;
 
 import static org.paradise.etrc.ETRC.__;
+import static org.paradise.etrc.ETRCUtil.*;
 
 import java.util.Hashtable;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import javax.swing.tree.TreePath;
 
 import org.paradise.etrc.data.RailNetwork;
 import org.paradise.etrc.data.RailroadLine;
+import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.event.RailroadLineChangeType;
 
@@ -102,8 +104,6 @@ public class Navigator extends JTree {
 		rootNode.add(remarksNode);
 
 		timeTableNodes = new Vector<DefaultMutableTreeNode>();
-		timeTableNodes.add(new DefaultMutableTreeNode(__("Default Time table")));
-		timeTablesNode.add(timeTableNodes.get(0));
 		
 		railroadLineTimeTableNodes = new Vector<DefaultMutableTreeNode>();
 		
@@ -118,61 +118,74 @@ public class Navigator extends JTree {
 	public void setTrainGraph(TrainGraph trainGraph) {
 		this.trainGraph = trainGraph;
 		
-		// Set time table nodes for trainGraph.
+		updateNavigatorByTimetables();
+		
+		updateNavigatorByRailNetwork();
+		
+		updateNavigatorByTrainTypes();
+	}
+	
+	public void updateNavigatorByTimetables() {
+		DEBUG_MSG("可以优化, 参照updateNavigatorByRailNetwork");
+		
+		trainGraph.syncLineChartsWithRailNetworks();
+		
 		timeTableNodes.clear();
 		timeTablesNode.removeAllChildren();
 		trainGraph.getCharts().forEach(railnetworkChart -> {
-			DefaultMutableTreeNode node = new DefaultMutableTreeNode(railnetworkChart);
-			timeTableNodes.add(node);
-			timeTablesNode.add(node);
-		});
-		
-		// Set railroad lines
-		railroadLinesNode.removeAllChildren();
-		railroadLineNodes.clear();
-		
-		this.trainGraph.railNetwork.getAllRailroadLines().stream()
-		.sorted((l1, l2) -> l1.zindex-l2.zindex)
-		.forEach(railroadLine -> {
-			updateUIByRailroadNetwork(railroadLine, RailroadLineChangeType.ADD);
-		});
-		
-		this.trainGraph.railNetwork.addRailroadLineChangedListener(
-			this::updateUIByRailroadNetwork
-		);
-		
-		updateUI();
-	}
-	
-	public void updateUIByRailroadNetwork(RailroadLine line, 
-			RailroadLineChangeType changeType) {
-
-		String lineName = line.name;
-		int lineID = line.getID();
-		
-		switch (changeType) {
-		case ADD:
-			DefaultMutableTreeNode nodeInRailroadLines = 
-			new DefaultMutableTreeNode(line);
-			railroadLineNodes.add(nodeInRailroadLines);
-			railroadLinesNode.add(nodeInRailroadLines);
+			DefaultMutableTreeNode parentNode = new DefaultMutableTreeNode(railnetworkChart);
+			timeTableNodes.add(parentNode);
+			timeTablesNode.add(parentNode);
 			
-			timeTableNodes.forEach(timeTableNode -> {
-				DefaultMutableTreeNode node = new DefaultMutableTreeNode(
-						line);
-				railroadLineTimeTableNodes.add(node);
-				timeTableNode.add(node);
+			trainGraph.railNetwork.getAllRailroadLines().forEach(line -> {
+				
+				RailroadLineChart lineChart = railnetworkChart.findRailLineChart(line);
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(lineChart);
+				parentNode.add(node);
 				
 				node.add(new DefaultMutableTreeNode(DOWNWARD_LABEL));
 				node.add(new DefaultMutableTreeNode(UPWARD_LABEL));
 			});
-			break;
-		case REMOVE:
+		});
+	}
+	
+	public void updateNavigatorByRailNetwork() {
+		trainGraph.syncLineChartsWithRailNetworks();
+		
+		// Sync Railroad lines
+		int raillineNodeCount = railroadLineNodes.size();
+		int raillineCount = trainGraph.railNetwork.getAllRailroadLines().size();
+		int i = 0, j = 0;
+		for (; i < raillineNodeCount && j < raillineCount; ++i, ++j) {
+			RailroadLine line = trainGraph.railNetwork.getRailroadLine(i);
+			railroadLineNodes.get(i).setUserObject(line);
 			
-			break;
-		case UPDATE:
-			break;
+//			trainGraph.getCharts().for
+//			RailroadLineChart lineChart = trainGraph.get
 		}
+		if (raillineNodeCount > raillineCount) {
+			for (int k = raillineNodeCount - 1; k >= raillineCount; -- k) {
+				DefaultMutableTreeNode node = railroadLineNodes.get(k);
+				railroadLineNodes.remove(k);
+				railroadLinesNode.remove(node);
+			}
+		} else if (raillineNodeCount < raillineCount) {
+			for (int k = raillineNodeCount; k < raillineCount; ++ k) {
+				RailroadLine line = trainGraph.railNetwork.getRailroadLine(k);
+				DefaultMutableTreeNode node = new DefaultMutableTreeNode(line);
+				railroadLineNodes.add(node);
+				railroadLinesNode.add(node);
+			}
+		}
+		
+		// Sync Railroad network chart
+		updateNavigatorByTimetables();
+		
+		updateUI();
+	}
+
+	public void updateNavigatorByTrainTypes() {
+		
 	}
 	
 	public void nodeSelectionChanged(TreeSelectionEvent e) {

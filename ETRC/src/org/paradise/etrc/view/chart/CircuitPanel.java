@@ -14,8 +14,10 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
+import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.slice.ChartSlice;
 
 /**
@@ -30,15 +32,20 @@ public class CircuitPanel extends JPanel {
 
 	int myLeftMargin = 5;
 
-	private RailroadLineChart chart;
 	private ChartView chartView;
 
-	public CircuitPanel(RailroadLineChart _chart, ChartView _mainView) {
-		chart = _chart;
-		chartView = _mainView;
+	private RailroadLineChart chart;
+	private GlobalSettings settings;
+
+	private boolean ui_inited;
+
+	public CircuitPanel(TrainGraph trainGraph, RailroadLineChart _chart, ChartView chartView) {
+		this.chartView = chartView;
+		setModel(trainGraph, _chart);
 
 		try {
 			jbInit();
+			ui_inited = true;
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -61,6 +68,15 @@ public class CircuitPanel extends JPanel {
 			}
 		});
 	}
+	
+	public void setModel(TrainGraph trainGraph, RailroadLineChart activeChart) {
+		this.chart = activeChart;
+		this.settings = trainGraph.settings;
+		
+		if (ui_inited) {
+			repaint();
+		}
+	}
 
 	public void paint(Graphics g) {
 		super.paint(g);
@@ -82,7 +98,7 @@ public class CircuitPanel extends JPanel {
 			return new Dimension(ChartView.circuitPanelWidth, 480);
 
 		int w = ChartView.circuitPanelWidth;
-		int h = Math.round(chart.railroadLine.length * chart.distScale) + chartView.topMargin
+		int h = Math.round(chart.railroadLine.length * settings.distScale) + chartView.topMargin
 				+ chartView.bottomMargin;
 		return new Dimension(w, h);
 	}
@@ -91,9 +107,9 @@ public class CircuitPanel extends JPanel {
 		if (station.hide)
 			return;
 
-		int y = Math.round(station.dist * chart.distScale) + chartView.topMargin;
+		int y = Math.round(station.dist * settings.distScale) + chartView.topMargin;
 
-		if (station.level <= chart.displayLevel) {
+		if (station.level <= settings.displayLevel) {
 			//设置坐标线颜色
 			Color oldColor = g.getColor();
 			
@@ -104,7 +120,7 @@ public class CircuitPanel extends JPanel {
 
 			//画坐标线
 			g.drawLine(myLeftMargin, y, ChartView.circuitPanelWidth, y);
-			if (station.level <= chart.boldLevel) {
+			if (station.level <= settings.boldLevel) {
 				g.drawLine(myLeftMargin, y + 1, ChartView.circuitPanelWidth,
 						y + 1);
 			}

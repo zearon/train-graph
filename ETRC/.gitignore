@@ -1,4 +1,6 @@
 /bin/
 /htrc.prop
 /build/
+/.settings/
 *.class
+*.log

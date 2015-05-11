@@ -147,6 +147,8 @@ public class Navigator extends JTree {
 				node.add(new DefaultMutableTreeNode(UPWARD_LABEL));
 			});
 		});
+		
+		updateUI();
 	}
 	
 	public void updateNavigatorByRailNetwork() {

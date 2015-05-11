@@ -1,6 +1,7 @@
 package org.paradise.etrc.view.alltrains;
 
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.DEBUG;
 
 import java.awt.BorderLayout;
@@ -51,8 +52,8 @@ import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.TRFFilter;
-import org.paradise.etrc.view.widget.DefaultJEditTableModel;
-import org.paradise.etrc.view.widget.JEditTable;
+import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.table.JEditTable;
 
 /**
  * @author lguo@sina.com

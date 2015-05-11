@@ -9,7 +9,7 @@ import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
-import org.paradise.etrc.view.widget.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 
 public class SheetModel extends DefaultJEditTableModel {
 	private static final long serialVersionUID = 6767541225039467460L;

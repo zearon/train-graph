@@ -4,7 +4,8 @@ import java.awt.Dimension;
 
 import javax.swing.ListSelectionModel;
 
-import org.paradise.etrc.view.widget.JEditTable;
+import org.paradise.etrc.util.ui.table.JEditTable;
+
 import static org.paradise.etrc.ETRC.__;
 
 public class StationTable extends JEditTable {

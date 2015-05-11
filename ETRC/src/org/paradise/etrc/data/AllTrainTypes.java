@@ -1,4 +1,7 @@
 package org.paradise.etrc.data;
+import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.*;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -7,68 +10,62 @@ import java.util.Vector;
 import java.util.function.Supplier;
 
 import org.paradise.etrc.data.util.Tuple;
-import static org.paradise.etrc.ETRC.__;
 
-/**
- * A list of all trains
- * @author Jeff Gong
- *
- */
-public class AllTrains extends TrainGraphPart<AllTrains, Train>
-implements Collection<Train>
+public class AllTrainTypes extends TrainGraphPart<AllTrainTypes, TrainType>
+implements Collection<TrainType>
 {
 
-	AllTrains() {
+	AllTrainTypes() {
 	}
 
-	public Vector<Train> trains = new Vector<Train>();
-	protected HashMap<String, Train> trainDict = new HashMap<String, Train> ();
+	public Vector<TrainType> trainTypes = new Vector<TrainType>();
+	protected HashMap<String, TrainType> trainTypeDict = new HashMap<String, TrainType> ();
 	
 	
-	protected void updateTrainDict() {
-		trainDict.clear();
-		for (Train train : trains) {
-			trainDict.put(train.name, train);
+	protected void updateTrainTypeDict() {
+		trainTypeDict.clear();
+		for (TrainType train : trainTypes) {
+			trainTypeDict.put(train.name, train);
 		}
 	}
-	protected void addItemToTrainDict(Train train, Collection<? extends Train> c) {
+	protected void addItemToTrainTypeDict(TrainType train, Collection<? extends TrainType> c) {
 		if (train != null)
-			trainDict.put(train.name, train);
+			trainTypeDict.put(train.name, train);
 
 		if (c != null)
-			for (Train e : c) {
-				trainDict.put(e.name, e);
+			for (TrainType e : c) {
+				trainTypeDict.put(e.name, e);
 			}
 	}
-	protected void removeItemFromTrainDict(Object train, Collection<?> c) {
-		if (train != null && train instanceof Train)
-			trainDict.remove(((Train) train).name);
+	protected void removeItemFromTrainTypeDict(Object train, Collection<?> c) {
+		if (train != null && train instanceof TrainType)
+			trainTypeDict.remove(((TrainType) train).name);
 
 		if (c != null)
 			for (Object e : c) {
-				if (e instanceof Train)
-					trainDict.remove(((Train) e).name);
+				if (e instanceof TrainType)
+					trainTypeDict.remove(((TrainType) e).name);
 			}
 	}
 
-	public void updateTrain(Train newTrain) {
-		for (int i = 0; i < trains.size(); i++) {
-			if (newTrain.equals(trains.get(i))) {
-				if(newTrain.color == null)
-					newTrain.color = trains.get(i).color;
-				trains.set(i, newTrain);
+	public void updateTrainType(TrainType newTrainType) {
+		for (int i = 0; i < trainTypes.size(); i++) {
+			if (newTrainType.equals(trainTypes.get(i))) {
+				if(newTrainType.color == null)
+					newTrainType.color = trainTypes.get(i).color;
+				trainTypes.set(i, newTrainType);
 			}
 		}
 	}
 	
 
 	
-	public Train findTrain(String trainNameFull) {
-		return trainDict.get(trainNameFull);
+	public TrainType findTrainType(String trainTypeName) {
+		return trainTypeDict.get(trainTypeName);
 	}
 	
-	public Train get(int index) {
-		return trains.get(index);
+	public TrainType get(int index) {
+		return trainTypes.get(index);
 	}
 	
 	public int count() {
@@ -76,36 +73,36 @@ implements Collection<Train>
 	}
 
 	@Override
-	public boolean add(Train e) {
-		boolean r = trains.add(e);
+	public boolean add(TrainType e) {
+		boolean r = trainTypes.add(e);
 		if (r)
-			addItemToTrainDict(e, null);
+			addItemToTrainTypeDict(e, null);
 		return r;
 	}
 
-	public void add(int index, Train element) {
-		trains.add(index, element);
-		addItemToTrainDict(element, null);
+	public void add(int index, TrainType element) {
+		trainTypes.add(index, element);
+		addItemToTrainTypeDict(element, null);
 	}
 
 	@Override
-	public boolean addAll(Collection<? extends Train> c) {
-		boolean r = trains.addAll(c);
+	public boolean addAll(Collection<? extends TrainType> c) {
+		boolean r = trainTypes.addAll(c);
 		if (r)
-			addItemToTrainDict(null, c);
+			addItemToTrainTypeDict(null, c);
 		return r;
 	}
 	
-	public boolean addAll(int index, Collection<? extends Train> c) {
-		boolean r =  trains.addAll(index, c);
+	public boolean addAll(int index, Collection<? extends TrainType> c) {
+		boolean r =  trainTypes.addAll(index, c);
 		if (r)
-			addItemToTrainDict(null, c);
+			addItemToTrainTypeDict(null, c);
 		return r;
 	}
 	
-	public Train remove(int index) {
-		Train r = trains.remove(index);
-		removeItemFromTrainDict(r, null);
+	public TrainType remove(int index) {
+		TrainType r = trainTypes.remove(index);
+		removeItemFromTrainTypeDict(r, null);
 		return r;
 	}
 	
@@ -113,65 +110,79 @@ implements Collection<Train>
 	public boolean remove(Object o) {
 		boolean r = remove(o);
 		if (r)
-			removeItemFromTrainDict(o, null);
+			removeItemFromTrainTypeDict(o, null);
 		return r;
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> c) {
-		boolean r = trains.removeAll(c);
+		boolean r = trainTypes.removeAll(c);
 		if (r)
-			removeItemFromTrainDict(null, c);
+			removeItemFromTrainTypeDict(null, c);
 		return r;
 	}
 
 	@Override
 	public boolean retainAll(Collection<?> c) {
-		boolean r = trains.retainAll(c);
-		updateTrainDict();
+		boolean r = trainTypes.retainAll(c);
+		updateTrainTypeDict();
 		return r;
 	}
 	
 	@Override
 	public void clear() {
-		trains.clear();
-		updateTrainDict();
+		trainTypes.clear();
+		updateTrainTypeDict();
 	};
 
 	@Override
 	public int size() {
-		return trains.size();
+		return trainTypes.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return trains.isEmpty();
+		return trainTypes.isEmpty();
 	}
 
 	@Override
 	public boolean contains(Object o) {
-		return trains.contains(o);
+		return trainTypes.contains(o);
 	}
 	
 	@Override
-	public Iterator<Train> iterator() {
-		return trains.iterator();
+	public Iterator<TrainType> iterator() {
+		return trainTypes.iterator();
 	}
 	
 	@Override
 	public Object[] toArray() {
-		return trains.toArray();
+		return trainTypes.toArray();
 	}
 	
 	@Override
 	public <T> T[] toArray(T[] a) {
-		return trains.toArray(a);
+		return trainTypes.toArray(a);
 	}
 	
 	@Override
 	public boolean containsAll(Collection<?> c) {
-		return trains.containsAll(c);
+		return trainTypes.containsAll(c);
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+
 	
 	
 	
@@ -185,20 +196,20 @@ implements Collection<Train>
 	 * Implements method inherited from abstract base class TrainGraphPart
 	 */
 	@Override
-	protected String getStartSectionString() { return START_SECTION_ALL_TRAIN; }
+	protected String getStartSectionString() { return START_SECTION_ALL_TRAIN_TYPES; }
 	@Override
-	protected String getEndSectionString() { return END_SECTION_ALL_TRAIN; }
+	protected String getEndSectionString() { return END_SECTION_ALL_TRAIN_TYPES; }
 	@Override
 	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return AllTrains::new;
+		return AllTrainTypes::new;
 	}
 	@Override
 	public void _prepareForFirstLoading() {
-		new Train().prepareForFirstLoading();
+		new TrainType().prepareForFirstLoading();
 	}
 	@Override
 	public String getName() {
-		return String.format(__("%d trains in total"), trains.size());
+		return String.format(__("%d train types in total"), trainTypes.size());
 	}
 
 	/* Properties */
@@ -256,26 +267,27 @@ implements Collection<Train>
 
 	/* Element array */
 	@Override
-	protected Vector<Train> getTGPElements() {
-		return trains;
+	protected Vector<TrainType> getTGPElements() {
+		return trainTypes;
 	}
 
 	@Override
-	protected void addTGPElement(Train element) {
-		trains.add(element);
+	protected void addTGPElement(TrainType element) {
+		trainTypes.add(element);
 	}
 
 	@Override
 	protected boolean isOfElementType(TrainGraphPart part) {
-		return part != null && part instanceof Train;
+		return part != null && part instanceof TrainType;
 	}
 	
 	/* Do complete work after all data loaded from file */
 	@Override
 	protected void loadComplete() {
-		updateTrainDict();
+		updateTrainTypeDict();
 	}
 	
 	/*********************End of TrainGraphPart method implementations*********/
+
 
 }

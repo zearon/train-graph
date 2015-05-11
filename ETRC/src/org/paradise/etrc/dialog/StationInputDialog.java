@@ -21,7 +21,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.view.widget.JEditTable;
+import org.paradise.etrc.util.ui.table.JEditTable;
 
 /**
  * @author lguo@sina.com

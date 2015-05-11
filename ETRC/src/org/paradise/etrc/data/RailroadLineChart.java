@@ -28,7 +28,7 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	//本运行图的线路
 	public RailroadLine railroadLine;
 	// 用于序列化时引用RailNetwork中的线路
-	String railroadLineName = "";
+//	String railroadLineName = "";
 	public Vector<RailroadLine> allCircuits = new Vector<RailroadLine>(6);
 
 	//本运行图所包含的车次，最多600趟
@@ -61,8 +61,9 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	}
 	
 	@Override
-	public String toString() {
-		return String.format(__("%s"), railroadLine.getName());
+	public String getName() {
+		name = railroadLine != null ? railroadLine.getName() : __("NO_RAILLINE");
+		return name;
 	}
 	
 	public Train getTrain(int index) {
@@ -587,7 +588,7 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(propName)) {
-			railroadLineName = valueInStr;
+			setName(valueInStr);
 		} 
 	}
 
@@ -596,8 +597,7 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 		String value = "";
 		
 		if (index == 0) {
-			railroadLineName = railroadLine.name;
-			value = railroadLineName;	
+			value = getName();	
 		}
 		
 		return value;

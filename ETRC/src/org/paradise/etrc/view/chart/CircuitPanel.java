@@ -141,7 +141,7 @@ public class CircuitPanel extends JPanel {
 		String stDist;
 		//下行里程
 		if (chartView.distUpDownState == ChartView.SHOW_DOWN) {
-			stDist = station.dist == 0 ? "0km" : "" + station.dist;
+			stDist = station.dist == 0 ? "0" + settings.distUnit : "" + station.dist;
 			g.setColor(chartView.downDistColor);
 		}
 		//上行里程

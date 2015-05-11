@@ -15,11 +15,12 @@ public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
 	public int startHour;
 	public float minuteScale;
 	public int timeInterval;
+	public String distUnit;
 	
 	GlobalSettings() {}
 
 	public void setProperties(float distScale, int displayLevel,
-			int boldLevel, int startHour, float minuteScale, int timeInterval) {
+			int boldLevel, int startHour, float minuteScale, int timeInterval, String distUnit) {
 		this.name = "";
 		this.distScale = distScale;
 		this.displayLevel = displayLevel;
@@ -27,10 +28,25 @@ public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
 		this.startHour = startHour;
 		this.minuteScale = minuteScale;
 		this.timeInterval = timeInterval;
+		this.distUnit = distUnit;
 	}
 	
-	
-	
+	public int getDisplayLevel() {
+		return displayLevel;
+	}
+
+	public void setDisplayLevel(int displayLevel) {
+		this.displayLevel = displayLevel;
+	}
+
+	public float getMinuteScale() {
+		return minuteScale;
+	}
+
+	public void setMinuteScale(float minuteScale) {
+		this.minuteScale = minuteScale;
+	}
+
 	/**
 	 * Implements method inherited from abstract base class TrainGraphPart
 	 */
@@ -50,7 +66,7 @@ public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
 	public void _prepareForFirstLoading() {}
 	@Override
 	void setToDefault() {
-		setProperties(3.0f, 4, 2, 18, 2.0f, 10);
+		setProperties(3.0f, 4, 2, 18, 2.0f, 10, "km");
 	}
 
 	/* Properties */
@@ -58,7 +74,7 @@ public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
 	@Override
 	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
 		if (propTuples == null) {
-			propTuples = new Tuple[7];
+			propTuples = new Tuple[8];
 			
 			propTuples[0] = Tuple.of("name", String.class);
 			propTuples[1] = Tuple.of("distScale", float.class);
@@ -67,6 +83,7 @@ public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
 			propTuples[4] = Tuple.of("timeInterval", int.class);
 			propTuples[5] = Tuple.of("displayLevel", int.class);
 			propTuples[6] = Tuple.of("boldLevel", int.class);
+			propTuples[7] = Tuple.of("distUnit", String.class);
 		}
 		
 		return propTuples;
@@ -90,6 +107,8 @@ public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
 			displayLevel = Integer.parseInt(valueInStr);
 		} else if (propTuples[6].A.equals(porpName)) {
 			boldLevel = Integer.parseInt(valueInStr);
+		} else if (propTuples[7].A.equals(porpName)) {
+			distUnit = valueInStr;
 		}
 	}
 
@@ -111,6 +130,8 @@ public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
 			value = displayLevel + "";
 		} else if (index == 6) {
 			value = boldLevel + "";
+		} else if (index == 7) {
+			value = distUnit == null ? "" : distUnit;
 		}
 		
 		return value;

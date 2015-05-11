@@ -1,6 +1,7 @@
 package org.paradise.etrc;
 
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
 import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
 import static org.paradise.etrc.ETRCUtil.DEBUG;
@@ -33,6 +34,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
+import java.util.StringJoiner;
 import java.util.Vector;
 import java.util.stream.Stream;
 
@@ -67,6 +69,7 @@ import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.skb.ETRCLCB;
 import org.paradise.etrc.data.skb.ETRCSKB;
 import org.paradise.etrc.dialog.AboutBox;
@@ -83,6 +86,7 @@ import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.GIFFilter;
 import org.paradise.etrc.filter.TRCFilter;
 import org.paradise.etrc.filter.TRFFilter;
+import org.paradise.etrc.util.ui.UIBinding;
 import org.paradise.etrc.view.alltrains.AllTrainsView;
 import org.paradise.etrc.view.alltrains.TrainListView;
 import org.paradise.etrc.view.chart.ChartView;
@@ -90,6 +94,7 @@ import org.paradise.etrc.view.dynamic.DynamicView;
 import org.paradise.etrc.view.lineedit.RailroadLineEditView;
 import org.paradise.etrc.view.nav.Navigator;
 import org.paradise.etrc.view.nav.Navigator.NavigatorNodeType;
+import org.paradise.etrc.view.settings.SettingsView;
 import org.paradise.etrc.view.sheet.SheetView;
 import org.paradise.etrc.view.timetables.TimetableListTableModel;
 import org.paradise.etrc.view.timetables.TimetableListView;
@@ -106,14 +111,15 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public Navigator navigator;
 	public JPanel navigatorContentPanel;
 	CardLayout navigatorContentCard;
-	public JPanel raillineChartView;
 	public JSplitPane splitPaneV;
 	public JSplitPane splitPaneH;
-	
+
+	public JPanel raillineChartView;
 	public ChartView chartView;
 	public DynamicView runView;
 	public SheetView sheetView;
 	
+	public SettingsView settingsView;
 	public RailroadLineEditView railLineEditView;
 	public AllTrainsView allTrainsView;
 	public TimetableListView timetableListView;
@@ -187,10 +193,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 		try {
 			jbInit();
-//			circuitEditDialog = new RailroadLineEditView(this, chart.allCircuits);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		UIBinding.setExceptionHandler(e -> {
+			e.printStackTrace();
+			new MessageBox(e.getMessage()).showMessage();
+		});
 
 		setModel(trainGraph);
 		
@@ -326,6 +336,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		runView = new DynamicView(trainGraph, currentLineChart, this);
 		sheetView = new SheetView(trainGraph, currentLineChart, this);
 		
+		settingsView = new SettingsView(trainGraph);
 		railLineEditView = new RailroadLineEditView(this);
 		allTrainsView = new AllTrainsView();
 		timetableListView = new TimetableListView(trainGraph);
@@ -346,6 +357,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 		navigatorContentCard = new CardLayout();
 		navigatorContentPanel = new JPanel(navigatorContentCard);
+		navigatorContentPanel.add(NavigatorNodeType.GLOBAL_SETTINGS.name(),
+				settingsView);
 		navigatorContentPanel.add(NavigatorNodeType.RAILROAD_LINES.name(), 
 				railLineEditView);
 		navigatorContentPanel.add(NavigatorNodeType.ALL_TRAINS.name(), 
@@ -1341,9 +1354,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //							.reduce((a,b) -> a+", "+b).orElse("")
 //							))
 //				.showMessage();
-		});
+		}, TrainGraphPart.reprJoining(params, "\r\n", true));
 		
 		switch (nodeType) {
+		case GLOBAL_SETTINGS:
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.GLOBAL_SETTINGS.name());
+			break;
 		case RAILROAD_LINES:
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.RAILROAD_LINES.name());

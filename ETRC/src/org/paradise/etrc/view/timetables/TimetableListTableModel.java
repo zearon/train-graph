@@ -6,8 +6,8 @@ import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.RailNetworkChart;
 import org.paradise.etrc.data.TrainGraph;
-import org.paradise.etrc.view.widget.DefaultJEditTableModel;
-import org.paradise.etrc.view.widget.JEditTable;
+import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.table.JEditTable;
 
 public class TimetableListTableModel extends DefaultJEditTableModel {
 	public TrainGraph trainGraph;
@@ -16,6 +16,28 @@ public class TimetableListTableModel extends DefaultJEditTableModel {
 	public TimetableListTableModel(JEditTable table) {
 		this.table = table;
 		table.setModel(this);
+	}
+
+	@Override
+	public String getColumnName(int column) {
+		switch (column) {
+		case 0:
+			return __("Name");
+		default:
+			break;
+		}
+		return "";
+	}
+
+	@Override
+	public Class<?> getColumnClass(int columnIndex) {
+		switch (columnIndex) {
+		case 0:
+			return String.class;
+		default:
+			break;
+		}
+		return null;
 	}
 
 	@Override

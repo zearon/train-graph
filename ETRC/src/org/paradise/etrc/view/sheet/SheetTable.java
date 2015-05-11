@@ -20,7 +20,7 @@ import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
 //import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.slice.ChartSlice;
-import org.paradise.etrc.view.widget.JEditTable;
+import org.paradise.etrc.util.ui.table.JEditTable;
 
 public class SheetTable extends JEditTable {
 	private static final long serialVersionUID = 1L;

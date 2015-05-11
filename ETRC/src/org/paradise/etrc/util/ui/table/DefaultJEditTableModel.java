@@ -1,4 +1,4 @@
-package org.paradise.etrc.view.widget;
+package org.paradise.etrc.util.ui.table;
 
 import java.time.Duration;
 import java.time.LocalTime;

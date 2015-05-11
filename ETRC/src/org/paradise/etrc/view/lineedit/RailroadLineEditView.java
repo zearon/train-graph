@@ -860,7 +860,7 @@ public class RailroadLineEditView extends JPanel {
 					
 			line.name = (String) value;
 			tfName.setText((String) value);
-		});
+		}, null);
 	}
 	
 	private void doRailline_UpdateDisplayScale(String oldValue) {
@@ -879,7 +879,7 @@ public class RailroadLineEditView extends JPanel {
 				new MessageBox(__("Display scale should be a decimal."))
 						.showMessage();
 			}	
-		});
+		}, mainFrame.raillineChartView::updateUI);
 	}
 	
 	private void doRailline_UpdateMultiplicity(String oldValue) {
@@ -897,7 +897,7 @@ public class RailroadLineEditView extends JPanel {
 				new MessageBox(__("Rail count should be an integer."))
 						.showMessage();
 			}
-		});
+		}, mainFrame.raillineChartView::updateUI);
 	}
 
 	private void doRailline_OK() {

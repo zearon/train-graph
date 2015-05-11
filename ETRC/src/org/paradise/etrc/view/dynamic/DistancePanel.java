@@ -15,7 +15,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
+import org.paradise.etrc.data.GlobalSettings;
 import org.paradise.etrc.data.RailroadLineChart;
+import org.paradise.etrc.data.TrainGraph;
 
 /**
  * @author lguo@sina.com
@@ -27,6 +29,7 @@ public class DistancePanel extends JPanel {
 
 	private RailroadLineChart chart;
 	private DynamicView dView;
+	private GlobalSettings settings;
 
 	private boolean ui_inited = false;
 
@@ -42,7 +45,8 @@ public class DistancePanel extends JPanel {
 		}
 	}
 	
-	public void setModel(RailroadLineChart chart) {
+	public void setModel(TrainGraph trainGraph, RailroadLineChart chart) {
+		this.settings = trainGraph.settings;
 		this.chart = chart;
 		
 		if (ui_inited)
@@ -171,7 +175,7 @@ public class DistancePanel extends JPanel {
 			return;
 		
 		g.setColor(drawColor);
-		g.drawString(drawingDist == 0 ? drawingDist+"km" : drawingDist+"", x + 2, 9);
+		g.drawString(drawingDist == 0 ? drawingDist+settings.distUnit : drawingDist+"", x + 2, 9);
 		g.setColor(oldColor);
 	}
 

@@ -16,13 +16,15 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 
 import org.paradise.etrc.data.RailroadLine;
+import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.table.JEditTable;
 import org.paradise.etrc.view.lineedit.RailroadLineTableModel;
 import org.paradise.etrc.view.lineedit.StationTableModel;
-import org.paradise.etrc.view.widget.DefaultJEditTableModel;
-import org.paradise.etrc.view.widget.JEditTable;
 
 import apple.laf.JRSUIConstants.Size;
+
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.*;
 
 public class RemoveTableElementAction<T> extends TableAction {

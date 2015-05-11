@@ -15,6 +15,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 
 	public GlobalSettings settings;
 	public RailNetwork railNetwork;
+	public AllTrainTypes allTrainTypes;
 	public AllTrains allTrains;
 	protected Vector<RailNetworkChart> charts;
 	
@@ -25,6 +26,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	void initTGP() {
 		settings = TrainGraphFactory.createInstance(GlobalSettings.class);
 		railNetwork = TrainGraphFactory.createInstance(RailNetwork.class);
+		allTrainTypes = TrainGraphFactory.createInstance(AllTrainTypes.class);
 		allTrains = TrainGraphFactory.createInstance(AllTrains.class);
 		charts = new Vector<RailNetworkChart> ();
 	}
@@ -38,6 +40,9 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 					iter.hasNext(); ) {
 				
 				RailroadLineChart lineChart = iter.next();
+				if (lineChart.railroadLine == null) {
+					iter.remove();
+				}
 				if (railNetwork.getAllRailroadLines().stream()
 						.noneMatch(line->line.equals(lineChart.railroadLine))) {
 					iter.remove();
@@ -47,15 +52,18 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 
 		// Create empty line charts in every network chart for railroad lines
 		// that have no corresponding line charts.
-		railNetwork.getAllRailroadLines().stream()
-			.filter(line -> charts.get(0).getRailLineCharts().stream()
-					.noneMatch(lineChart->lineChart.railroadLine.equals(line)))
-			.forEachOrdered(line -> {
+		railNetwork.getAllRailroadLines().forEach(line -> {
 				
-				charts.forEach(networkChart ->
-					networkChart.getRailLineCharts()
-					.add(TrainGraphFactory.createInstance(RailroadLineChart.class).setProperties(line)) );
+				charts.forEach(networkChart -> {
+
+					if (networkChart.getRailLineCharts().stream()
+							.noneMatch(lineChart -> lineChart.railroadLine.equals(line)) ) {
+						networkChart.getRailLineCharts()
+						.add(TrainGraphFactory.createInstance(RailroadLineChart.class).setProperties(line));
+					}
 			});
+		
+		});
 	}
 
 	public Vector<RailNetworkChart> getCharts () {
@@ -93,6 +101,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	public void _prepareForFirstLoading() {
 		new GlobalSettings().prepareForFirstLoading();
 		new RailNetwork().prepareForFirstLoading();
+		new AllTrainTypes().prepareForFirstLoading();
 		new AllTrains().prepareForFirstLoading();
 		new RailNetworkChart().prepareForFirstLoading();
 	}
@@ -134,9 +143,10 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	@Override
 	protected void getObjectTGPProperties() {
 		objectProperties.clear();
-		objectProperties.add(settings);
-		objectProperties.add(railNetwork);
-		objectProperties.add(allTrains);
+		objectProperties.add(Tuple.of("settings", settings));
+		objectProperties.add(Tuple.of("railNetwork", railNetwork));
+		objectProperties.add(Tuple.of("allTrainTypes", allTrainTypes));
+		objectProperties.add(Tuple.of("allTrains", allTrains));
 	}
 	
 	@Override
@@ -146,6 +156,10 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 		} else if (part instanceof RailNetwork) {
 			railNetwork.getAllRailroadLines().clear();
 			railNetwork = (RailNetwork) part;
+		} else if (part instanceof AllTrainTypes) {
+			allTrainTypes.trainTypes.clear();
+			allTrainTypes.trainTypes.clear();
+			allTrainTypes = (AllTrainTypes) part;
 		} else if (part instanceof AllTrains) {
 			allTrains.trains.clear();
 			allTrains.trainDict.clear();
@@ -176,7 +190,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 			chart.railLineCharts.forEach(railineChart-> {
 				// Set railroadLine according to railroadLineName
 				railineChart.railroadLine = railNetwork.getAllRailroadLines().stream()
-						.filter(line->line.name.equals(railineChart.railroadLineName))
+						.filter(line->line.name.equals(railineChart.name))
 						.findFirst().orElse(null);				
 
 				// Set trains in terms of trainRefs

@@ -5,7 +5,8 @@ import java.awt.Dimension;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelListener;
 
-import org.paradise.etrc.view.widget.JEditTable;
+import org.paradise.etrc.util.ui.table.JEditTable;
+
 import static org.paradise.etrc.ETRC.__;
 
 public class RailroadLineTable extends JEditTable {

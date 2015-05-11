@@ -7,13 +7,19 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.paradise.etrc.data.util.Tuple;
+
 
 /**
  * 所有组成运行图的部件的基类
@@ -22,7 +28,18 @@ import org.paradise.etrc.data.util.Tuple;
  * @author Jeff Gong
  *
  */
+@SuppressWarnings("rawtypes")
 public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
+	public static int TO_STRING_ELEMENT_DEPTH = 0;
+	public static HashMap<String, Integer> TO_STRING_SPECIFIC_TYPE_DEPTH = new HashMap<String, Integer> ();
+//	public static HashMap<String, Integer> TO_DEBUG_STRING_SPECIFIC_TYPE_DEPTH = new HashMap<String, Integer> ();
+	public static boolean TO_STRING_SHOW_TYPE = false;
+	public static boolean TO_STRING_SHOW_PROPERTIES = false;
+	
+	static {
+		setSimpleToString();
+	}
+	
 	public static final String IDENT_STR	= "  ";
 	public Boolean IN_ONE_LINE	= null;
 	
@@ -45,6 +62,11 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	public static final String START_SECTION_STATION 			= "Station {";
 	public static final String END_SECTION_STATION 				= "}\r\n";
 	
+	public static final String START_SECTION_ALL_TRAIN_TYPES	= "All TrainTypes {\r\n";
+	public static final String END_SECTION_ALL_TRAIN_TYPES		= "} All TrainTypes\r\n";
+	public static final String START_SECTION_TRAIN_TYPE			= "TrainType {";
+	public static final String END_SECTION_TRAIN_TYPE			= "}\r\n";
+	
 	public static final String START_SECTION_ALL_TRAIN			= "All Trains {\r\n";
 	public static final String END_SECTION_ALL_TRAIN			= "} All Trains\r\n";
 	public static final String START_SECTION_TRAIN				= "Train {\r\n";
@@ -63,7 +85,7 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	 * No need to set value. */
 //	public ET _elementInstance = null;
 	
-	protected Vector<TrainGraphPart> objectProperties = new Vector<TrainGraphPart>();
+	protected Vector<Tuple<String, TrainGraphPart>> objectProperties = new Vector<Tuple<String, TrainGraphPart>>();
 	/* Store a (Class, Class constructor) tuple for each sub-class */
 	protected static HashMap<String, 
 		Tuple<Class<? extends TrainGraphPart>, Supplier<? extends TrainGraphPart>>> _partClassMap = 
@@ -86,6 +108,37 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	@Override
 	public int hashCode() {
 		return _id;
+	}
+	
+	@Override 
+	public String toString() {
+		return repr(TO_STRING_ELEMENT_DEPTH, TO_STRING_SHOW_TYPE, TO_STRING_SHOW_PROPERTIES);
+	}
+	
+	public String toDebugString() {
+		return repr(TO_STRING_SPECIFIC_TYPE_DEPTH.getOrDefault(
+				getStartSectionString(), 3), false, false);
+	}
+	
+	public static String reprJoining(Object[] array, String delimeter, boolean debug) {
+		return reprJoining(Arrays.stream(array), delimeter, debug);
+	}
+	
+	public static String reprJoining(Iterable<Object> iterable, String delimeter, boolean debug) {
+		return reprJoining(StreamSupport.stream(iterable.spliterator(), false), delimeter, debug);
+	}
+	
+	public static String reprJoining(Stream<Object> stream, String delimeter, boolean debug) {
+		return stream.map(obj -> {
+					if (obj instanceof TrainGraphPart) {
+						if (debug)
+							return ((TrainGraphPart) obj).toDebugString();
+						else
+							return ((TrainGraphPart) obj).toString();
+					} else {
+						return obj.toString();
+					} })
+			.collect(Collectors.joining(delimeter, "[", "]"));
 	}
 	
 	/**************************************************************************
@@ -161,28 +214,14 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 		_print(writer, _getStartSectionString());
 		
 		// Write simple properties
-		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-		int propIndex = 0;
-		int propCount = propTuples.length;
-		Tuple<String, Class<?>> currentProperty = null;
-
-		_printIdent(writer, identLevel + 1, isInOneLine());
-		for (; propIndex < propCount; ++ propIndex) {
-			if (propIndex == 1 && !isInOneLine()) {
-				_println(writer);
-				_printIdent(writer, identLevel + 1, isInOneLine());
-			}
-			currentProperty = propTuples[propIndex];
-			String propRepr = _encode(getTGPPropertyReprStr(propIndex));
-			_print(writer, "%s=%s,", currentProperty.A, propRepr);
-		}
+		saveSimplePropertiesToWriter(writer, identLevel, isInOneLine());
 		
 		// Write object properties
 		getObjectTGPProperties();
 		if (objectProperties.size() > 0) {
 			_println(writer);
-			for (TrainGraphPart element : objectProperties) {
-				element.saveToWriter(writer, identLevel + 1);
+			for (Tuple<String, TrainGraphPart> elementTuple : objectProperties) {
+				elementTuple.B.saveToWriter(writer, identLevel + 1);
 			}
 		}
 		
@@ -198,6 +237,25 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 		// Write section end string
 		_printIdent(writer, identLevel, isInOneLine());
 		_print(writer, getEndSectionString());
+	}
+	
+	private void saveSimplePropertiesToWriter(Writer writer, int identLevel, boolean inOneLine)
+			throws IOException {
+		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
+		int propIndex = 0;
+		int propCount = propTuples.length;
+		Tuple<String, Class<?>> currentProperty = null;
+
+		_printIdent(writer, identLevel + 1, inOneLine);
+		for (; propIndex < propCount; ++ propIndex) {
+			if (propIndex == 1 && !inOneLine) {
+				_println(writer);
+				_printIdent(writer, identLevel + 1, inOneLine);
+			}
+			currentProperty = propTuples[propIndex];
+			String propRepr = _encode(getTGPPropertyReprStr(propIndex));
+			_print(writer, "%s=%s,", currentProperty.A, propRepr);
+		}
 	}
 	
 	private String _getStartSectionString() {
@@ -355,6 +413,104 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 		
 		while (identLevel -- > 0) {
 			writer.append(IDENT_STR);
+		}
+	}
+	
+	public static void setSimpleToString() {
+		TO_STRING_ELEMENT_DEPTH = -1;
+		
+		// Init for toDebugString
+		TO_STRING_SHOW_TYPE = true;
+		TO_STRING_SHOW_PROPERTIES = false;
+		TO_STRING_SPECIFIC_TYPE_DEPTH.put(START_SECTION_ALL_TRAIN, 0);
+		TO_STRING_SPECIFIC_TYPE_DEPTH.put(START_SECTION_RAILINE_CHART, 0);
+		TO_STRING_SPECIFIC_TYPE_DEPTH.put(START_SECTION_RAILROAD_LINE, 0);
+	}
+	
+	public static void setDebugToString() {
+		TO_STRING_ELEMENT_DEPTH = 2;
+		TO_STRING_SHOW_TYPE = false;
+		TO_STRING_SHOW_PROPERTIES = false;
+	}
+	
+	public static void setFullToString() {
+		TO_STRING_ELEMENT_DEPTH = 100;
+		TO_STRING_SHOW_TYPE = true;
+		TO_STRING_SHOW_PROPERTIES = true;
+	}
+	
+	public String repr(int elementDepth, 
+			boolean showType, boolean showProperties) {
+		
+		if (elementDepth < 0) {
+			return getName();
+		} else {
+			StringWriter writer = new StringWriter();
+			
+			if (showType) {
+				writer.append(getStartSectionString().replace("{\r\n", "{"));
+			} else {
+				writer.append("{");
+			}
+			
+			// Print simple properties
+			if (showProperties) {
+				writer.append("id=" + _id + ",");
+				try {
+					saveSimplePropertiesToWriter(writer, 0, true);
+				} catch (IOException e) {}
+			} else {
+				if (showType) {
+					writer.append(String.format("id=%d,name=%s", _id, getName()));
+				} else {
+					writer.append(getName() + "@" + _id);
+				}
+			}
+			
+			String propertiesRepr=null, elementsRepr=null;
+			
+			// Print object properties
+			getObjectTGPProperties();
+			propertiesRepr = objectProperties.stream()
+				.map(propertyTuple -> {
+					String aString = propertyTuple.A + "=";
+					aString += propertyTuple.B.repr(
+						TO_STRING_SPECIFIC_TYPE_DEPTH.getOrDefault(
+								propertyTuple.B.getStartSectionString(), elementDepth - 1),
+						showType, showProperties);
+					return aString;})
+				.collect(Collectors.joining(","));
+			
+			// Print elements
+			if (elementDepth > 0) {
+				if (getTGPElements() != null) {
+					elementsRepr = getTGPElements().stream().map(element -> 
+										element.repr(TO_STRING_SPECIFIC_TYPE_DEPTH.getOrDefault(
+												element.getStartSectionString(), elementDepth - 1),
+											showType, showProperties))
+									.collect(Collectors.joining(",", "[", "]"));
+				}
+			}
+			
+			if (!"".equals(propertiesRepr) || elementsRepr != null) {
+				writer.append(": ");
+				if (propertiesRepr != null) {
+					writer.append(propertiesRepr);
+				}
+				if (elementsRepr != null) {
+					if (!"".equals(propertiesRepr)) {
+						writer.append(", ");
+					}
+
+					writer.append("elements=" + getTGPElements().size());
+					writer.append(elementsRepr);
+				}
+			}
+			
+			writer.append("}");
+			
+			
+			return writer.toString();
 		}
 	}
 	

@@ -27,7 +27,7 @@ import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.MessageBox;
-import org.paradise.etrc.view.widget.JEditTable;
+import org.paradise.etrc.util.ui.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -157,7 +157,7 @@ public class TimetableListView extends JPanel {
 		tableModel = new TimetableListTableModel(table);
 		tableModel.trainGraph = this.trainGraph;
 		
-		scrollPane.add(table);
+		scrollPane.getViewport().add(table);
 	}
 	
 	protected void do_MoveDown() {

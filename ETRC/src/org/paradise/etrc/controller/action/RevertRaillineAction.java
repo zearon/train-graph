@@ -9,11 +9,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 
 import org.paradise.etrc.data.RailroadLine;
+import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 import org.paradise.etrc.view.lineedit.RailroadLineTableModel;
 import org.paradise.etrc.view.lineedit.StationTableModel;
-import org.paradise.etrc.view.widget.DefaultJEditTableModel;
 
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.*;
 
 public class RevertRaillineAction extends UIAction {

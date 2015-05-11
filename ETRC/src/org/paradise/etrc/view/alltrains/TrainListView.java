@@ -42,8 +42,8 @@ import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.YesNoBox;
+import org.paradise.etrc.util.ui.table.JEditTable;
 import org.paradise.etrc.view.chart.ChartView;
-import org.paradise.etrc.view.widget.JEditTable;
 
 /**
  * @author lguo@sina.com

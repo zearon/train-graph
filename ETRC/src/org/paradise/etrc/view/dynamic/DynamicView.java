@@ -100,7 +100,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 		
 		if (ui_inited) {
 			panelRunning.setModel(trainGraph, activeChart);
-			panelDistance.setModel(activeChart);
+			panelDistance.setModel(trainGraph, activeChart);
 			
 			refresh();
 		}

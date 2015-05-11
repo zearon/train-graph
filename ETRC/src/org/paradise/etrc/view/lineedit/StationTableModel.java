@@ -9,7 +9,7 @@ import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.TrainGraphFactory;
-import org.paradise.etrc.view.widget.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 
 public class StationTableModel extends DefaultJEditTableModel {
 	/**

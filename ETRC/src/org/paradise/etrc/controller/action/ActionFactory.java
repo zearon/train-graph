@@ -10,9 +10,9 @@ import javax.swing.table.AbstractTableModel;
 
 import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.data.RailroadLine;
+import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.table.JEditTable;
 import org.paradise.etrc.view.lineedit.StationTableModel;
-import org.paradise.etrc.view.widget.DefaultJEditTableModel;
-import org.paradise.etrc.view.widget.JEditTable;
 
 public class ActionFactory {
 
@@ -67,10 +67,10 @@ public class ActionFactory {
 	}
 
 	public static UIAction createSetValueActionAndDoIt(String valueDesc,
-			Object oldValue, Object newValue, Consumer<Object> valueSetter) {
+			Object oldValue, Object newValue, Consumer<Object> valueSetter, Runnable callback) {
 
 		UIAction action = new SetValueAction(valueDesc, oldValue, newValue,
-				valueSetter);
+				valueSetter, callback);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 

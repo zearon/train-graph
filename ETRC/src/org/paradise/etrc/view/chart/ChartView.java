@@ -570,6 +570,7 @@ public class ChartView extends JPanel {
 	public void updateData() {
 		activeTrain = null;
 		activeStation = null;
+		shouldUpdateDrawingModel = true;
 		repaint();
 	}
 

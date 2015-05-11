@@ -2,7 +2,14 @@ package org.paradise.etrc;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.StringJoiner;
+import java.util.stream.Stream;
+
+import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.TrainGraphPart;
 
 /**
  * Utility class
@@ -14,6 +21,10 @@ public class ETRCUtil {
 	private static DateFormat dateFormat;
 	
 	private static String lastInvoker;
+	
+	public static String joinString(String str1, String str2) { 
+		return str1 + "," + str2; 
+	}
 	
 	@FunctionalInterface
 	public static interface DebugAction {		
@@ -32,6 +43,29 @@ public class ETRCUtil {
 	 */
 	  public static boolean IS_DEBUG() {
 		  return isDebug;
+	  }
+	  
+	  /**
+	   * Print a representation of the object
+	   * if it is running in debug mode.
+	   * @param tgp
+	   */
+	  public static void DEBUG_PRINT(Object o) {
+		  if (IS_DEBUG()) {
+			  System.err.println(o.toString());
+		  }
+	  }
+	  
+	  /**
+	   * Print a debug representation of the train graph part
+	   * if it is running in debug mode.
+	   * @param tgp
+	   */
+	  @SuppressWarnings("rawtypes")
+	  public static void DEBUG_PRINT_TGP(TrainGraphPart tgp) {
+		  if (IS_DEBUG()) {
+			  System.err.println(tgp.toDebugString());
+		  }
 	  }
 	  
 	  /**

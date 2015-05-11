@@ -31,11 +31,12 @@ public class ActionManager {
 	private LinkedList<UIAction> undoneActionList = new LinkedList<UIAction>();
 	private int actionCount = 0;
 
+	private LinkedList<JMenuItem> actionItemList = new LinkedList<JMenuItem> ();
 	private LinkedList<JMenuItem> undoneActionItemList = new LinkedList<JMenuItem>();
 
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
-	private JMenuItem actionHistoryMenuItem;
+	private JMenu actionHistoryMenuItem;
 	private JButton undoButton;
 	private JButton redoButton;
 
@@ -72,18 +73,20 @@ public class ActionManager {
 				actionList.removeFirst();
 				actionList.addLast(action);
 	
-				// actionHistoryMenuItem.remove(actionCount - 1);
-				// actionHistoryMenuItem.add(createMenuItem(action), 0);
+//				 actionHistoryMenuItem.remove(actionCount - 1);
+//				 actionHistoryMenuItem.add(createMenuItem(action), 0);
 			} else {
 				actionList.addLast(action);
 				++actionCount;
 	
-				// actionHistoryMenuItem.add(createMenuItem(action), 0);
+				JMenuItem item = createMenuItem(action);
+				actionItemList.addLast(item);
+				actionHistoryMenuItem.add(item, 0);
 			}
 	
 			undoneActionList.clear();
 	
-			// undoneActionItemList.clear();
+			undoneActionItemList.clear();
 		}
 		
 		updateUI();
@@ -95,13 +98,13 @@ public class ActionManager {
 		}
 
 		UIAction action = actionList.pollLast();
-		// JMenuItem menuItem = (JMenuItem)
-		// actionHistoryMenuItem.getComponent(0);
+		JMenuItem menuItem = actionItemList.pollLast();
+		actionHistoryMenuItem.remove(menuItem);
 
 		action.undoAction();
 
 		undoneActionList.addFirst(action);
-		// undoneActionItemList.addFirst(menuItem);
+		undoneActionItemList.addFirst(menuItem);
 
 		updateUI();
 	}
@@ -112,12 +115,13 @@ public class ActionManager {
 		}
 
 		UIAction action = undoneActionList.pollFirst();
-		// JMenuItem menuItem = undoneActionItemList.pollFirst();
+		JMenuItem menuItem = undoneActionItemList.pollFirst();
 
 		action.redoAction();
 
 		actionList.addLast(action);
-		// actionHistoryMenuItem.add(menuItem, 0);
+		actionItemList.addLast(menuItem);
+		actionHistoryMenuItem.add(menuItem, 0);
 
 		updateUI();
 	}

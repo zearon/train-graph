@@ -94,10 +94,12 @@ import org.paradise.etrc.view.dynamic.DynamicView;
 import org.paradise.etrc.view.lineedit.RailroadLineEditView;
 import org.paradise.etrc.view.nav.Navigator;
 import org.paradise.etrc.view.nav.Navigator.NavigatorNodeType;
+import org.paradise.etrc.view.network.RailNetworkEditorView;
 import org.paradise.etrc.view.settings.SettingsView;
 import org.paradise.etrc.view.sheet.SheetView;
 import org.paradise.etrc.view.timetables.TimetableListTableModel;
 import org.paradise.etrc.view.timetables.TimetableListView;
+import org.paradise.etrc.view.traintypes.TrainTypesView;
 
 /**
  * @author lguo@sina.com
@@ -120,7 +122,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public SheetView sheetView;
 	
 	public SettingsView settingsView;
+	public RailNetworkEditorView railNetworkEditorView;
 	public RailroadLineEditView railLineEditView;
+	public TrainTypesView trainTypesView;
 	public AllTrainsView allTrainsView;
 	public TimetableListView timetableListView;
 	
@@ -229,7 +233,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		// Set Navigator in terms of train Graph
 		navigator.setTrainGraph(trainGraph);
+		railNetworkEditorView.setModel(trainGraph);
 		railLineEditView.setModel(trainGraph);
+		trainTypesView.setModel(trainGraph);
 		allTrainsView.setModel(trainGraph);
 		timetableListView.setModel(trainGraph);
 		
@@ -337,7 +343,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		sheetView = new SheetView(trainGraph, currentLineChart, this);
 		
 		settingsView = new SettingsView(trainGraph);
+		railNetworkEditorView = new RailNetworkEditorView(trainGraph);
 		railLineEditView = new RailroadLineEditView(this);
+		trainTypesView = new TrainTypesView(trainGraph);
 		allTrainsView = new AllTrainsView();
 		timetableListView = new TimetableListView(trainGraph);
 		
@@ -359,8 +367,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		navigatorContentPanel = new JPanel(navigatorContentCard);
 		navigatorContentPanel.add(NavigatorNodeType.GLOBAL_SETTINGS.name(),
 				settingsView);
+		navigatorContentPanel.add(NavigatorNodeType.RAILROAD_NETWORK.name(),
+				railNetworkEditorView);
 		navigatorContentPanel.add(NavigatorNodeType.RAILROAD_LINES.name(), 
 				railLineEditView);
+		navigatorContentPanel.add(NavigatorNodeType.TRAIN_TYPES.name(), 
+				trainTypesView);
 		navigatorContentPanel.add(NavigatorNodeType.ALL_TRAINS.name(), 
 				allTrainsView);
 		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLES.name(),
@@ -699,6 +711,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private final String File_Save_Chart_As = "File_Save_Chart_As";
 	private final String File_Clear_Chart = "File_Clear_Chart";
 //	private final String File_Circuit = "File_Circuit";
+	private final String File_Load_Map = "File_Load_Map";
 	private final String File_Train = "File_Train";
 	private final String File_Export = "File_Export";
 	private final String File_Exit = "File_Exit";
@@ -1361,6 +1374,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.GLOBAL_SETTINGS.name());
 			break;
+		case RAILROAD_NETWORK:
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.RAILROAD_NETWORK.name());
+			break;
 		case RAILROAD_LINES:
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.RAILROAD_LINES.name());
@@ -1369,6 +1386,16 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			railLineEditView.switchRailLine((RailroadLine) params[0]); 
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.RAILROAD_LINES.name());
+			break;
+		case TRAIN_TYPES:
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.TRAIN_TYPES.name());
+			break;
+		case TRAIN_TYPE_SPECIFIC:
+			/**********************************************/
+			currentLineChart = (RailroadLineChart) params[0];
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.TRAIN_TYPES.name());
 			break;
 		case ALL_TRAINS:
 			navigatorContentCard.show(navigatorContentPanel, 

@@ -21,6 +21,11 @@ implements Collection<TrainType>
 	public Vector<TrainType> trainTypes = new Vector<TrainType>();
 	protected HashMap<String, TrainType> trainTypeDict = new HashMap<String, TrainType> ();
 	
+	@Override
+	public void setToDefault(){
+		add(TrainGraphFactory.createInstance(TrainType.class));
+	}
+	
 	
 	protected void updateTrainTypeDict() {
 		trainTypeDict.clear();

@@ -46,11 +46,13 @@ public class RailNetworkTest {
 		trainGraph = TrainGraphFactory.createInstance(TrainGraph.class);
 		trainGraph.name = "Test Train Graph";
 		trainGraph.railNetwork = railNetwork;
-		trainGraph.allTrains = new AllTrains();
 		trainGraph.allTrains.trains.addAll(chart.trains);
 		RailNetworkChart railNetworkChart = TrainGraphFactory.createInstance(RailNetworkChart.class);;
 		railNetworkChart.getRailLineCharts().add(chart);
 		trainGraph.getCharts().add(railNetworkChart);
+		
+
+		TrainGraphPart.setDebugToString();
 		
 //		railNetwork.print(false);
 	}

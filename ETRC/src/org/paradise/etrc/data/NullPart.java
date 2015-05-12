@@ -15,6 +15,9 @@ public class NullPart extends TrainGraphPart<NullPart, NullPart> {
 	public NullPart() {
 		// TODO Auto-generated constructor stub
 	}
+	
+	
+	
 	/**
 	 * Implements method inherited from abstract base class TrainGraphPart
 	 */

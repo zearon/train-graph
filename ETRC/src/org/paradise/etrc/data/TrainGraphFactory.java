@@ -39,6 +39,7 @@ public class TrainGraphFactory {
 		} catch (IOException ioe) {
 			throw ioe;
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new IOException("运行图文件格式错误!", e);
 		} finally {
 			if (reader0 != null) {

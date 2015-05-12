@@ -17,6 +17,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	public RailNetwork railNetwork;
 	public AllTrainTypes allTrainTypes;
 	public AllTrains allTrains;
+	public RailNetworkMap map;
 	protected Vector<RailNetworkChart> charts;
 	
 	TrainGraph() {
@@ -28,6 +29,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 		railNetwork = TrainGraphFactory.createInstance(RailNetwork.class);
 		allTrainTypes = TrainGraphFactory.createInstance(AllTrainTypes.class);
 		allTrains = TrainGraphFactory.createInstance(AllTrains.class);
+		map = TrainGraphFactory.createInstance(RailNetworkMap.class);
 		charts = new Vector<RailNetworkChart> ();
 	}
 	
@@ -104,6 +106,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 		new AllTrainTypes().prepareForFirstLoading();
 		new AllTrains().prepareForFirstLoading();
 		new RailNetworkChart().prepareForFirstLoading();
+		new RailNetworkMap().prepareForFirstLoading();
 	}
 
 	/* Properties */
@@ -144,26 +147,29 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	protected void getObjectTGPProperties() {
 		objectProperties.clear();
 		objectProperties.add(Tuple.of("settings", settings));
-		objectProperties.add(Tuple.of("railNetwork", railNetwork));
 		objectProperties.add(Tuple.of("allTrainTypes", allTrainTypes));
+		objectProperties.add(Tuple.of("railNetwork", railNetwork));
 		objectProperties.add(Tuple.of("allTrains", allTrains));
+		objectProperties.add(Tuple.of("map", map));
 	}
 	
 	@Override
 	protected void setObjectTGPProperties(TrainGraphPart part) {
 		if (part instanceof GlobalSettings) {
 			settings = (GlobalSettings) part;
-		} else if (part instanceof RailNetwork) {
-			railNetwork.getAllRailroadLines().clear();
-			railNetwork = (RailNetwork) part;
 		} else if (part instanceof AllTrainTypes) {
 			allTrainTypes.trainTypes.clear();
 			allTrainTypes.trainTypes.clear();
 			allTrainTypes = (AllTrainTypes) part;
+		} else if (part instanceof RailNetwork) {
+			railNetwork.getAllRailroadLines().clear();
+			railNetwork = (RailNetwork) part;
 		} else if (part instanceof AllTrains) {
 			allTrains.trains.clear();
 			allTrains.trainDict.clear();
 			allTrains = (AllTrains) part;
+		} else if (part instanceof RailNetworkMap) {
+			map = (RailNetworkMap) part;
 		}
 	};
 

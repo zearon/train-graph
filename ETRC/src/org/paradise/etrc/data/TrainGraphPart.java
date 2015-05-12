@@ -1,6 +1,7 @@
 package org.paradise.etrc.data;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -81,6 +82,9 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	public static final String START_SECTION_TRAIN_REF			= "Train Ref {";
 	public static final String END_SECTION_TRAIN_REF			= "}\r\n";
 	
+	public static final String START_SECTION_RAILNETWORK_MAP	= "RailNetwork Map {\r\n";
+	public static final String END_SECTION_RAILNETWORK_MAP		= "} RailNetwork Map\r\n";
+	
 	/* Field used by reflection code to determine the class of element.
 	 * No need to set value. */
 //	public ET _elementInstance = null;
@@ -156,6 +160,13 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	void initTGP() {}
 	void setToDefault() {}
 	
+	/* Binary coding */
+	protected boolean isBinaryEncoded() { return false; }
+	protected String encodeToBase64() { return ""; }
+	protected void decodeFromBase64Start() {};
+	protected void decodeFromBase64NewLine(String base64Line) {};
+	protected void decodeFromBase64End() {};
+	
 	/* Properties */
 	protected abstract Tuple<String, Class<?>>[] getSimpleTGPProperties();
 	protected abstract void setTGPProperty(String name, String valueInStr);
@@ -199,7 +210,9 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 			if (writer != null) {
 				try { writer.close(); } catch (Exception e) {}
 			}
-		}		
+		}	
+		
+		System.gc();
 	}
 	
 	public void print(OutputStream out) throws IOException {
@@ -213,24 +226,31 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 		_printIdent(writer, identLevel, false);
 		_print(writer, _getStartSectionString());
 		
-		// Write simple properties
-		saveSimplePropertiesToWriter(writer, identLevel, isInOneLine());
-		
-		// Write object properties
-		getObjectTGPProperties();
-		if (objectProperties.size() > 0) {
+		if (isBinaryEncoded()) {
+			// Write base64 codes for binary contents
+			
+			writer.append( encodeToBase64() );
 			_println(writer);
-			for (Tuple<String, TrainGraphPart> elementTuple : objectProperties) {
-				elementTuple.B.saveToWriter(writer, identLevel + 1);
+		} else {			
+			// Write simple properties
+			saveSimplePropertiesToWriter(writer, identLevel, isInOneLine());
+			
+			// Write object properties
+			getObjectTGPProperties();
+			if (objectProperties.size() > 0) {
+				_println(writer);
+				for (Tuple<String, TrainGraphPart> elementTuple : objectProperties) {
+					elementTuple.B.saveToWriter(writer, identLevel + 1);
+				}
 			}
-		}
-		
-		// Write element arrays
-		Vector<ET> elements = getTGPElements();
-		if (elements != null) {
-			_println(writer);
-			for (ET element : getTGPElements()) {
-				element.saveToWriter(writer, identLevel + 1);
+			
+			// Write element arrays
+			Vector<ET> elements = getTGPElements();
+			if (elements != null) {
+				_println(writer);
+				for (ET element : getTGPElements()) {
+					element.saveToWriter(writer, identLevel + 1);
+				}
 			}
 		}
 		
@@ -336,30 +356,42 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 		if (thisObj != null)
 			parsingNodeStack.push(thisObj);
 		
-		// Step 2. try to find "name=value," patterns for properties
-		TrainGraphPart objToBeAssigned = parsingNodeStack.peek();
-		if (objToBeAssigned != null) {
-			String propLine = line.replaceFirst("^[^\\{]*\\{", "").replaceFirst("\\}.*", "");
-			String[] assignments = propLine.split(",");
-			for (String assignment : assignments) {
-				String[] strParts = assignment.split("=");
-				if (strParts.length >= 2) {
-					objToBeAssigned.setTGPProperty(strParts[0], _decode(strParts[1]));
+		if (parentPart != null && parentPart.isBinaryEncoded()) {
+			parentPart.decodeFromBase64NewLine(line);
+		} else {
+			
+			// Step 2. try to find "name=value," patterns for properties
+			TrainGraphPart objToBeAssigned = parsingNodeStack.peek();
+			if (objToBeAssigned != null) {
+				String propLine = line.replaceFirst("^[^\\{]*\\{", "").replaceFirst("\\}.*", "");
+				String[] assignments = propLine.split(",");
+				for (String assignment : assignments) {
+					String[] strParts = assignment.split("=");
+					if (strParts.length >= 2) {
+						objToBeAssigned.setTGPProperty(strParts[0], _decode(strParts[1]));
+					} else {
+						objToBeAssigned.setTGPProperty(strParts[0], "");
+					}
+				}
+			}
+			
+			// Step 3. try to read as an object property or an element.
+			if (thisObj != null && parentPart != null) {
+				if (parentPart.isOfElementType(thisObj)) {
+					// Add thisObj as an element of parantPart
+					parentPart.addTGPElement(thisObj);
+				} else {
+					// Set thisObj as an object property of parantPart
+					parentPart.setObjectTGPProperties(thisObj);
 				}
 			}
 		}
 		
-		if (thisObj != null && parentPart != null) {
-			if (parentPart.isOfElementType(thisObj)) {
-				// Add thisObj as an element of parantPart
-				parentPart.addTGPElement(thisObj);
-			} else {
-				// Set thisObj as an object property of parantPart
-				parentPart.setObjectTGPProperties(thisObj);
-			}
-		}
-		
 		if (line.contains("}")) {
+			if (parentPart != null && parentPart.isBinaryEncoded()) {
+				parentPart.decodeFromBase64End();
+			}
+			
 			TrainGraphPart part = parsingNodeStack.pop();
 			part.loadComplete();
 		}
@@ -378,11 +410,19 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 			 * instead of creating new one.
 			 */
 			if (loadingNode != null && partClassTuple.A.isInstance(loadingNode)) {
+				if (loadingNode.isBinaryEncoded()) {
+					loadingNode.decodeFromBase64Start();
+				}
 				return loadingNode;
 			} else {
 				TrainGraphPart obj = partClassTuple.B.get();
 				TrainGraphFactory.setID(partClassTuple.A, obj);
 				obj.initTGP();
+				
+				if (obj.isBinaryEncoded()) {
+					obj.decodeFromBase64Start();
+				}
+				
 				return obj;
 			}
 		} else {

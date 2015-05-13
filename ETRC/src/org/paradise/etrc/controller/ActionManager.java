@@ -14,6 +14,12 @@ import javax.swing.table.TableModel;
 
 import org.paradise.etrc.controller.action.*;
 
+/**
+ * Keep in track of all actions that may modify the underlying model,
+ * and provide do-undo-redo support for all actions.
+ * @author Jeff Gong
+ *
+ */
 public class ActionManager {
 	public static final int MAX_ACTION_COUNT = 100;
 
@@ -132,6 +138,10 @@ public class ActionManager {
 
 	public synchronized boolean canRedo() {
 		return !undoneActionList.isEmpty();
+	}
+	
+	public boolean isModelModified() {
+		return !actionList.isEmpty();
 	}
 
 	private JMenuItem createMenuItem(UIAction action) {

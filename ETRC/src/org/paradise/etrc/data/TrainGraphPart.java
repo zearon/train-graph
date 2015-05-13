@@ -326,12 +326,14 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 		TrainGraphPart root = null;
 		TrainGraphPart classObjRoot = null;
 		String line = null;
+		int lineNum = 0;
 		while ((line = reader.readLine()) != null) {
+			++ lineNum;
 			line = line.trim();
 			if (classObjRoot == null) {
-				root = parseLine(line, loadingNode);
+				root = parseLine(line, lineNum, loadingNode);
 			} else {
-				root = parseLine(line, null);
+				root = parseLine(line, lineNum, null);
 			}
 			
 			if (classObjRoot == null && clazz.isInstance(root)) {
@@ -348,7 +350,7 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	}
 	protected static Stack<TrainGraphPart> parsingNodeStack = new Stack<TrainGraphPart>();
 	
-	protected static TrainGraphPart parseLine(String line, TrainGraphPart loadingNode) {
+	protected static TrainGraphPart parseLine(String line, int lineNum, TrainGraphPart loadingNode) {
 		TrainGraphPart parentPart = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
 		
 		// Step 1. try to interpret this line as a start of an object.

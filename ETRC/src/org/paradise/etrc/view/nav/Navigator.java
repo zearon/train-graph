@@ -68,6 +68,7 @@ public class Navigator extends JTree {
 	protected DefaultMutableTreeNode remarksNode;
 	
 	protected Vector<DefaultMutableTreeNode> railroadLineNodes;
+	protected Vector<DefaultMutableTreeNode> trainTypeNodes;
 	protected Vector<DefaultMutableTreeNode> timeTableNodes;
 	protected Vector<DefaultMutableTreeNode> railroadLineTimeTableNodes;
 	
@@ -76,10 +77,13 @@ public class Navigator extends JTree {
 
 	public Navigator() {
 		railroadLineNodes = new Vector<DefaultMutableTreeNode> ();
+		trainTypeNodes = new Vector<DefaultMutableTreeNode> ();
 		timeTableNodes = new Vector<DefaultMutableTreeNode> ();
 		railroadLineTimeTableNodes = new Vector<DefaultMutableTreeNode> ();
 		
-		buildUI();		
+		buildUI();	
+		
+		setCellRenderer(new NavigatorTreeCellRenderer());
 	}
 	
 	private void buildUI() {
@@ -187,7 +191,16 @@ public class Navigator extends JTree {
 	}
 
 	public void updateNavigatorByTrainTypes() {
+		trainTypeNodes.clear();
+		trainTypesNode.removeAllChildren();
 		
+		trainGraph.allTrainTypes.trainTypes.forEach(trainType -> {
+			DefaultMutableTreeNode node = new DefaultMutableTreeNode(trainType);
+			trainTypeNodes.add(node);
+			trainTypesNode.add(node);
+		});
+		
+		updateUI();
 	}
 	
 	public void nodeSelectionChanged(TreeSelectionEvent e) {

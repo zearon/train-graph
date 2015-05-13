@@ -4,6 +4,7 @@ import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.*;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.util.Vector;
 import java.util.function.Supplier;
 
@@ -21,6 +22,7 @@ public class TrainType extends TrainGraphPart<TrainType, NullPart> {
 	public String lineStype;
 	public float lineWidth;
 	public String fontFamily;
+	public int fontStyle;
 	public int fontSize;
 	public Color fontColor;
 	
@@ -39,13 +41,14 @@ public class TrainType extends TrainGraphPart<TrainType, NullPart> {
 	 * @return current object, for convenience of link-style invocation
 	 */
 	public TrainType setProperties(String abbriveation, String pattern, Color color, String lineStype, 
-			float lineWidth, String fontFamily, int fontSize, Color fontColor) {
+			float lineWidth, String fontFamily, int fontStyle, int fontSize, Color fontColor) {
 		this.abbriveation = abbriveation;
 		this.pattern = pattern;
 		this.color = color;
 		this.lineStype = lineStype;
 		this.lineWidth = lineWidth;
 		this.fontFamily = fontFamily;
+		this.fontStyle = fontStyle;
 		this.fontSize = fontSize;
 		this.fontColor = fontColor;
 		
@@ -56,7 +59,7 @@ public class TrainType extends TrainGraphPart<TrainType, NullPart> {
 	
 	@Override
 	public void setToDefault() {
-		setProperties("", "", Color.BLACK, LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), 12, Color.BLACK);
+		setProperties("", "", Color.RED, LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.RED);
 	}
 
 	public String getColorStr() {
@@ -118,7 +121,7 @@ public class TrainType extends TrainGraphPart<TrainType, NullPart> {
 	@Override
 	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
 		if (propTuples == null) {
-			propTuples = new Tuple[9];
+			propTuples = new Tuple[10];
 			
 			propTuples[0] = Tuple.of("name", String.class);
 			propTuples[1] = Tuple.of("abbriveation", String.class);
@@ -127,8 +130,9 @@ public class TrainType extends TrainGraphPart<TrainType, NullPart> {
 			propTuples[4] = Tuple.of("lineStype", String.class);
 			propTuples[5] = Tuple.of("lineWidth", String.class);
 			propTuples[6] = Tuple.of("fontFamily", String.class);
-			propTuples[7] = Tuple.of("fontSize", String.class);
-			propTuples[8] = Tuple.of("fontColor", String.class);
+			propTuples[7] = Tuple.of("fontStyle", int.class);
+			propTuples[8] = Tuple.of("fontSize", int.class);
+			propTuples[9] = Tuple.of("fontColor", String.class);
 		}
 		
 		return propTuples;
@@ -153,8 +157,10 @@ public class TrainType extends TrainGraphPart<TrainType, NullPart> {
 		} else if (propTuples[6].A.equals(porpName)) {
 			fontFamily = valueInStr;
 		} else if (propTuples[7].A.equals(porpName)) {
-			fontSize = Integer.parseInt(valueInStr);
+			fontStyle = Integer.parseInt(valueInStr);
 		} else if (propTuples[8].A.equals(porpName)) {
+			fontSize = Integer.parseInt(valueInStr);
+		} else if (propTuples[9].A.equals(porpName)) {
 			setFontColorStr(valueInStr);
 		}
 	}
@@ -178,8 +184,10 @@ public class TrainType extends TrainGraphPart<TrainType, NullPart> {
 		} else if (index == 6) {
 			value = fontFamily + "";
 		} else if (index == 7) {
-			value = fontSize + "";
+			value = fontStyle + "";
 		} else if (index == 8) {
+			value = fontSize + "";
+		} else if (index == 9) {
 			value = getFontColorStr() + "";
 		}
 		

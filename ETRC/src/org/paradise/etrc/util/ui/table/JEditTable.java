@@ -753,7 +753,7 @@ public class JEditTable extends JTable {
 		// DEBUG("row=%d, column=%d", row, column);
 		Object newCellValue = getModel().getValueAt(row, column);
 
-		int increment = getIncrementalModel().getIncrement(origCellValue,
+		int increment = getIncrementalModel().getDifference(origCellValue,
 				newCellValue);
 
 //		DEBUG("EDIT Stoped: CELL(%d,%d) = %s, oldValue=%s, inc=%d", row, column, newCellValue, origCellValue, increment);

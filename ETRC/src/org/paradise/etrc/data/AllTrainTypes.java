@@ -105,7 +105,7 @@ implements Collection<TrainType>
 		return r;
 	}
 	
-	public TrainType remove(int index) {
+	public TrainType removeAt(int index) {
 		TrainType r = trainTypes.remove(index);
 		removeItemFromTrainTypeDict(r, null);
 		return r;

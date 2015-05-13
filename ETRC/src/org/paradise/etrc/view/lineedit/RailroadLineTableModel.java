@@ -109,7 +109,7 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 	}
 
 	protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createTableEditActionAndDoIt(__("railroad line table"), 
+		return ActionFactory.createTableCellEditActionAndDoIt(__("railroad line table"), 
 				table, this, rowIndex, columnIndex, aValue);
 	}
 	
@@ -147,15 +147,6 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 		default:
 			return null;
 		}
-	}
-
-	/**
-	 * removeTableModelListener
-	 *
-	 * @param l
-	 *            TableModelListener
-	 */
-	public void removeTableModelListener(TableModelListener l) {
 	}
 
 	@Override

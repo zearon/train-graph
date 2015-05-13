@@ -66,7 +66,7 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 	}
 
 	@Override
-	public <T> int getIncrement(T baseObj, T newObj) {
+	public <T> int getDifference(T baseObj, T newObj) {
 		Optional<Integer> increment;
 		if (baseObj instanceof Integer)
 			return (Integer)newObj - (Integer) baseObj;

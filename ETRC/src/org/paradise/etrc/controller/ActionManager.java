@@ -5,6 +5,7 @@ import static org.paradise.etrc.ETRC.__;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.function.Consumer;
 
 import javax.swing.JButton;
 import javax.swing.JMenu;
@@ -45,24 +46,47 @@ public class ActionManager {
 	private JMenu actionHistoryMenuItem;
 	private JButton undoButton;
 	private JButton redoButton;
+	
+	Consumer<ActionManager> updateUIHook;
 
 	private ActionManager() {
 	}
 
+	/**
+	 * Set menu items relating to undo/redo actions.
+	 * @param undoMenuItem
+	 * @param redoMenuItem
+	 * @param actionHistoryMenu
+	 */
 	public void setMenuItem(JMenuItem undoMenuItem, JMenuItem redoMenuItem,
-			JMenu actionHistoryMenuItem) {
+			JMenu actionHistoryMenu) {
 		this.undoMenuItem = undoMenuItem;
 		this.redoMenuItem = redoMenuItem;
-		this.actionHistoryMenuItem = actionHistoryMenuItem;
+		this.actionHistoryMenuItem = actionHistoryMenu;
 
 		updateUI();
 	}
 
+	/**
+	 * Set toolbar buttons relating to undo/redo actions;
+	 * @param undoButton
+	 * @param redoButton
+	 */
 	public void setToolbarButton(JButton undoButton, JButton redoButton) {
 		this.undoButton = undoButton;
 		this.redoButton = redoButton;
 
 		updateUI();
+	}
+	
+	/**
+	 * Set a update UI hook. Every time a do/undo/redo action is done, the
+	 * update UI hook is called beside updating the status of menu items
+	 * and toolbar buttons.
+	 * @param updateUIHook
+	 */
+	public void setUpdateUIHook(Consumer<ActionManager> updateUIHook) {
+		this.updateUIHook = updateUIHook;
 	}
 
 	public synchronized void addActionAndDoIt(UIAction action) {
@@ -143,6 +167,19 @@ public class ActionManager {
 	public boolean isModelModified() {
 		return !actionList.isEmpty();
 	}
+	
+	public void reset() {
+		actionList.clear();
+		undoneActionList.clear();
+		
+		actionCount = 0;
+		
+		actionItemList.clear();
+		undoneActionItemList.clear();
+		
+		if (actionHistoryMenuItem != null)
+			actionHistoryMenuItem.removeAll();
+	}
 
 	private JMenuItem createMenuItem(UIAction action) {
 		JMenuItem menuItem = new JMenuItem(action.repr());
@@ -178,6 +215,9 @@ public class ActionManager {
 					.format(__("Redo %s"), nextRedoAction.repr());
 			redoButton.setToolTipText(redoTooltip);
 		}
+		
+		if (updateUIHook != null)
+			updateUIHook.accept(this);
 	}
 
 }

@@ -14,46 +14,86 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.paradise.etrc.controller.ActionManager;
+
 public class Config {
+	public static final String NEW_FILE_NAME = __("Unnamed Train Graph");
+	static final int Prop_Recent_File_Size = 15;
+	
 	static Properties prop;
 	static Properties defaultProp;
+
+	static String currentFile;
+
+//	static String Prop_Show_UP = "Show_UP";
+//	static String Prop_Show_Down = "Show_Down";
+//	static String Prop_Show_Run = "Show_Run";
 	
-	static int Prop_Recent_File_Size = 15;
-	
+	static String Prop_AUTO_LOAD_FILE = "Auto_Load_Last_Edit_File";
 	static String Prop_Working_Chart = "Working_File";
-	static String Prop_Show_UP = "Show_UP";
-	static String Prop_Show_Down = "Show_Down";
-	static String Prop_Show_Run = "Show_Run";
+	static String Prop_Recent_Open_File_Path = "Recent_Open_File_Path";
+	static String Prop_LAST_RAILNETWORK_PATH = "Last_railroad_network_path";
+	static String Prop_LAST_TRAIN_PATH = "Last_train_path";
+	static String Prop_LAST_MAP_PATH = "Last_map_path";
 	static String Prop_HTTP_Proxy_Server = "HTTP_Proxy_Server";
 	static String Prop_HTTP_Proxy_Port = "HTTP_Proxy_Port";
-	static String Prop_Recent_Open_File_Path = "Recent_Open_File_Path";
 	
-	private static String Sample_Chart_File = "sample.trc";
 	private static String Properties_File = "config.prop";
 	
 	static {
+		makeDefault();
 		init();
-	}
+	}	
 	
 	static void makeDefault() {
 		defaultProp = new Properties();
-//		defaultProp.setProperty(Prop_Working_Chart, Sample_Chart_File);
-		defaultProp.setProperty(Prop_Show_UP, "Y");
-		defaultProp.setProperty(Prop_Show_Down, "Y");
-		defaultProp.setProperty(Prop_Show_Run, "Y");
-		defaultProp.setProperty(Prop_HTTP_Proxy_Server, "");
-		defaultProp.setProperty(Prop_HTTP_Proxy_Port, "");
+		
+		defaultProp.setProperty(Prop_AUTO_LOAD_FILE, "no");
+		defaultProp.setProperty(Prop_Working_Chart, "");
 		defaultProp.setProperty(Prop_Recent_Open_File_Path, "");
+		defaultProp.setProperty(Prop_LAST_RAILNETWORK_PATH, "");
+		defaultProp.setProperty(Prop_LAST_TRAIN_PATH, "");
+		defaultProp.setProperty(Prop_LAST_MAP_PATH, "");
+		defaultProp.setProperty(Prop_HTTP_Proxy_Server, "");
+		defaultProp.setProperty(Prop_HTTP_Proxy_Port, "80");
 	}
 	
 	public static void init() {
+		prop = new Properties(defaultProp);
+		
 		try {
 			prop.load(new FileInputStream(Properties_File));
-		} catch (IOException e) {
+		} catch (Exception e) {
+			e.printStackTrace();
 			resetToDefault();
 			save();
 		}
 	}
+	
+	/*****************************************************************/
+	/* This part are in memory and has no need to be write to disks. */
+	/*****************************************************************/
+	public static String getCurrentFile() {
+		return currentFile;
+	}
+	
+	public static String getCurrentFileName() {
+		return new File(getCurrentFile()).getName();
+	}
+	
+	public static void setCurrentFileToNew() {
+		currentFile = NEW_FILE_NAME;
+	}
+	
+	public static void setCurrentFile(String filePath) {
+		currentFile = filePath;
+	}
+	
+	public static boolean isNewFile() {
+		return NEW_FILE_NAME.equalsIgnoreCase(currentFile);
+	}
+	/*****************************************************************/
+
 	
 	public static void load() throws FileNotFoundException, IOException {
 		prop.load(new FileInputStream(Properties_File));
@@ -68,12 +108,11 @@ public class Config {
 	}
 	
 	public static void resetToDefault() {
-		prop.clear();			
-		prop = new Properties(defaultProp);
+		prop.clear();
 	}
 	
 	public static String getValue(String key) {
-		return prop.getProperty(key);
+		return prop.getProperty(key, "");
 	}
 	
 	public static String getValue(String key, String defaultValue) {
@@ -86,12 +125,12 @@ public class Config {
 		save();
 	}
 	
-	public static String getCurrentFile() {
-		return getValue(Prop_Working_Chart);
+	public static boolean getAutoLoadLastFile() {
+		return getValue(Prop_AUTO_LOAD_FILE, "false").equalsIgnoreCase("yes");
 	}
 	
-	public static void setCurrentFile(String value) {
-		setValue(Prop_Working_Chart, value);
+	public static void setAutoLoadLastFile(boolean value) {
+		setValue(Prop_AUTO_LOAD_FILE, value ? "yes" : "no");
 	}
 	
 	public static String[] getRecentOpenedFiles() {
@@ -110,6 +149,15 @@ public class Config {
 		setValue(Prop_Recent_Open_File_Path, newList);
 	}
 	
+	public static String getLastFile(String defaultValue) {
+		String[] recentFiles = getRecentOpenedFiles();
+		if (recentFiles.length < 1)
+			return defaultValue;
+		else {
+			return getRecentOpenedFiles()[0];
+		}
+	}
+	
 	public static String getLastFilePath(String defaultValue) {
 		String[] recentFiles = getRecentOpenedFiles();
 		if (recentFiles.length < 1)
@@ -120,6 +168,34 @@ public class Config {
 		}
 	}
 	
+	public static boolean isFileModified() {
+		return ActionManager.getInstance().isModelModified();
+	}
+	
+	public static String getLastRailnetworkPath() {
+		return getValue(Prop_LAST_RAILNETWORK_PATH);
+	}
+	
+	public static void setLastRailnetworkPath(String value) {
+		setValue(Prop_LAST_RAILNETWORK_PATH, value);
+	}
+	
+	public static String getLastTrainPath() {
+		return getValue(Prop_LAST_TRAIN_PATH);
+	}
+	
+	public static void setLastTrainPath(String value) {
+		setValue(Prop_LAST_TRAIN_PATH, value);
+	}
+	
+	public static String getLastMapPath() {
+		return getValue(Prop_LAST_MAP_PATH);
+	}
+	
+	public static void setLastMapPath(String value) {
+		setValue(Prop_LAST_MAP_PATH, value);
+	}
+	
 	public static String getHttpProxyServer() {
 		return getValue(Prop_HTTP_Proxy_Server);
 	}
@@ -128,8 +204,13 @@ public class Config {
 		setValue(Prop_HTTP_Proxy_Server, value);
 	}
 	
-	public static String getHttpProxyPort() {
-		return getValue(Prop_HTTP_Proxy_Port);
+	public static int getHttpProxyPort() {
+		int port = 0;
+		try {
+			port = Integer.parseInt(getValue(Prop_HTTP_Proxy_Port));
+		} catch (Exception e) {}
+		
+		return port < 0 || port > 65535 ? 80 : port;
 	}
 	
 	public static void setHttpProxyPort(int value) {

@@ -322,29 +322,21 @@ public class ChartView extends JPanel {
 			cornerUpDown.setIcon(imAll);
 			mainFrame.jtButtonDown.setSelected(true);
 			mainFrame.jtButtonUp.setSelected(true);
-			mainFrame.prop.setProperty(MainFrame.Prop_Show_Down, "Y");
-			mainFrame.prop.setProperty(MainFrame.Prop_Show_UP, "Y");
 			break;
 		case SHOW_DOWN:
 			cornerUpDown.setIcon(imDown);
 			mainFrame.jtButtonDown.setSelected(true);
 			mainFrame.jtButtonUp.setSelected(false);
-			mainFrame.prop.setProperty(MainFrame.Prop_Show_Down, "Y");
-			mainFrame.prop.setProperty(MainFrame.Prop_Show_UP, "N");
 			break;
 		case SHOW_UP:
 			cornerUpDown.setIcon(imUp);
 			mainFrame.jtButtonDown.setSelected(false);
 			mainFrame.jtButtonUp.setSelected(true);
-			mainFrame.prop.setProperty(MainFrame.Prop_Show_Down, "N");
-			mainFrame.prop.setProperty(MainFrame.Prop_Show_UP, "Y");
 			break;
 		case SHOW_NONE:
 			cornerUpDown.setIcon(imNone);
 			mainFrame.jtButtonDown.setSelected(false);
 			mainFrame.jtButtonUp.setSelected(false);
-			mainFrame.prop.setProperty(MainFrame.Prop_Show_Down, "N");
-			mainFrame.prop.setProperty(MainFrame.Prop_Show_UP, "N");
 			break;
 		}
 		

@@ -74,7 +74,7 @@ public class TimetableListTableModel extends DefaultJEditTableModel {
 	@Override
 	protected UIAction getActionAndDoIt(Object aValue, int rowIndex,
 			int columnIndex) {
-		return ActionFactory.createTableEditActionAndDoIt(__("station table"), 
+		return ActionFactory.createTableCellEditActionAndDoIt(__("station table"), 
 				table, this, rowIndex, columnIndex, aValue);
 	}
 

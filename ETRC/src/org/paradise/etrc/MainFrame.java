@@ -86,6 +86,7 @@ import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.GIFFilter;
 import org.paradise.etrc.filter.TRCFilter;
 import org.paradise.etrc.filter.TRFFilter;
+import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.UIBinding;
 import org.paradise.etrc.view.alltrains.AllTrainsView;
 import org.paradise.etrc.view.alltrains.TrainListView;
@@ -100,6 +101,8 @@ import org.paradise.etrc.view.sheet.SheetView;
 import org.paradise.etrc.view.timetables.TimetableListTableModel;
 import org.paradise.etrc.view.timetables.TimetableListView;
 import org.paradise.etrc.view.traintypes.TrainTypesView;
+
+import com.sun.corba.se.spi.orbutil.fsm.Action;
 
 /**
  * @author lguo@sina.com
@@ -136,22 +139,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	public JLabel statusBarMain = new JLabel();
 	public JLabel statusBarRight = new JLabel();
-
-	private Properties defaultProp;
-	public Properties prop;
-	public static String Prop_Working_Chart = "Working_Chart";
-	public static String Prop_Show_UP = "Show_UP";
-	public static String Prop_Show_Down = "Show_Down";
-	public static String Prop_Show_Run = "Show_Run";
-	public static String Prop_HTTP_Proxy_Server = "HTTP_Proxy_Server";
-	public static String Prop_HTTP_Proxy_Port = "HTTP_Proxy_Port";
-	public static String Prop_Recent_Open_File_Path = "Recent_Open_File_Path";
-	
-//	private static String Sample_Chart_File = "sample.trc";
-	private static String Properties_File = "htrc.prop";
 	
 //	public boolean isNewCircuit = false;
-	private String workingFileName;
+//	private String workingFileName;
 	
 	public TrainGraph trainGraph;
 	RailNetworkChart currentNetworkChart;
@@ -162,6 +152,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public JComboBox<String> cbTrainSelectHistory;
 	
 	private boolean firstTimeLoading = true;
+
+	private boolean ui_inited;
 	
 	public static MainFrame instance;
 	public static MainFrame getInstance() { return instance; }
@@ -172,39 +164,25 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		addFullScreenModeSupportOnOSX();
 		
-		defaultProp = new Properties();
-		defaultProp.setProperty(Prop_Working_Chart, Sample_Chart_File);
-		defaultProp.setProperty(Prop_Show_UP, "Y");
-		defaultProp.setProperty(Prop_Show_Down, "Y");
-		defaultProp.setProperty(Prop_Show_Run, "Y");
-		defaultProp.setProperty(Prop_HTTP_Proxy_Server, "");
-		defaultProp.setProperty(Prop_HTTP_Proxy_Port, "");
-		defaultProp.setProperty(Prop_Recent_Open_File_Path, "");
-		
-		prop = new Properties(defaultProp);
-		
 		trainSelectHistory = new Vector<String>();
 		cbTrainSelectHistory = new JComboBox<String>(new DefaultComboBoxModel<String>(trainSelectHistory));
-		
-		try {
-			prop.load(new FileInputStream(Properties_File));
-		} catch (IOException e) {
-			System.out.println("Unable to load prop file. Use default value.");
-		}
 				
-		initChart(false);
+		initChart();
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 		try {
 			jbInit();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		ActionManager.getInstance().setUpdateUIHook(actionMgr -> this.setTitle());
 		
 		UIBinding.setExceptionHandler(e -> {
 			e.printStackTrace();
 			new MessageBox(e.getMessage()).showMessage();
 		});
 
+		ui_inited = true;
 		setModel(trainGraph);
 		
 		// for DEBUG purposes
@@ -229,25 +207,29 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 	
 	public void setModel(TrainGraph trainGraph) {
-		
-		// Set Navigator in terms of train Graph
-		navigator.setTrainGraph(trainGraph);
-		railNetworkEditorView.setModel(trainGraph);
-		railLineEditView.setModel(trainGraph);
-		trainTypesView.setModel(trainGraph);
-		allTrainsView.setModel(trainGraph);
-		timetableListView.setModel(trainGraph);
-		
-
-		chartView.updateData();
-		chartView.resetSize();
-
-		sheetView.updateData();
-		sheetView.refresh();
-		
-		runView.refresh();
-		
 		setTitle();
+		
+		currentNetworkChart = trainGraph.getCharts().get(0);
+		currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
+		
+		if (ui_inited) {
+			// Set Navigator in terms of train Graph
+			navigator.setTrainGraph(trainGraph);
+			railNetworkEditorView.setModel(trainGraph);
+			railLineEditView.setModel(trainGraph);
+			trainTypesView.setModel(trainGraph);
+			allTrainsView.setModel(trainGraph);
+			timetableListView.setModel(trainGraph);
+			
+	
+			chartView.updateData();
+			chartView.resetSize();
+	
+			sheetView.updateData();
+			sheetView.refresh();
+			
+			runView.refresh();
+		}
 	}
 	
 	static Boolean isOSX = null;
@@ -322,15 +304,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	public void doExit() {
-		if(currentLineChart != null)
-			if(new YesNoBox(this, __("The train graph is has changed.\nDo you want to save the changes?")).askForYes())
+		if(Config.isFileModified())
+			if(new YesNoBox(this, __("Current train graph has changed.\nDo you want to save the changes?")).askForYes())
 				doSaveChart(); 
 		
-		try {
-			prop.store(new FileOutputStream(Properties_File), null);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		System.exit(0);
 	}
 
@@ -512,26 +489,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		setTitle();
 	}
 
-	public String getRailNetworkName() {
-		if (workingFileName == null)
-			return "";
-		
-		if (workingFileName.endsWith(TRCFilter.suffix))
-			workingFileName = workingFileName.replace(TRCFilter.suffix, "");
-		
-		return workingFileName;
-		
-//		String circuitName = "";
-//		if (chart.trunkCircuit.name.equalsIgnoreCase(""))
-//			circuitName = "";
-//		else
-////			circuitName = chart.allCircuits.get(0).name + _(" etc");
-//
-//		return circuitName;
-	}
-
 	public void setTitle() {
-		setTitle(titlePrefix + " -- [" + getRailNetworkName() + "]" + activeTrainName);
+		setTitle(titlePrefix + " -- [" + Config.getCurrentFile()+ "] " + 
+				(Config.isFileModified() ? __("Modified ") : "") + activeTrainName);
 	}
 
 	private JLabel loadStatusBar() {
@@ -598,12 +558,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		});
 		
 		//读配置文件设定是否显示动态图
-		if(prop.getProperty(Prop_Show_Run).equalsIgnoreCase("Y")) {
-			isShowRun = true;
-		}
-		else {
-			isShowRun = false;
-		}
+//		if(prop.getProperty(Prop_Show_Run).equalsIgnoreCase("Y")) {
+//			isShowRun = true;
+//		}
+//		else {
+//			isShowRun = false;
+//		}
 		updateShowRunState();
 		
 		jToolBar.addSeparator();
@@ -639,19 +599,26 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		});
 		
 		//读配置文件设置上下行状态按钮
-		chartView.showUpDownState = ChartView.SHOW_NONE;
-		if(prop.getProperty(Prop_Show_Down).equalsIgnoreCase("Y")) {
-			jtButtonDown.setSelected(true);
-			chartView.showUpDownState ^= ChartView.SHOW_DOWN;
-		}
-		else
-			jtButtonDown.setSelected(false);
-		if(prop.getProperty(Prop_Show_UP).equalsIgnoreCase("Y")) {
-			jtButtonUp.setSelected(true);
-			chartView.showUpDownState ^= ChartView.SHOW_UP;
-		}
-		else
-			jtButtonUp.setSelected(false);
+		chartView.showUpDownState = ChartView.SHOW_ALL;
+		jtButtonDown.setSelected(true);
+		jtButtonUp.setSelected(true);
+		jtButtonShowWatermark.setSelected(true);
+		
+//		chartView.showUpDownState = ChartView.SHOW_NONE;
+//		if(prop.getProperty(Prop_Show_Down).equalsIgnoreCase("Y")) {
+//			jtButtonDown.setSelected(true);
+//			chartView.showUpDownState ^= ChartView.SHOW_DOWN;
+//		}
+//		else
+//			jtButtonDown.setSelected(false);
+//		
+//		if(prop.getProperty(Prop_Show_UP).equalsIgnoreCase("Y")) {
+//			jtButtonUp.setSelected(true);
+//			chartView.showUpDownState ^= ChartView.SHOW_UP;
+//		}
+//		else
+//			jtButtonUp.setSelected(false);
+		
 		//让ChartView右下角的上下行状态显示图标显示正确的内容
 		chartView.updateUpDownDisplay();
 
@@ -708,7 +675,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private final String File_Load_Chart = "File_Load_Chart";
 	private final String File_Save_Chart = "File_Save_Chart";
 	private final String File_Save_Chart_As = "File_Save_Chart_As";
-	private final String File_Clear_Chart = "File_Clear_Chart";
+	private final String File_New_Chart = "File_Clear_Chart";
 //	private final String File_Circuit = "File_Circuit";
 	private final String File_Load_Map = "File_Load_Map";
 	private final String File_Train = "File_Train";
@@ -736,7 +703,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 		JMenu menuFile = createMenu(__("File"));
 		menuFile.setMnemonic(KeyEvent.VK_F);
-		menuFile.add(createMenuItem(__("New"), File_Clear_Chart)).setMnemonic(KeyEvent.VK_N);
+		menuFile.add(createMenuItem(__("New"), File_New_Chart)).setMnemonic(KeyEvent.VK_N);
 		menuFile.add(createMenuItem(__("Open..."), File_Load_Chart)).setMnemonic(KeyEvent.VK_O);
 		menuFile.addSeparator();
 		menuFile.add(createMenuItem(__("Save"), File_Save_Chart)).setMnemonic(KeyEvent.VK_S);
@@ -819,41 +786,71 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		return menuItem;
 	}
 
-	private void initChart(boolean loadLastFile) {
-		File chartFile = new File(prop.getProperty(Prop_Working_Chart));
-
-		if (loadLastFile) {
-			//
+	private void initChart() {
+		if (Config.getAutoLoadLastFile()) {
+			File file = new File(Config.getLastFile(""));
+			if (file.exists())
+				do_OpenFile(file.getAbsolutePath());
+			else {
+				new MessageBox(__("The last edited file do not exists. Thus a new file is created instead."))
+					.showMessage();
+				do_NewFile();
+			}
 		} else {
-			TrainGraphFactory.resetIDCounters();
-			trainGraph = TrainGraphFactory.createDefaultTrainGraph();
-			
-			workingFileName = "";
+			do_NewFile();
 		}
+	}
+	
+	private void do_NewFile() {
+		// Create a default file.
+		TrainGraphFactory.resetIDCounters();
+		trainGraph = TrainGraphFactory.createDefaultTrainGraph();
 		
-
-		currentNetworkChart = trainGraph.getCharts().get(0);
-		currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
+		Config.setCurrentFileToNew();
+		ActionManager.getInstance().reset();
 		
+		setTitle();
 		
-//		try {
-//			trainGraph = TrainGraphFactory.loadTrainGraphFromFile(
-//					chartFile.getAbsolutePath());
-//			prop.setProperty(Prop_Working_Chart, chartFile.getAbsolutePath());
-//		} catch (IOException ioe) {
-//			System.out.println("Load old graph from last session failed, try to load the default graph.");
-//			new MessageBox(String.format(__("Load train graph failed. Use default graph. Please check the %s file."
-//					+ "\nReason:%s\nDetail:%s"), Sample_Chart_File, ioe.getMessage(), 
-//					ioe.getCause() )).showMessage();
-//			
-//			TrainGraphFactory.resetIDCounters();
-//			trainGraph = TrainGraphFactory.createDefaultTrainGraph();
-//		} finally {
-//			currentNetworkChart = trainGraph.getCharts().get(0);
-//			currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
-//			
-//			workingFileName = chartFile.getName();
-//		}
+		setModel(trainGraph);
+	}
+	
+	private void do_OpenFile(String filePath) {
+		try {
+			TrainGraphFactory.resetIDCounters();
+			trainGraph = TrainGraphFactory.loadTrainGraphFromFile(filePath);
+			
+			Config.setCurrentFile(filePath);
+			Config.addToRecentOpenedFiles(filePath);
+			
+			do_UpdateRecentFilesMenu();
+			
+			setModel(trainGraph);
+			
+		} catch (IOException ioe) {
+			System.out.println("Loading graph failed.");
+			ioe.printStackTrace();
+			new MessageBox(String.format(__("Load train graph failed. Please check the %s file."
+					+ "\nReason:%s\nDetail:%s"), filePath, ioe.getMessage(), 
+					ioe.getCause() )).showMessage();
+		}
+	}
+	
+	private void do_SaveFile(String filePath) {
+		try {
+			trainGraph.saveToFile(filePath);
+			
+			Config.setCurrentFile(filePath);
+			Config.addToRecentOpenedFiles(filePath);
+			
+			do_UpdateRecentFilesMenu();
+		} catch (IOException ex) {
+			System.err.println("Err:" + ex.getMessage());
+			this.statusBarMain.setText(__("Unable to save the graph."));
+		}
+	}
+	
+	private void do_UpdateRecentFilesMenu() {
+		
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -889,8 +886,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			this.doLoadTrain();
 //		} else if (command.equalsIgnoreCase(File_Circuit)) {
 //			this.doLoadCircuit();
-		} else if (command.equalsIgnoreCase(File_Clear_Chart)) {
-			this.doClearChart();
+		} else if (command.equalsIgnoreCase(File_New_Chart)) {
+			this.doNewChart();
 		} else if (command.equalsIgnoreCase(File_Save_Chart)) {
 			this.doSaveChart();
 		} else if (command.equalsIgnoreCase(File_Save_Chart_As)) {
@@ -903,7 +900,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			this.doHelpAbout();
 		}
 	}
-
+	
 	private void doTrainTools() {
 		//new MessageBox(this, "todo：从网络获取数据生成车次描述文件(.trf文件)。").showMessage();
 		if(new YesNoBox(this, __("This operation will delete all the train information on the graph, then import the train information from the default time table for this circuit. Continue?")).askForYes()) {
@@ -934,8 +931,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		this.setTitle();
 		chartView.repaint();
 		runView.refresh();
-		
-		this.isNewCircuit = true;
 	}
 
 	private void doEditTrains() {
@@ -1006,16 +1001,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //		dlg.pack();
 //		dlg.setVisible(true);
 //	}
-
-	/**
-	 * doClearChart
-	 */
-	private void doClearChart() {
-		TrainGraphFactory.resetIDCounters();
-		trainGraph = TrainGraphFactory.createDefaultTrainGraph();
-		
-		setModel(trainGraph);
-	}
 
 	/**
 	 * doExportChart
@@ -1109,25 +1094,20 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		return Printable.PAGE_EXISTS;
 	}
 
-	public void doSaveChart() {
-		File savingFile = new File(prop.getProperty(Prop_Working_Chart));
+	public void doNewChart() {
+		if(Config.isFileModified())
+			if(new YesNoBox(this, __("Current train graph has changed.\nDo you want to save the changes?")).askForYes())
+				doSaveChart(); 
 		
-		//如果是在Sample_Chart_File上操作的，则改调“另存为”
-		if(savingFile.getName().equalsIgnoreCase(Sample_Chart_File)) {
+		do_NewFile();
+	}
+
+	public void doSaveChart() {
+		//如果是新文件，则改调“另存为”
+		if(Config.isNewFile()) {
 			doSaveChartAs();
-		}
-		//如果已经做过载入过线路等操作，则改调“另存为”
-		else if(isNewCircuit) {
-			doSaveChartAs();
-		}
-		else {
-			try {
-				trainGraph.saveToFile(savingFile.getAbsolutePath());
-//				currentLineChart.saveToFile(savingFile);
-			} catch (IOException ex) {
-				System.err.println("Err:" + ex.getMessage());
-				this.statusBarMain.setText(__("Unable to save the graph."));
-			}
+		} else {
+			do_SaveFile(Config.getCurrentFile());
 		}
 	}
 
@@ -1143,36 +1123,26 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileFilter(new TRCFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+		
 		try {
-			File recentPath = new File(prop.getProperty(Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(Config.getLastFilePath(""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
 		
 		// SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = workingFileName;
+		String fileName = Config.isNewFile() ? Config.NEW_FILE_NAME : Config.getCurrentFileName();
 		chooser.setSelectedFile(new File(fileName));
 
 		int returnVal = chooser.showSaveDialog(this); 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
-			if (!f.getAbsolutePath().endsWith(".trc")) {
-				f = new File(f.getAbsolutePath() + ".trc");
+			String suffix = TRCFilter.suffix;
+			if (!f.getAbsolutePath().endsWith(suffix)) {
+				f = new File(f.getAbsolutePath() + suffix);
 			}
-			workingFileName = f.getName();
-			//System.out.println(f);
 
-			try {
-				trainGraph.saveToFile(f.getAbsolutePath());
-//				currentLineChart.saveToFile(f);
-				
-				setTitle();
-				prop.setProperty(Prop_Working_Chart, f.getAbsolutePath());
-				prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
-			} catch (IOException ex) {
-				System.err.println("Err:" + ex.getMessage());
-				this.statusBarMain.setText(__("Unable to save the graph."));
-			}
+			do_SaveFile(f.getAbsolutePath());
 		}
 	}
 
@@ -1188,8 +1158,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFileFilter(new TRCFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+		
 		try {
-			File recentPath = new File(prop.getProperty(Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(Config.getLastFilePath(""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
@@ -1199,26 +1170,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			File f = chooser.getSelectedFile();
 			System.out.println(f);
 			
-			try {
-				TrainGraphFactory.resetIDCounters();
-				trainGraph = TrainGraphFactory.loadTrainGraphFromFile(
-						f.getAbsolutePath());
-				
-				setModel(trainGraph);
-				
-				workingFileName = f.getName();		
-				currentNetworkChart = trainGraph.getCharts().get(0);
-				currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
-				
-				prop.setProperty(Prop_Working_Chart, f.getAbsolutePath());
-				prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
-			} catch (IOException ioe) {
-				System.out.println("Loading graph failed.");
-				ioe.printStackTrace();
-				new MessageBox(String.format(__("Load train graph failed. Please check the %s file."
-						+ "\nReason:%s\nDetail:%s"), Sample_Chart_File, ioe.getMessage(), 
-						ioe.getCause() )).showMessage();
-			}
+			do_OpenFile(f.getAbsolutePath());
 		}
 	}
 
@@ -1239,7 +1191,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.addChoosableFileFilter(new TRFFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(prop.getProperty(Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(Config.getLastFilePath(""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
@@ -1257,7 +1209,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				loadingTrain = TrainGraphFactory.createInstance(Train.class);
 				try {
 					loadingTrain.loadFromFile2(f[j].getAbsolutePath());
-					prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
+//					prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
 				} catch (IOException ex) {
 					System.err.println("Error: " + ex.getMessage());
 				}
@@ -1367,7 +1319,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		runView.setVisible(isShowRun);
 		if (isShowRun)
 			splitPaneV.setDividerLocation(runView.getPreferredSize().height);
-		prop.setProperty(Prop_Show_Run, isShowRun ? "Y" : "N");
 	}
 	
 	private void onNavigatorNodeChanged(NavigatorNodeType nodeType, 

@@ -45,11 +45,14 @@ public class MapPanel extends JPanel {
 		if (bgImage != null) {
 			this.width = trainGraph.map.getWidth();
 			this.height = trainGraph.map.getHeight();
-			size = new Dimension(width, height);
+		} else {
+			this.width = 0;
+			this.height = 0;
 		}
+		size = new Dimension(width, height);
 		
 		if (ui_inited) {
-			
+			repaint();
 		}
 	}
 

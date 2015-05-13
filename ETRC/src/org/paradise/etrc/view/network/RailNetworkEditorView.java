@@ -11,11 +11,13 @@ import javax.swing.JButton;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.filter.ImageFilter;
 import org.paradise.etrc.filter.TRCFilter;
+import org.paradise.etrc.util.Config;
 
 import javax.swing.BoxLayout;
 
@@ -89,7 +91,7 @@ public class RailNetworkEditorView extends JPanel {
 		chooser.setFileFilter(new ImageFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(mainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(Config.getLastMapPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
@@ -99,20 +101,24 @@ public class RailNetworkEditorView extends JPanel {
 			File f = chooser.getSelectedFile();
 			System.out.println(f);
 			
-			try {
-				trainGraph.map.loadFromFile(f);
-				setModel(trainGraph);
-				
-				updateUI();
-				
-				mainFrame.prop.setProperty(mainFrame.Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
-			} catch (IOException ioe) {
-				System.out.println("Loading map failed.");
-				ioe.printStackTrace();
-				new MessageBox(String.format(__("Load map failed. Please check the %s file."
-						+ "\nReason:%s\nDetail:%s"), chooser.getSelectedFile(), ioe.getMessage(), 
-						ioe.getCause() )).showMessage();
-			}
+
+			ActionFactory.createDirectActionAndDoIt(__("Load a map as the backgroup picture"), 
+					() -> {
+				try {
+					trainGraph.map.loadFromFile(f);
+					setModel(trainGraph);
+					
+					updateUI();
+					
+					Config.setLastMapPath(chooser.getSelectedFile().getParentFile().getAbsolutePath());
+				} catch (IOException ioe) {
+					System.out.println("Loading map failed.");
+					ioe.printStackTrace();
+					new MessageBox(String.format(__("Load map failed. Please check the %s file."
+							+ "\nReason:%s\nDetail:%s"), chooser.getSelectedFile(), ioe.getMessage(), 
+							ioe.getCause() )).showMessage();
+				}
+			});
 		}
 	}
 

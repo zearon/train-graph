@@ -52,6 +52,7 @@ import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.TRFFilter;
+import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 import org.paradise.etrc.util.ui.table.JEditTable;
 
@@ -238,15 +239,8 @@ public class TrainView extends JPanel {
 				if (table.getCellEditor() != null)
 					table.getCellEditor().stopCellEditing();
 
-				String proxyAddress = mainFrame.prop
-						.getProperty(MainFrame.Prop_HTTP_Proxy_Server);
-				int proxyPort = 0;
-				try {
-					proxyPort = Integer.parseInt(mainFrame.prop
-							.getProperty(MainFrame.Prop_HTTP_Proxy_Port));
-				} catch (NumberFormatException ex) {
-					proxyPort = 0;
-				}
+				String proxyAddress = Config.getHttpProxyServer();
+				int proxyPort = Config.getHttpProxyPort();
 				
 				Color color = table.getBackground();
 				
@@ -417,8 +411,7 @@ public class TrainView extends JPanel {
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		chooser.setApproveButtonText(__("Save "));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(
-					MainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(Config.getLastTrainPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -440,10 +433,9 @@ public class TrainView extends JPanel {
 
 				out.close();
 
-				mainFrame.prop.setProperty(
-						MainFrame.Prop_Recent_Open_File_Path, chooser
-								.getSelectedFile().getParentFile()
-								.getAbsolutePath());
+				Config.setLastTrainPath(chooser
+						.getSelectedFile().getParentFile()
+						.getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -461,8 +453,7 @@ public class TrainView extends JPanel {
 		chooser.addChoosableFileFilter(new TRFFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(
-					MainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(Config.getLastTrainPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -475,10 +466,9 @@ public class TrainView extends JPanel {
 			Train loadingTrain = TrainGraphFactory.createInstance(Train.class);
 			try {
 				loadingTrain.loadFromFile2(f.getAbsolutePath());
-				mainFrame.prop.setProperty(
-						MainFrame.Prop_Recent_Open_File_Path, chooser
-								.getSelectedFile().getParentFile()
-								.getAbsolutePath());
+				Config.setLastTrainPath(chooser
+						.getSelectedFile().getParentFile()
+						.getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 			}
@@ -797,7 +787,7 @@ public class TrainView extends JPanel {
 		}
 
 		protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
-			return ActionFactory.createTableEditActionAndDoIt(__("train table"), 
+			return ActionFactory.createTableCellEditActionAndDoIt(__("train table"), 
 					table, this, rowIndex, columnIndex, aValue);
 		}
 

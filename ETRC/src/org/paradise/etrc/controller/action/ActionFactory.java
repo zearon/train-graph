@@ -22,11 +22,12 @@ public class ActionFactory {
 	 * In order to keep track of all actions that may modify the underlying
 	 * data model, even actions that should not or do not yet support undo/redo
 	 * are in control of action manager. For these actions, DirectAction is used.
+	 * @param actionRepr A string that describes the action.
 	 * @param action0 An action that takes no parameter.
 	 * @return The DirectAction created and executed
 	 */
-	public static UIAction createDirectActionAndDoIt(Runnable action0) {
-		UIAction action = new DirectAction(action0);
+	public static UIAction createDirectActionAndDoIt(String actionDesc, Runnable action0) {
+		UIAction action = new DirectAction(actionDesc, action0);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 
@@ -36,12 +37,15 @@ public class ActionFactory {
 	 * In order to keep track of all actions that may modify the underlying
 	 * data model, even actions that should not or do not yet support undo/redo
 	 * are in control of action manager. For these actions, DirectAction is used.
+	 * @param actionRepr A string that describes the action.
 	 * @param action1 An action that takes one parameter.
 	 * @param a Parameter 1.
 	 * @return The DirectAction created and executed
 	 */
-	public static <T1> UIAction createDirectActionAndDoIt(Consumer<T1> action1, T1 a) {
-		UIAction action = new DirectAction(action1, a);
+	public static <T1> UIAction createDirectActionAndDoIt(String actionDesc, 
+			Consumer<T1> action1, T1 a) {
+		
+		UIAction action = new DirectAction(actionDesc, action1, a);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 
@@ -51,13 +55,16 @@ public class ActionFactory {
 	 * In order to keep track of all actions that may modify the underlying
 	 * data model, even actions that should not or do not yet support undo/redo
 	 * are in control of action manager. For these actions, DirectAction is used.
+	 * @param actionRepr A string that describes the action.
 	 * @param action1 An action that takes two parameters.
 	 * @param a1 Parameter 1.
 	 * @param a2 Parameter 2
 	 * @return The DirectAction created and executed
 	 */
-	public static <T1, T2> UIAction createDirectActionAndDoIt(BiConsumer<T1, T2> action2, T1 a1, T2 a2) {
-		UIAction action = new DirectAction(action2, a1, a2);
+	public static <T1, T2> UIAction createDirectActionAndDoIt(String actionDesc, 
+			BiConsumer<T1, T2> action2, T1 a1, T2 a2) {
+		
+		UIAction action = new DirectAction(actionDesc, action2, a1, a2);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 
@@ -67,14 +74,17 @@ public class ActionFactory {
 	 * In order to keep track of all actions that may modify the underlying
 	 * data model, even actions that should not or do not yet support undo/redo
 	 * are in control of action manager. For these actions, DirectAction is used.
+	 * @param actionRepr A string that describes the action.
 	 * @param action1 An action that takes three parameters.
 	 * @param a1 Parameter 1.
 	 * @param a2 Parameter 2
 	 * @param a3 Parameter 3
 	 * @return The DirectAction created and executed
 	 */
-	public static <T1, T2, T3> UIAction createDirectActionAndDoIt(TriConsumer<T1, T2, T3> action3, T1 a1, T2 a2, T3 a3) {
-		UIAction action = new DirectAction(action3, a1, a2, a3);
+	public static <T1, T2, T3> UIAction createDirectActionAndDoIt(String actionDesc, 
+			TriConsumer<T1, T2, T3> action3, T1 a1, T2 a2, T3 a3) {
+		
+		UIAction action = new DirectAction(actionDesc, action3, a1, a2, a3);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 
@@ -84,6 +94,7 @@ public class ActionFactory {
 	 * In order to keep track of all actions that may modify the underlying
 	 * data model, even actions that should not or do not yet support undo/redo
 	 * are in control of action manager. For these actions, DirectAction is used.
+	 * @param actionRepr A string that describes the action.
 	 * @param action1 An action that takes at least three parameters.
 	 * @param a1 Parameter 1.
 	 * @param a2 Parameter 2
@@ -91,8 +102,10 @@ public class ActionFactory {
 	 * @param args Other parameters
 	 * @return The DirectAction created and executed
 	 */
-	public static <T1, T2, T3, T4> UIAction createDirectActionAndDoIt(MultiConsumer<T1, T2, T3, T4> action4, T1 a1, T2 a2, T3 a3, T4... args) {
-		UIAction action = new DirectAction(action4, a1, a2, a3, args);
+	public static <T1, T2, T3, T4> UIAction createDirectActionAndDoIt(String actionDesc, 
+			MultiConsumer<T1, T2, T3, T4> action4, T1 a1, T2 a2, T3 a3, T4... args) {
+		
+		UIAction action = new DirectAction(actionDesc, action4, a1, a2, a3, args);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 

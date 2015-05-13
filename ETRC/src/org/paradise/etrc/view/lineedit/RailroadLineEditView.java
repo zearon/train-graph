@@ -1,6 +1,7 @@
 package org.paradise.etrc.view.lineedit;
 
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.*;
 
 import java.awt.BorderLayout;
@@ -68,6 +69,7 @@ import org.paradise.etrc.dialog.XianluSelectDialog;
 import org.paradise.etrc.filter.CIRFilter;
 import org.paradise.etrc.filter.CRSFilter;
 import org.paradise.etrc.filter.CSVFilter;
+import org.paradise.etrc.util.Config;
 
 public class RailroadLineEditView extends JPanel {
 	private static final long serialVersionUID = 8501387955756137148L;
@@ -146,8 +148,7 @@ public class RailroadLineEditView extends JPanel {
 		chooser.addChoosableFileFilter(new CIRFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(
-					MainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(Config.getLastRailnetworkPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -161,8 +162,7 @@ public class RailroadLineEditView extends JPanel {
 			RailroadLine c = TrainGraphFactory.createInstance(RailroadLine.class);
 			try {
 				c.loadFromFile2(f.getAbsolutePath());
-				mainFrame.prop.setProperty(
-						MainFrame.Prop_Recent_Open_File_Path, chooser
+				Config.setLastRailnetworkPath(chooser
 								.getSelectedFile().getParentFile()
 								.getAbsolutePath());
 			} catch (IOException ex) {
@@ -189,8 +189,7 @@ public class RailroadLineEditView extends JPanel {
 		chooser.addChoosableFileFilter(new CRSFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(
-					MainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(Config.getLastRailnetworkPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -216,11 +215,9 @@ public class RailroadLineEditView extends JPanel {
 				
 				updateRailroadListSelection(999999);
 				
-
-				mainFrame.prop.setProperty(
-						MainFrame.Prop_Recent_Open_File_Path, chooser
-								.getSelectedFile().getParentFile()
-								.getAbsolutePath());
+				Config.setLastRailnetworkPath(chooser
+						.getSelectedFile().getParentFile()
+						.getAbsolutePath());
 			} catch (IOException ex) {
 				System.err.println("Error: " + ex.getMessage());
 				new MessageBox(__("Cannot load railroad network due to\r\n")
@@ -277,7 +274,7 @@ public class RailroadLineEditView extends JPanel {
 			chooser.setDialogTitle(__("Export Railroad Network"));
 			chooser.addChoosableFileFilter(new CRSFilter());
 			suffix = CRSFilter.suffix;
-			chooser.setSelectedFile(new File(mainFrame.getRailNetworkName()
+			chooser.setSelectedFile(new File(Config.getCurrentFileName()
 					.replace(' ', '_')));
 		} else {
 			return;
@@ -287,8 +284,7 @@ public class RailroadLineEditView extends JPanel {
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(mainFrame.prop.getProperty(
-					MainFrame.Prop_Recent_Open_File_Path, ""));
+			File recentPath = new File(Config.getLastRailnetworkPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -307,8 +303,7 @@ public class RailroadLineEditView extends JPanel {
 				trainGraph.railNetwork.saveToWriter(out, 0);
 				
 				out.close();
-				mainFrame.prop.setProperty(
-						MainFrame.Prop_Recent_Open_File_Path, chooser
+				Config.setLastRailnetworkPath(chooser
 								.getSelectedFile().getParentFile()
 								.getAbsolutePath());
 			} catch (IOException ex) {
@@ -937,7 +932,6 @@ public class RailroadLineEditView extends JPanel {
 		RailroadLine cir = doLoadCircuit();
 		if (cir != null) {
 			switchRailLine(cir, selectedCircuitIndex);
-			mainFrame.isNewCircuit = true;
 		}
 	}
 

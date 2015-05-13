@@ -9,6 +9,7 @@ import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.YesNoBox;
+import org.paradise.etrc.util.Config;
 import org.paradise.etrc.view.alltrains.TrainView;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.wizard.Wizard;
@@ -49,14 +50,8 @@ public class AddTrainWizard extends Wizard {
 					upName = step1.getUpName();
 					
 					if(new YesNoBox(chartView.mainFrame, __("Automatically get train informtaion from web?")).askForYes()) {
-						String proxyAddress = chartView.mainFrame.prop.getProperty(MainFrame.Prop_HTTP_Proxy_Server);
-						int proxyPort = 0;
-						try {
-							proxyPort = Integer.parseInt(chartView.mainFrame.prop.getProperty(MainFrame.Prop_HTTP_Proxy_Port));
-						}
-						catch (NumberFormatException ex) {
-						    proxyPort = 0;
-						}
+						String proxyAddress = Config.getHttpProxyServer();
+						int proxyPort = Config.getHttpProxyPort();
 						train = TrainView.doLoadTrainFromWeb(fullName, proxyAddress, proxyPort);
 						if (train == null) 
 						{

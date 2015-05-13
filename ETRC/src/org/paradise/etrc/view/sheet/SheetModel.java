@@ -74,7 +74,7 @@ public class SheetModel extends DefaultJEditTableModel {
 	}
 
 	protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createTableEditActionAndDoIt(__("stop table"), 
+		return ActionFactory.createTableCellEditActionAndDoIt(__("stop table"), 
 				table, this, rowIndex, columnIndex, aValue);
 	}
 	

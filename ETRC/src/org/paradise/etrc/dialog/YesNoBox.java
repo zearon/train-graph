@@ -29,12 +29,13 @@ import org.paradise.etrc.ETRC;
 public class YesNoBox extends JDialog implements ActionListener {
 	private static final long serialVersionUID = 256443803232381267L;
 	
-	boolean saidYes = false;
+	Boolean saidYes = false;
 
 	JPanel panel1 = new JPanel();
 
 	JButton buttonYes = new JButton();
 	JButton buttonNo = new JButton();
+	JButton buttonCancel = new JButton();
 
 	JLabel imageLabel = new JLabel();
 	JLabel msgLabel = new JLabel();
@@ -89,6 +90,11 @@ public class YesNoBox extends JDialog implements ActionListener {
 		buttonNo.setActionCommand("No");
 		buttonNo.setText(__("No"));
 		buttonNo.addActionListener(this);
+		
+		buttonCancel.setFont(new java.awt.Font("Dialog", 0, 12));
+		buttonCancel.setActionCommand("Cancel");
+		buttonCancel.setText(__("Cancel"));
+		buttonCancel.addActionListener(this);
 
 		msgLabel.setFont(new java.awt.Font("Dialog", 0, 12));
 		msgLabel.setText(msg);
@@ -97,6 +103,7 @@ public class YesNoBox extends JDialog implements ActionListener {
 		panel1.add(jPanel1, BorderLayout.SOUTH);
 		jPanel1.add(buttonYes, null);
 		jPanel1.add(buttonNo, null);
+		jPanel1.add(buttonCancel, null);
 		panel1.add(jPanel2, BorderLayout.CENTER);
 		jPanel2.add(imageLabel, null);
 		jPanel2.add(msgLabel, null);
@@ -119,7 +126,12 @@ public class YesNoBox extends JDialog implements ActionListener {
 		super.processWindowEvent(e);
 	}
 
-	public boolean askForYes() {
+	/**
+	 * 
+	 * @return True if yes button is pressed, false if no button is pressed, 
+	 * and null if cancel button is pressed
+	 */
+	public Boolean askForYes() {
 		Dimension dlgSize = this.getPreferredSize();
 		Dimension frmSize;
 		Point loc;
@@ -154,6 +166,11 @@ public class YesNoBox extends JDialog implements ActionListener {
 		saidYes = true;
 		dispose();
 	}
+	
+	private void sayCancel() {
+		saidYes = null;
+		dispose();
+	}
 
 	//Close the dialog on a button event
 	public void actionPerformed(ActionEvent e) {
@@ -162,6 +179,9 @@ public class YesNoBox extends JDialog implements ActionListener {
 		}
 		else if (e.getSource() == buttonYes) {
 			sayYes();
+		}
+		else if (e.getSource() == buttonCancel) {
+			sayCancel();
 		}
 	}
 }

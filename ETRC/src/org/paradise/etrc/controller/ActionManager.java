@@ -2,6 +2,8 @@ package org.paradise.etrc.controller;
 
 import static org.paradise.etrc.ETRC.__;
 
+import java.awt.event.ActionEvent;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -36,14 +38,19 @@ public class ActionManager {
 
 	private LinkedList<UIAction> actionList = new LinkedList<UIAction>();
 	private LinkedList<UIAction> undoneActionList = new LinkedList<UIAction>();
+	private int distinctActionID = 0;
 	private int actionCount = 0;
+	private int actionCountAtMark = 0;
+	private boolean newActionCarriedOn = false;
 
 	private LinkedList<JMenuItem> actionItemList = new LinkedList<JMenuItem> ();
 	private LinkedList<JMenuItem> undoneActionItemList = new LinkedList<JMenuItem>();
+	private HashMap<Integer, Boolean> actionItemIsUndoMap = new HashMap<Integer, Boolean>();
 
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
-	private JMenu actionHistoryMenuItem;
+	private JMenu undoMenu;
+	private JMenu redoMenu;
 	private JButton undoButton;
 	private JButton redoButton;
 	
@@ -56,13 +63,15 @@ public class ActionManager {
 	 * Set menu items relating to undo/redo actions.
 	 * @param undoMenuItem
 	 * @param redoMenuItem
-	 * @param actionHistoryMenu
+	 * @param undoMenu
+	 * @param redoMenu
 	 */
 	public void setMenuItem(JMenuItem undoMenuItem, JMenuItem redoMenuItem,
-			JMenu actionHistoryMenu) {
+			JMenu undoMenu, JMenu redoMenu) {
 		this.undoMenuItem = undoMenuItem;
 		this.redoMenuItem = redoMenuItem;
-		this.actionHistoryMenuItem = actionHistoryMenu;
+		this.undoMenu = undoMenu;
+		this.redoMenu = redoMenu;
 
 		updateUI();
 	}
@@ -93,25 +102,32 @@ public class ActionManager {
 		if (action.shouldSkip())
 			return;
 
+		action.setID(++ distinctActionID);
 		action.doAction();
+		actionItemIsUndoMap.put(action.getID(), true);
+		if ((actionCount == MAX_ACTION_COUNT && actionCount == actionCountAtMark) ||
+				actionCount < actionCountAtMark)
+			newActionCarriedOn = true;
 		
 		UIAction lastAction = actionList.peekLast();
 		if (lastAction != null && lastAction.canMerge(action)) {
 			lastAction.merge(action);
 		} else {
+			JMenuItem item = createMenuItem(action);
 			if (actionCount == MAX_ACTION_COUNT) {
 				actionList.removeFirst();
 				actionList.addLast(action);
 	
-//				 actionHistoryMenuItem.remove(actionCount - 1);
-//				 actionHistoryMenuItem.add(createMenuItem(action), 0);
+				actionItemList.removeFirst();
+				actionItemList.addLast(item);
+				undoMenu.remove(actionCount - 1);
+				undoMenu.add(createMenuItem(action), 0);
 			} else {
 				actionList.addLast(action);
 				++actionCount;
 	
-				JMenuItem item = createMenuItem(action);
 				actionItemList.addLast(item);
-				actionHistoryMenuItem.add(item, 0);
+				undoMenu.add(item, 0);
 			}
 	
 			undoneActionList.clear();
@@ -121,39 +137,71 @@ public class ActionManager {
 		
 		updateUI();
 	}
+	
+	public void undo() {
+		undo(true);
+	}
 
-	public synchronized void undo() {
+	private synchronized void undo(boolean updateUI) {
 		if (!canUndo()) {
 			return;
 		}
 
 		UIAction action = actionList.pollLast();
 		JMenuItem menuItem = actionItemList.pollLast();
-		actionHistoryMenuItem.remove(menuItem);
+		undoMenu.remove(menuItem);
 
 		action.undoAction();
-
+		actionItemIsUndoMap.put(action.getID(), false);
+		actionCount --;
+		
 		undoneActionList.addFirst(action);
 		undoneActionItemList.addFirst(menuItem);
+		redoMenu.add(menuItem, 0);
 
-		updateUI();
+		if (updateUI)
+			updateUI();
+	}
+	
+	public synchronized void redo() {
+		redo(true);
 	}
 
-	public synchronized void redo() {
+	private synchronized void redo(boolean updateUI) {
 		if (!canRedo()) {
 			return;
 		}
 
 		UIAction action = undoneActionList.pollFirst();
 		JMenuItem menuItem = undoneActionItemList.pollFirst();
+		redoMenu.remove(menuItem);
 
 		action.redoAction();
+		actionItemIsUndoMap.put(action.getID(), true);
+		actionCount ++;
 
 		actionList.addLast(action);
 		actionItemList.addLast(menuItem);
-		actionHistoryMenuItem.add(menuItem, 0);
+		undoMenu.add(menuItem, 0);
 
-		updateUI();
+		if (updateUI)
+			updateUI();
+	}
+	
+	private void batchUndo(int id) {
+		
+		while (canUndo() && actionList.peekLast().getID() != id) {
+			undo(false);
+		}
+		undo(false);
+	}
+	
+	private void batchRedo(int id) {
+		
+		while (canRedo() && undoneActionList.peekFirst().getID() != id) {
+			redo(false);
+		}
+		redo(false);
 	}
 
 	public synchronized boolean canUndo() {
@@ -165,29 +213,56 @@ public class ActionManager {
 	}
 	
 	public boolean isModelModified() {
-		return !actionList.isEmpty();
+		return actionCountAtMark != actionCount || newActionCarriedOn;
 	}
 	
 	public void reset() {
 		actionList.clear();
 		undoneActionList.clear();
 		
+		distinctActionID = 0;
 		actionCount = 0;
+		actionCountAtMark = 0;
+		newActionCarriedOn = false;
 		
 		actionItemList.clear();
 		undoneActionItemList.clear();
 		
-		if (actionHistoryMenuItem != null)
-			actionHistoryMenuItem.removeAll();
+		if (undoMenu != null)
+			undoMenu.removeAll();
+		if (redoMenu != null)
+			redoMenu.removeAll();
+	}
+	
+	public void markModelSaved() {
+		actionCountAtMark = actionCount;
+		newActionCarriedOn = false;
+		
+		if (updateUIHook != null)
+			updateUIHook.accept(this);
 	}
 
 	private JMenuItem createMenuItem(UIAction action) {
-		JMenuItem menuItem = new JMenuItem(action.repr());
+		JMenuItem menuItem = new JMenuItem(action.getReprWithID());
+		menuItem.setName("" + action.getID());
 		menuItem.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 
-		// menuItem.addActionListener(this);
+		menuItem.addActionListener(this::batchRedoOrUndo);
 
 		return menuItem;
+	}
+	
+	private void batchRedoOrUndo(ActionEvent e) {
+		JMenuItem menu = (JMenuItem) e.getSource();
+		int id = Integer.parseInt(menu.getName());
+		boolean isUndo = actionItemIsUndoMap.get(id);
+		if (isUndo) {
+			batchUndo(id);
+		} else {
+			batchRedo(id);
+		}
+		
+		updateUI();
 	}
 
 	private void updateUI() {
@@ -198,13 +273,18 @@ public class ActionManager {
 			undoMenuItem.setEnabled(canUndo);
 		if (redoMenuItem != null)
 			redoMenuItem.setEnabled(canRedo);
+		
+		if (undoMenu != null)
+			undoMenu.setEnabled(canUndo);
+		if (redoMenu != null)
+			redoMenu.setEnabled(canRedo);
 
 		if (undoButton != null) {
 			undoButton.setEnabled(canUndo);
 			
 			UIAction nextUndoAction = actionList.peekLast();
 			String undoTooltip = nextUndoAction == null ? __("Undo") : String
-					.format(__("Undo %s"), nextUndoAction.repr());
+					.format(__("Undo %s"), nextUndoAction.getReprWithID());
 			undoButton.setToolTipText(undoTooltip);
 		}
 		if (redoButton != null) {
@@ -212,7 +292,7 @@ public class ActionManager {
 			
 			UIAction nextRedoAction = undoneActionList.peekFirst();
 			String redoTooltip = nextRedoAction == null ? __("Redo") : String
-					.format(__("Redo %s"), nextRedoAction.repr());
+					.format(__("Redo %s"), nextRedoAction.getReprWithID());
 			redoButton.setToolTipText(redoTooltip);
 		}
 		

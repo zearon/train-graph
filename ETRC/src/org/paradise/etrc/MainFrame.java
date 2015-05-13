@@ -112,6 +112,9 @@ import com.sun.corba.se.spi.orbutil.fsm.Action;
 public class MainFrame extends JFrame implements ActionListener, Printable {
 	private static final long serialVersionUID = 1L;
 	
+	private JMenu openRecentFilesMenu;
+	private Vector<JMenuItem> recentFileMenuItems = new Vector<>();
+	
 	public JSplitPane navigatorSplitPane;
 	public Navigator navigator;
 	public JPanel navigatorContentPanel;
@@ -304,9 +307,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	public void doExit() {
-		if(Config.getInstance().isFileModified())
-			if(new YesNoBox(this, __("Current train graph has changed.\nDo you want to save the changes?")).askForYes())
-				doSaveChart(); 
+		Boolean confirmed = null;
+		boolean isFileModified;
+		if((isFileModified = Config.getInstance().isFileModified()) &&
+				(confirmed = confirmSaveCurrentFile()) == null) 
+			return;
+		
+		if (isFileModified && confirmed)
+			doSaveChart();
 		
 		System.exit(0);
 	}
@@ -705,6 +713,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		menuFile.setMnemonic(KeyEvent.VK_F);
 		menuFile.add(createMenuItem(__("New"), File_New_Chart)).setMnemonic(KeyEvent.VK_N);
 		menuFile.add(createMenuItem(__("Open..."), File_Load_Chart)).setMnemonic(KeyEvent.VK_O);
+		openRecentFilesMenu = createMenu(__("Open Recent Files"));
+		menuFile.add(openRecentFilesMenu);
+		do_UpdateRecentFilesMenu();
 		menuFile.addSeparator();
 		menuFile.add(createMenuItem(__("Save"), File_Save_Chart)).setMnemonic(KeyEvent.VK_S);
 		menuFile.add(createMenuItem(__("Save As..."), File_Save_Chart_As)).setMnemonic(KeyEvent.VK_A);
@@ -738,9 +749,11 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			redoMenuItem.setAccelerator(
 					KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
 		}
-		JMenu actionHistoryMenuItem = createMenu(__("Action History"));
-		menuEdit.add(actionHistoryMenuItem);
-		ActionManager.getInstance().setMenuItem(undoMenuItem, redoMenuItem, actionHistoryMenuItem);
+		JMenu undoMenu = createMenu(__("Undo..."));
+		JMenu redoMenu = createMenu(__("Redo..."));
+		menuEdit.add(undoMenu);
+		menuEdit.add(redoMenu);
+		ActionManager.getInstance().setMenuItem(undoMenuItem, redoMenuItem, undoMenu, redoMenu);
 		
 		menuEdit.addSeparator();
         menuEdit.add(createMenuItem(__("Circuit..."), Edit_Circuit)).setMnemonic(KeyEvent.VK_C);
@@ -821,6 +834,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			
 			Config.getInstance().setCurrentFile(filePath);
 			Config.getInstance().addToRecentOpenedFiles(filePath);
+			ActionManager.getInstance().reset();
 			
 			do_UpdateRecentFilesMenu();
 			
@@ -841,6 +855,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			
 			Config.getInstance().setCurrentFile(filePath);
 			Config.getInstance().addToRecentOpenedFiles(filePath);
+			ActionManager.getInstance().markModelSaved();
 			
 			do_UpdateRecentFilesMenu();
 		} catch (IOException ex) {
@@ -850,6 +865,45 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 	
 	private void do_UpdateRecentFilesMenu() {
+		if (openRecentFilesMenu == null)
+			return;
+		
+		recentFileMenuItems.forEach(item -> openRecentFilesMenu.remove(item) );
+		recentFileMenuItems.clear();
+		
+		for (String filePath : Config.getInstance().getRecentOpenedFiles()) {
+			JMenuItem item = new JMenuItem(filePath);
+			item.setName(filePath);
+			item.addActionListener(this::menuItem_OpenRecentFile);
+			recentFileMenuItems.add(item);
+			openRecentFilesMenu.add(item);
+		}
+	}
+	
+	private void menuItem_OpenRecentFile(ActionEvent e) {
+		Boolean confirmed = null;
+		boolean isFileModified;
+		if((isFileModified = Config.getInstance().isFileModified()) &&
+				(confirmed = confirmSaveCurrentFile()) == null) 
+			return;
+		
+		if (isFileModified && confirmed)
+			doSaveChart();
+		
+		JMenuItem item = (JMenuItem) e.getSource();
+		String filePath = item.getName();
+		do_OpenFile(filePath);
+	}
+
+	/**
+	 * Show a Yes/No/Cancel message box to user and let him/her choose whether 
+	 * saving the  current file is required.
+	 * @return True if Yes button is pressed, false if No button is pressed, 
+	 * and null if Cancel button is pressed
+	 */
+	private Boolean confirmSaveCurrentFile() {
+		return new YesNoBox(this, __("Current train graph has been changed.\n"
+				+ "Do you want to save the changes?")).askForYes();
 		
 	}
 
@@ -1095,9 +1149,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	public void doNewChart() {
-		if(Config.getInstance().isFileModified())
-			if(new YesNoBox(this, __("Current train graph has changed.\nDo you want to save the changes?")).askForYes())
-				doSaveChart(); 
+		Boolean confirmed = null;
+		boolean isFileModified;
+		if((isFileModified = Config.getInstance().isFileModified()) &&
+				(confirmed = confirmSaveCurrentFile()) == null) 
+			return;
+		
+		if (isFileModified && confirmed)
+			doSaveChart();
 		
 		do_NewFile();
 	}
@@ -1150,6 +1209,16 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	 * doLoadChart
 	 */
 	public void doLoadChart() {
+		Boolean confirmed = null;
+		boolean isFileModified;
+		if((isFileModified = Config.getInstance().isFileModified()) &&
+				(confirmed = confirmSaveCurrentFile()) == null) 
+			return;
+		
+		if (isFileModified && confirmed)
+			doSaveChart();
+		
+		
 		JFileChooser chooser = new JFileChooser();
 		ETRC.setFont(chooser);
 

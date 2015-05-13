@@ -1,5 +1,6 @@
 package org.paradise.etrc.controller.action;
 
+import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.*;
 
 public abstract class UIAction {
@@ -7,8 +8,12 @@ public abstract class UIAction {
 	
 	protected int id;
 	
-	public UIAction() {
-		id = ++ id;
+	public void setID(int id) {
+		this.id = id;
+	}
+	
+	public int getID() {
+		return this.id;
 	}
 	
 	public void doAction() {
@@ -33,6 +38,10 @@ public abstract class UIAction {
 		return _shouldSkip();
 		
 //		log("Undo action: %s", repr());
+	}
+	
+	public String getReprWithID() {
+		return String.format(__("action %d@%s"), id, repr());
 	}
 	
 	protected abstract void _doAction();

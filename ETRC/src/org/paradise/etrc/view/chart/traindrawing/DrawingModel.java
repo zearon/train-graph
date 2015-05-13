@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Vector;
 
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Train;
@@ -35,7 +35,7 @@ public class DrawingModel {
 	protected Vector<TrainDrawing> normalDrawings = new Vector<TrainDrawing>();
 	protected Vector<TrainDrawing> underDrawings  = new Vector<TrainDrawing>();
 
-	private GlobalSettings settings;
+	private ChartSettings settings;
 
 	public TrainDrawing getActiveTrainDrawing() {
 		return activeTrainDrawing;
@@ -55,7 +55,7 @@ public class DrawingModel {
 	}
 	
 
-	public void buildTrainDrawings(GlobalSettings settings, RailroadLineChart chart, 
+	public void buildTrainDrawings(ChartSettings settings, RailroadLineChart chart, 
 			ChartView chartView) {
 		this.settings = settings;
 		isLastActiveTrainDrawingInUnderMode = chartView.showUpDownState == ChartView.SHOW_NONE;
@@ -69,7 +69,7 @@ public class DrawingModel {
 	 * @param currentCircuit
 	 */
 	public void updateCurrentCircuit(RailroadLineChart chart, RailroadLine currentCircuit, 
-			GlobalSettings settings, ChartView chartView) {
+			ChartSettings settings, ChartView chartView) {
 		// 更新当前线路以及Train列表
 		this.currentCircuit = currentCircuit;
 		

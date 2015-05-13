@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.TrainGraph;
 
@@ -28,7 +28,7 @@ public class ClockPanel extends JPanel {
 	private static final long serialVersionUID = 2449059376608773861L;
 
 	private ChartView chartView;
-	private GlobalSettings settings;
+	private ChartSettings settings;
 
 	private boolean ui_inited;
 

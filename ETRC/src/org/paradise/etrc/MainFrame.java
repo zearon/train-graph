@@ -87,7 +87,7 @@ import org.paradise.etrc.filter.GIFFilter;
 import org.paradise.etrc.filter.TRCFilter;
 import org.paradise.etrc.filter.TRFFilter;
 import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.ui.UIBinding;
+import org.paradise.etrc.util.ui.databinding.UIBinding;
 import org.paradise.etrc.view.alltrains.AllTrainsView;
 import org.paradise.etrc.view.alltrains.TrainListView;
 import org.paradise.etrc.view.chart.ChartView;

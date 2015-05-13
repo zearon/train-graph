@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Train;
@@ -41,7 +41,7 @@ public class RunningPanel extends JPanel {
 	private JPopupMenu popupMenu;
 	private JMenuItem popupMenuStation;
 
-	private GlobalSettings settings;
+	private ChartSettings settings;
 	
 
 	public RunningPanel(TrainGraph trainGraph, RailroadLineChart activeChart, DynamicView _dView) {

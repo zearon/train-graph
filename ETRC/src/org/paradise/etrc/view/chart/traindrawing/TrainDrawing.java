@@ -12,7 +12,7 @@ import java.util.Enumeration;
 import java.util.Optional;
 import java.util.Vector;
 
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Stop;
 import org.paradise.etrc.data.Train;
@@ -48,7 +48,7 @@ public class TrainDrawing {
   //是否是反向车次
   private boolean isUnderDrawing = false;
 
-private GlobalSettings settings;
+private ChartSettings settings;
   
 //  private static final Color selectedColor = Color.black;
   static final Color notSchedularColor = new Color(192, 192, 0);
@@ -65,7 +65,7 @@ public boolean isUnderDrawing() {
 	return isUnderDrawing;
 }
 
-public TrainDrawing(ChartView _chartView, GlobalSettings settings, 
+public TrainDrawing(ChartView _chartView, ChartSettings settings, 
 		Train _train, boolean _active, boolean _under) {
 	
     chartView = _chartView;

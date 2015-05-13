@@ -14,7 +14,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.TrainGraph;
 
@@ -53,7 +53,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 
 	private RailroadLineChart activeChart;
 
-	private GlobalSettings settings;
+	private ChartSettings settings;
 
 	private boolean ui_inited;
 	private static final int DEFAULT_SCALE = 5;

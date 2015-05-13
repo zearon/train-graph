@@ -14,7 +14,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
@@ -40,7 +40,7 @@ public class SheetView extends JPanel {
 
 	private boolean ui_inited;
 
-	private GlobalSettings settings;
+	private ChartSettings settings;
 
 	private RailroadLineChart activeLineChart;
 

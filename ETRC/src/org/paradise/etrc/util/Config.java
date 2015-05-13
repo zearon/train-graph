@@ -17,13 +17,15 @@ public class Config {
 	static final int Prop_Recent_File_Size = 15;
 	
 	static String Prop_AUTO_LOAD_FILE = "Auto_Load_Last_Edit_File";
+	static String prop_HTTP_Proxy_Use = "Use_HTTP_Proxy";
+	static String Prop_HTTP_Proxy_Server = "HTTP_Proxy_Server";
+	static String Prop_HTTP_Proxy_Port = "HTTP_Proxy_Port";
+	
 	static String Prop_Working_Chart = "Working_File";
 	static String Prop_Recent_Open_File_Path = "Recent_Open_File_Path";
 	static String Prop_LAST_RAILNETWORK_PATH = "Last_railroad_network_path";
 	static String Prop_LAST_TRAIN_PATH = "Last_train_path";
 	static String Prop_LAST_MAP_PATH = "Last_map_path";
-	static String Prop_HTTP_Proxy_Server = "HTTP_Proxy_Server";
-	static String Prop_HTTP_Proxy_Port = "HTTP_Proxy_Port";
 	
 	static String Properties_File = "config.prop";
 	
@@ -59,6 +61,7 @@ public class Config {
 		defaultProp.setProperty(Prop_LAST_RAILNETWORK_PATH, "");
 		defaultProp.setProperty(Prop_LAST_TRAIN_PATH, "");
 		defaultProp.setProperty(Prop_LAST_MAP_PATH, "");
+		defaultProp.setProperty(prop_HTTP_Proxy_Use, "no");
 		defaultProp.setProperty(Prop_HTTP_Proxy_Server, "");
 		defaultProp.setProperty(Prop_HTTP_Proxy_Port, "80");
 	}
@@ -130,11 +133,11 @@ public class Config {
 		save();
 	}
 	
-	public  boolean getAutoLoadLastFile() {
+	public  Boolean getAutoLoadLastFile() {
 		return getValue(Prop_AUTO_LOAD_FILE, "false").equalsIgnoreCase("yes");
 	}
 	
-	public  void setAutoLoadLastFile(boolean value) {
+	public  void setAutoLoadLastFile(Boolean value) {
 		setValue(Prop_AUTO_LOAD_FILE, value ? "yes" : "no");
 	}
 	
@@ -199,6 +202,14 @@ public class Config {
 	
 	public  void setLastMapPath(String value) {
 		setValue(Prop_LAST_MAP_PATH, value);
+	}
+	
+	public  Boolean getHttpProxyUse() {
+		return getValue(prop_HTTP_Proxy_Use, "false").equalsIgnoreCase("yes");
+	}
+	
+	public  void setHttpProxyUse(Boolean value) {
+		setValue(prop_HTTP_Proxy_Use, value ? "yes" : "no");
 	}
 	
 	public  String getHttpProxyServer() {

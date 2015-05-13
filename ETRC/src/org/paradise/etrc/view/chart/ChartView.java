@@ -19,7 +19,7 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.Station;
@@ -82,7 +82,7 @@ public class ChartView extends JPanel {
 	
 
 	public TrainGraph trainGraph;
-	public GlobalSettings settings;
+	public ChartSettings settings;
 	public RailroadLineChart activeLineChart;
 	
 	public Train activeTrain;

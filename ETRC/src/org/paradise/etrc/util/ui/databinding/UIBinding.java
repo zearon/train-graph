@@ -1,37 +1,73 @@
-package org.paradise.etrc.util.ui;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
+package org.paradise.etrc.util.ui.databinding;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import javax.swing.JComponent;
-
 import org.paradise.etrc.controller.action.ActionFactory;
+import org.paradise.etrc.data.util.Tuple;
 
-import sun.reflect.generics.scope.MethodScope;
-import jdk.internal.org.objectweb.asm.tree.TryCatchBlockNode;
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * UIBinding is used to bing a UI control and a data model.
  * @author Jeff Gong
  *
- * @param <VT> Type of UI value. For example, VT should be text for JTextField
+ * @param <M> Type of model value. For example.
+ * @param <U> Type of UI value. For example, UVT should be text for JTextField
  */
-public abstract class UIBinding<VT> {
+public abstract class UIBinding<M, U> {
+	static HashMap<Tuple<String, String>, ValueTypeConverter<? extends Object, ? extends Object>> modelValueConverterMap = 
+			new HashMap<>();
+	static HashMap<Tuple<String, String>, ValueTypeConverter<? extends Object, ? extends Object>> uiValueConverterMap = 
+			new HashMap<>();
+	
+	public static interface ValueTypeConverter<A, B> {
+		public Class<A> getAValueType();
+		public Class<B> getBValueType();
+		public B convertAValueToBValue(A value);
+	}
+	
+	/**
+	 * Register model value to UI value type converter. <br/>
+	 * if UI value type U is String and model value type M is String, and
+	 * modelValue.toString() is what you want, then youdon't need to register 
+	 * a ValueTypeConverter<M, String>, since this function is built-in.
+	 * @param converter A ValueTypeConverter type converter.
+	 */
+	public static <M, U> void registerModelValueTypeConverter(
+			ValueTypeConverter<M, U> converter) {
+		
+		modelValueConverterMap.put(Tuple.oF(converter.getAValueType().getName(), 
+				converter.getBValueType().getName()), converter);
+	}
+	
+	/**
+	 * Register ui value to movel value type converter. <br/>
+	 * if ui value type U is String and model value type M is String too or classes
+	 * corresponding to primitive types, then you don't need to register a 
+	 * ValueTypeConverter<String, M>, since this function is built-in.
+	 * @param converter A ValueTypeConverter type converter.
+	 */
+	public static <U, M> void registerUIValueTypeConverter(
+			ValueTypeConverter<U, M> converter) {
+		
+		uiValueConverterMap.put(Tuple.oF(converter.getAValueType().getName(), 
+				converter.getBValueType().getName()), converter);
+	}
+	
+	
 	protected Object model;
 	protected String propertyName;
 	protected String propertyDesc;
 	
-	protected Function<Object, Object> getter = null;
-	protected BiConsumer<Object, Object> setter = null;
+	protected Function<Object, M> getter = null;
+	protected BiConsumer<Object, M> setter = null;
 //	protected Class<? extends Object> propertyClass = null;
 	protected String propertyClassName = null;
+	protected String uiValueClassName = null;
 	
 	protected Runnable callback;
 	
@@ -67,12 +103,12 @@ public abstract class UIBinding<VT> {
 	}
 
 	public void updateModel() {
-		VT oldUIValue = getOldUIValue();
-		VT newUIValue = getNewUIValue();
+		U oldUIValue = getOldUIValue();
+		U newUIValue = getNewUIValue();
 		
-		Object oldModelValue, newModelValue;
+		M oldModelValue, newModelValue;
 		try {
-			oldModelValue = uiValueToModelValue(oldUIValue);
+			oldModelValue = convertUiValueToModelValue(oldUIValue);
 		} catch (Exception e) {
 			Exception e2 = new IllegalArgumentException(String.format(__("Invalid input: %s. Only a value of %s type is accepted."), 
 					newUIValue, getReadableTypeStr(propertyClassName)), e);
@@ -81,7 +117,7 @@ public abstract class UIBinding<VT> {
 			return;
 		}
 		try {
-			newModelValue = uiValueToModelValue(newUIValue);
+			newModelValue = convertUiValueToModelValue(newUIValue);
 		} catch (Exception e) {
 			Exception e2 = new IllegalArgumentException(String.format(__("Invalid input: %s. Only a value of %s type is accepted."), 
 					newUIValue, getReadableTypeStr(propertyClassName)), e);
@@ -103,8 +139,8 @@ public abstract class UIBinding<VT> {
 	}
 
 	public void updateUI() {
-		Object modelValue = getModelValue();
-		VT uiValue = modelValueToUIValue(modelValue);
+		M modelValue = getModelValue();
+		U uiValue = convertModelValueToUIValue(modelValue);
 		_setUIValue(uiValue);
 	}
 	
@@ -114,20 +150,20 @@ public abstract class UIBinding<VT> {
 		}
 	}
 	
-	public Object getModelValue() {
+	public M getModelValue() {
 		return getter.apply(model);
 	}
 	
-	public void setModelValue(Object value) {
+	public void setModelValue(M value) {
 		setter.accept(model, value);
 	}
 	
-	public void setModelAndUIValue(Object value) {
+	private void setModelAndUIValue(M value) {
 		setModelValue(value);
 		updateUI();
 	}
 	
-	public void _setUIValue(VT uiValue) {
+	public void _setUIValue(U uiValue) {
 		if (uiValue == null)
 			return;
 		
@@ -138,41 +174,152 @@ public abstract class UIBinding<VT> {
 		setUIValue(uiValue);
 	}
 	
-	public abstract VT getOldUIValue();
+	public abstract U getOldUIValue();
 	
-	public abstract VT  getNewUIValue();
+	public abstract U  getNewUIValue();
 	
-	public abstract void setUIValue(VT uiValue);
+	public abstract void setUIValue(U uiValue);
 	
-	public abstract VT modelValueToUIValue(Object modelValue);
+	@SuppressWarnings("unchecked")
+	protected U convertModelValueToUIValue(M modelValue) {
+		
+		// Directly return if the model type is the same with the ui value type.
+		if (isModelTypeAndUiTypeTheSame()) {
+			return (U) modelValue;
+		}
+		
+		// If ui value is String and no M->String converter is registered,
+		// then use modelValue.toString() as the default converter.
+		if (String.class.getName().equals(uiValueClassName) &&
+				!modelValueConverterMap.containsKey(Tuple.oF(propertyClassName, 
+						String.class.getName() )) ) {
+			
+			if (modelValue == null)
+				return (U) "";
+			else
+				return (U) modelValue.toString();
+		} 
+		
+		// Find a M->U converter to do the converting job.
+		else {
+			try {
+				ValueTypeConverter<M, U> converter = (ValueTypeConverter<M, U>) 
+					modelValueConverterMap.get(Tuple.oF(propertyClassName, uiValueClassName));
+				if (converter == null)
+					throw new NullPointerException();
+				else
+					return converter.convertAValueToBValue(modelValue);
+			} catch (Exception e) {
+				throw new IllegalArgumentException(String.format(
+						__("I Don't know how to convert the model value in (%s) type into a"
+								+ " ui value in (%s) type."),
+								propertyClassName, uiValueClassName ));
+			}
+		}
+		
+	}
 	
-	public Object uiValueToModelValue(VT uiValue) {
-		String strValue = uiValue.toString();
+	@SuppressWarnings("unchecked")
+	protected M convertUiValueToModelValue(U uiValue) {
+		
+		// Directly return if the model type is the same with the ui value type.
+		if (isModelTypeAndUiTypeTheSame()) {
+			return (M) uiValue;
+		}
+
+		// If ui value is String and no String->M converter is registered,
+		// then use the default converter.
+		if (String.class.getName().equals(uiValueClassName) &&
+				!uiValueConverterMap.containsKey(Tuple.oF(String.class.getName(), 
+						propertyClassName )) ) {
+			
+			if (uiValue == null)
+				return null;
+			else
+				return (M) stringValueToKnownTypesValue((String) uiValue, 
+						propertyClassName);
+		} 
+		
+		// Find a U->M converter to do the converting job.
+		else {
+			try {
+				ValueTypeConverter<U, M> converter = (ValueTypeConverter<U, M>) 
+					uiValueConverterMap.get(Tuple.oF(uiValueClassName, propertyClassName));
+				if (converter == null)
+					throw new NullPointerException();
+				else
+					return converter.convertAValueToBValue(uiValue);
+			} catch (Exception e) {
+				throw new IllegalArgumentException(String.format(
+						__("I Don't know how to convert the ui value in (%s) type into a"
+								+ " model value in (%s) type.")
+								, uiValueClassName, propertyClassName));
+			}
+		}
+		
+	}
+	
+	protected boolean isModelTypeAndUiTypeTheSame() {
+		if (propertyClassName.equals(uiValueClassName)) {
+			return true;
+		}
+		
+		propertyClassName = convertPrimitiveTypeNameToObjectName(propertyClassName);
+		
+		return propertyClassName.equals(uiValueClassName);
+	}
+	
+	private String convertPrimitiveTypeNameToObjectName(String name) {
+		
+		if("byte".equals(name) ) {
+			return "java.lang.Byte";
+		} else if("int".equals(name) ) {
+			return "java.lang.Integer";
+		} else if("long".equals(name) ) {
+			return "java.lang.Long";
+		} else if ("float".equals(name) ) {
+			return "java.lang.Float";
+		} else if ("double".equals(name) ) {
+			return "java.lang.Double";
+		} else if ("boolean".equals(name) ) {
+			return "java.lang.Boolean";
+		}
+		
+		return name;
+	}
+	
+	private static Object stringValueToKnownTypesValue(String strValue, String propertyClassName) {
+		if (strValue == null)
+			return null;
+		
 		Object modelValue = null;
 		
 		if("byte".equals(propertyClassName) || "java.lang.Byte".equals(propertyClassName) ) {
-			modelValue = Byte.parseByte(strValue);
+			modelValue = Byte.valueOf(strValue);
 		} else if("int".equals(propertyClassName) || "java.lang.Integer".equals(propertyClassName) ) {
-			modelValue = Integer.parseInt(strValue);
+			modelValue = Integer.valueOf(strValue);
 		} else if("long".equals(propertyClassName) || "java.lang.Long".equals(propertyClassName) ) {
-			modelValue = Long.parseLong(strValue);
+			modelValue = Long.valueOf(strValue);
 		} else if ("float".equals(propertyClassName) || "java.lang.Float".equals(propertyClassName) ) {
-			modelValue = Float.parseFloat(strValue);
+			modelValue = Float.valueOf(strValue);
 		} else if ("double".equals(propertyClassName) || "java.lang.Double".equals(propertyClassName) ) {
-			modelValue = Double.parseDouble(strValue);
+			modelValue = Double.valueOf(strValue);
 		} else if ("boolean".equals(propertyClassName) || "java.lang.Boolean".equals(propertyClassName) ) {
-			modelValue = Boolean.parseBoolean(strValue);
+			modelValue = Boolean.valueOf(strValue);
 		} else if ("java.lang.String".equals(propertyClassName)) {
 			modelValue = strValue;
 		} else {
-			throw new IllegalArgumentException(String.format("I Don't know how to convert the ui value into a %s value", propertyClassName));
+			throw new IllegalArgumentException(String.format(
+					__("I Don't know how to convert the ui value in string type into a"
+							+ " model value in (%s) type.")
+							, propertyClassName));
 		}
 		
 		return modelValue;
 	}
 	
 	private String getReadableTypeStr(String propertyClassName) {
-		String modelValue ="";
+		String modelValue = propertyClassName;
 		
 		if("byte".equals(propertyClassName) || "java.lang.Byte".equals(propertyClassName) ) {
 			modelValue = __("byte");
@@ -193,8 +340,15 @@ public abstract class UIBinding<VT> {
 		return modelValue;
 	}
 	
+	public String init(boolean autoFind, boolean isField) {
+		uiValueClassName = getNewUIValue().getClass().getName();
+		
+		return initGetterAndSetter(true, true);
+	}
+	
 	/**
-	 * Find getter/setter for model property.
+	 * Find getter/setter for model property. This methods is called by the factory once
+	 * instance is created.
 	 * @param model Model object
 	 * @param property Name Name of model property as the data source of UI control.
 	 * @param autoFind If True try to find field first and then try to find getter/setter methods.
@@ -203,7 +357,7 @@ public abstract class UIBinding<VT> {
 	 * if autoFind parameter is set to true, then this parameter is meaningless.
 	 * @return
 	 */
-	public String initSetterAndGetter(boolean autoFind, boolean isField) {
+	public String initGetterAndSetter(boolean autoFind, boolean isField) {
 		if (model == null || propertyName == null) {
 			throw new IllegalArgumentException("Both model and propertyName cannot be empty");
 		}
@@ -226,13 +380,14 @@ public abstract class UIBinding<VT> {
 			}
 		}
 	}
-	
-	public void copySetterAndGetter(UIBinding<? extends Object> binding2) {
+
+	public void copySetterAndGetter(UIBinding<M, ? extends Object> binding2) {
 		this.getter = binding2.getter;
 		this.setter = binding2.setter;
 		this.propertyClassName = binding2.propertyClassName;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected String findField(Object model, String fieldName) {
 		Field field;
 		
@@ -246,7 +401,7 @@ public abstract class UIBinding<VT> {
 				
 				getter = obj -> { 
 					try { 
-						return field.get(obj); 
+						return (M) field.get(obj); 
 					} catch (Exception e) { 
 						e.printStackTrace();
 						return null;
@@ -269,6 +424,7 @@ public abstract class UIBinding<VT> {
 		return "Cannot find field.";
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected String findMethods(Object model, String propertyName) {
 		
 		try {
@@ -291,7 +447,7 @@ public abstract class UIBinding<VT> {
 
 						getter = obj -> { 
 							try { 
-								return method.invoke(obj); 
+								return (M) method.invoke(obj); 
 							} catch (Exception e) { 
 								e.printStackTrace();
 								return null;

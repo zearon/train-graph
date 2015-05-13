@@ -26,7 +26,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.view.chart.ChartView;
@@ -46,11 +46,11 @@ public class ChartSetDialog extends JDialog {
 	private JTextField t1;
 	private JTextField t2;
 
-	private GlobalSettings settings;
+	private ChartSettings settings;
 	
 	private static String defaultStatus = __("Settings for Train Graph");
 
-	public ChartSetDialog(GlobalSettings settings, MainFrame _mainFrame) {
+	public ChartSetDialog(ChartSettings settings, MainFrame _mainFrame) {
 		super(_mainFrame, __("Settings for Train Graph"), false);
 		mainFrame = _mainFrame;
 		setModel(settings);
@@ -58,7 +58,7 @@ public class ChartSetDialog extends JDialog {
 		init();
 	}
 	
-	public void setModel(GlobalSettings settings) {
+	public void setModel(ChartSettings settings) {
 		this.settings = settings;
 	}
 

@@ -15,7 +15,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.TrainGraph;
 
@@ -29,7 +29,7 @@ public class DistancePanel extends JPanel {
 
 	private RailroadLineChart chart;
 	private DynamicView dView;
-	private GlobalSettings settings;
+	private ChartSettings settings;
 
 	private boolean ui_inited = false;
 

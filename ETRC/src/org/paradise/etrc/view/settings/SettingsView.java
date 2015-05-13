@@ -1,47 +1,32 @@
 package org.paradise.etrc.view.settings;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
-import javafx.scene.control.ComboBox;
-
-import javax.swing.JPanel;
-
 import java.awt.BorderLayout;
-
-import javax.swing.JScrollPane;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JSeparator;
-import javax.swing.JLabel;
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JComboBox;
-import javax.swing.DefaultComboBoxModel;
-
-import java.awt.Font;
-
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-
-import java.awt.Component;
-import java.awt.GridLayout;
-
-import javax.swing.border.LineBorder;
-
-import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.GlobalSettings;
-import org.paradise.etrc.data.TrainGraph;
-import org.paradise.etrc.util.ui.JComboBoxBinding;
-import org.paradise.etrc.util.ui.JTextFieldBinding;
-import org.paradise.etrc.util.ui.UIBinding;
-import org.paradise.etrc.util.ui.UIBindingFactory;
-
-import com.sun.xml.internal.org.jvnet.staxex.NamespaceContextEx.Binding;
-
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
+
+import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.data.ChartSettings;
+import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.util.Config;
+import org.paradise.etrc.util.ui.databinding.JComboBoxBinding;
+import org.paradise.etrc.util.ui.databinding.JTextFieldBinding;
+import org.paradise.etrc.util.ui.databinding.UIBinding;
+import org.paradise.etrc.util.ui.databinding.UIBindingFactory;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class SettingsView extends JPanel {
 	private JTextField txtDistscale;
@@ -51,7 +36,7 @@ public class SettingsView extends JPanel {
 	private JTextField txtStarthour;
 	private boolean ui_inited;
 	
-	private GlobalSettings settings;
+	private ChartSettings settings;
 	
 	private MainFrame mainFrame;
 	
@@ -61,7 +46,10 @@ public class SettingsView extends JPanel {
 	private static Vector<JTextField> allTextFields = new Vector<>();
 	private static Vector<JComboBox> allComboBoxes = new Vector<JComboBox>();
 	
-	private Vector<UIBinding<? extends Object>> allUIBindings = new Vector<UIBinding<? extends Object>>();
+	private Vector<UIBinding<? extends Object, ? extends Object>> allUIBindings = 
+			new Vector<UIBinding<? extends Object, ? extends Object>>();
+	private JTextField txtGlobalhttpproxyserver;
+	private JTextField txtGlobalhttpproxyport;
 
 	/**
 	 * Create the panel.
@@ -74,7 +62,7 @@ public class SettingsView extends JPanel {
 		allComboBoxes.clear();
 		initUI();
 		
-		setupUI();
+		setupUIDataBinding();
 		
 		ui_inited = true;
 	}
@@ -96,17 +84,13 @@ public class SettingsView extends JPanel {
 		JPanel panel = new JPanel();
 		scrollPane.setViewportView(panel);
 		
-		JLabel lblGlobalSettings = new JLabel(__("Global Settings"));
-		lblGlobalSettings.setBounds(6, 6, 85, 15);
-		lblGlobalSettings.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		
 		JPanel panel_runningChart = new JPanel();
-		panel_runningChart.setBounds(6, 41, 565, 152);
+		panel_runningChart.setBounds(6, 162, 565, 152);
 		panel_runningChart.setBorder(new LineBorder(new Color(192, 192, 192), 1, true));
 		
 		JLabel lblRuningChart = new JLabel(__("Runing Chart"));
+		lblRuningChart.setBounds(19, 154, 85, 15);
 		lblRuningChart.setOpaque(true);
-		lblRuningChart.setBounds(19, 33, 85, 15);
 		lblRuningChart.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRuningChart.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
@@ -122,7 +106,7 @@ public class SettingsView extends JPanel {
 		JLabel lblStationLevelFor = new JLabel(__("Level of Station as Bold Lines"));
 		lblStationLevelFor.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JComboBox cbDistanceUnit = createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel(new String[] {"km", "hm", "dam", "m", "mile"}), 0, "runningChart.distUnit");
+		JComboBox<String> cbDistanceUnit = createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"km", "hm", "dam", "m", "mile"}), 0, "runningChart.distUnit");
 		
 		txtDistscale = createJTextField("runningChart.distScale");
 		
@@ -149,7 +133,7 @@ public class SettingsView extends JPanel {
 		txtStarthour.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		txtStarthour.setColumns(5);
 		
-		JComboBox comboBox = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel(new Integer[] {60, 30, 20, 15, 10, 5}), 4, "runningChart.timeInterval");
+		JComboBox<Integer> comboBox = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel(new Integer[] {60, 30, 20, 15, 10, 5}), 4, "runningChart.timeInterval");
 //		comboBox.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 //		comboBox.setModel(new DefaultComboBoxModel(new Integer[] {60, 30, 20, 15, 10, 5}));
 		GroupLayout gl_panel_runningChart = new GroupLayout(panel_runningChart);
@@ -236,20 +220,71 @@ public class SettingsView extends JPanel {
 					.addContainerGap())
 		);
 		panel_runningChart.setLayout(gl_panel_runningChart);
-		panel.setLayout(null);
 		
 		JLabel lblPlanningSchedule = new JLabel(__("Planning Schedule"));
+		lblPlanningSchedule.setBounds(19, 326, 103, 15);
 		lblPlanningSchedule.setOpaque(true);
 		lblPlanningSchedule.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		lblPlanningSchedule.setBounds(16, 210, 103, 15);
-		panel.add(lblPlanningSchedule);
-		panel.add(lblRuningChart);
-		panel.add(panel_runningChart);
-		panel.add(lblGlobalSettings);
 		
 		JPanel panel_planningSchedule = new JPanel();
+		panel_planningSchedule.setBounds(6, 333, 565, 94);
 		panel_planningSchedule.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
-		panel_planningSchedule.setBounds(6, 216, 565, 178);
+		
+		JLabel lblGlobalSettings = new JLabel(__("Global Settings"));
+		lblGlobalSettings.setBounds(19, 12, 85, 15);
+		lblGlobalSettings.setOpaque(true);
+		lblGlobalSettings.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		
+		JPanel panelGlobalSettings = new JPanel();
+		panelGlobalSettings.setBounds(6, 20, 565, 122);
+		panelGlobalSettings.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
+		
+		JLabel lblAutoload = new JLabel(__("Auto Load"));
+		lblAutoload.setBounds(7, 20, 58, 15);
+		lblAutoload.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		
+		JLabel lblUseHttpProxy = new JLabel(__("Use HTTP Proxy"));
+		lblUseHttpProxy.setBounds(7, 54, 93, 15);
+		lblUseHttpProxy.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		
+		JLabel lblHttpProxyServer = new JLabel(__("HTTP Proxy Server:"));
+		lblHttpProxyServer.setBounds(7, 92, 112, 15);
+		lblHttpProxyServer.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		
+		JComboBox cbAutoLoadLastFile = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.AutoLoadLastFile");
+		cbAutoLoadLastFile.setBounds(112, 15, 93, 27);
+		cbAutoLoadLastFile.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		
+		JComboBox cbHttpProxyUse = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.HttpProxyUse");
+		cbHttpProxyUse.setBounds(112, 49, 93, 27);
+		
+		txtGlobalhttpproxyserver = SettingsView.createJTextField("global.HttpProxyServer");
+		txtGlobalhttpproxyserver.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtGlobalhttpproxyserver.setBounds(122, 85, 181, 28);
+		txtGlobalhttpproxyserver.setColumns(10);
+		
+		JLabel label = new JLabel(":");
+		label.setBounds(302, 91, 4, 16);
+		
+		txtGlobalhttpproxyport = SettingsView.createJTextField("global.HttpProxyPort");
+		txtGlobalhttpproxyport.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtGlobalhttpproxyport.setBounds(306, 85, 109, 28);
+		txtGlobalhttpproxyport.setColumns(10);
+		panel.setLayout(null);
+		panel.add(lblGlobalSettings);
+		panel.add(panelGlobalSettings);
+		panelGlobalSettings.setLayout(null);
+		panelGlobalSettings.add(cbAutoLoadLastFile);
+		panelGlobalSettings.add(cbHttpProxyUse);
+		panelGlobalSettings.add(txtGlobalhttpproxyserver);
+		panelGlobalSettings.add(label);
+		panelGlobalSettings.add(txtGlobalhttpproxyport);
+		panelGlobalSettings.add(lblAutoload);
+		panelGlobalSettings.add(lblUseHttpProxy);
+		panelGlobalSettings.add(lblHttpProxyServer);
+		panel.add(lblRuningChart);
+		panel.add(panel_runningChart);
+		panel.add(lblPlanningSchedule);
 		panel.add(panel_planningSchedule);
 		
 		JPanel panel_1 = new JPanel();
@@ -261,19 +296,19 @@ public class SettingsView extends JPanel {
 		lblTip.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 	}
 	
-	private void setupUI() {
+	private void setupUIDataBinding() {
 		for (JTextField tf : allTextFields) {
 			// Such as "runningChart.distScale"
 			String[] parts = tf.getText().split("\\.");
-			String group = parts[0];
+			String propertyGroup = parts[0];
 			String propertyName = parts[1];
 			
 			// TODO: 配置界面, 实现 getPropertyDesc, 如果GLobal settings不止包含运行图的配置,则
 			// mainFrame.raillineChartView::updateUI 应该改为对应的界面更新.
 			JTextFieldBinding binding = UIBindingFactory.getJTextFieldBinding(tf, 
-					settings, propertyName, getPropertyDesc(propertyName),
+					getModelObject(propertyGroup), propertyName, getPropertyDesc(propertyName),
 					() -> {
-						updateUIforModel(group);
+						updateUIforModel(propertyGroup);
 					});
 			tf.addFocusListener(binding);
 			binding.updateUI();
@@ -284,29 +319,20 @@ public class SettingsView extends JPanel {
 		for (JComboBox<? extends Object> cb : allComboBoxes) {
 			// Such as "runningChart.distScale"
 			String[] parts = cb.getName().split("\\.");
-			String group = parts[0];
+			String propertyGroup = parts[0];
 			String propertyName = parts[1];
 
 			// TODO: 配置界面, 实现 getPropertyDesc, 如果GLobal settings不止包含运行图的配置,则
 			// mainFrame.raillineChartView::updateUI 应该改为对应的界面更新.
-			JComboBoxBinding<? extends Object> binding = UIBindingFactory.getJComboBoxBindingBinding(cb, 
-					settings, propertyName, getPropertyDesc(propertyName), 
+			JComboBoxBinding<Object, ? extends Object> binding = UIBindingFactory.getJComboBoxBindingBinding(cb, 
+					getModelObject(propertyGroup), propertyName, getPropertyDesc(propertyName), 
 					() -> {
-						updateUIforModel(group);
+						updateUIforModel(propertyGroup);
 					});
 			cb.addItemListener(binding);
 			binding.updateUI();
 			
 			allUIBindings.add(binding);
-		}
-	}
-	
-	private void updateUIforModel(String propertyGroup) {
-		if ("runningChart".equals(propertyGroup)) {
-//			mainFrame.chartView.setModel(mainFrame.trainGraph, mainFrame.currentLineChart);
-//			mainFrame.runView.setModel(mainFrame.trainGraph, mainFrame.currentLineChart);
-			mainFrame.chartView.updateData();
-			mainFrame.runView.updateUI();
 		}
 	}
 	
@@ -334,10 +360,10 @@ public class SettingsView extends JPanel {
 	 * @wbp.factory.parameter.source selectedIndex 0
 	 * @wbp.factory.parameter.source name "distUnit"
 	 */
-	public static JComboBox createJComboBox(Font font, ComboBoxModel model, int selectedIndex, String name) {
+	public static <E> JComboBox<E> createJComboBox(Font font, ComboBoxModel<E> model, int selectedIndex, String name) {
 		// Use name attribute of JComboBox to keep property of data source model
 		
-		JComboBox comboBox = new JComboBox();
+		JComboBox<E> comboBox = new JComboBox<E>();
 		comboBox.setFont(font);
 		comboBox.setModel(model);
 		comboBox.setSelectedIndex(selectedIndex);
@@ -348,23 +374,52 @@ public class SettingsView extends JPanel {
 		return comboBox;
 	}
 	
+	public Object getModelObject(String propertyGroup) {
+		if ("global".equals(propertyGroup)) {
+			return Config.getInstance();
+		} else if ("runningChart".equals(propertyGroup)) {
+			return settings;
+		}
+		
+		return null;
+	}
+	
+	private void updateUIforModel(String propertyGroup) {
+		if ("runningChart".equals(propertyGroup)) {
+//			mainFrame.chartView.setModel(mainFrame.trainGraph, mainFrame.currentLineChart);
+//			mainFrame.runView.setModel(mainFrame.trainGraph, mainFrame.currentLineChart);
+			mainFrame.chartView.updateData();
+			mainFrame.runView.updateUI();
+		}
+	}
+	
 	public String getPropertyDesc(String propertyName) {
 		String desc = "";
 		
 		if ("distScale".equals(propertyName)) {
-			desc = __("pixels/Unit") + __(" of running chart");
+			desc = String.format(__("%s of running chart"), __("pixels/Unit") );
 		} else if ("displayLevel".equals(propertyName)) {
-			desc = __("minimal station level to be displayed") + __(" of running chart");
+			desc = String.format(__("%s of running chart"), __("minimal station level to be displayed") );
 		} else if ("boldLevel".equals(propertyName)) {
-			desc = __("level of station as bold line") + __(" of running chart");
+			desc = String.format(__("%s of running chart"), __("level of station as bold line") );
 		} else if ("startHour".equals(propertyName)) {
-			desc = __("starting hour") + __(" of running chart");
+			desc = String.format(__("%s of running chart"), __("starting hour") );
 		} else if ("minuteScale".equals(propertyName)) {
-			desc = __("pixels/minute") + __(" of running chart");
+			desc = String.format(__("%s of running chart"), __("pixels/minute") );
 		} else if ("timeInterval".equals(propertyName)) {
-			desc = __("minutes/x-axis gap") + __(" of running chart");
+			desc = String.format(__("%s of running chart"), __("minutes/x-axis gap") );
 		} else if ("distUnit".equals(propertyName)) {
-			desc = __("distance unit") + __(" of running chart");
+			desc = String.format(__("%s of running chart"), __("distance unit") );
+		}
+		
+		else if ("AutoLoadLastFile".equals(propertyName)) {
+			desc = String.format(__("%s in global settings"), __("auto load last file value") );
+		} else if ("HttpProxyUse".equals(propertyName)) {
+			desc = String.format(__("%s in global settings"), __("use http proxy value") );
+		} else if ("HttpProxyServer".equals(propertyName)) {
+			desc = String.format(__("%s in global settings"), __("http proxy server value") );
+		}else if ("HttpProxyPort".equals(propertyName)) {
+			desc = String.format(__("%s in global settings"), __("http port value") );
 		}
 		
 		return desc;

@@ -11,7 +11,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.dialog.ChartSetDialog;
@@ -26,7 +26,7 @@ public class ControlPanel extends JPanel {
 
 	private ChartView chartView;
 
-	private GlobalSettings settings;
+	private ChartSettings settings;
 
 	public ControlPanel(TrainGraph trainGraph, ChartView _chartView) {
 		chartView = _chartView;

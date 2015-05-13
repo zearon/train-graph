@@ -1,4 +1,4 @@
-package org.paradise.etrc.util.ui;
+package org.paradise.etrc.util.ui.databinding;
 import static org.paradise.etrc.ETRC.__;
 
 import static org.paradise.etrc.ETRCUtil.*;
@@ -12,12 +12,23 @@ import javax.swing.JTextField;
 
 
 /**
- * A data binding model to binding a JTextField to a data source model.
+ * A data binding model to binding a JTextField to a data source model.<br/>
+ * NOTE: the value type should be the same as the value type of UI component. <br/>
+ * If two types are not the same, you should extend this class or its sub-class
+ * and override two methods: <br/> <code>
+ * public T modelValueToUIValue(Object modelValue) </code> and <br/><code>
+ * public Object uiValueToModelValue(T uiValue) </code>
+ * 
+ * @param <M> Type of model value. M can only be java.lang.String or classes
+ * corresponding to primitive types. Otherwise, you should extends this class
+ * and override two methods: <br/> <code>
+ * public String modelValueToUIValue(M modelValue) </code> and <br/><code>
+ * public M uiValueToModelValue(String uiValue) </code>
  * 
  * @author Jeff Gong
  * 
  */
-public class JTextFieldBinding extends UIBinding<String> implements FocusListener {
+public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusListener {
 	JTextField textField;
 	String oldValue;
 
@@ -59,9 +70,14 @@ public class JTextFieldBinding extends UIBinding<String> implements FocusListene
 		textField.setText(uiValue);
 	}
 
-	@Override
-	public String modelValueToUIValue(Object modelValue) {
-		return modelValue == null ? "" : modelValue.toString();
-	}
+//	@Override
+//	public String modelValueToUIValue(M modelValue) {
+//		return modelValue == null ? "" : modelValue.toString();
+//	}
+
+//	@Override
+//	public M uiValueToModelValue(String modelValue) {
+//		return (M) UIBinding.stringValueToKnownTypesValue(modelValue);
+//	}
 
 }

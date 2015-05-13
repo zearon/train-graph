@@ -20,7 +20,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 //import com.borland.jbcl.layout.*;
 import org.paradise.etrc.data.RailroadLineChart;
 
@@ -57,8 +57,8 @@ public class TimeSetDialog extends JDialog implements ActionListener {
 
   RailroadLineChart chart;
 
-private GlobalSettings settings;
-  public TimeSetDialog(GlobalSettings settings, Frame frame) {
+private ChartSettings settings;
+  public TimeSetDialog(ChartSettings settings, Frame frame) {
     super(frame, __("Timeline Settings"), false);
 
     if(frame instanceof MainFrame) {
@@ -76,7 +76,7 @@ private GlobalSettings settings;
     }
   }
 	
-	public void setModel(GlobalSettings settings) {
+	public void setModel(ChartSettings settings) {
 		this.settings = settings;
 	}
 

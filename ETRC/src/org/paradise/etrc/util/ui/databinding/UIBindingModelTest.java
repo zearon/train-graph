@@ -1,4 +1,4 @@
-package org.paradise.etrc.util.ui;
+package org.paradise.etrc.util.ui.databinding;
 import static org.junit.Assert.*;
 
 import static org.paradise.etrc.ETRC.__;
@@ -8,18 +8,19 @@ import static org.paradise.etrc.ETRCUtil.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.util.Config;
 
 public class UIBindingModelTest {
-	GlobalSettings settings;
+	ChartSettings settings;
 
 	public UIBindingModelTest() {
 	}
 
 	@Before
 	public void setUp() throws Exception {
-		settings = TrainGraphFactory.createInstance(GlobalSettings.class);
+		settings = TrainGraphFactory.createInstance(ChartSettings.class);
 //		UIBindingFactory.setCacheEnabledForSameProperty(false);
 	}
 

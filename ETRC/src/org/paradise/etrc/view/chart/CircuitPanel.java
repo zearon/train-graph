@@ -14,7 +14,7 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.TrainGraph;
@@ -35,7 +35,7 @@ public class CircuitPanel extends JPanel {
 	private ChartView chartView;
 
 	private RailroadLineChart chart;
-	private GlobalSettings settings;
+	private ChartSettings settings;
 
 	private boolean ui_inited;
 

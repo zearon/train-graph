@@ -13,7 +13,7 @@ import static org.paradise.etrc.ETRC.__;
 
 public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 
-	public GlobalSettings settings;
+	public ChartSettings settings;
 	public RailNetwork railNetwork;
 	public AllTrainTypes allTrainTypes;
 	public AllTrains allTrains;
@@ -25,7 +25,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	
 	@Override
 	void initTGP() {
-		settings = TrainGraphFactory.createInstance(GlobalSettings.class);
+		settings = TrainGraphFactory.createInstance(ChartSettings.class);
 		railNetwork = TrainGraphFactory.createInstance(RailNetwork.class);
 		allTrainTypes = TrainGraphFactory.createInstance(AllTrainTypes.class);
 		allTrains = TrainGraphFactory.createInstance(AllTrains.class);
@@ -101,7 +101,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	}
 	@Override
 	public void _prepareForFirstLoading() {
-		new GlobalSettings().prepareForFirstLoading();
+		new ChartSettings().prepareForFirstLoading();
 		new RailNetwork().prepareForFirstLoading();
 		new AllTrainTypes().prepareForFirstLoading();
 		new AllTrains().prepareForFirstLoading();
@@ -155,8 +155,8 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	
 	@Override
 	protected void setObjectTGPProperties(TrainGraphPart part) {
-		if (part instanceof GlobalSettings) {
-			settings = (GlobalSettings) part;
+		if (part instanceof ChartSettings) {
+			settings = (ChartSettings) part;
 		} else if (part instanceof AllTrainTypes) {
 			allTrainTypes.trainTypes.clear();
 			allTrainTypes.trainTypes.clear();

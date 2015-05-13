@@ -8,7 +8,7 @@ import java.util.function.Supplier;
 
 import org.paradise.etrc.data.util.Tuple;
 
-public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
+public class ChartSettings extends TrainGraphPart<ChartSettings, NullPart> {
 	public float distScale;
 	public int displayLevel;
 	public int boldLevel;
@@ -17,7 +17,7 @@ public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
 	public int timeInterval;
 	public String distUnit;
 	
-	GlobalSettings() {}
+	ChartSettings() {}
 
 	public void setProperties(float distScale, int displayLevel,
 			int boldLevel, int startHour, float minuteScale, int timeInterval, String distUnit) {
@@ -60,7 +60,7 @@ public class GlobalSettings extends TrainGraphPart<GlobalSettings, NullPart> {
 	}
 	@Override
 	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return GlobalSettings::new;
+		return ChartSettings::new;
 	}
 	@Override
 	public void _prepareForFirstLoading() {}

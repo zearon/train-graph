@@ -36,7 +36,7 @@ import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
 import org.paradise.etrc.ETRC;
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.Stop;
@@ -80,7 +80,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	private boolean shouldRepaint = true;
 	private BufferedImage bufferedImage;
 
-	GlobalSettings settings;
+	ChartSettings settings;
 	private RailroadLineChart chart;
 
 	private boolean ui_inited;

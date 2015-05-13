@@ -20,7 +20,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.GlobalSettings;
+import org.paradise.etrc.data.ChartSettings;
 //import com.borland.jbcl.layout.*;
 import org.paradise.etrc.data.RailroadLineChart;
 import org.paradise.etrc.data.TrainGraph;
@@ -56,7 +56,7 @@ MainFrame mainFrame = null;
   JTextField tfBold = new JTextField();
   JLabel jLabel3 = new JLabel();
 
-private GlobalSettings settings;
+private ChartSettings settings;
 
 //  RailroadLineChart chart;
   public DistSetDialog(Frame frame, TrainGraph trainGraph) {

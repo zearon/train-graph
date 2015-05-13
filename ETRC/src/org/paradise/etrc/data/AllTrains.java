@@ -7,6 +7,7 @@ import java.util.Vector;
 import java.util.function.Supplier;
 
 import org.paradise.etrc.data.util.Tuple;
+
 import static org.paradise.etrc.ETRC.__;
 
 /**
@@ -193,13 +194,15 @@ implements Collection<Train>
 		return AllTrains::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {
-		new Train().prepareForFirstLoading();
+	public void registerSubclasses() {
+		new Train().registerClasses();
 	}
 	@Override
 	public String getName() {
 		return String.format(__("%d trains in total"), trains.size());
 	}
+	@Override
+	public void setName(String name) {}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;
@@ -219,7 +222,7 @@ implements Collection<Train>
 	}
 
 	@Override
-	protected void setTGPProperty(String propName, String valueInStr) {
+	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
 //		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 //		
 //		if (propTuples[0].A.equals(propName)) {

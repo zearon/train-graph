@@ -19,16 +19,10 @@ import static org.paradise.etrc.ETRC.__;
  * @param <U> Type of UI value. For example, UVT should be text for JTextField
  */
 public abstract class UIBinding<M, U> {
-	static HashMap<Tuple<String, String>, ValueTypeConverter<? extends Object, ? extends Object>> modelValueConverterMap = 
+	static HashMap<Tuple<String, String>, IValueTypeConverter<? extends Object, ? extends Object>> modelValueConverterMap = 
 			new HashMap<>();
-	static HashMap<Tuple<String, String>, ValueTypeConverter<? extends Object, ? extends Object>> uiValueConverterMap = 
+	static HashMap<Tuple<String, String>, IValueTypeConverter<? extends Object, ? extends Object>> uiValueConverterMap = 
 			new HashMap<>();
-	
-	public static interface ValueTypeConverter<A, B> {
-		public Class<A> getAValueType();
-		public Class<B> getBValueType();
-		public B convertAValueToBValue(A value);
-	}
 	
 	/**
 	 * Register model value to UI value type converter. <br/>
@@ -38,7 +32,7 @@ public abstract class UIBinding<M, U> {
 	 * @param converter A ValueTypeConverter type converter.
 	 */
 	public static <M, U> void registerModelValueTypeConverter(
-			ValueTypeConverter<M, U> converter) {
+			IValueTypeConverter<M, U> converter) {
 		
 		modelValueConverterMap.put(Tuple.oF(converter.getAValueType().getName(), 
 				converter.getBValueType().getName()), converter);
@@ -52,7 +46,7 @@ public abstract class UIBinding<M, U> {
 	 * @param converter A ValueTypeConverter type converter.
 	 */
 	public static <U, M> void registerUIValueTypeConverter(
-			ValueTypeConverter<U, M> converter) {
+			IValueTypeConverter<U, M> converter) {
 		
 		uiValueConverterMap.put(Tuple.oF(converter.getAValueType().getName(), 
 				converter.getBValueType().getName()), converter);
@@ -203,7 +197,7 @@ public abstract class UIBinding<M, U> {
 		// Find a M->U converter to do the converting job.
 		else {
 			try {
-				ValueTypeConverter<M, U> converter = (ValueTypeConverter<M, U>) 
+				IValueTypeConverter<M, U> converter = (IValueTypeConverter<M, U>) 
 					modelValueConverterMap.get(Tuple.oF(propertyClassName, uiValueClassName));
 				if (converter == null)
 					throw new NullPointerException();
@@ -243,7 +237,7 @@ public abstract class UIBinding<M, U> {
 		// Find a U->M converter to do the converting job.
 		else {
 			try {
-				ValueTypeConverter<U, M> converter = (ValueTypeConverter<U, M>) 
+				IValueTypeConverter<U, M> converter = (IValueTypeConverter<U, M>) 
 					uiValueConverterMap.get(Tuple.oF(uiValueClassName, propertyClassName));
 				if (converter == null)
 					throw new NullPointerException();
@@ -269,7 +263,7 @@ public abstract class UIBinding<M, U> {
 		return propertyClassName.equals(uiValueClassName);
 	}
 	
-	private String convertPrimitiveTypeNameToObjectName(String name) {
+	public String convertPrimitiveTypeNameToObjectName(String name) {
 		
 		if("byte".equals(name) ) {
 			return "java.lang.Byte";
@@ -288,7 +282,7 @@ public abstract class UIBinding<M, U> {
 		return name;
 	}
 	
-	private static Object stringValueToKnownTypesValue(String strValue, String propertyClassName) {
+	public static Object stringValueToKnownTypesValue(String strValue, String propertyClassName) {
 		if (strValue == null)
 			return null;
 		

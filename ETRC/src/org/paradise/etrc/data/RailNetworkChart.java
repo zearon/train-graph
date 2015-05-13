@@ -58,8 +58,8 @@ extends TrainGraphPart<RailNetworkChart, RailroadLineChart> {
 		return RailNetworkChart::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {
-		new RailroadLineChart().prepareForFirstLoading();
+	public void registerSubclasses() {
+		new RailroadLineChart().registerClasses();
 	}
 
 	/* Properties */
@@ -76,7 +76,7 @@ extends TrainGraphPart<RailNetworkChart, RailroadLineChart> {
 	}
 
 	@Override
-	protected void setTGPProperty(String propName, String valueInStr) {
+	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(propName)) {

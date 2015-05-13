@@ -209,13 +209,15 @@ implements Collection<TrainType>
 		return AllTrainTypes::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {
-		new TrainType().prepareForFirstLoading();
+	public void registerSubclasses() {
+		new TrainType().registerClasses();
 	}
 	@Override
 	public String getName() {
 		return String.format(__("%d train types in total"), trainTypes.size());
 	}
+	@Override 
+	public void setName(String name) {}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;
@@ -235,7 +237,7 @@ implements Collection<TrainType>
 	}
 
 	@Override
-	protected void setTGPProperty(String propName, String valueInStr) {
+	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
 //		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 //		
 //		if (propTuples[0].A.equals(propName)) {

@@ -797,8 +797,8 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 		return RailroadLine::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {
-		new Station().prepareForFirstLoading();
+	public void registerSubclasses() {
+		new Station().registerClasses();
 	}
 
 	/* Properties */
@@ -821,7 +821,7 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	}
 
 	@Override
-	protected void setTGPProperty(String propName, String valueInStr) {
+	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(propName)) {

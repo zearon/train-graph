@@ -10,6 +10,7 @@ import javafx.scene.shape.Line;
 import org.paradise.etrc.data.annotation.SimpleProperty;
 import org.paradise.etrc.data.annotation.TrainGraphElement;
 import org.paradise.etrc.data.util.Tuple;
+
 import static org.paradise.etrc.ETRC.__;
 
 public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
@@ -101,13 +102,13 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 		return TrainGraph::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {
-		new ChartSettings().prepareForFirstLoading();
-		new RailNetwork().prepareForFirstLoading();
-		new AllTrainTypes().prepareForFirstLoading();
-		new AllTrains().prepareForFirstLoading();
-		new RailNetworkChart().prepareForFirstLoading();
-		new RailNetworkMap().prepareForFirstLoading();
+	public void registerSubclasses() {
+		new ChartSettings().registerClasses();
+		new RailNetwork().registerClasses();
+		new AllTrainTypes().registerClasses();
+		new AllTrains().registerClasses();
+		new RailNetworkChart().registerClasses();
+		new RailNetworkMap().registerClasses();
 	}
 
 	/* Properties */
@@ -124,7 +125,7 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 	}
 
 	@Override
-	protected void setTGPProperty(String propName, String valueInStr) {
+	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(propName)) {

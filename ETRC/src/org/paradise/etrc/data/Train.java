@@ -62,7 +62,7 @@ public class Train extends TrainGraphPart<Train, Stop> {
 	public String getColorStr() {
 		return color == null ? "" : "#" + Integer.toHexString(color.getRGB() & 0x11ffffff);
 	}
-	public void setColorByStr(String colorStr) {
+	public void setColorStr(String colorStr) {
 		try {
 			color = Color.decode(colorStr);
 		} catch (Exception e) {
@@ -924,8 +924,8 @@ public class Train extends TrainGraphPart<Train, Stop> {
 		return Train::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {
-		new Stop().prepareForFirstLoading();
+	public void registerSubclasses() {
+		new Stop().registerClasses();
 	}
 
 	/* Properties */
@@ -947,7 +947,7 @@ public class Train extends TrainGraphPart<Train, Stop> {
 	}
 
 	@Override
-	protected void setTGPProperty(String propName, String valueInStr) {
+	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(propName)) {
@@ -961,7 +961,7 @@ public class Train extends TrainGraphPart<Train, Stop> {
 		} else if (propTuples[4].A.equals(propName)) {
 			setTerminalStation(valueInStr);
 		} else if (propTuples[5].A.equals(propName)) {
-			setColorByStr(valueInStr);
+			setColorStr(valueInStr);
 		}
 	
 	}

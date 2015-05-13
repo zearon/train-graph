@@ -23,7 +23,7 @@ public class TrainGraphTest {
 
 	@Before
 	public void setUp() throws Exception {
-		trainGraph = TrainGraphFactory.loadTrainGraphFromFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test.test1");
+		trainGraph = TrainGraphFactory.loadTrainGraphFromFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2.trc");
 	}
 
 	@After
@@ -35,14 +35,14 @@ public class TrainGraphTest {
 		fail("Not yet implemented");
 	}
 	
-	@Test
+//	@Test
 	public void testSimpleToString() {
 		System.out.println("-------      Simple toString      ---------");
 		TrainGraphPart.setSimpleToString();
 		System.out.println(trainGraph.toString());
 	}
 	
-	@Test
+//	@Test
 	public void testDebugToString() {
 		System.out.println("-------      Debug toString      ---------");
 		TrainGraphPart.setDebugToString();
@@ -57,7 +57,7 @@ public class TrainGraphTest {
 		System.out.println(trainGraph.toString());
 	}
 	
-	@Test
+//	@Test
 	public void testSyncLineChartsWithLines() {
 		System.out.println("-------      SyncLineChartsWithLines      ---------");
 		TrainGraphPart.setDebugToString();
@@ -76,6 +76,17 @@ public class TrainGraphTest {
 			System.out.println(String.format("----------- Iteration %d -----------\r\n%s\r\n\r\n", 
 					i, trainGraph));
 		});
+	}
+	
+	@Test
+	public void testSimplePropertyAnnotation() {
+		System.out.println("-------      testSimplePropertyAnnotation      ---------");
+		TrainGraphPart.setFullToString();
+		try {
+			System.out.println(trainGraph.settings);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }

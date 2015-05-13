@@ -112,7 +112,7 @@ public class Stop extends TrainGraphPart<Stop, NullPart> {
 		return Stop::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {}
+	public void registerSubclasses() {}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;
@@ -131,7 +131,7 @@ public class Stop extends TrainGraphPart<Stop, NullPart> {
 	}
 
 	@Override
-	protected void setTGPProperty(String porpName, String valueInStr) {
+	protected void setTGPProperty(TrainGraphPart obj, String porpName, String valueInStr) {
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(porpName)) {

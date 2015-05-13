@@ -30,7 +30,7 @@ public class NullPart extends TrainGraphPart<NullPart, NullPart> {
 		return NullPart::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {}
+	public void registerSubclasses() {}
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;
@@ -44,7 +44,7 @@ public class NullPart extends TrainGraphPart<NullPart, NullPart> {
 	}
 
 	@Override
-	protected void setTGPProperty(String porpName, String valueInStr) {}
+	protected void setTGPProperty(TrainGraphPart obj, String porpName, String valueInStr) {}
 
 	@Override
 	protected String getTGPPropertyReprStr(int index) {return "";}

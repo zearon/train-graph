@@ -10,7 +10,6 @@ import javax.swing.JComponent;
 import javax.swing.JTextField;
 
 import org.paradise.etrc.data.util.Tuple;
-import org.paradise.etrc.util.ui.databinding.UIBinding.ValueTypeConverter;
 
 public class UIBindingFactory {
 	
@@ -26,7 +25,7 @@ public class UIBindingFactory {
 	
 	static void registerKnownConverters() {
 		UIBinding.registerModelValueTypeConverter(
-				new ValueTypeConverter<Boolean, String>() {
+				new IValueTypeConverter<Boolean, String>() {
 					@Override public Class<Boolean> getAValueType() { return Boolean.class; }
 					@Override public Class<String> getBValueType() { return String.class; }
 					@Override public String convertAValueToBValue(Boolean modelValue) {
@@ -34,7 +33,7 @@ public class UIBindingFactory {
 					}
 		});
 		UIBinding.registerUIValueTypeConverter(
-				new ValueTypeConverter<String, Boolean>() {
+				new IValueTypeConverter<String, Boolean>() {
 					@Override public Class<String> getAValueType() { return String.class; }
 					@Override public Class<Boolean> getBValueType() { return Boolean.class; }
 					@Override public Boolean convertAValueToBValue(String uiValue) {

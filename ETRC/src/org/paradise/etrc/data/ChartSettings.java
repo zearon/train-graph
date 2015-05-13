@@ -6,17 +6,34 @@ import java.math.BigInteger;
 import java.util.Vector;
 import java.util.function.Supplier;
 
+import org.paradise.etrc.data.annotation.SimpleProperty;
+import org.paradise.etrc.data.annotation.SimplePropertyGetter;
+import org.paradise.etrc.data.annotation.SimplePropertySetter;
 import org.paradise.etrc.data.util.Tuple;
 
 public class ChartSettings extends TrainGraphPart<ChartSettings, NullPart> {
+	@SimpleProperty
 	public float distScale;
+	@SimpleProperty
 	public int displayLevel;
+	@SimpleProperty
 	public int boldLevel;
+	@SimpleProperty
 	public int startHour;
+	@SimpleProperty
 	public float minuteScale;
 	public int timeInterval;
+	@SimpleProperty
 	public String distUnit;
-	
+	@SimplePropertyGetter
+	public int getTimeInterval() {
+		return timeInterval;
+	}
+	@SimplePropertySetter
+	public void setTimeInterval(int timeInterval) {
+		this.timeInterval = timeInterval;
+	}
+
 	ChartSettings() {}
 
 	public void setProperties(float distScale, int displayLevel,
@@ -63,7 +80,7 @@ public class ChartSettings extends TrainGraphPart<ChartSettings, NullPart> {
 		return ChartSettings::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {}
+	public void registerSubclasses() {}
 	@Override
 	void setToDefault() {
 		setProperties(3.0f, 4, 2, 18, 2.0f, 10, "km");
@@ -89,28 +106,28 @@ public class ChartSettings extends TrainGraphPart<ChartSettings, NullPart> {
 		return propTuples;
 	}
 
-	@Override
-	protected void setTGPProperty(String porpName, String valueInStr) {
-		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-		
-		if (propTuples[0].A.equals(porpName)) {
-			name = valueInStr;
-		} else if (propTuples[1].A.equals(porpName)) {
-			distScale = Float.parseFloat(valueInStr);
-		} else if (propTuples[2].A.equals(porpName)) {
-			minuteScale = Float.parseFloat(valueInStr);
-		} else if (propTuples[3].A.equals(porpName)) {
-			startHour = Integer.parseInt(valueInStr);
-		} else if (propTuples[4].A.equals(porpName)) {
-			timeInterval = Integer.parseInt(valueInStr);
-		} else if (propTuples[5].A.equals(porpName)) {
-			displayLevel = Integer.parseInt(valueInStr);
-		} else if (propTuples[6].A.equals(porpName)) {
-			boldLevel = Integer.parseInt(valueInStr);
-		} else if (propTuples[7].A.equals(porpName)) {
-			distUnit = valueInStr;
-		}
-	}
+//	@Override
+//	protected void setTGPProperty(String porpName, String valueInStr) {
+//		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
+//		
+//		if (propTuples[0].A.equals(porpName)) {
+//			name = valueInStr;
+//		} else if (propTuples[1].A.equals(porpName)) {
+//			distScale = Float.parseFloat(valueInStr);
+//		} else if (propTuples[2].A.equals(porpName)) {
+//			minuteScale = Float.parseFloat(valueInStr);
+//		} else if (propTuples[3].A.equals(porpName)) {
+//			startHour = Integer.parseInt(valueInStr);
+//		} else if (propTuples[4].A.equals(porpName)) {
+//			timeInterval = Integer.parseInt(valueInStr);
+//		} else if (propTuples[5].A.equals(porpName)) {
+//			displayLevel = Integer.parseInt(valueInStr);
+//		} else if (propTuples[6].A.equals(porpName)) {
+//			boldLevel = Integer.parseInt(valueInStr);
+//		} else if (propTuples[7].A.equals(porpName)) {
+//			distUnit = valueInStr;
+//		}
+//	}
 
 	@Override
 	protected String getTGPPropertyReprStr(int index) {

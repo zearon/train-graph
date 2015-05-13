@@ -1,6 +1,7 @@
 package org.paradise.etrc.data;
 
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.*;
 
 import java.io.BufferedReader;
@@ -473,8 +474,8 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 		return RailNetwork::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {
-		new RailroadLine().prepareForFirstLoading();
+	public void registerSubclasses() {
+		new RailroadLine().registerClasses();
 	}
 
 	/* Properties */
@@ -496,7 +497,7 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 	}
 
 	@Override
-	protected void setTGPProperty(String propName, String valueInStr) {
+	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(propName)) {

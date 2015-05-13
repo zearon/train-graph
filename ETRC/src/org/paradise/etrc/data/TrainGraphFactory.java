@@ -19,7 +19,8 @@ public class TrainGraphFactory {
 	 * 初始化ID列表, 并调用顶层对象的prepare方法, 初始化所有涉及到的TrainGraphPart
 	 */
 	private static void init() {
-		new TrainGraph().prepareForFirstLoading();
+		TrainGraph trainGraph = new TrainGraph();
+		trainGraph.prepareForFirstLoading();
 	}
 	
 	/**

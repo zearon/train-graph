@@ -65,6 +65,8 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 		name = railroadLine != null ? railroadLine.getName() : __("NO_RAILLINE");
 		return name;
 	}
+	@Override
+	public void setName(String name) {}
 	
 	public Train getTrain(int index) {
 		return trains.get(index);
@@ -566,8 +568,8 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 		return RailroadLineChart::new;
 	}
 	@Override
-	public void _prepareForFirstLoading() {
-		new TrainRef().prepareForFirstLoading();
+	public void registerSubclasses() {
+		new TrainRef().registerClasses();
 	}
 
 	/* Properties */
@@ -584,7 +586,7 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	}
 
 	@Override
-	protected void setTGPProperty(String propName, String valueInStr) {
+	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
 		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
 		
 		if (propTuples[0].A.equals(propName)) {

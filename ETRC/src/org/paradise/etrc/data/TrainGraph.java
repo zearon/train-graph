@@ -7,8 +7,9 @@ import java.util.stream.Collectors;
 
 import javafx.scene.shape.Line;
 
+import org.paradise.etrc.data.annotation.SimpleProperty;
+import org.paradise.etrc.data.annotation.TrainGraphElement;
 import org.paradise.etrc.data.util.Tuple;
-
 import static org.paradise.etrc.ETRC.__;
 
 public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {

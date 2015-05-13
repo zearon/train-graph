@@ -11,6 +11,8 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.Vector;
@@ -19,6 +21,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import org.paradise.etrc.data.annotation.TrainGraphElement;
+import org.paradise.etrc.data.annotation.SimpleProperty;
 import org.paradise.etrc.data.util.Tuple;
 
 
@@ -94,6 +98,45 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 	protected static HashMap<String, 
 		Tuple<Class<? extends TrainGraphPart>, Supplier<? extends TrainGraphPart>>> _partClassMap = 
 			new HashMap<String, Tuple<Class<? extends TrainGraphPart>,Supplier<? extends TrainGraphPart>>> ();
+	
+	public static String ELEMENT_REPR_PREFIX;
+	public static String ELEMENT_REPR_SUFFIX;
+	public static Class<? extends TrainGraphPart> ELEMENT_TYPE;
+	public static Vector<Field> ELEMENT_SIMPLE_PROPERTY_FIELD_LIST;
+	
+	protected Supplier<String> _elementReprPreffix;
+	
+	static {
+		registerSubClasses();
+		processAnnotations();
+	}
+	
+	static void registerSubClasses() {
+		_partClassMap.put(START_SECTION_TRAIN_GRAPH.trim(), 
+				Tuple.of(TrainGraph.class, TrainGraph::new));
+		_partClassMap.put(START_SECTION_RAILROAD_NETWORK.trim(), 
+				Tuple.of(RailNetwork.class, RailNetwork::new));
+		_partClassMap.put(START_SECTION_RAILROAD_LINE.trim(), 
+				Tuple.of(RailroadLine.class, RailroadLine::new));
+		_partClassMap.put(START_SECTION_STATION.trim(), 
+				Tuple.of(Station.class, Station::new));
+		
+		_partClassMap.put(START_SECTION_ALL_TRAIN.trim(), 
+				Tuple.of(AllTrains.class, AllTrains::new));
+		_partClassMap.put(START_SECTION_TRAIN.trim(), 
+				Tuple.of(Train.class, Train::new));
+		_partClassMap.put(START_SECTION_STOP.trim(), 
+				Tuple.of(Stop.class, Stop::new));
+		
+		_partClassMap.put(START_SECTION_RAILNETWORK_CHART.trim(), 
+				Tuple.of(RailNetworkChart.class, RailNetworkChart::new));
+		_partClassMap.put(START_SECTION_RAILINE_CHART.trim(), 
+				Tuple.of(RailroadLineChart.class, RailroadLineChart::new));
+		_partClassMap.put(START_SECTION_TRAIN_REF.trim(), 
+				Tuple.of(TrainRef.class, TrainRef::new));
+		
+	}
+
 
 	static HashMap<String, Integer> _objectIdMap = new HashMap<String, Integer> ();
 	
@@ -143,6 +186,41 @@ public abstract class TrainGraphPart<T, ET extends TrainGraphPart> {
 						return obj.toString();
 					} })
 			.collect(Collectors.joining(delimeter, "[", "]"));
+	}
+	
+	static void processAnnotations() {
+//		_partClassMap.values().stream().map(tuple->tuple.A).forEach(clazz -> {
+//			try {
+//				TrainGraphElement tgeAnno = clazz.getAnnotation(TrainGraphElement.class);
+//				if (tgeAnno == null) {
+//					System.err.println("Annotation to be added for class: " + clazz.getSimpleName());
+//					return;
+//				}
+//				
+//				// Get information from class annotation
+//				Field prefixField = clazz.getField("ELEMENT_REPR_PREFIX");
+//				Field suffixField = clazz.getField("ELEMENT_REPR_SUFFIX");
+//				Field elementTypeField = clazz.getField("ELEMENT_TYPE");
+//				
+//				prefixField.set(null, tgeAnno.prefix());
+//				suffixField.set(null, tgeAnno.suffix());
+//				elementTypeField.set(null, tgeAnno.elementType());
+//				
+//				// Get information from field annotation
+//
+//				Field simplePropertyFieldList = 
+//						clazz.getField("ELEMENT_SIMPLE_PROPERTY_FIELD_LIST");
+//				
+//				Field[] propertyFields = clazz.getDeclaredFields();
+//				elementTypeField.isAnnotationPresent(SimpleProperty.class);
+//				Stream.of(propertyFields)
+//					.filter(field->field.isAnnotationPresent(SimpleProperty.class)).;
+//
+//			} catch (Exception e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//		});
 	}
 	
 	/**************************************************************************

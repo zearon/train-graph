@@ -1,8 +1,4 @@
 package org.paradise.etrc.util;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,24 +6,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.paradise.etrc.controller.ActionManager;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class Config {
 	public static final String NEW_FILE_NAME = __("Unnamed Train Graph");
 	static final int Prop_Recent_File_Size = 15;
-	
-	static Properties prop;
-	static Properties defaultProp;
-
-	static String currentFile;
-
-//	static String Prop_Show_UP = "Show_UP";
-//	static String Prop_Show_Down = "Show_Down";
-//	static String Prop_Show_Run = "Show_Run";
 	
 	static String Prop_AUTO_LOAD_FILE = "Auto_Load_Last_Edit_File";
 	static String Prop_Working_Chart = "Working_File";
@@ -38,11 +25,29 @@ public class Config {
 	static String Prop_HTTP_Proxy_Server = "HTTP_Proxy_Server";
 	static String Prop_HTTP_Proxy_Port = "HTTP_Proxy_Port";
 	
-	private static String Properties_File = "config.prop";
+	static String Properties_File = "config.prop";
+	
+	static Properties defaultProp;
+	static Config instance;
+	
+	private Properties prop;
+	
+	public static synchronized Config getInstance() {
+		if (instance == null) {
+			instance = new Config();
+		}
+		
+		return instance;
+	}
+
+	String currentFile;
+
+//	static String Prop_Show_UP = "Show_UP";
+//	static String Prop_Show_Down = "Show_Down";
+//	static String Prop_Show_Run = "Show_Run";
 	
 	static {
 		makeDefault();
-		init();
 	}	
 	
 	static void makeDefault() {
@@ -58,7 +63,7 @@ public class Config {
 		defaultProp.setProperty(Prop_HTTP_Proxy_Port, "80");
 	}
 	
-	public static void init() {
+	private Config() {
 		prop = new Properties(defaultProp);
 		
 		try {
@@ -73,33 +78,33 @@ public class Config {
 	/*****************************************************************/
 	/* This part are in memory and has no need to be write to disks. */
 	/*****************************************************************/
-	public static String getCurrentFile() {
+	public  String getCurrentFile() {
 		return currentFile;
 	}
 	
-	public static String getCurrentFileName() {
+	public  String getCurrentFileName() {
 		return new File(getCurrentFile()).getName();
 	}
 	
-	public static void setCurrentFileToNew() {
+	public  void setCurrentFileToNew() {
 		currentFile = NEW_FILE_NAME;
 	}
 	
-	public static void setCurrentFile(String filePath) {
+	public  void setCurrentFile(String filePath) {
 		currentFile = filePath;
 	}
 	
-	public static boolean isNewFile() {
+	public  boolean isNewFile() {
 		return NEW_FILE_NAME.equalsIgnoreCase(currentFile);
 	}
 	/*****************************************************************/
 
 	
-	public static void load() throws FileNotFoundException, IOException {
+	public  void load() throws FileNotFoundException, IOException {
 		prop.load(new FileInputStream(Properties_File));
 	}
 	
-	public static void save() {
+	public  void save() {
 		try {
 			prop.store(new FileOutputStream(Properties_File), "Common settings");
 		} catch (IOException e) {
@@ -107,37 +112,37 @@ public class Config {
 		}
 	}
 	
-	public static void resetToDefault() {
+	public  void resetToDefault() {
 		prop.clear();
 	}
 	
-	public static String getValue(String key) {
+	public  String getValue(String key) {
 		return prop.getProperty(key, "");
 	}
 	
-	public static String getValue(String key, String defaultValue) {
+	public  String getValue(String key, String defaultValue) {
 		return prop.getProperty(key, defaultValue);
 	}
 	
-	public static void setValue(String key, String value) {
+	public  void setValue(String key, String value) {
 		prop.setProperty(key, value);
 		
 		save();
 	}
 	
-	public static boolean getAutoLoadLastFile() {
+	public  boolean getAutoLoadLastFile() {
 		return getValue(Prop_AUTO_LOAD_FILE, "false").equalsIgnoreCase("yes");
 	}
 	
-	public static void setAutoLoadLastFile(boolean value) {
+	public  void setAutoLoadLastFile(boolean value) {
 		setValue(Prop_AUTO_LOAD_FILE, value ? "yes" : "no");
 	}
 	
-	public static String[] getRecentOpenedFiles() {
+	public  String[] getRecentOpenedFiles() {
 		return getValue(Prop_Recent_Open_File_Path, "").split(";");
 	}
 	
-	public static void addToRecentOpenedFiles(String filePath) {
+	public  void addToRecentOpenedFiles(String filePath) {
 		if (filePath == null || "".equals(filePath))
 			return;
 		
@@ -149,7 +154,7 @@ public class Config {
 		setValue(Prop_Recent_Open_File_Path, newList);
 	}
 	
-	public static String getLastFile(String defaultValue) {
+	public  String getLastFile(String defaultValue) {
 		String[] recentFiles = getRecentOpenedFiles();
 		if (recentFiles.length < 1)
 			return defaultValue;
@@ -158,7 +163,7 @@ public class Config {
 		}
 	}
 	
-	public static String getLastFilePath(String defaultValue) {
+	public  String getLastFilePath(String defaultValue) {
 		String[] recentFiles = getRecentOpenedFiles();
 		if (recentFiles.length < 1)
 			return defaultValue;
@@ -168,43 +173,43 @@ public class Config {
 		}
 	}
 	
-	public static boolean isFileModified() {
+	public  boolean isFileModified() {
 		return ActionManager.getInstance().isModelModified();
 	}
 	
-	public static String getLastRailnetworkPath() {
+	public  String getLastRailnetworkPath() {
 		return getValue(Prop_LAST_RAILNETWORK_PATH);
 	}
 	
-	public static void setLastRailnetworkPath(String value) {
+	public  void setLastRailnetworkPath(String value) {
 		setValue(Prop_LAST_RAILNETWORK_PATH, value);
 	}
 	
-	public static String getLastTrainPath() {
+	public  String getLastTrainPath() {
 		return getValue(Prop_LAST_TRAIN_PATH);
 	}
 	
-	public static void setLastTrainPath(String value) {
+	public  void setLastTrainPath(String value) {
 		setValue(Prop_LAST_TRAIN_PATH, value);
 	}
 	
-	public static String getLastMapPath() {
+	public  String getLastMapPath() {
 		return getValue(Prop_LAST_MAP_PATH);
 	}
 	
-	public static void setLastMapPath(String value) {
+	public  void setLastMapPath(String value) {
 		setValue(Prop_LAST_MAP_PATH, value);
 	}
 	
-	public static String getHttpProxyServer() {
+	public  String getHttpProxyServer() {
 		return getValue(Prop_HTTP_Proxy_Server);
 	}
 	
-	public static void setHttpProxyServer(String value) {
+	public  void setHttpProxyServer(String value) {
 		setValue(Prop_HTTP_Proxy_Server, value);
 	}
 	
-	public static int getHttpProxyPort() {
+	public  int getHttpProxyPort() {
 		int port = 0;
 		try {
 			port = Integer.parseInt(getValue(Prop_HTTP_Proxy_Port));
@@ -213,7 +218,7 @@ public class Config {
 		return port < 0 || port > 65535 ? 80 : port;
 	}
 	
-	public static void setHttpProxyPort(int value) {
+	public  void setHttpProxyPort(int value) {
 		if (value < 0 || value > 65535)
 			throw new IllegalArgumentException(__("Port number should be within 0 - 65535."));
 		

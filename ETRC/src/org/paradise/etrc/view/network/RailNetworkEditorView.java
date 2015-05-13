@@ -91,7 +91,7 @@ public class RailNetworkEditorView extends JPanel {
 		chooser.setFileFilter(new ImageFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(Config.getLastMapPath());
+			File recentPath = new File(Config.getInstance().getLastMapPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
@@ -110,7 +110,7 @@ public class RailNetworkEditorView extends JPanel {
 					
 					updateUI();
 					
-					Config.setLastMapPath(chooser.getSelectedFile().getParentFile().getAbsolutePath());
+					Config.getInstance().setLastMapPath(chooser.getSelectedFile().getParentFile().getAbsolutePath());
 				} catch (IOException ioe) {
 					System.out.println("Loading map failed.");
 					ioe.printStackTrace();

@@ -304,7 +304,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	public void doExit() {
-		if(Config.isFileModified())
+		if(Config.getInstance().isFileModified())
 			if(new YesNoBox(this, __("Current train graph has changed.\nDo you want to save the changes?")).askForYes())
 				doSaveChart(); 
 		
@@ -490,8 +490,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	public void setTitle() {
-		setTitle(titlePrefix + " -- [" + Config.getCurrentFile()+ "] " + 
-				(Config.isFileModified() ? __("Modified ") : "") + activeTrainName);
+		setTitle(titlePrefix + " -- [" + Config.getInstance().getCurrentFile()+ "] " + 
+				(Config.getInstance().isFileModified() ? __("Modified ") : "") + activeTrainName);
 	}
 
 	private JLabel loadStatusBar() {
@@ -787,8 +787,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	private void initChart() {
-		if (Config.getAutoLoadLastFile()) {
-			File file = new File(Config.getLastFile(""));
+		if (Config.getInstance().getAutoLoadLastFile()) {
+			File file = new File(Config.getInstance().getLastFile(""));
 			if (file.exists())
 				do_OpenFile(file.getAbsolutePath());
 			else {
@@ -806,7 +806,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		TrainGraphFactory.resetIDCounters();
 		trainGraph = TrainGraphFactory.createDefaultTrainGraph();
 		
-		Config.setCurrentFileToNew();
+		Config.getInstance().setCurrentFileToNew();
 		ActionManager.getInstance().reset();
 		
 		setTitle();
@@ -819,8 +819,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			TrainGraphFactory.resetIDCounters();
 			trainGraph = TrainGraphFactory.loadTrainGraphFromFile(filePath);
 			
-			Config.setCurrentFile(filePath);
-			Config.addToRecentOpenedFiles(filePath);
+			Config.getInstance().setCurrentFile(filePath);
+			Config.getInstance().addToRecentOpenedFiles(filePath);
 			
 			do_UpdateRecentFilesMenu();
 			
@@ -839,8 +839,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		try {
 			trainGraph.saveToFile(filePath);
 			
-			Config.setCurrentFile(filePath);
-			Config.addToRecentOpenedFiles(filePath);
+			Config.getInstance().setCurrentFile(filePath);
+			Config.getInstance().addToRecentOpenedFiles(filePath);
 			
 			do_UpdateRecentFilesMenu();
 		} catch (IOException ex) {
@@ -1095,7 +1095,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	public void doNewChart() {
-		if(Config.isFileModified())
+		if(Config.getInstance().isFileModified())
 			if(new YesNoBox(this, __("Current train graph has changed.\nDo you want to save the changes?")).askForYes())
 				doSaveChart(); 
 		
@@ -1104,10 +1104,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 	public void doSaveChart() {
 		//如果是新文件，则改调“另存为”
-		if(Config.isNewFile()) {
+		if(Config.getInstance().isNewFile()) {
 			doSaveChartAs();
 		} else {
-			do_SaveFile(Config.getCurrentFile());
+			do_SaveFile(Config.getInstance().getCurrentFile());
 		}
 	}
 
@@ -1125,13 +1125,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		
 		try {
-			File recentPath = new File(Config.getLastFilePath(""));
+			File recentPath = new File(Config.getInstance().getLastFilePath(""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
 		
 		// SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = Config.isNewFile() ? Config.NEW_FILE_NAME : Config.getCurrentFileName();
+		String fileName = Config.getInstance().isNewFile() ? Config.getInstance().NEW_FILE_NAME : Config.getInstance().getCurrentFileName();
 		chooser.setSelectedFile(new File(fileName));
 
 		int returnVal = chooser.showSaveDialog(this); 
@@ -1160,7 +1160,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		
 		try {
-			File recentPath = new File(Config.getLastFilePath(""));
+			File recentPath = new File(Config.getInstance().getLastFilePath(""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
@@ -1191,7 +1191,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.addChoosableFileFilter(new TRFFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(Config.getLastFilePath(""));
+			File recentPath = new File(Config.getInstance().getLastFilePath(""));
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}

@@ -50,8 +50,8 @@ public class AddTrainWizard extends Wizard {
 					upName = step1.getUpName();
 					
 					if(new YesNoBox(chartView.mainFrame, __("Automatically get train informtaion from web?")).askForYes()) {
-						String proxyAddress = Config.getHttpProxyServer();
-						int proxyPort = Config.getHttpProxyPort();
+						String proxyAddress = Config.getInstance().getHttpProxyServer();
+						int proxyPort = Config.getInstance().getHttpProxyPort();
 						train = TrainView.doLoadTrainFromWeb(fullName, proxyAddress, proxyPort);
 						if (train == null) 
 						{

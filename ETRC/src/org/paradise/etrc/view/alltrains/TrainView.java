@@ -239,8 +239,8 @@ public class TrainView extends JPanel {
 				if (table.getCellEditor() != null)
 					table.getCellEditor().stopCellEditing();
 
-				String proxyAddress = Config.getHttpProxyServer();
-				int proxyPort = Config.getHttpProxyPort();
+				String proxyAddress = Config.getInstance().getHttpProxyServer();
+				int proxyPort = Config.getInstance().getHttpProxyPort();
 				
 				Color color = table.getBackground();
 				
@@ -411,7 +411,7 @@ public class TrainView extends JPanel {
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		chooser.setApproveButtonText(__("Save "));
 		try {
-			File recentPath = new File(Config.getLastTrainPath());
+			File recentPath = new File(Config.getInstance().getLastTrainPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -433,7 +433,7 @@ public class TrainView extends JPanel {
 
 				out.close();
 
-				Config.setLastTrainPath(chooser
+				Config.getInstance().setLastTrainPath(chooser
 						.getSelectedFile().getParentFile()
 						.getAbsolutePath());
 			} catch (IOException ex) {
@@ -453,7 +453,7 @@ public class TrainView extends JPanel {
 		chooser.addChoosableFileFilter(new TRFFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(Config.getLastTrainPath());
+			File recentPath = new File(Config.getInstance().getLastTrainPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -466,7 +466,7 @@ public class TrainView extends JPanel {
 			Train loadingTrain = TrainGraphFactory.createInstance(Train.class);
 			try {
 				loadingTrain.loadFromFile2(f.getAbsolutePath());
-				Config.setLastTrainPath(chooser
+				Config.getInstance().setLastTrainPath(chooser
 						.getSelectedFile().getParentFile()
 						.getAbsolutePath());
 			} catch (IOException ex) {

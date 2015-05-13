@@ -148,7 +148,7 @@ public class RailroadLineEditView extends JPanel {
 		chooser.addChoosableFileFilter(new CIRFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(Config.getLastRailnetworkPath());
+			File recentPath = new File(Config.getInstance().getLastRailnetworkPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -162,7 +162,7 @@ public class RailroadLineEditView extends JPanel {
 			RailroadLine c = TrainGraphFactory.createInstance(RailroadLine.class);
 			try {
 				c.loadFromFile2(f.getAbsolutePath());
-				Config.setLastRailnetworkPath(chooser
+				Config.getInstance().setLastRailnetworkPath(chooser
 								.getSelectedFile().getParentFile()
 								.getAbsolutePath());
 			} catch (IOException ex) {
@@ -189,7 +189,7 @@ public class RailroadLineEditView extends JPanel {
 		chooser.addChoosableFileFilter(new CRSFilter());
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(Config.getLastRailnetworkPath());
+			File recentPath = new File(Config.getInstance().getLastRailnetworkPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -215,7 +215,7 @@ public class RailroadLineEditView extends JPanel {
 				
 				updateRailroadListSelection(999999);
 				
-				Config.setLastRailnetworkPath(chooser
+				Config.getInstance().setLastRailnetworkPath(chooser
 						.getSelectedFile().getParentFile()
 						.getAbsolutePath());
 			} catch (IOException ex) {
@@ -274,7 +274,7 @@ public class RailroadLineEditView extends JPanel {
 			chooser.setDialogTitle(__("Export Railroad Network"));
 			chooser.addChoosableFileFilter(new CRSFilter());
 			suffix = CRSFilter.suffix;
-			chooser.setSelectedFile(new File(Config.getCurrentFileName()
+			chooser.setSelectedFile(new File(Config.getInstance().getCurrentFileName()
 					.replace(' ', '_')));
 		} else {
 			return;
@@ -284,7 +284,7 @@ public class RailroadLineEditView extends JPanel {
 		chooser.setMultiSelectionEnabled(false);
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		try {
-			File recentPath = new File(Config.getLastRailnetworkPath());
+			File recentPath = new File(Config.getInstance().getLastRailnetworkPath());
 			if (recentPath.exists() && recentPath.isDirectory())
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {
@@ -303,7 +303,7 @@ public class RailroadLineEditView extends JPanel {
 				trainGraph.railNetwork.saveToWriter(out, 0);
 				
 				out.close();
-				Config.setLastRailnetworkPath(chooser
+				Config.getInstance().setLastRailnetworkPath(chooser
 								.getSelectedFile().getParentFile()
 								.getAbsolutePath());
 			} catch (IOException ex) {

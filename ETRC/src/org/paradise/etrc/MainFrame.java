@@ -147,10 +147,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public static String Prop_HTTP_Proxy_Port = "HTTP_Proxy_Port";
 	public static String Prop_Recent_Open_File_Path = "Recent_Open_File_Path";
 	
-	private static String Sample_Chart_File = "sample.trc";
+//	private static String Sample_Chart_File = "sample.trc";
 	private static String Properties_File = "htrc.prop";
 	
-	public boolean isNewCircuit = false;
+//	public boolean isNewCircuit = false;
 	private String workingFileName;
 	
 	public TrainGraph trainGraph;
@@ -169,7 +169,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public MainFrame() {
 		if (instance == null)
 			instance = this;
-		
 		
 		addFullScreenModeSupportOnOSX();
 		
@@ -193,7 +192,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			System.out.println("Unable to load prop file. Use default value.");
 		}
 				
-		initChart();
+		initChart(false);
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
 		try {
 			jbInit();
@@ -820,27 +819,41 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		return menuItem;
 	}
 
-	private void initChart() {
+	private void initChart(boolean loadLastFile) {
 		File chartFile = new File(prop.getProperty(Prop_Working_Chart));
 
-		try {
-			trainGraph = TrainGraphFactory.loadTrainGraphFromFile(
-					chartFile.getAbsolutePath());
-			prop.setProperty(Prop_Working_Chart, chartFile.getAbsolutePath());
-		} catch (IOException ioe) {
-			System.out.println("Load old graph from last session failed, try to load the default graph.");
-			new MessageBox(String.format(__("Load train graph failed. Use default graph. Please check the %s file."
-					+ "\nReason:%s\nDetail:%s"), Sample_Chart_File, ioe.getMessage(), 
-					ioe.getCause() )).showMessage();
-			
+		if (loadLastFile) {
+			//
+		} else {
 			TrainGraphFactory.resetIDCounters();
 			trainGraph = TrainGraphFactory.createDefaultTrainGraph();
-		} finally {
-			currentNetworkChart = trainGraph.getCharts().get(0);
-			currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
 			
-			workingFileName = chartFile.getName();
+			workingFileName = "";
 		}
+		
+
+		currentNetworkChart = trainGraph.getCharts().get(0);
+		currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
+		
+		
+//		try {
+//			trainGraph = TrainGraphFactory.loadTrainGraphFromFile(
+//					chartFile.getAbsolutePath());
+//			prop.setProperty(Prop_Working_Chart, chartFile.getAbsolutePath());
+//		} catch (IOException ioe) {
+//			System.out.println("Load old graph from last session failed, try to load the default graph.");
+//			new MessageBox(String.format(__("Load train graph failed. Use default graph. Please check the %s file."
+//					+ "\nReason:%s\nDetail:%s"), Sample_Chart_File, ioe.getMessage(), 
+//					ioe.getCause() )).showMessage();
+//			
+//			TrainGraphFactory.resetIDCounters();
+//			trainGraph = TrainGraphFactory.createDefaultTrainGraph();
+//		} finally {
+//			currentNetworkChart = trainGraph.getCharts().get(0);
+//			currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
+//			
+//			workingFileName = chartFile.getName();
+//		}
 	}
 
 	public void actionPerformed(ActionEvent e) {

@@ -8,7 +8,7 @@ import org.paradise.etrc.data.util.Tuple;
 
 import static org.paradise.etrc.ETRC.__;
 
-public class Station extends TrainGraphPart<Station, NullPart> {
+public class Station extends TrainGraphPart<NullPart> {
 	@TGPProperty
 	public boolean hide = false;
 	@TGPProperty
@@ -109,54 +109,6 @@ public class Station extends TrainGraphPart<Station, NullPart> {
 	}
 	@Override
 	public void registerSubclasses() {}
-
-	/* Properties */
-	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[4];
-			
-			propTuples[0] = Tuple.of("name", String.class);
-			propTuples[1] = Tuple.of("dist", int.class);
-			propTuples[2] = Tuple.of("level", int.class);
-			propTuples[3] = Tuple.of("hide", boolean.class);
-		}
-		
-		return propTuples;
-	}
-
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String porpName, String valueInStr) {
-		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-		
-		if (propTuples[0].A.equals(porpName)) {
-			name = valueInStr;
-		} else if (propTuples[1].A.equals(porpName)) {
-			dist = Integer.parseInt(valueInStr);
-		} else if (propTuples[2].A.equals(porpName)) {
-			level = Integer.parseInt(valueInStr);
-		} else if (propTuples[3].A.equals(porpName)) {
-			hide = Boolean.parseBoolean(valueInStr);
-		}
-	}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {
-		String value = "";
-		
-		if (index == 0) {
-			value = name;	
-		} else if (index == 1) {
-			value = dist + "";
-		} else if (index == 2) {
-			value = level + "";
-		} else if (index == 3) {
-			value = hide + "";
-		}
-		
-		return value;
-	}
 
 	/* Element array */
 	@Override

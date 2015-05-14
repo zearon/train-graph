@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 
 import org.paradise.etrc.data.util.Tuple;
 
-public class TrainRef extends TrainGraphPart<TrainRef, NullPart> {
+public class TrainRef extends TrainGraphPart<NullPart> {
 
 	
 	TrainRef() {
@@ -43,36 +43,6 @@ public class TrainRef extends TrainGraphPart<TrainRef, NullPart> {
 
 	/* Properties */
 	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[1];
-			
-			propTuples[0] = Tuple.of("name", String.class);
-		}
-		
-		return propTuples;
-	}
-
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String porpName, String valueInStr) {
-		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-		
-		if (propTuples[0].A.equals(porpName)) {
-			name = valueInStr;
-		}
-	}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {
-		String value = "";
-		
-		if (index == 0) {
-			value = name;	
-		} 
-		
-		return value;
-	}
 
 	/* Element array */
 	@Override

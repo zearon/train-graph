@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface TGPProperty {
+	String name() default "";
 	int index() default Integer.MAX_VALUE;
 	boolean firstline() default false;
-	boolean element() default false;
 }

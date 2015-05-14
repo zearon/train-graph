@@ -10,7 +10,7 @@ import org.paradise.etrc.data.util.Tuple;
  * @author Jeff Gong
  *
  */
-public class NullPart extends TrainGraphPart<NullPart, NullPart> {
+public class NullPart extends TrainGraphPart<NullPart> {
 
 	public NullPart() {
 		// TODO Auto-generated constructor stub
@@ -31,23 +31,6 @@ public class NullPart extends TrainGraphPart<NullPart, NullPart> {
 	}
 	@Override
 	public void registerSubclasses() {}
-
-	/* Properties */
-	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[0];
-		}
-		
-		return propTuples;
-	}
-
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String porpName, String valueInStr) {}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {return "";}
 
 	/* Element array */
 	@Override

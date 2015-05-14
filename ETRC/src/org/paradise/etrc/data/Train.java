@@ -20,6 +20,7 @@ import java.util.Vector;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.paradise.etrc.data.annotation.TGPProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.data.util.Tuple;
 
@@ -28,11 +29,13 @@ import org.paradise.etrc.data.util.Tuple;
  * @version 1.0
  */
 
-public class Train extends TrainGraphPart<Train, Stop> {
+public class Train extends TrainGraphPart<Stop> {
 //	public static int MAX_STOP_NUM = 100;
 
+	@TGPProperty
 	public String trainNameDown = "";
 
+	@TGPProperty
 	public String trainNameUp = "";
 	
 	/**
@@ -58,21 +61,55 @@ public class Train extends TrainGraphPart<Train, Stop> {
 //	private Stop[] _stops = new Stop[MAX_STOP_NUM];
 	private Vector<Stop> stops = new Vector<Stop>(15);
 
+
+	@TGPProperty(name="color")
 	public Color color = null;
-	public String getColorStr() {
-		return color == null ? "" : "#" + Integer.toHexString(color.getRGB() & 0x11ffffff);
-	}
-	public void setColorStr(String colorStr) {
-		try {
-			color = Color.decode(colorStr);
-		} catch (Exception e) {
-			System.err.println("Invalid color string:" + colorStr);
-		}
-	}
+//	@TGPProperty(name="color")
+//	public String getColorStr() {
+//		return color == null ? "" : "#" + Integer.toHexString(color.getRGB() & 0x11ffffff);
+//	}
+//	@TGPProperty(name="color")
+//	public void setColorStr(String colorStr) {
+//		try {
+//			color = Color.decode(colorStr);
+//		} catch (Exception e) {
+//			System.err.println("Invalid color string:" + colorStr);
+//		}
+//	}
 	
 	private List<Consumer<Train>> trainChangedListeners = new Vector<Consumer<Train>> ();
 
 	Train() {
+	}
+
+	@TGPProperty
+	public void setStartStation(String sta) {
+		startStation = sta;
+	}
+
+	@TGPProperty
+	public void setTerminalStation(String sta) {
+		terminalStation = sta;
+	}
+
+	@TGPProperty
+	public String getStartStation() {
+		if(!startStation.equalsIgnoreCase(""))
+			return startStation;
+		else if(getStopNum() > 0)
+			return stops.get(0).name;
+		else
+			return "";
+	}
+
+	@TGPProperty
+	public String getTerminalStation() {
+		if(!terminalStation.equalsIgnoreCase(""))
+			return terminalStation;
+		else if(getStopNum() > 0)
+			return stops.get(getStopNum() - 1).name;
+		else
+			return "";
 	}
 
 	public Stop getStop(int index) {
@@ -109,32 +146,6 @@ public class Train extends TrainGraphPart<Train, Stop> {
 			tr.stops.add(stops.get(i).copy());
 		}
 		return tr;
-	}
-	
-	public void setStartStation(String sta) {
-		startStation = sta;
-	}
-	
-	public void setTerminalStation(String sta) {
-		terminalStation = sta;
-	}
-	
-	public String getStartStation() {
-		if(!startStation.equalsIgnoreCase(""))
-			return startStation;
-		else if(getStopNum() > 0)
-			return stops.get(0).name;
-		else
-			return "";
-	}
-	
-	public String getTerminalStation() {
-		if(!terminalStation.equalsIgnoreCase(""))
-			return terminalStation;
-		else if(getStopNum() > 0)
-			return stops.get(getStopNum() - 1).name;
-		else
-			return "";
 	}
 
 	/**
@@ -926,65 +937,6 @@ public class Train extends TrainGraphPart<Train, Stop> {
 	@Override
 	public void registerSubclasses() {
 		new Stop().registerClasses();
-	}
-
-	/* Properties */
-	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[6];
-			
-			propTuples[0] = Tuple.of("name", String.class);
-			propTuples[1] = Tuple.of("nameDown", String.class);
-			propTuples[2] = Tuple.of("nameUp", String.class);
-			propTuples[3] = Tuple.of("startStation", String.class);
-			propTuples[4] = Tuple.of("terminalStation", String.class);
-			propTuples[5] = Tuple.of("color", Color.class);
-		}
-		
-		return propTuples;
-	}
-
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
-		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-		
-		if (propTuples[0].A.equals(propName)) {
-			name = valueInStr;
-		} else if (propTuples[1].A.equals(propName)) {
-			trainNameDown = valueInStr;
-		} else if (propTuples[2].A.equals(propName)) {
-			trainNameUp = valueInStr;
-		} else if (propTuples[3].A.equals(propName)) {
-			setStartStation(valueInStr);
-		} else if (propTuples[4].A.equals(propName)) {
-			setTerminalStation(valueInStr);
-		} else if (propTuples[5].A.equals(propName)) {
-			setColorStr(valueInStr);
-		}
-	
-	}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {
-		String value = "";
-		
-		if (index == 0) {
-			value = name + "";	
-		} else if (index == 1) {
-			value = trainNameDown + "";
-		} else if (index == 2) {
-			value = trainNameUp + "";
-		} else if (index == 3) {
-			value = getStartStation() + "";
-		} else if (index == 4) {
-			value = getTerminalStation() + "";
-		} else if (index == 5) {
-			value = getColorStr() + "";
-		}
-		
-		return value;
 	}
 
 	/* Element array */

@@ -18,16 +18,12 @@ import org.paradise.etrc.data.util.Tuple;
 
 import sun.misc.BASE64Decoder;
 
-public class RailNetworkMap extends Base64EncodingBinaryPart<RailNetworkMap, NullPart> {
+public class RailNetworkMap extends Base64EncodingBinaryPart<NullPart> {
 	BufferedImage image;
 	int height;
 	int width;
 	
 	RailNetworkMap() {}
-	
-	@Override
-	protected boolean isBinaryEncoded() { return true; }
-	
 	
 	protected byte[] encode() { 
 		if (image == null) 
@@ -85,7 +81,7 @@ public class RailNetworkMap extends Base64EncodingBinaryPart<RailNetworkMap, Nul
 		return width;
 	}
 
-	public void initTGP() {
+	public void initElements() {
 //		loadFromFile(new File("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map.jpg"));
 	}
 	
@@ -105,23 +101,6 @@ public class RailNetworkMap extends Base64EncodingBinaryPart<RailNetworkMap, Nul
 	}
 	@Override
 	public void registerSubclasses() {}
-
-	/* Properties */
-	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[0];
-		}
-		
-		return propTuples;
-	}
-
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String porpName, String valueInStr) {}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {return "";}
 
 	/* Element array */
 	@Override

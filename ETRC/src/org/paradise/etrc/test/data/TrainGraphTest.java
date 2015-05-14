@@ -99,11 +99,11 @@ public class TrainGraphTest {
 		System.out.println("-------      test SimpleProperty Annotation Save      ---------");
 		TrainGraphPart.setFullToString();
 		try {
-			System.out.println("********* trainGraph.railNetwork");
-			trainGraph.railNetwork.saveToStream(System.out, 0);
+//			System.out.println("********* trainGraph.railNetwork");
+//			trainGraph.railNetwork.saveToStream(System.out, 0);
 			
-			System.out.println("********* trainGraph.settings");
-			trainGraph.settings.saveToStream(System.out, 0);
+			System.out.println("********* trainGraph");
+			trainGraph.saveToStream(System.out, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

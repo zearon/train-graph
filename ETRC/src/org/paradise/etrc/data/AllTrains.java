@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.function.Supplier;
 
+import org.paradise.etrc.data.annotation.TGPElement;
 import org.paradise.etrc.data.util.Tuple;
 
 import static org.paradise.etrc.ETRC.__;
@@ -15,13 +16,14 @@ import static org.paradise.etrc.ETRC.__;
  * @author Jeff Gong
  *
  */
-public class AllTrains extends TrainGraphPart<AllTrains, Train>
+public class AllTrains extends TrainGraphPart<Train>
 implements Collection<Train>
 {
 
 	AllTrains() {
 	}
 
+	@TGPElement(name="All Trains", isList=true)
 	public Vector<Train> trains = new Vector<Train>();
 	protected HashMap<String, Train> trainDict = new HashMap<String, Train> ();
 	
@@ -203,59 +205,6 @@ implements Collection<Train>
 	}
 	@Override
 	public void setName(String name) {}
-
-	/* Properties */
-	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[0];
-			
-//			propTuples[0] = Tuple.of("trainNameFull", String.class);
-//			propTuples[1] = Tuple.of("trainNameDown", String.class);
-//			propTuples[2] = Tuple.of("trainNameUp", String.class);
-//			propTuples[3] = Tuple.of("startStation", String.class);
-//			propTuples[4] = Tuple.of("terminalStation", String.class);
-		}
-		
-		return propTuples;
-	}
-
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
-//		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-//		
-//		if (propTuples[0].A.equals(propName)) {
-//			trainNameFull = valueInStr;
-//		} else if (propTuples[1].A.equals(propName)) {
-//			trainNameDown = valueInStr;
-//		} else if (propTuples[2].A.equals(propName)) {
-//			trainNameUp = valueInStr;
-//		} else if (propTuples[3].A.equals(propName)) {
-//			setStartStation(valueInStr);
-//		} else if (propTuples[4].A.equals(propName)) {
-//			setTerminalStation(valueInStr);
-//		}
-	}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {
-		String value = "";
-		
-//		if (index == 0) {
-//			value = trainNameFull + "";	
-//		} else if (index == 1) {
-//			value = trainNameDown + "";
-//		} else if (index == 2) {
-//			value = trainNameUp + "";
-//		} else if (index == 3) {
-//			value = getStartStation() + "";
-//		} else if (index == 4) {
-//			value = getTerminalStation() + "";
-//		}
-		
-		return value;
-	}
 
 	/* Element array */
 	@Override

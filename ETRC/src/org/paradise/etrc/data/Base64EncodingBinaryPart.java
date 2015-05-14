@@ -10,8 +10,8 @@ import java.io.IOException;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
-public abstract class Base64EncodingBinaryPart<T, ET extends TrainGraphPart> extends
-		TrainGraphPart<T, ET> {
+public abstract class Base64EncodingBinaryPart<ET extends TrainGraphPart> extends
+		TrainGraphPart<ET> {
 	
 	ByteArrayOutputStream out;
 	BASE64Decoder decoder;
@@ -21,24 +21,24 @@ public abstract class Base64EncodingBinaryPart<T, ET extends TrainGraphPart> ext
 	}
 
 	@Override
-	protected boolean isBinaryEncoded() { 
+	public final boolean isBase64Encoded() { 
 		return true;
 	}
 
 	@Override
-	protected String encodeToBase64() {
+	protected final String encodeToBase64() {
 		String base64Codes = new sun.misc.BASE64Encoder().encode(encode());
 		return base64Codes;
 	}
 
 	@Override
-	protected void decodeFromBase64Start() {
+	protected final void decodeFromBase64Start() {
 		out = new ByteArrayOutputStream();
 		decoder = new BASE64Decoder();
 	}
 
 	@Override
-	protected void decodeFromBase64NewLine(String base64Line) {
+	protected final void decodeFromBase64NewLine(String base64Line) {
 		try {
 			out.write( decoder.decodeBuffer(base64Line) );
 		} catch (IOException e) {
@@ -47,7 +47,7 @@ public abstract class Base64EncodingBinaryPart<T, ET extends TrainGraphPart> ext
 	}
 
 	@Override
-	public void decodeFromBase64End() {
+	protected final void decodeFromBase64End() {
 		decode(out.toByteArray());
 		System.gc();
 	}

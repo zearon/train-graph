@@ -18,10 +18,12 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.paradise.etrc.data.annotation.TGPElement;
+import org.paradise.etrc.data.annotation.TGPProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.data.util.Tuple;
 
-public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRef> {
+public class RailroadLineChart extends TrainGraphPart<TrainRef> {
 	public static final float MAX_DIST_SCALE = 10f;
 	public static final int  MAX_MINUTE_SCALE = 10;
 	
@@ -37,6 +39,7 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	public Vector<Train> trains = new Vector<Train> (100);
 	
 	//由于车次跨多条线路,因此序列化线路运行图时只保留途径该线路的车次的引用
+	@TGPElement(name="All TrainRefs", isList=true, inOneLine=true)
 	Vector<TrainRef> trainRefs = new Vector<TrainRef> ();
 
 	//本运行图的车次总数
@@ -61,12 +64,16 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	}
 	
 	@Override
+	@TGPProperty(name="railroadLineName")
 	public String getName() {
 		name = railroadLine != null ? railroadLine.getName() : __("NO_RAILLINE");
 		return name;
 	}
 	@Override
-	public void setName(String name) {}
+	@TGPProperty(name="railroadLineName")
+	public void setName(String name) {
+		super.setName(name);
+	}
 	
 	public Train getTrain(int index) {
 		return trains.get(index);
@@ -570,39 +577,6 @@ public class RailroadLineChart extends TrainGraphPart<RailroadLineChart, TrainRe
 	@Override
 	public void registerSubclasses() {
 		new TrainRef().registerClasses();
-	}
-
-	/* Properties */
-	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[1];
-			
-			propTuples[0] = Tuple.of("railroadLineName", String.class);
-		}
-		
-		return propTuples;
-	}
-
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
-		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-		
-		if (propTuples[0].A.equals(propName)) {
-			setName(valueInStr);
-		} 
-	}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {
-		String value = "";
-		
-		if (index == 0) {
-			value = getName();	
-		}
-		
-		return value;
 	}
 
 	/* Element array */

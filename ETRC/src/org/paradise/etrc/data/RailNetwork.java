@@ -20,6 +20,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.paradise.etrc.data.annotation.TGPElement;
 import org.paradise.etrc.data.event.RailroadLineChangeType;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.data.util.Tuple;
@@ -32,7 +33,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * @author Jeff Gong
  *
  */
-public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
+public class RailNetwork extends TrainGraphPart<RailroadLine> {
 	
 	protected Vector<RailroadLine> railroadLines;
 
@@ -56,6 +57,7 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 		setName(name);
 	}
 
+	@TGPElement(name="All Raillines", isList=true)
 	public Vector<RailroadLine> getAllRailroadLines() {
 		return railroadLines;
 	}
@@ -470,66 +472,6 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 	@Override
 	public void registerSubclasses() {
 		new RailroadLine().registerClasses();
-	}
-
-	/* Properties */
-	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[1];
-			
-			propTuples[0] = Tuple.of("name", String.class);
-//			propTuples[1] = Tuple.of("length", int.class);
-//			propTuples[2] = Tuple.of("multiplicity", int.class);
-//			propTuples[3] = Tuple.of("zindex", int.class);
-//			propTuples[4] = Tuple.of("dispScale", float.class);
-//			propTuples[5] = Tuple.of("visible", boolean.class);
-		}
-		
-		return propTuples;
-	}
-
-//	@Override
-//	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
-//		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-//		
-//		if (propTuples[0].A.equals(propName)) {
-//			name = valueInStr;
-//		}
-////		else if (propTuples[1].A.equals(propName)) {
-////			length = Integer.parseInt(valueInStr);
-////		} else if (propTuples[2].A.equals(propName)) {
-////			multiplicity = Integer.parseInt(valueInStr);
-////		} else if (propTuples[3].A.equals(propName)) {
-////			zindex = Integer.parseInt(valueInStr);
-////		} else if (propTuples[4].A.equals(propName)) {
-////			dispScale = Float.parseFloat(valueInStr);
-////		} else if (propTuples[5].A.equals(propName)) {
-////			visible = Boolean.parseBoolean(valueInStr);
-////		}
-//	}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {
-		String value = "";
-		
-		if (index == 0) {
-			value = name;	
-		} 
-//		else if (index == 1) {
-//			value = length + "";
-//		} else if (index == 2) {
-//			value = multiplicity + "";
-//		} else if (index == 3) {
-//			value = zindex + "";
-//		} else if (index == 4) {
-//			value = dispScale + "";
-//		} else if (index == 5) {
-//			value = visible + "";
-//		}
-		
-		return value;
 	}
 
 	/* Element array */

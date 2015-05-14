@@ -114,7 +114,7 @@ public class TrainGraphFactory {
 		
 		// Initialize the object
 		setID(clazz, obj);
-		obj.initTGP();
+		obj.initElements();
 		obj.setToDefault();
 		
 		if (name == null) {
@@ -130,12 +130,14 @@ public class TrainGraphFactory {
 	public static synchronized void setID(Class<? extends TrainGraphPart> clazz, 
 			TrainGraphPart instance) {
 		
-		String className = clazz.getName();
-		int id = TrainGraph._objectIdMap.get(className);
+		// Moved into constructor of abstract class TrainGraphPart
 		
-		instance._id = ++ id;
-		
-		TrainGraph._objectIdMap.put(className, id);
+//		String className = clazz.getName();
+//		int id = TrainGraph._objectIdMap.get(className);
+//		
+//		instance._id = ++ id;
+//		
+//		TrainGraphPart._objectIdMap.put(className, id);
 	}
 	
 	/**

@@ -7,26 +7,37 @@ import java.util.stream.Collectors;
 
 import javafx.scene.shape.Line;
 
+import org.paradise.etrc.data.annotation.TGPElement;
 import org.paradise.etrc.data.annotation.TGPProperty;
 import org.paradise.etrc.data.annotation.TrainGraphElement;
 import org.paradise.etrc.data.util.Tuple;
 
 import static org.paradise.etrc.ETRC.__;
 
-public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
+public class TrainGraph extends TrainGraphPart<RailNetworkChart> {
 
+	@TGPElement(name="GlobalSettings")
 	public ChartSettings settings;
+	@TGPElement(name="RailNetwork")
 	public RailNetwork railNetwork;
+	@TGPElement(name="All Traintypes")
 	public AllTrainTypes allTrainTypes;
+	@TGPElement(name="All Trains")
 	public AllTrains allTrains;
+	@TGPElement(name="RailNetwork Map")
 	public RailNetworkMap map;
 	protected Vector<RailNetworkChart> charts;
+
+	@TGPElement(name="RailNetwork Chart", isList=true, index=999)
+	public Vector<RailNetworkChart> getCharts () {
+		return charts;
+	}
 	
 	TrainGraph() {
 	}
 	
 	@Override
-	void initTGP() {
+	void initElements() {
 		settings = TrainGraphFactory.createInstance(ChartSettings.class);
 		railNetwork = TrainGraphFactory.createInstance(RailNetwork.class);
 		allTrainTypes = TrainGraphFactory.createInstance(AllTrainTypes.class);
@@ -69,10 +80,6 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 		
 		});
 	}
-
-	public Vector<RailNetworkChart> getCharts () {
-		return charts;
-	}
 	
 	
 	
@@ -109,39 +116,6 @@ public class TrainGraph extends TrainGraphPart<TrainGraph, RailNetworkChart> {
 		new AllTrains().registerClasses();
 		new RailNetworkChart().registerClasses();
 		new RailNetworkMap().registerClasses();
-	}
-
-	/* Properties */
-	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[1];
-			
-			propTuples[0] = Tuple.of("name", String.class);
-		}
-		
-		return propTuples;
-	}
-
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
-		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-		
-		if (propTuples[0].A.equals(propName)) {
-			name = valueInStr;
-		}
-	}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {
-		String value = "";
-		
-		if (index == 0) {
-			value = name;	
-		}
-		
-		return value;
 	}
 	
 	/* Object Properties */

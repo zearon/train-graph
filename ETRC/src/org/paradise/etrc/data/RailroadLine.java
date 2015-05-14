@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.paradise.etrc.data.annotation.TGPElement;
 import org.paradise.etrc.data.annotation.TGPProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.data.util.Tuple;
@@ -29,7 +30,7 @@ import org.paradise.etrc.data.util.Tuple;
  * 
  */
 
-public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
+public class RailroadLine extends TrainGraphPart<Station> {
 	private static int idCounter = 0;
 //	public static int MAX_STATION_NUM = 512;
 	
@@ -49,6 +50,7 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	public transient String dinfo = "";
 	private transient int id;
 
+	@TGPElement(name="All Stations", isList=true)
 	private Vector<Station> stations = new Vector<Station> (10);
 	
 	public int calIndex = 0;
@@ -800,69 +802,6 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	@Override
 	public void registerSubclasses() {
 		new Station().registerClasses();
-	}
-
-	/* Properties */
-	private static Tuple<String, Class<?>>[] propTuples = null;
-	@Override
-	protected Tuple<String, Class<?>>[] getSimpleTGPProperties() {
-		if (propTuples == null) {
-			propTuples = new Tuple[7];
-			
-			propTuples[0] = Tuple.of("name", String.class);
-			propTuples[1] = Tuple.of("length", int.class);
-			propTuples[2] = Tuple.of("multiplicity", int.class);
-			propTuples[3] = Tuple.of("zindex", int.class);
-			propTuples[4] = Tuple.of("dispScale", float.class);
-			propTuples[5] = Tuple.of("visible", boolean.class);
-			propTuples[6] = Tuple.of("isProjection", boolean.class);
-		}
-		
-		return propTuples;
-	}
-
-//	@Override
-//	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
-//		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-//		
-//		if (propTuples[0].A.equals(propName)) {
-//			name = valueInStr;
-//		} else if (propTuples[1].A.equals(propName)) {
-//			length = Integer.parseInt(valueInStr);
-//		} else if (propTuples[2].A.equals(propName)) {
-//			multiplicity = Integer.parseInt(valueInStr);
-//		} else if (propTuples[3].A.equals(propName)) {
-//			zindex = Integer.parseInt(valueInStr);
-//		} else if (propTuples[4].A.equals(propName)) {
-//			dispScale = Float.parseFloat(valueInStr);
-//		} else if (propTuples[5].A.equals(propName)) {
-//			visible = Boolean.parseBoolean(valueInStr);
-//		} else if (propTuples[6].A.equals(propName)) {
-//			isProjection = Boolean.parseBoolean(valueInStr);
-//		}
-//	}
-
-	@Override
-	protected String getTGPPropertyReprStr(int index) {
-		String value = "";
-		
-		if (index == 0) {
-			value = name;	
-		} else if (index == 1) {
-			value = length + "";
-		} else if (index == 2) {
-			value = multiplicity + "";
-		} else if (index == 3) {
-			value = zindex + "";
-		} else if (index == 4) {
-			value = dispScale + "";
-		} else if (index == 5) {
-			value = visible + "";
-		} else if (index == 6) {
-			value = isProjection + "";
-		}
-		
-		return value;
 	}
 
 	/* Element array */

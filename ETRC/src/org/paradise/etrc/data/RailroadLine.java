@@ -16,6 +16,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.paradise.etrc.data.annotation.TGPProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.data.util.Tuple;
 
@@ -32,11 +33,17 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 	private static int idCounter = 0;
 //	public static int MAX_STATION_NUM = 512;
 	
+	@TGPProperty
 	public int length = 0;
+	@TGPProperty
 	public int multiplicity = 2;
+	@TGPProperty
 	public int zindex = 0;
+	@TGPProperty
 	public float dispScale = 1.0f;
+	@TGPProperty
 	public boolean visible = true;
+	@TGPProperty
 	public boolean isProjection = false;
 	
 	public transient String dinfo = "";
@@ -654,12 +661,6 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 
 		return sb.toString();
 	}
-
-	public static boolean SIMPLE_VERSION_TO_STRING = true;
-	@Override
-	public String toString() {
-		return SIMPLE_VERSION_TO_STRING ? this.name : repr();
-	}	
 	
 	public void revertStations() {
 		int stationCount = getStationNum();
@@ -678,20 +679,20 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 		}
 	}
 
-	public static void main(String argv[]) {
-		RailroadLine c = new RailroadLine();
-		try {
-			c.loadFromFile2("c:\\沪宁线.cir");
-			System.out.println(c.name + "共" + c.getStationNum() + "个车站，总长："
-					+ c.length);
-			for (int i = 0; i < c.getStationNum(); i++)
-				System.out.println(c.stations.get(i).name + "站" + " 距离："
-						+ c.stations.get(i).dist + " 等级:" + c.stations.get(i).level
-						+ " 隐藏：" + c.stations.get(i).hide);
-		} catch (IOException ex) {
-			System.out.println("Error:" + ex.getMessage());
-		}
-	}
+//	public static void main(String argv[]) {
+//		RailroadLine c = new RailroadLine();
+//		try {
+//			c.loadFromFile2("c:\\沪宁线.cir");
+//			System.out.println(c.name + "共" + c.getStationNum() + "个车站，总长："
+//					+ c.length);
+//			for (int i = 0; i < c.getStationNum(); i++)
+//				System.out.println(c.stations.get(i).name + "站" + " 距离："
+//						+ c.stations.get(i).dist + " 等级:" + c.stations.get(i).level
+//						+ " 隐藏：" + c.stations.get(i).hide);
+//		} catch (IOException ex) {
+//			System.out.println("Error:" + ex.getMessage());
+//		}
+//	}
 	
 	public boolean isStartInsideMe(Train train) {
 		if(train == null)
@@ -820,26 +821,26 @@ public class RailroadLine extends TrainGraphPart<RailroadLine, Station> {
 		return propTuples;
 	}
 
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
-		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-		
-		if (propTuples[0].A.equals(propName)) {
-			name = valueInStr;
-		} else if (propTuples[1].A.equals(propName)) {
-			length = Integer.parseInt(valueInStr);
-		} else if (propTuples[2].A.equals(propName)) {
-			multiplicity = Integer.parseInt(valueInStr);
-		} else if (propTuples[3].A.equals(propName)) {
-			zindex = Integer.parseInt(valueInStr);
-		} else if (propTuples[4].A.equals(propName)) {
-			dispScale = Float.parseFloat(valueInStr);
-		} else if (propTuples[5].A.equals(propName)) {
-			visible = Boolean.parseBoolean(valueInStr);
-		} else if (propTuples[6].A.equals(propName)) {
-			isProjection = Boolean.parseBoolean(valueInStr);
-		}
-	}
+//	@Override
+//	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
+//		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
+//		
+//		if (propTuples[0].A.equals(propName)) {
+//			name = valueInStr;
+//		} else if (propTuples[1].A.equals(propName)) {
+//			length = Integer.parseInt(valueInStr);
+//		} else if (propTuples[2].A.equals(propName)) {
+//			multiplicity = Integer.parseInt(valueInStr);
+//		} else if (propTuples[3].A.equals(propName)) {
+//			zindex = Integer.parseInt(valueInStr);
+//		} else if (propTuples[4].A.equals(propName)) {
+//			dispScale = Float.parseFloat(valueInStr);
+//		} else if (propTuples[5].A.equals(propName)) {
+//			visible = Boolean.parseBoolean(valueInStr);
+//		} else if (propTuples[6].A.equals(propName)) {
+//			isProjection = Boolean.parseBoolean(valueInStr);
+//		}
+//	}
 
 	@Override
 	protected String getTGPPropertyReprStr(int index) {

@@ -110,7 +110,7 @@ public class RailNetworkTest {
 		TrainGraph graph2 = TrainGraphFactory.loadTrainGraphFromFile(
 				"/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test.test1");
 		
-		graph2.print(System.out);
+		graph2.saveToStream(System.out);
 	}
 	
 //	@Test

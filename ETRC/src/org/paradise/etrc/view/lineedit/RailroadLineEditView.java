@@ -297,10 +297,9 @@ public class RailroadLineEditView extends JPanel {
 				f += suffix;
 
 			try {
-				BufferedWriter out = new BufferedWriter(new OutputStreamWriter(
-						new FileOutputStream(f), "UTF-8"));
+				FileOutputStream out = new FileOutputStream(f);
 				
-				trainGraph.railNetwork.saveToWriter(out, 0);
+				trainGraph.railNetwork.saveToStream(out);
 				
 				out.close();
 				Config.getInstance().setLastRailnetworkPath(chooser

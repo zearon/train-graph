@@ -119,12 +119,6 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 		return sb.toString();
 	}
 
-	public static boolean SIMPLE_VERSION_TO_STRING = true;
-	@Override
-	public String toString() {
-		return SIMPLE_VERSION_TO_STRING ? this.name : repr();
-	}
-
 	public Vector<Station> getCrossoverStations() {
 		return crossoverStations;
 	}
@@ -496,25 +490,25 @@ public class RailNetwork extends TrainGraphPart<RailNetwork, RailroadLine> {
 		return propTuples;
 	}
 
-	@Override
-	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
-		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
-		
-		if (propTuples[0].A.equals(propName)) {
-			name = valueInStr;
-		}
-//		else if (propTuples[1].A.equals(propName)) {
-//			length = Integer.parseInt(valueInStr);
-//		} else if (propTuples[2].A.equals(propName)) {
-//			multiplicity = Integer.parseInt(valueInStr);
-//		} else if (propTuples[3].A.equals(propName)) {
-//			zindex = Integer.parseInt(valueInStr);
-//		} else if (propTuples[4].A.equals(propName)) {
-//			dispScale = Float.parseFloat(valueInStr);
-//		} else if (propTuples[5].A.equals(propName)) {
-//			visible = Boolean.parseBoolean(valueInStr);
+//	@Override
+//	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
+//		Tuple<String, Class<?>>[] propTuples = getSimpleTGPProperties();
+//		
+//		if (propTuples[0].A.equals(propName)) {
+//			name = valueInStr;
 //		}
-	}
+////		else if (propTuples[1].A.equals(propName)) {
+////			length = Integer.parseInt(valueInStr);
+////		} else if (propTuples[2].A.equals(propName)) {
+////			multiplicity = Integer.parseInt(valueInStr);
+////		} else if (propTuples[3].A.equals(propName)) {
+////			zindex = Integer.parseInt(valueInStr);
+////		} else if (propTuples[4].A.equals(propName)) {
+////			dispScale = Float.parseFloat(valueInStr);
+////		} else if (propTuples[5].A.equals(propName)) {
+////			visible = Boolean.parseBoolean(valueInStr);
+////		}
+//	}
 
 	@Override
 	protected String getTGPPropertyReprStr(int index) {

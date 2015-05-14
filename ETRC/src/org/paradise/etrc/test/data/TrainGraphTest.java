@@ -2,6 +2,9 @@ package org.paradise.etrc.test.data;
 
 import static org.junit.Assert.*;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.function.IntConsumer;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -17,6 +20,7 @@ import org.paradise.etrc.data.TrainGraphPart;
 public class TrainGraphTest {
 	
 	TrainGraph trainGraph;
+	OutputStreamWriter writer;
 
 	public TrainGraphTest() {
 	}
@@ -24,6 +28,7 @@ public class TrainGraphTest {
 	@Before
 	public void setUp() throws Exception {
 		trainGraph = TrainGraphFactory.loadTrainGraphFromFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2.trc");
+//		writer = new OutputStreamWriter(System.out, "utf-8");
 	}
 
 	@After
@@ -78,12 +83,27 @@ public class TrainGraphTest {
 		});
 	}
 	
-	@Test
-	public void testSimplePropertyAnnotation() {
-		System.out.println("-------      testSimplePropertyAnnotation      ---------");
+//	@Test
+	public void testSimplePropertyAnnotationLoad() {
+		System.out.println("-------      test SimpleProperty Annotation Load      ---------");
 		TrainGraphPart.setFullToString();
 		try {
 			System.out.println(trainGraph.settings);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testSimplePropertyAnnotationSave() {
+		System.out.println("-------      test SimpleProperty Annotation Save      ---------");
+		TrainGraphPart.setFullToString();
+		try {
+			System.out.println("********* trainGraph.railNetwork");
+			trainGraph.railNetwork.saveToStream(System.out, 0);
+			
+			System.out.println("********* trainGraph.settings");
+			trainGraph.settings.saveToStream(System.out, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

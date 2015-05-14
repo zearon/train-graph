@@ -3,13 +3,17 @@ package org.paradise.etrc.data;
 import java.util.Vector;
 import java.util.function.Supplier;
 
+import org.paradise.etrc.data.annotation.TGPProperty;
 import org.paradise.etrc.data.util.Tuple;
 
 import static org.paradise.etrc.ETRC.__;
 
 public class Station extends TrainGraphPart<Station, NullPart> {
+	@TGPProperty
 	public boolean hide = false;
+	@TGPProperty
 	public int level = 0;
+	@TGPProperty
 	public int dist = 0;
 
 	public boolean isCrossover = false;

@@ -6,33 +6,25 @@ import java.math.BigInteger;
 import java.util.Vector;
 import java.util.function.Supplier;
 
-import org.paradise.etrc.data.annotation.SimpleProperty;
-import org.paradise.etrc.data.annotation.SimplePropertyGetter;
-import org.paradise.etrc.data.annotation.SimplePropertySetter;
+import org.paradise.etrc.data.annotation.TGPProperty;
+import org.paradise.etrc.data.annotation.TGPPropertyGetter;
+import org.paradise.etrc.data.annotation.TGPPropertySetter;
 import org.paradise.etrc.data.util.Tuple;
 
 public class ChartSettings extends TrainGraphPart<ChartSettings, NullPart> {
-	@SimpleProperty
+	@TGPProperty
 	public float distScale;
-	@SimpleProperty
+	@TGPProperty
 	public int displayLevel;
-	@SimpleProperty
+	@TGPProperty
 	public int boldLevel;
-	@SimpleProperty
+	@TGPProperty
 	public int startHour;
-	@SimpleProperty
+	@TGPProperty
 	public float minuteScale;
 	public int timeInterval;
-	@SimpleProperty
+	@TGPProperty
 	public String distUnit;
-	@SimplePropertyGetter
-	public int getTimeInterval() {
-		return timeInterval;
-	}
-	@SimplePropertySetter
-	public void setTimeInterval(int timeInterval) {
-		this.timeInterval = timeInterval;
-	}
 
 	ChartSettings() {}
 

@@ -6,6 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.FIELD)
-public @interface SimpleProperty {
+@Target({ElementType.FIELD, ElementType.METHOD})
+public @interface TGPProperty {
+	int index() default Integer.MAX_VALUE;
+	boolean firstline() default false;
+	boolean element() default false;
 }

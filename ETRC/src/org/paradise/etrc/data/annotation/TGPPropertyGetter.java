@@ -10,6 +10,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface SimplePropertyGetter {
-
+public @interface TGPPropertyGetter {
+	int index() default Integer.MAX_VALUE;
+	boolean firstline() default false;
+	boolean element() default false;
 }

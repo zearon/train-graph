@@ -9,7 +9,7 @@ import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.util.data.Tuple2;
 
 @TGElementType(name="TrainRef", printInOneLine=true)
-public class TrainRef extends TrainGraphPart<NullPart> {
+public class TrainRef extends TrainGraphPart {
 
 	
 	TrainRef() {

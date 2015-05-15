@@ -16,7 +16,7 @@ import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.util.data.Tuple2;
 
 @TGElementType(name="All Train Types")
-public class AllTrainTypes extends TrainGraphPart<TrainType>
+public class AllTrainTypes extends TrainGraphPart
 implements Collection<TrainType>
 {
 

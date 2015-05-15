@@ -12,7 +12,7 @@ import org.paradise.etrc.util.data.Tuple2;
  * @author Jeff Gong
  *
  */
-public class ListElementAssignment extends TrainGraphPart<ListElementAssignment> {
+public class ListElementAssignment extends TrainGraphPart {
 	
 	List<Object> listElement;
 	Supplier<? extends Object> creator;

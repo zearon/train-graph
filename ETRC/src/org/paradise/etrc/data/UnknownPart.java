@@ -10,7 +10,7 @@ import org.paradise.etrc.util.data.Tuple2;
  * @author Jeff Gong
  *
  */
-public class UnknownPart extends TrainGraphPart<UnknownPart> {
+public class UnknownPart extends TrainGraphPart {
 	
 	public String message;
 	public int startLineIndex;

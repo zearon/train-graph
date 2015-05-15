@@ -12,7 +12,7 @@ import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.util.data.Tuple2;
 
 @TGElementType(name="Chart Settings")
-public class ChartSettings extends TrainGraphPart<NullPart> {
+public class ChartSettings extends TrainGraphPart {
 	@TGProperty
 	public float distScale;
 	@TGProperty

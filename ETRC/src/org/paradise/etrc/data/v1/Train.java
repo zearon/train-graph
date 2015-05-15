@@ -34,7 +34,7 @@ import org.paradise.etrc.util.data.Tuple2;
  */
 
 @TGElementType(name="Train")
-public class Train extends TrainGraphPart<Stop> {
+public class Train extends TrainGraphPart {
 //	public static int MAX_STOP_NUM = 100;
 
 	@TGProperty

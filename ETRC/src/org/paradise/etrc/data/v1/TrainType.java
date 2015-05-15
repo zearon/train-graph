@@ -14,7 +14,7 @@ import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.util.data.Tuple2;
 
 @TGElementType(name="Train Type", printInOneLine=true)
-public class TrainType extends TrainGraphPart<NullPart> {
+public class TrainType extends TrainGraphPart {
 	public static final String LINE_STYLE_SOLID = "SOLID";
 	public static final String LINE_STYLE_DASH = "DASH";
 	public static final String LINE_STYLE_DOT_DASH = "DOT_DASH";
@@ -65,6 +65,13 @@ public class TrainType extends TrainGraphPart<NullPart> {
 		return this;
 	}
 	
+	/**
+	 * Implements method inherited from abstract base class TrainGraphPart
+	 */	
+	@Override
+	public void setToDefault() {
+		setProperties("", "", Color.decode("#ff0000"), LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), 12, Color.decode("#700000"));
+	}	
 	
 
 //
@@ -107,13 +114,6 @@ public class TrainType extends TrainGraphPart<NullPart> {
 	
 	
 	
-	
-	/**
-	 * Implements method inherited from abstract base class TrainGraphPart
-	 */	
-	@Override
-	public void setToDefault() {
-		setProperties("", "", Color.decode("#ff0000"), LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), 12, Color.decode("#700000"));
-	}
+
 	
 }

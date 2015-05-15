@@ -36,7 +36,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  *
  */
 @TGElementType(name="RailNetwork")
-public class RailNetwork extends TrainGraphPart<RailroadLine> {
+public class RailNetwork extends TrainGraphPart {
 
 	@TGElement(name="All Raillines", isList=true, type=RailroadLine.class)
 	protected Vector<RailroadLine> railroadLines;

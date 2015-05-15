@@ -19,7 +19,7 @@ import static org.paradise.etrc.ETRC.__;
  *
  */
 @TGElementType(name="All Trains")
-public class AllTrains extends TrainGraphPart<Train>
+public class AllTrains extends TrainGraphPart
 implements Collection<Train>
 {
 

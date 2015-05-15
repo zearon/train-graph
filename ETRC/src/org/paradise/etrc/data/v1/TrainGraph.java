@@ -18,34 +18,24 @@ import org.paradise.etrc.util.data.Tuple2;
 import static org.paradise.etrc.ETRC.__;
 
 @TGElementType(name="Train Graph", root=true)
-public class TrainGraph extends TrainGraphPart<RailNetworkChart> {
+public class TrainGraph extends TrainGraphPart {
 
 	@TGElement
 	public ChartSettings settings;
 	@TGElement
 	public RailNetwork railNetwork;
-//	@TGElement
+	@TGElement
 	public AllTrainTypes allTrainTypes;
 	@TGElement
 	public AllTrains allTrains;
 	@TGElement(index=999)
 	public RailNetworkMap map;
+	@TGElement(isList=true, type=RailNetworkChart.class)
 	public Vector<RailNetworkChart> charts;
 	
 	TrainGraph() {
 	}
-	
-	@TGElement
-	public AllTrainTypes getAllTrainTypes() {
-		return allTrainTypes;
-	}
 
-	@TGElement
-	public void setAllTrainTypes(AllTrainTypes allTrainTypes) {
-		this.allTrainTypes = allTrainTypes;
-	}
-
-	@TGElement(isList=true, type=RailNetworkChart.class)
 	public Vector<RailNetworkChart> getCharts () {
 		return charts;
 	}

@@ -12,8 +12,8 @@ import org.paradise.etrc.data.TrainGraphPart;
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
 
-public abstract class Base64EncodingBinaryPart<ET extends TrainGraphPart> extends
-		TrainGraphPart<ET> {
+public abstract class Base64EncodingBinaryPart extends
+		TrainGraphPart {
 	
 	ByteArrayOutputStream out;
 	BASE64Decoder decoder;

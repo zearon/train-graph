@@ -12,7 +12,7 @@ import org.paradise.etrc.util.data.Tuple2;
 import static org.paradise.etrc.ETRC.__;
 
 @TGElementType(name="Station", printInOneLine=true)
-public class Station extends TrainGraphPart<NullPart> {
+public class Station extends TrainGraphPart {
 	@TGProperty
 	public boolean hide = false;
 	@TGProperty

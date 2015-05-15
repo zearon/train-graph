@@ -13,7 +13,7 @@ import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.util.data.Tuple2;
 
 @TGElementType(name="Stop", printInOneLine=true)
-public class Stop extends TrainGraphPart<NullPart> {
+public class Stop extends TrainGraphPart {
 
 	@TGProperty
 	public String arrive;

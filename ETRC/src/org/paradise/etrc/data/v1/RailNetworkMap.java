@@ -22,7 +22,7 @@ import org.paradise.etrc.util.data.Tuple2;
 import sun.misc.BASE64Decoder;
 
 @TGElementType(name="RailNetwork Map")
-public class RailNetworkMap extends Base64EncodingBinaryPart<NullPart> {
+public class RailNetworkMap extends Base64EncodingBinaryPart {
 	BufferedImage image;
 	int height;
 	int width;

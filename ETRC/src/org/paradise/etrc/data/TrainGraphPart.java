@@ -48,18 +48,22 @@ import static org.paradise.etrc.ETRCUtil.*;
 
 /**
  * 所有组成运行图的部件的基类
- * T是继承该类的类型本身,
  * ET是该类的元素的类型
  * @author Jeff Gong
  *
  */
 @SuppressWarnings("rawtypes")
-public abstract class TrainGraphPart<ET extends TrainGraphPart> {
+public abstract class TrainGraphPart {
 	
 	
-	static boolean SHOW_DEBUG_MESSAGE = "true".equalsIgnoreCase(System.getenv("TGP-DEBUG"));
+	static boolean SHOW_DEBUG_MESSAGE = "true".equalsIgnoreCase(System.getenv("TGP-ANO-DEBUG"));
 
-	static void DEBUG_MSG(String msgFormat, Object... msgArgs) {
+	static void DEBUG_MSG_ANO(String msgFormat, Object... msgArgs) {
+		if (SHOW_DEBUG_MESSAGE)
+			ETRCUtil.DEBUG_MSG(msgFormat, msgArgs);
+	}
+	
+	static void DEBUG_MSG_SAVE(String msgFormat, Object... msgArgs) {
 		if (SHOW_DEBUG_MESSAGE)
 			ETRCUtil.DEBUG_MSG(msgFormat, msgArgs);
 	}
@@ -261,10 +265,21 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	// {{ TrainGraphPart及其子类的Annotation处理 (@TGElementTYpe, @TGProperty, @TGElement)
 	
 	public void prepareForFirstLoading() {
-		processAnnotations();
+		Vector<AnnotationException> exceptions = new Vector<> ();
+		
+		processAnnotations(exceptions);
+		
+		if (exceptions.size() > 0) {
+			int errorCount = exceptions.stream().mapToInt(e -> e.errorCount).sum();
+			String msg = exceptions.stream().map(e -> e.getMessage())
+					.collect(Collectors.joining(NEW_LINE_STR, 
+							String.format("There are %d error%s found when parsing annotations:\r\n",
+									errorCount, (errorCount > 1 ? "s" : "") ), ""));
+			System.err.println(msg);
+		}
 	}
 	
-	protected void processAnnotations() {		
+	protected void processAnnotations(Vector<AnnotationException> exceptions) {		
 		simplePropertyGetterMap.clear();
 		simplePropertySetterMap.clear();
 		simplePropertyIndexList.clear();
@@ -281,8 +296,35 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		while (!classList.isEmpty()) {
 			clazz = classList.pollFirst();
 			processedClassSet.add(clazz);
-			processClassAnnotations(clazz, classList, processedClassSet);
+			try {
+				processClassAnnotations(clazz, classList, processedClassSet, exceptions);
+			} catch (AnnotationException e) {
+				exceptions.add(e);
+			}
 		}
+		
+		/* 
+		 * Converting a list of tuples in form of ((className, propName), (porpIndex, firstLine) )
+		 * into a map of className -> List< ((className, propName), (porpIndex, firstLine) ) >
+		 */
+		simplePropertyIndexMap = simplePropertyIndexList.stream()
+				.collect(Collectors.groupingBy(tuple -> tuple.A.A));
+
+		// Check missing setters and getters for simple properties in all classes
+		try {
+			checkMissingAccessor(simplePropertyGetterMap.keySet(), 
+					simplePropertySetterMap.keySet());
+		} catch (AnnotationException e) {
+			exceptions.add(e);
+		}
+
+		// Check missing setters and getters for element properties in all classes
+		try {
+			checkMissingAccessor(elementGetterMap.keySet(), elementSetterMap.keySet());
+		} catch (AnnotationException e) {
+			exceptions.add(e);
+		}
+		
 
 		// Create maps for efficiency fetching.
 		typeToNameDict = registeredTypeList.stream().collect(Collectors.toMap(
@@ -297,35 +339,12 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		
 		elementGetterKeyDict = elementGetterMap.keySet().stream().collect(Collectors.groupingBy(
 				(Tuple2<String, String> tuple) -> tuple.A));
-		
-		
-		// Check missing setters and getters for simple properties in all classes
-		Vector<String> errorMsgs = new Vector<>();
-		Set<Tuple2<String, String>> getterKeysSet = simplePropertyGetterMap.keySet();
-		Set<Tuple2<String, String>> setterKeysSet = simplePropertySetterMap.keySet();
-		getterKeysSet.stream().filter(getterTuple -> !setterKeysSet.contains(getterTuple))
-			.map(tuple -> String.format("Getter for %s.%s has no corresponding setter.", tuple.A, tuple.B))
-			.forEach(errorMsgs::add);
-		setterKeysSet.stream().filter(setterTuple -> !getterKeysSet.contains(setterTuple))
-		.map(tuple -> String.format("Setter for %s.%s has no corresponding getter.", tuple.A, tuple.B))
-		.forEach(errorMsgs::add);
-		
-		if (errorMsgs.size() > 0) {
-			String errMsg = errorMsgs.stream().collect(Collectors.joining("\r\n", "\r\n", ""));
-			throw new RuntimeException(errMsg);
-		}
-		
-		/* 
-		 * Converting a list of tuples in form of ((className, propName), (porpIndex, firstLine) )
-		 * into a map of className -> List< ((className, propName), (porpIndex, firstLine) ) >
-		 */
-		simplePropertyIndexMap = simplePropertyIndexList.stream()
-				.collect(Collectors.groupingBy(tuple -> tuple.A.A));
 	}
 	
 	public void processClassAnnotations(Class<? extends TrainGraphPart> clazz, 
 			LinkedList<Class<? extends TrainGraphPart>> classList, 
-			HashSet<Class<? extends TrainGraphPart>> processedClassSet) {
+			HashSet<Class<? extends TrainGraphPart>> processedClassSet,
+			Vector<AnnotationException> exceptions) {
 		
 		// If the class is annotated with @TGElement.
 		TGElementType tgeType = (TGElementType) clazz.getAnnotation(TGElementType.class);
@@ -333,13 +352,13 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 			Constructor<? extends TrainGraphPart> defaultConstructor = findDefaultConstructor(clazz);
 			Supplier<TrainGraphPart> creator = () -> TrainGraphPart.newInstance(defaultConstructor);
 			
-			DEBUG_MSG("Register class '%s' as %s", tgeType.name(), clazz.getName());
+			DEBUG_MSG_ANO("%sRegister class '%s' as %s", NEW_LINE_STR, tgeType.name(), clazz.getName());
 			registeredTypeList.add(Tuple3.oF(clazz, tgeType.name(), tgeType));
 			elementCreatorMap.put(Tuple2.oF("", tgeType.name()), 
 					Tuple2.oF(clazz, (Supplier<? extends Object>) creator));
 			registeredTypeCreatorDict.put(clazz, creator);
 		} else {
-			throw new RuntimeException(String.format("Class %s must be annotabed with @TGElementType annotation.", 
+			throw new AnnotationException(String.format("Class %s must be annotabed with @TGElementType annotation.", 
 					clazz.getName()));
 		}
 		
@@ -352,11 +371,15 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		fields.stream().distinct().forEach(field-> {
 			TGProperty tp = field.getAnnotation(TGProperty.class);
 			TGElement te = field.getAnnotation(TGElement.class);
-			if (tp != null)
-				processFieldAsSimpleProperty(clazz, tp, field, ++ propIndex[0]);
-			else if (te != null)
-				processFieldAsElement(clazz, te, field, classList, processedClassSet, 
-						++ propIndex[0]);
+			try {
+				if (tp != null)
+					processFieldAsSimpleProperty(clazz, tp, field, ++ propIndex[0]);
+				else if (te != null)
+					processFieldAsElement(clazz, te, field, classList, processedClassSet, 
+							++ propIndex[0]);
+			} catch (AnnotationException e) {
+				exceptions.add(e);
+			}
 		});
 		
 		// Find public methods as simple property getters and setters
@@ -366,11 +389,15 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		methods.stream().distinct().forEach(method -> {
 			TGProperty tp = method.getAnnotation(TGProperty.class);
 			TGElement te = method.getAnnotation(TGElement.class);
+			try {
 			if (tp != null)
 				processMethodAsSimpleProperty(clazz, tp, method, ++ propIndex[0]);
 			else if (te != null)
 				processMethodAsElement(clazz, te, method, classList, processedClassSet, 
 						++ propIndex[0]);
+			} catch (AnnotationException e) {
+				exceptions.add(e);
+			}
 		});
 	}
 	
@@ -407,7 +434,8 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 				e.printStackTrace();
 			}
 		});
-		DEBUG_MSG("Register Simple property field %s.'%s' in %s type", className, 
+		
+		DEBUG_MSG_ANO("Register Simple property field %s.'%s' in %s type", className, 
 				fieldName, fieldClass.getName());
 		
 		int newPropIndex = tp.index() == Integer.MAX_VALUE ? propIndex : tp.index();
@@ -470,7 +498,7 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 					true, false, classList, processedClassSet);
 		}
 		
-		DEBUG_MSG("Register %s field %s.'%s' as %s", elementType, className, 
+		DEBUG_MSG_ANO("Register %s field %s.'%s' as %s", elementType, className, 
 				propName, fieldClass.getName());
 		elementGetterMap.put(propTuple, Tuple3.oF(tea, elementClass, getter));
 		elementSetterMap.put(propTuple, Tuple3.oF(tea, elementClass, setter));
@@ -479,91 +507,104 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	
 	private void processMethodAsSimpleProperty(Class<? extends TrainGraphPart> clazz,
 			TGProperty tp, Method method, int propIndex) {
+		
+		String className = clazz.getName();	
+		if (tp == null)
+			return;
 
-		String className = clazz.getName();
-		if (tp != null) {
-			String methodName = method.getName();
-			String propName;
-			if ("".equals(tp.name())) {
-				propName = methodName.replace("get", "").replace("set", "");
-				if (propName.length() > 1)
-					propName = propName.substring(0, 1).toLowerCase() + propName.substring(1);				
-			} else {
-				propName = tp.name();
+		String methodName = method.getName();
+		boolean isSetter = methodName.startsWith("set");
+		boolean isGetter = methodName.startsWith("get");
+		if (!isSetter && !isGetter)
+			throw new AnnotationException(String.format("Method %s.%s annotated with @TGElement has to "
+					+ "be a setter or a getter, i.e. its name must starts with 'get' or 'set'.",
+					className, methodName));
+		
+		Class<?> propClass = null;
+		String propName = tp.name();;
+		if ("".equals(tp.name())) {
+			propName = methodName.replace("get", "").replace("set", "");
+			if (propName.length() > 1)
+				propName = propName.substring(0, 1).toLowerCase() + propName.substring(1);				
+		}
+		
+		Tuple2<String, String> propTuple = Tuple2.oF(className, propName);
+		method.setAccessible(true);
+		
+		// Setters
+		if (isSetter) {
+			if (method.getParameterCount() != 1) {
+				throw new AnnotationException(String.format("The %s method in %s class with "
+						+ "@TGProperty should take and only take one paramter.",
+						methodName, className));
+			}
+			propClass = method.getParameterTypes()[0];
+			String setterPropClass = propClass.getName();
+			String getterPropClass = PropertyTypeMap.get(propTuple);
+			if (getterPropClass == null) {
+				PropertyTypeMap.put(propTuple, setterPropClass);
+			} else if (!setterPropClass.equals(getterPropClass)) {
+				throw new AnnotationException(String.format("The type of first argument of method %s in class %s with "
+						+ "@TGProperty should be %s, which is the return type of corresponding getter method.",
+						methodName, className, getterPropClass));
 			}
 			
-			Tuple2<String, String> propTuple = Tuple2.oF(className, propName);
-			method.setAccessible(true);
+			Class<?> propClass0 = propClass;
+			simplePropertySetterMap.put(propTuple, (tgp, strValue) -> {
+				Object value = ValueTypeConverter.convertType(strValue, 
+						String.class, propClass0);
+				try {
+					method.invoke(tgp, value);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			});
 			
-			// Setters
-			if (methodName.toLowerCase().startsWith("set")) {
-				if (method.getParameterCount() != 1) {
-					throw new RuntimeException(String.format("The %s method in %s class with "
-							+ "@TGProperty should take and only take one paramter.",
-							methodName, className));
-				}
-				Class<?> propClass = method.getParameterTypes()[0];
-				String setterPropClass = propClass.getName();
-				String getterPropClass = PropertyTypeMap.get(propTuple);
-				if (getterPropClass == null) {
-					PropertyTypeMap.put(propTuple, setterPropClass);
-				} else if (!setterPropClass.equals(getterPropClass)) {
-					throw new RuntimeException(String.format("The type of first argument of method %s in class %s with "
-							+ "@TGProperty should be %s, which is the return type of corresponding getter method.",
-							methodName, className, getterPropClass));
-				}
-				
-				simplePropertySetterMap.put(propTuple, (tgp, strValue) -> {
-					Object value = ValueTypeConverter.convertType(strValue, 
-							String.class, propClass);
-					try {
-						method.invoke(tgp, value);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				});
-				
-				
-			}
-			
-			// Getters
-			else if (methodName.toLowerCase().startsWith("get")) {
-				if (method.getParameterCount() != 0) {
-					throw new RuntimeException(String.format("The %s method in %s class with "
-							+ "@TGProperty should take no paramter.",
-							methodName, className));
-				}
-				Class<? extends Object> propClass = method.getReturnType();
-				String getterPropClass = propClass.getName();
-				String setterPropClass = PropertyTypeMap.get(propTuple);
-				if (setterPropClass == null) {
-					PropertyTypeMap.put(propTuple, getterPropClass);
-				} else if (!setterPropClass.equals(getterPropClass)) {
-					throw new RuntimeException(String.format("The return type of method %s in class %s with "
-							+ "@TGProperty should be %s, which is the type of the first argument of corresponding setter method.",
-							methodName, className, setterPropClass));
-				}
-				
-				simplePropertyGetterMap.put(propTuple, tgp -> {
-					Object value;
-					try {
-						value = method.invoke(tgp);
-						return value == null ? "" : (String) ValueTypeConverter.convertType(value, 
-								propClass, String.class);
-					} catch (Exception e) {
-						e.printStackTrace();
-						return "";
-					}
-				});
-
-				int newPropIndex = Math.min(propIndex, tp.index());
-				Tuple2 attrTuple = Tuple2.oF(newPropIndex, tp.firstline());
-				simplePropertyIndexList.add(Tuple2.oF(propTuple, attrTuple));
-				
-				
-			}
 			
 		}
+		
+		// Getters
+		else if (isGetter) {
+			if (method.getParameterCount() != 0) {
+				throw new AnnotationException(String.format("The %s method in %s class with "
+						+ "@TGProperty should take no paramter.",
+						methodName, className));
+			}
+			propClass = method.getReturnType();
+			String getterPropClass = propClass.getName();
+			String setterPropClass = PropertyTypeMap.get(propTuple);
+			if (setterPropClass == null) {
+				PropertyTypeMap.put(propTuple, getterPropClass);
+			} else if (!setterPropClass.equals(getterPropClass)) {
+				throw new AnnotationException(String.format("The return type of method %s in class %s with "
+						+ "@TGProperty should be %s, which is the type of the first argument of corresponding setter method.",
+						methodName, className, setterPropClass));
+			}
+
+			Class<?> propClass0 = propClass;
+			simplePropertyGetterMap.put(propTuple, tgp -> {
+				Object value;
+				try {
+					value = method.invoke(tgp);
+					return value == null ? "" : (String) ValueTypeConverter.convertType(value, 
+							propClass0, String.class);
+				} catch (Exception e) {
+					e.printStackTrace();
+					return "";
+				}
+			});
+
+			int newPropIndex = Math.min(propIndex, tp.index());
+			Tuple2 attrTuple = Tuple2.oF(newPropIndex, tp.firstline());
+			simplePropertyIndexList.add(Tuple2.oF(propTuple, attrTuple));
+			
+			
+		}
+		
+		String methodDesc = isGetter ? "getter" : "setter";
+		DEBUG_MSG_ANO("Register Simple property %s %s.'%s' in %s type", methodDesc,
+				className, propName, propClass.getName());
+
 	}
 	
 	private void processMethodAsElement(Class<? extends TrainGraphPart> clazz,
@@ -580,7 +621,7 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		boolean isSetter = methodName.startsWith("set");
 		boolean isGetter = methodName.startsWith("get");
 		if (!isSetter && !isGetter)
-			throw new RuntimeException(String.format("Method %s.%s annotated with @TGElement has to "
+			throw new AnnotationException(String.format("Method %s.%s annotated with @TGElement has to "
 					+ "be a setter or a getter, i.e. its name must starts with 'get' or 'set'.",
 					className, methodName));
 		
@@ -604,7 +645,7 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		
 		if (isSetter) {
 			if (method.getParameterCount() != 1) {
-				throw new RuntimeException(String.format("The %s method in %s class with "
+				throw new AnnotationException(String.format("The %s method in %s class with "
 						+ "@TGElement should take and only take one paramter.",
 						methodName, className));
 			}
@@ -614,7 +655,7 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 			if (getterPropClass == null) {
 				PropertyTypeMap.put(propTuple, setterPropClass);
 			} else if (!setterPropClass.equals(getterPropClass)) {
-				throw new RuntimeException(String.format("The type of first argument of method %s in class %s with "
+				throw new AnnotationException(String.format("The type of first argument of method %s in class %s with "
 						+ "@TGElement should be %s, which is the return type of corresponding getter method.",
 						methodName, className, getterPropClass));
 			}
@@ -628,7 +669,7 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 			};
 		} else if (isGetter) {
 			if (method.getParameterCount() != 0) {
-				throw new RuntimeException(String.format("The %s method in %s class with "
+				throw new AnnotationException(String.format("The %s method in %s class with "
 						+ "@TGElement should take no paramter.",
 						methodName, className));
 			}
@@ -638,7 +679,7 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 			if (setterPropClass == null) {
 				PropertyTypeMap.put(propTuple, getterPropClass);
 			} else if (!setterPropClass.equals(getterPropClass)) {
-				throw new RuntimeException(String.format("The return type of method %s in class %s with "
+				throw new AnnotationException(String.format("The return type of method %s in class %s with "
 						+ "@TGElement should be %s, which is the type of the first argument of corresponding setter method.",
 						methodName, className, setterPropClass));
 			}
@@ -671,7 +712,7 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		}
 		
 		String methodType = isGetter ? "getter" : "setter";
-		DEBUG_MSG("Register %s %s %s.'%s' as %s", elementType, methodType, className, 
+		DEBUG_MSG_ANO("Register %s %s %s.'%s' as %s", elementType, methodType, className, 
 				propName, propClass.getName());
 		if (isGetter)
 			elementGetterMap.put(propTuple, Tuple3.oF(tea, elementClass, getter));
@@ -690,12 +731,12 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		
 		if (!isListType) 
 			if (memberIsField)
-				throw new RuntimeException(String.format("The type of field %s.%s anotated with "
+				throw new AnnotationException(String.format("The type of field %s.%s anotated with "
 					+ "@TGElement should be a subclass of java.util.List<? extends %s>.",
 					className, memberName, TrainGraphPart.class.getName()));
 			else {
 				String typePosition = memberIsSetter ? "parameter" : "return";
-				throw new RuntimeException(String.format("The %s type of method %s.%s anotated with "
+				throw new AnnotationException(String.format("The %s type of method %s.%s anotated with "
 					+ "@TGElement should be a subclass of java.util.List<? extends %s>.",
 					typePosition, className, memberName, TrainGraphPart.class.getName()));
 			}
@@ -704,12 +745,12 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		// Default value is used
 		if (elementClass.equals(TrainGraphPart.class)) 
 			if (memberIsField)
-				throw new RuntimeException(String.format("Field %s.%s anotated with "
+				throw new AnnotationException(String.format("Field %s.%s anotated with "
 					+ "@TGElement should has annotation attribute type set to the type parameter in "
 					+ "java.util.List<? extends %s>.",
 					className, memberName, TrainGraphPart.class.getName()));
 			else
-				throw new RuntimeException(String.format("Method %s.%s anotated with "
+				throw new AnnotationException(String.format("Method %s.%s anotated with "
 					+ "@TGElement should has annotation attribute type set to the type parameter in "
 					+ "java.util.List<? extends %s>.",
 					className, memberName, TrainGraphPart.class.getName()));
@@ -728,7 +769,7 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 				try {
 					return listClass.newInstance();
 				} catch (InstantiationException | IllegalAccessException e) {
-					throw new RuntimeException(String.format("Cannot create list property %s for class %s",
+					throw new AnnotationException(String.format("Cannot create list property %s for class %s",
 							propTuple.B, className), e);
 				}
 			};
@@ -747,12 +788,12 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		
 		if (!typeMatch) 
 			if (memberIsField)
-				throw new RuntimeException(String.format("The type of field %s.%s anotated with "
+				throw new AnnotationException(String.format("The type of field %s.%s anotated with "
 					+ "@TGElement should be a subclass of %s.",
 					className, memberName, TrainGraphPart.class.getName()));
 			else {
 				String typePosition = memberIsSetter ? "paramter" : "return";
-				throw new RuntimeException(String.format("The %s type of method %s.%s anotated with "
+				throw new AnnotationException(String.format("The %s type of method %s.%s anotated with "
 					+ "@TGElement should be a subclass of %s.",
 					typePosition, className, memberName, TrainGraphPart.class.getName()));
 			}
@@ -760,6 +801,23 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		if (!processedClassSet.contains(elementClass)) {
 			processedClassSet.add(elementClass);
 			classList.addLast(elementClass);
+		}
+	}
+	
+	private void checkMissingAccessor(Set<Tuple2<String, String>> getterKeySet, 
+			Set<Tuple2<String, String>> setterKeySet) {
+		// Check missing setters and getters for simple properties in all classes
+		Vector<String> errorMsgs = new Vector<>();
+		getterKeySet.stream().filter(getterTuple -> !setterKeySet.contains(getterTuple))
+			.map(tuple -> String.format("Getter for %s.%s has no corresponding setter.", tuple.A, tuple.B))
+			.forEach(errorMsgs::add);
+		setterKeySet.stream().filter(setterTuple -> !getterKeySet.contains(setterTuple))
+		.map(tuple -> String.format("Setter for %s.%s has no corresponding getter.", tuple.A, tuple.B))
+		.forEach(errorMsgs::add);
+		
+		if (errorMsgs.size() > 0) {
+			String errMsg = errorMsgs.stream().collect(Collectors.joining("\r\n", "\r\n", ""));
+			throw new AnnotationException(errorMsgs.size(), errMsg);
 		}
 	}
 	
@@ -799,7 +857,6 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	protected void saveToWriter(Writer writer, int identLevel, boolean printIdentOnFirstLine) 
 			throws IOException {
 		
-		Vector<ET> elements = null;
 		boolean elementPrinted = false;
 		// Write section begin string
 		if (printIdentOnFirstLine)
@@ -839,7 +896,7 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		String className = getClass().getName();
 		List<Tuple2<Tuple2<String, String>, Tuple2<Integer, Boolean> >> propKeyList= simplePropertyIndexMap.get(className);
 		if (propKeyList == null) {
-			DEBUG_MSG("There is no fileds/accessor registered as simple property "
+			DEBUG_MSG_ANO("There is no fileds/accessor registered as simple property "
 					+ "in %s class with @SimpleProperty", className);
 			return;
 		}

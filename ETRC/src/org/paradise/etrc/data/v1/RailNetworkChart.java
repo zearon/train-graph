@@ -11,8 +11,7 @@ import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.util.data.Tuple2;
 
 @TGElementType(name="RailNetwork Chart")
-public class RailNetworkChart 
-extends TrainGraphPart<RailroadLineChart> {
+public class RailNetworkChart extends TrainGraphPart {
 
 	@TGElement(name="All Line Charts", isList=true, type=RailroadLineChart.class)
 	protected Vector<RailroadLineChart> railLineCharts = new Vector<RailroadLineChart> ();

@@ -26,7 +26,7 @@ import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.util.data.Tuple2;
 
 @TGElementType(name="RailLine Chart")
-public class RailroadLineChart extends TrainGraphPart<TrainRef> {
+public class RailroadLineChart extends TrainGraphPart {
 	public static final float MAX_DIST_SCALE = 10f;
 	public static final int  MAX_MINUTE_SCALE = 10;
 	

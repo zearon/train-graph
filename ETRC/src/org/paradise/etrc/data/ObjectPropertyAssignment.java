@@ -11,7 +11,7 @@ import org.paradise.etrc.util.data.Tuple2;
  * @author Jeff Gong
  *
  */
-public class ObjectPropertyAssignment extends TrainGraphPart<ObjectPropertyAssignment> {
+public class ObjectPropertyAssignment extends TrainGraphPart {
 	
 	BiConsumer<TrainGraphPart, Object> setter;
 

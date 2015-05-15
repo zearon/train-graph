@@ -34,7 +34,7 @@ import org.paradise.etrc.util.data.Tuple2;
  */
 
 @TGElementType(name="RailLine")
-public class RailroadLine extends TrainGraphPart<Station> {
+public class RailroadLine extends TrainGraphPart {
 	private static int idCounter = 0;
 //	public static int MAX_STATION_NUM = 512;
 	

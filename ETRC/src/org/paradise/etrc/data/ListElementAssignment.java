@@ -1,6 +1,8 @@
 package org.paradise.etrc.data;
 
+import java.util.List;
 import java.util.Vector;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import org.paradise.etrc.util.data.Tuple2;
@@ -10,12 +12,24 @@ import org.paradise.etrc.util.data.Tuple2;
  * @author Jeff Gong
  *
  */
-public class ListPart extends TrainGraphPart<ListPart> {
+public class ListElementAssignment extends TrainGraphPart<ListElementAssignment> {
 	
-	TrainGraphPart parent;
+	List<Object> listElement;
+	Supplier<? extends Object> creator;
+	BiConsumer<TrainGraphPart, Object> setter;
 	
-
-	public ListPart() {
-		// TODO Auto-generated constructor stub
+	ListElementAssignment() {
+	}
+	
+	public void createList() {
+		listElement = (List<Object>) creator.get();
+	}
+	
+	public void addElement(Object element) {
+		listElement.add(element);
+	}
+	
+	public void assign(TrainGraphPart parentObj) {
+		setter.accept(parentObj, listElement);
 	}
 }

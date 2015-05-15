@@ -24,18 +24,33 @@ public class TrainGraph extends TrainGraphPart<RailNetworkChart> {
 	public ChartSettings settings;
 	@TGElement
 	public RailNetwork railNetwork;
-	@TGElement
+//	@TGElement
 	public AllTrainTypes allTrainTypes;
 	@TGElement
 	public AllTrains allTrains;
 	@TGElement(index=999)
 	public RailNetworkMap map;
-	@TGElement(isList=true, type=RailNetworkChart.class)
 	public Vector<RailNetworkChart> charts;
 	
 	TrainGraph() {
 	}
 	
+	@TGElement
+	public AllTrainTypes getAllTrainTypes() {
+		return allTrainTypes;
+	}
+
+	@TGElement
+	public void setAllTrainTypes(AllTrainTypes allTrainTypes) {
+		this.allTrainTypes = allTrainTypes;
+	}
+
+	@TGElement(isList=true, type=RailNetworkChart.class)
+	public Vector<RailNetworkChart> getCharts () {
+		return charts;
+	}
+
+
 	@Override
 	public void initElements() {
 		settings = TrainGraphFactory.createInstance(ChartSettings.class);
@@ -44,10 +59,6 @@ public class TrainGraph extends TrainGraphPart<RailNetworkChart> {
 		allTrains = TrainGraphFactory.createInstance(AllTrains.class);
 		map = TrainGraphFactory.createInstance(RailNetworkMap.class);
 		charts = new Vector<RailNetworkChart> ();
-	}
-
-	public Vector<RailNetworkChart> getCharts () {
-		return charts;
 	}
 	
 	public void syncLineChartsWithRailNetworks() {

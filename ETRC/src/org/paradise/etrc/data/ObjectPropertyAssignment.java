@@ -1,6 +1,7 @@
 package org.paradise.etrc.data;
 
 import java.util.Vector;
+import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 import org.paradise.etrc.util.data.Tuple2;
@@ -10,12 +11,14 @@ import org.paradise.etrc.util.data.Tuple2;
  * @author Jeff Gong
  *
  */
-public class Assignment extends TrainGraphPart<Assignment> {
+public class ObjectPropertyAssignment extends TrainGraphPart<ObjectPropertyAssignment> {
 	
-	TrainGraphPart parent;
-	
+	BiConsumer<TrainGraphPart, Object> setter;
 
-	public Assignment() {
-		// TODO Auto-generated constructor stub
+	ObjectPropertyAssignment() {
+	}
+	
+	public void assign(TrainGraphPart parentObj, TrainGraphPart element) {
+		setter.accept(parentObj, element);
 	}
 }

@@ -15,7 +15,7 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
-import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 import com.sun.javafx.collections.MappingChange.Map;
 

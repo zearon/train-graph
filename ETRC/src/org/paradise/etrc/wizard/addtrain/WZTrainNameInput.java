@@ -22,7 +22,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.DefaultCaret;
 
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.wizard.WizardDialog;
 
 public class WZTrainNameInput extends WizardDialog {

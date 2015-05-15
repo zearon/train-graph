@@ -23,11 +23,11 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 
-import org.paradise.etrc.data.ChartSettings;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.Station;
-import org.paradise.etrc.data.Train;
-import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.v1.ChartSettings;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Station;
+import org.paradise.etrc.data.v1.Train;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 
 public class RunningPanel extends JPanel {

@@ -12,10 +12,10 @@ import java.util.stream.Stream;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.paradise.etrc.data.RailNetworkChart;
-import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.v1.RailNetworkChart;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 public class TrainGraphTest {
 	
@@ -27,7 +27,7 @@ public class TrainGraphTest {
 
 	@Before
 	public void setUp() throws Exception {
-		trainGraph = TrainGraphFactory.loadTrainGraphFromFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2.trc");
+//		trainGraph = TrainGraphFactory.loadTrainGraphFromFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2.trc");
 //		writer = new OutputStreamWriter(System.out, "utf-8");
 	}
 
@@ -83,24 +83,27 @@ public class TrainGraphTest {
 		});
 	}
 	
-//	@Test
-	public void testSimplePropertyAnnotationLoad() {
-		System.out.println("-------      test SimpleProperty Annotation Load      ---------");
+	@Test
+	public void testSimplePropertyAnnotationSave() {
+		System.out.println("-------      test SimpleProperty Annotation Save      ---------");
 		TrainGraphPart.setFullToString();
+		trainGraph = TrainGraphFactory.createDefaultTrainGraph();
 		try {
-			System.out.println(trainGraph.settings);
+			trainGraph.saveToStream(System.out, 0);
+			
+			trainGraph.saveToFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2-save.trc");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 	
-	@Test
-	public void testSimplePropertyAnnotationSave() {
-		System.out.println("-------      test SimpleProperty Annotation Save      ---------");
+//	@Test
+	public void testSimplePropertyAnnotationLoad() {
+		System.out.println("-------      test SimpleProperty Annotation Load      ---------");
 		TrainGraphPart.setFullToString();
+		
 		try {
-//			System.out.println("********* trainGraph.railNetwork");
-//			trainGraph.railNetwork.saveToStream(System.out, 0);
+			trainGraph = TrainGraphFactory.loadTrainGraphFromFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2.trc");
 			
 			System.out.println("********* trainGraph");
 			trainGraph.saveToStream(System.out, 0);

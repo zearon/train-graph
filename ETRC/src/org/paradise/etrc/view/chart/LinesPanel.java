@@ -1,6 +1,7 @@
 package org.paradise.etrc.view.chart;
 
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.*;
 
 import java.awt.BorderLayout;
@@ -36,13 +37,13 @@ import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
 
 import org.paradise.etrc.ETRC;
-import org.paradise.etrc.data.ChartSettings;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.Station;
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
-import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.v1.ChartSettings;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Station;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.slice.ChartSlice;

@@ -14,9 +14,9 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
 
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
 
 public class SheetCellEditor extends AbstractCellEditor implements
 		TableCellEditor {

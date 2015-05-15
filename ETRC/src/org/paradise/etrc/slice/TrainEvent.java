@@ -1,6 +1,6 @@
 package org.paradise.etrc.slice;
 
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.Train;
 
 public class TrainEvent extends ChartEvent {
 	public static final int MEET = -1;    //会

@@ -1,6 +1,7 @@
 package org.paradise.etrc.view.nav;
 
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.*;
 
 import java.util.Hashtable;
@@ -16,11 +17,11 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import org.paradise.etrc.data.RailNetwork;
-import org.paradise.etrc.data.RailroadLine;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.event.RailroadLineChangeType;
+import org.paradise.etrc.data.v1.RailNetwork;
+import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 

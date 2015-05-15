@@ -21,11 +21,11 @@ import javax.swing.Action;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.data.RailNetworkChart;
-import org.paradise.etrc.data.RailroadLine;
-import org.paradise.etrc.data.Station;
-import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.v1.RailNetworkChart;
+import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.Station;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.util.ui.table.JEditTable;
 

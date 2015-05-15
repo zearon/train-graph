@@ -1,4 +1,4 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -6,6 +6,8 @@ import static org.paradise.etrc.ETRCUtil.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+
+import org.paradise.etrc.data.TrainGraphPart;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;

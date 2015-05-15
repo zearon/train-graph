@@ -7,7 +7,7 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.paradise.etrc.data.Stop;
+import org.paradise.etrc.data.v1.Stop;
 
 public class TrainTableCellRanderer extends DefaultTableCellRenderer {
 	private static final long serialVersionUID = -3005467491964709634L;

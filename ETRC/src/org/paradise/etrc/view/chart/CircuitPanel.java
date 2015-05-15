@@ -14,10 +14,10 @@ import java.awt.event.MouseEvent;
 
 import javax.swing.JPanel;
 
-import org.paradise.etrc.data.ChartSettings;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.Station;
-import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.v1.ChartSettings;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Station;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.slice.ChartSlice;
 
 /**

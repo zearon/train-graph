@@ -18,12 +18,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.RailNetwork;
-import org.paradise.etrc.data.RailroadLine;
-import org.paradise.etrc.data.Station;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.skb.ETRCLCB;
 import org.paradise.etrc.data.skb.LCBStation;
+import org.paradise.etrc.data.v1.RailNetwork;
+import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.Station;
 
 public class CircuitMakeDialog extends JDialog {
 	private static final long serialVersionUID = -5891299808461231142L;

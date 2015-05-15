@@ -15,14 +15,14 @@ import java.util.stream.Stream;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.paradise.etrc.data.AllTrains;
-import org.paradise.etrc.data.RailNetworkChart;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.RailNetwork;
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.v1.AllTrains;
+import org.paradise.etrc.data.v1.RailNetwork;
+import org.paradise.etrc.data.v1.RailNetworkChart;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 public class RailNetworkTest {
 	

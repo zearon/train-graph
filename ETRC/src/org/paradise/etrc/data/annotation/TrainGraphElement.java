@@ -5,8 +5,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.paradise.etrc.data.NullPart;
 import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.v1.NullPart;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

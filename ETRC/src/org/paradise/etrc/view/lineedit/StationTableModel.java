@@ -7,8 +7,8 @@ import javax.swing.event.TableModelListener;
 
 import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
-import org.paradise.etrc.data.RailroadLine;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 
 public class StationTableModel extends DefaultJEditTableModel {

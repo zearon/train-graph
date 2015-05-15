@@ -20,7 +20,7 @@ import java.awt.Font;
 
 import javax.swing.JButton;
 
-import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 public class TrainTypesView extends JPanel {
 

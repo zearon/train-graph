@@ -1,4 +1,4 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 
 import java.util.Iterator;
 import java.util.Vector;
@@ -7,43 +7,47 @@ import java.util.stream.Collectors;
 
 import javafx.scene.shape.Line;
 
-import org.paradise.etrc.data.annotation.TGPElement;
-import org.paradise.etrc.data.annotation.TGPProperty;
+import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.data.annotation.TrainGraphElement;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 
+@TGElementType(name="Train Graph", root=true)
 public class TrainGraph extends TrainGraphPart<RailNetworkChart> {
 
-	@TGPElement(name="GlobalSettings")
+	@TGElement
 	public ChartSettings settings;
-	@TGPElement(name="RailNetwork")
+	@TGElement
 	public RailNetwork railNetwork;
-	@TGPElement(name="All Traintypes")
+	@TGElement
 	public AllTrainTypes allTrainTypes;
-	@TGPElement(name="All Trains")
+	@TGElement
 	public AllTrains allTrains;
-	@TGPElement(name="RailNetwork Map")
+	@TGElement(index=999)
 	public RailNetworkMap map;
-	protected Vector<RailNetworkChart> charts;
-
-	@TGPElement(name="RailNetwork Chart", isList=true, index=999)
-	public Vector<RailNetworkChart> getCharts () {
-		return charts;
-	}
+	@TGElement(isList=true, type=RailNetworkChart.class)
+	public Vector<RailNetworkChart> charts;
 	
 	TrainGraph() {
 	}
 	
 	@Override
-	void initElements() {
+	public void initElements() {
 		settings = TrainGraphFactory.createInstance(ChartSettings.class);
 		railNetwork = TrainGraphFactory.createInstance(RailNetwork.class);
 		allTrainTypes = TrainGraphFactory.createInstance(AllTrainTypes.class);
 		allTrains = TrainGraphFactory.createInstance(AllTrains.class);
 		map = TrainGraphFactory.createInstance(RailNetworkMap.class);
 		charts = new Vector<RailNetworkChart> ();
+	}
+
+	public Vector<RailNetworkChart> getCharts () {
+		return charts;
 	}
 	
 	public void syncLineChartsWithRailNetworks() {
@@ -97,73 +101,6 @@ public class TrainGraph extends TrainGraphPart<RailNetworkChart> {
 	/**
 	 * Implements method inherited from abstract base class TrainGraphPart
 	 */
-	@Override
-	protected String getStartSectionString() { return START_SECTION_TRAIN_GRAPH; }
-	@Override
-	protected String getEndSectionString() { return END_SECTION_TRAIN_GRAPH; }
-	@Override String createTGPNameById(int id) { 
-		return String.format(__("Train Graph %d"), id);
-	}
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return TrainGraph::new;
-	}
-	@Override
-	public void registerSubclasses() {
-		new ChartSettings().registerClasses();
-		new RailNetwork().registerClasses();
-		new AllTrainTypes().registerClasses();
-		new AllTrains().registerClasses();
-		new RailNetworkChart().registerClasses();
-		new RailNetworkMap().registerClasses();
-	}
-	
-	/* Object Properties */
-	@Override
-	protected void getObjectTGPProperties() {
-		objectProperties.clear();
-		objectProperties.add(Tuple.of("settings", settings));
-		objectProperties.add(Tuple.of("allTrainTypes", allTrainTypes));
-		objectProperties.add(Tuple.of("railNetwork", railNetwork));
-		objectProperties.add(Tuple.of("allTrains", allTrains));
-		objectProperties.add(Tuple.of("map", map));
-	}
-	
-	@Override
-	protected void setObjectTGPProperties(TrainGraphPart part) {
-		if (part instanceof ChartSettings) {
-			settings = (ChartSettings) part;
-		} else if (part instanceof AllTrainTypes) {
-			allTrainTypes.trainTypes.clear();
-			allTrainTypes.trainTypes.clear();
-			allTrainTypes = (AllTrainTypes) part;
-		} else if (part instanceof RailNetwork) {
-			railNetwork.getAllRailroadLines().clear();
-			railNetwork = (RailNetwork) part;
-		} else if (part instanceof AllTrains) {
-			allTrains.trains.clear();
-			allTrains.trainDict.clear();
-			allTrains = (AllTrains) part;
-		} else if (part instanceof RailNetworkMap) {
-			map = (RailNetworkMap) part;
-		}
-	};
-
-	/* Element array */
-	@Override
-	protected Vector<RailNetworkChart> getTGPElements() {
-		return charts;
-	}
-
-	@Override
-	protected void addTGPElement(RailNetworkChart element) {
-		charts.add(element);
-	}
-
-	@Override
-	protected boolean isOfElementType(TrainGraphPart part) {
-		return part != null && part instanceof RailNetworkChart;
-	}
 	
 	/* Do complete work after all data loaded from file */
 	@Override

@@ -9,13 +9,13 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.util.data.Tuple2;
 
 public class UIBindingFactory {
 	
 
-	static HashMap<Tuple<String, String>, UIBinding<? extends Object, ? extends Object>> bindingDict = 
-			new HashMap<Tuple<String,String>, UIBinding<? extends Object, ? extends Object>> ();
+	static HashMap<Tuple2<String, String>, UIBinding<? extends Object, ? extends Object>> bindingDict = 
+			new HashMap<Tuple2<String,String>, UIBinding<? extends Object, ? extends Object>> ();
 	
 	static boolean cacheEnabled = true;
 	
@@ -98,7 +98,7 @@ public class UIBindingFactory {
 			throw new IllegalArgumentException("Both model and propertyName cannot be empty");
 		}
 		
-		Tuple<String, String> property = Tuple.oF(model.getClass().getName(), propertyName);
+		Tuple2<String, String> property = Tuple2.oF(model.getClass().getName(), propertyName);
 		UIBinding<? extends Object, ? extends Object> oldbinding = 
 				bindingDict.get(property);
 		boolean notExists = oldbinding == null;

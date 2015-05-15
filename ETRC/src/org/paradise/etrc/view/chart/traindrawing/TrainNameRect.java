@@ -8,7 +8,7 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.view.chart.ChartView;
 
 public class TrainNameRect {

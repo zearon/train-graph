@@ -2,7 +2,7 @@ package org.paradise.etrc.view.sheet;
 
 import javax.swing.AbstractListModel;
 
-import org.paradise.etrc.data.RailroadLineChart;
+import org.paradise.etrc.data.v1.RailroadLineChart;
 
 public class RowHeaderModel extends AbstractListModel<Object> {
 	private static final long serialVersionUID = 547009998890792058L;

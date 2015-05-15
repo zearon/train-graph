@@ -9,7 +9,7 @@ import javax.swing.JTable;
 import javax.swing.border.BevelBorder;
 import javax.swing.table.TableCellRenderer;
 
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.Train;
 
 public class SheetHeaderRanderer extends JLabel implements TableCellRenderer {
 	private static final long serialVersionUID = -3005467491964709634L;

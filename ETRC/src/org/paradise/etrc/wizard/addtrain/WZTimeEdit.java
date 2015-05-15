@@ -17,9 +17,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.text.DefaultCaret;
 
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.wizard.WizardDialog;
 
 public class WZTimeEdit extends WizardDialog {

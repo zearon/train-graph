@@ -25,11 +25,11 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.DefaultCaret;
 
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.Station;
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Station;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.slice.ChartEvent;
 import org.paradise.etrc.slice.ChartSlice;
 import org.paradise.etrc.slice.TrainSlice;

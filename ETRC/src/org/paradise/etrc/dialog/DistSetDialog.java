@@ -20,10 +20,10 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.ChartSettings;
 //import com.borland.jbcl.layout.*;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.v1.ChartSettings;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 /**
  * @author lguo@sina.com

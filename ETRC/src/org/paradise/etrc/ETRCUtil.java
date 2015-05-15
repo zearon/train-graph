@@ -8,8 +8,8 @@ import java.util.Date;
 import java.util.StringJoiner;
 import java.util.stream.Stream;
 
-import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 /**
  * Utility class
@@ -75,7 +75,7 @@ public class ETRCUtil {
 	   */
 	  public static boolean DEBUG(String msg) {
 		  if (isDebug)
-			  _printMsg("\r\nDEBUG: ", msg, true, true, true, true, true, 0);
+			  _printMsg("DEBUG: ", msg, true, true, true, true, true, 0);
 		  
 		  return isDebug;
 	  }
@@ -88,7 +88,7 @@ public class ETRCUtil {
 	   */
 	  public static boolean DEBUG(String msgFormat, Object... msgArgs) {
 		  if (isDebug)
-			  _printMsg("\r\nDEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
+			  _printMsg("DEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
 		  
 		  return isDebug;
 	  }
@@ -130,8 +130,8 @@ public class ETRCUtil {
 	   * @param msg
 	   */
 	  public static void DEBUG_MSG(String msgFormat, Object... msgArgs) {
-		  if (isDebug)
-			  _printMsg("\r\nDEBUG_MSG: ", String.format(msgFormat, msgArgs), false, false, false, false, false, 0);
+		  if (IS_DEBUG())
+			  _printMsg("DEBUG_MSG: ", String.format(msgFormat, msgArgs), false, false, false, true, false, 0);
 	  }
 	  
 	  /**
@@ -139,7 +139,7 @@ public class ETRCUtil {
 	   * @param msg
 	   */
 	  public static void DEBUG_STACKTRACE(int level, String msgFormat, Object... msgArgs) {
-		  if (isDebug)
+		  if (IS_DEBUG())
 			  _printMsg("\r\nDEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, false, level);
 	  }
 	  

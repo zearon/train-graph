@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -19,9 +19,9 @@ import static org.paradise.etrc.ETRC.__;
  * @param <U> Type of UI value. For example, UVT should be text for JTextField
  */
 public abstract class UIBinding<M, U> {
-	static HashMap<Tuple<String, String>, IValueTypeConverter<? extends Object, ? extends Object>> modelValueConverterMap = 
+	static HashMap<Tuple2<String, String>, IValueTypeConverter<? extends Object, ? extends Object>> modelValueConverterMap = 
 			new HashMap<>();
-	static HashMap<Tuple<String, String>, IValueTypeConverter<? extends Object, ? extends Object>> uiValueConverterMap = 
+	static HashMap<Tuple2<String, String>, IValueTypeConverter<? extends Object, ? extends Object>> uiValueConverterMap = 
 			new HashMap<>();
 	
 	/**
@@ -34,7 +34,7 @@ public abstract class UIBinding<M, U> {
 	public static <M, U> void registerModelValueTypeConverter(
 			IValueTypeConverter<M, U> converter) {
 		
-		modelValueConverterMap.put(Tuple.oF(converter.getAValueType().getName(), 
+		modelValueConverterMap.put(Tuple2.oF(converter.getAValueType().getName(), 
 				converter.getBValueType().getName()), converter);
 	}
 	
@@ -48,7 +48,7 @@ public abstract class UIBinding<M, U> {
 	public static <U, M> void registerUIValueTypeConverter(
 			IValueTypeConverter<U, M> converter) {
 		
-		uiValueConverterMap.put(Tuple.oF(converter.getAValueType().getName(), 
+		uiValueConverterMap.put(Tuple2.oF(converter.getAValueType().getName(), 
 				converter.getBValueType().getName()), converter);
 	}
 	
@@ -185,7 +185,7 @@ public abstract class UIBinding<M, U> {
 		// If ui value is String and no M->String converter is registered,
 		// then use modelValue.toString() as the default converter.
 		if (String.class.getName().equals(uiValueClassName) &&
-				!modelValueConverterMap.containsKey(Tuple.oF(propertyClassName, 
+				!modelValueConverterMap.containsKey(Tuple2.oF(propertyClassName, 
 						String.class.getName() )) ) {
 			
 			if (modelValue == null)
@@ -198,7 +198,7 @@ public abstract class UIBinding<M, U> {
 		else {
 			try {
 				IValueTypeConverter<M, U> converter = (IValueTypeConverter<M, U>) 
-					modelValueConverterMap.get(Tuple.oF(propertyClassName, uiValueClassName));
+					modelValueConverterMap.get(Tuple2.oF(propertyClassName, uiValueClassName));
 				if (converter == null)
 					throw new NullPointerException();
 				else
@@ -224,7 +224,7 @@ public abstract class UIBinding<M, U> {
 		// If ui value is String and no String->M converter is registered,
 		// then use the default converter.
 		if (String.class.getName().equals(uiValueClassName) &&
-				!uiValueConverterMap.containsKey(Tuple.oF(String.class.getName(), 
+				!uiValueConverterMap.containsKey(Tuple2.oF(String.class.getName(), 
 						propertyClassName )) ) {
 			
 			if (uiValue == null)
@@ -238,7 +238,7 @@ public abstract class UIBinding<M, U> {
 		else {
 			try {
 				IValueTypeConverter<U, M> converter = (IValueTypeConverter<U, M>) 
-					uiValueConverterMap.get(Tuple.oF(uiValueClassName, propertyClassName));
+					uiValueConverterMap.get(Tuple2.oF(uiValueClassName, propertyClassName));
 				if (converter == null)
 					throw new NullPointerException();
 				else

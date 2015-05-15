@@ -1,6 +1,6 @@
 package org.paradise.etrc.data.skb;
 
-import org.paradise.etrc.data.Station;
+import org.paradise.etrc.data.v1.Station;
 
 public 	class LCBStation extends Station{
 	public LCBStation(String _name, int _dist, int _level, boolean _hide) {

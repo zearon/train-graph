@@ -1,4 +1,4 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -18,11 +18,14 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.paradise.etrc.data.annotation.TGPElement;
-import org.paradise.etrc.data.annotation.TGPProperty;
+import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.util.data.Tuple2;
 
+@TGElementType(name="RailLine Chart")
 public class RailroadLineChart extends TrainGraphPart<TrainRef> {
 	public static final float MAX_DIST_SCALE = 10f;
 	public static final int  MAX_MINUTE_SCALE = 10;
@@ -39,7 +42,7 @@ public class RailroadLineChart extends TrainGraphPart<TrainRef> {
 	public Vector<Train> trains = new Vector<Train> (100);
 	
 	//由于车次跨多条线路,因此序列化线路运行图时只保留途径该线路的车次的引用
-	@TGPElement(name="All TrainRefs", isList=true, inOneLine=true)
+	@TGElement(name="All TrainRefs", isList=true, type=TrainRef.class)
 	Vector<TrainRef> trainRefs = new Vector<TrainRef> ();
 
 	//本运行图的车次总数
@@ -64,13 +67,13 @@ public class RailroadLineChart extends TrainGraphPart<TrainRef> {
 	}
 	
 	@Override
-	@TGPProperty(name="railroadLineName")
+	@TGProperty(name="railroadLineName")
 	public String getName() {
 		name = railroadLine != null ? railroadLine.getName() : __("NO_RAILLINE");
 		return name;
 	}
 	@Override
-	@TGPProperty(name="railroadLineName")
+	@TGProperty(name="railroadLineName")
 	public void setName(String name) {
 		super.setName(name);
 	}
@@ -551,55 +554,5 @@ public class RailroadLineChart extends TrainGraphPart<TrainRef> {
 		fireChartChangedEvent();
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
-	
-	/**
-	 * Implements method inherited from abstract base class TrainGraphPart
-	 */
-	@Override
-	protected String getStartSectionString() { return START_SECTION_RAILINE_CHART; }
-	@Override
-	protected String getEndSectionString() { return END_SECTION_RAILINE_CHART; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return RailroadLineChart::new;
-	}
-	@Override
-	public void registerSubclasses() {
-		new TrainRef().registerClasses();
-	}
-
-	/* Element array */
-	@Override
-	protected Vector<TrainRef> getTGPElements() {
-		trainRefs.clear();
-		trains.stream().map(train->new TrainRef(train.name))
-			.forEachOrdered(trainRefs::add);
-		return trainRefs;
-	}
-
-	@Override
-	protected void addTGPElement(TrainRef element) {
-		trainRefs.add(element);
-	}
-
-	@Override
-	protected boolean isOfElementType(TrainGraphPart part) {
-		return part != null && part instanceof TrainRef;
-	}
-	
-	/* Do complete work after all data loaded from file */
-	@Override
-	protected void loadComplete() {
-	};
 }

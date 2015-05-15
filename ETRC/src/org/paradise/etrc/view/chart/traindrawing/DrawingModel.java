@@ -5,10 +5,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Vector;
 
-import org.paradise.etrc.data.ChartSettings;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.RailroadLine;
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.ChartSettings;
+import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.view.chart.ChartView;
 
 /**

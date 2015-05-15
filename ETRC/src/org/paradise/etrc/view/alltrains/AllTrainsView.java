@@ -7,7 +7,7 @@ import java.awt.BorderLayout;
 import javax.swing.JSplitPane;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 public class AllTrainsView extends JPanel {
 	

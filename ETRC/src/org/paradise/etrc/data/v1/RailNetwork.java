@@ -1,4 +1,4 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -20,10 +20,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.paradise.etrc.data.annotation.TGPElement;
+import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.data.event.RailroadLineChangeType;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.util.data.Tuple2;
 
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -33,8 +35,10 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  * @author Jeff Gong
  *
  */
+@TGElementType(name="RailNetwork")
 public class RailNetwork extends TrainGraphPart<RailroadLine> {
-	
+
+	@TGElement(name="All Raillines", isList=true, type=RailroadLine.class)
 	protected Vector<RailroadLine> railroadLines;
 
 	protected Vector<Station> virtualRailroadLine;
@@ -57,7 +61,6 @@ public class RailNetwork extends TrainGraphPart<RailroadLine> {
 		setName(name);
 	}
 
-	@TGPElement(name="All Raillines", isList=true)
 	public Vector<RailroadLine> getAllRailroadLines() {
 		return railroadLines;
 	}
@@ -279,8 +282,8 @@ public class RailNetwork extends TrainGraphPart<RailroadLine> {
 					boolean skip = false;
 					boolean alignedAtFirstCrossover = false;
 					for (int csindex = 0; csindex < crossoverCount - 1; ++ csindex) {
-						Tuple<Station, Integer> cstation = circuit.getCrossoverStationTuple(csindex);
-						Tuple<Station, Integer> cstation2 = circuit.getCrossoverStationTuple(csindex + 1);
+						Tuple2<Station, Integer> cstation = circuit.getCrossoverStationTuple(csindex);
+						Tuple2<Station, Integer> cstation2 = circuit.getCrossoverStationTuple(csindex + 1);
 						Optional<Station> cstationOnVCircuit = findStationOnVirtualRailLine(cstation.A);
 						Optional<Station> cstation2OnVCircuit = findStationOnVirtualRailLine(cstation2.A);
 
@@ -445,54 +448,5 @@ public class RailNetwork extends TrainGraphPart<RailroadLine> {
 
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
 
-	/**
-	 * Implements method inherited from abstract base class TrainGraphPart
-	 */
-	@Override
-	protected String getStartSectionString() { return START_SECTION_RAILROAD_NETWORK; }
-	@Override
-	protected String getEndSectionString() { return END_SECTION_RAILROAD_NETWORK; }
-	@Override 
-	String createTGPNameById(int id) { 
-		return String.format(__("Railroad Network %d"), id);
-	}
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return RailNetwork::new;
-	}
-	@Override
-	public void registerSubclasses() {
-		new RailroadLine().registerClasses();
-	}
-
-	/* Element array */
-	@Override
-	protected Vector<RailroadLine> getTGPElements() {
-		return railroadLines;
-	}
-
-	@Override
-	protected void addTGPElement(RailroadLine element) {
-		railroadLines.add(element);
-	}
-
-	@Override
-	protected boolean isOfElementType(TrainGraphPart part) {
-		return part != null && part instanceof RailroadLine;
-	}
-	
-	/* Do complete work after all data loaded from file */
-	@Override
-	protected void loadComplete() {
-		
-	};
 }

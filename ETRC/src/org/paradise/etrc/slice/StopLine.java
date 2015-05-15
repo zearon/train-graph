@@ -1,7 +1,7 @@
 package org.paradise.etrc.slice;
 
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
 
 public class StopLine extends ChartLine {
 	public StopLine(Stop theStop, int timeArrive, int timeLeave, int dist) {

@@ -1,6 +1,6 @@
 package org.paradise.etrc.slice;
 
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.Train;
 
 public class StationEvent extends ChartEvent {
 	public static final int PASS = 1;   //通

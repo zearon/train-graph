@@ -1,4 +1,4 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 import static org.paradise.etrc.ETRC.__;
 
 import static org.paradise.etrc.ETRCUtil.*;
@@ -7,30 +7,34 @@ import java.awt.Color;
 import java.util.Vector;
 import java.util.function.Supplier;
 
-import org.paradise.etrc.data.annotation.TGPProperty;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.data.annotation.TGProperty;
+import org.paradise.etrc.util.data.Tuple2;
 
+@TGElementType(name="Train Type", printInOneLine=true)
 public class TrainType extends TrainGraphPart<NullPart> {
 	public static final String LINE_STYLE_SOLID = "SOLID";
 	public static final String LINE_STYLE_DASH = "DASH";
 	public static final String LINE_STYLE_DOT_DASH = "DOT_DASH";
 	public static final String LINE_STYLE_DOT = "DOT";
 	
-	@TGPProperty
+	@TGProperty
 	public String abbriveation;
-	@TGPProperty
+	@TGProperty
 	public String pattern;
-	@TGPProperty
+	@TGProperty
 	public Color color;
-	@TGPProperty
+	@TGProperty
 	public String lineStype;
-	@TGPProperty
+	@TGProperty
 	public float lineWidth;
-	@TGPProperty
+	@TGProperty
 	public String fontFamily;
-	@TGPProperty
+	@TGProperty
 	public int fontSize;
-	@TGPProperty
+	@TGProperty
 	public Color fontColor;
 	
 	TrainType() {}	
@@ -62,11 +66,7 @@ public class TrainType extends TrainGraphPart<NullPart> {
 	}
 	
 	
-	
-	@Override
-	public void setToDefault() {
-		setProperties("", "", Color.decode("#ff0000"), LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), 12, Color.decode("#700000"));
-	}
+
 //
 //	@TGPProperty(name="color")
 //	public String getColorStr() {
@@ -110,37 +110,10 @@ public class TrainType extends TrainGraphPart<NullPart> {
 	
 	/**
 	 * Implements method inherited from abstract base class TrainGraphPart
-	 */
+	 */	
 	@Override
-	protected String getStartSectionString() { return START_SECTION_TRAIN_TYPE; }
-	@Override
-	protected String getEndSectionString() { return END_SECTION_TRAIN_TYPE; }
-	@Override 
-	String createTGPNameById(int id) { 
-		return String.format(__("Train type %d"), id);
+	public void setToDefault() {
+		setProperties("", "", Color.decode("#ff0000"), LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), 12, Color.decode("#700000"));
 	}
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return TrainType::new;
-	}
-	@Override
-	public void registerSubclasses() {}
-
-	/* Element array */
-	@Override
-	protected Vector<NullPart> getTGPElements() {return null;}
-
-	@Override
-	protected void addTGPElement(NullPart element) {}
-
-	@Override
-	protected boolean isOfElementType(TrainGraphPart part) {
-		return part != null && part instanceof NullPart;
-	}
-	
-	/* Do complete work after all data loaded from file */
-	@Override
-	protected void loadComplete() {};
-	
 	
 }

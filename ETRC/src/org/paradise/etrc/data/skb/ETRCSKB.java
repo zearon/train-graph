@@ -17,10 +17,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.paradise.etrc.data.util.BOMStripperInputStream;
-import org.paradise.etrc.data.RailroadLine;
-import org.paradise.etrc.data.Station;
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.Station;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.TrainGraphFactory;
 
 public class ETRCSKB {

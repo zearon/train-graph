@@ -1,7 +1,7 @@
 package org.paradise.etrc.slice;
 
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
 
 public class RunLine extends ChartLine {
 	public RunLine(Stop fromStop, Stop toStop, int leaveTime, int arriveTime, int distStaLeave, int distStaArrive) {

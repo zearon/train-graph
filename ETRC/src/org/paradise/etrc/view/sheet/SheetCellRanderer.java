@@ -7,7 +7,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import org.paradise.etrc.data.Stop;
+import org.paradise.etrc.data.v1.Stop;
 
 public class SheetCellRanderer extends JLabel implements TableCellRenderer {
 

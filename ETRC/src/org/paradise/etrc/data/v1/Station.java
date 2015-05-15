@@ -1,19 +1,23 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 
 import java.util.Vector;
 import java.util.function.Supplier;
 
-import org.paradise.etrc.data.annotation.TGPProperty;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.data.annotation.TGProperty;
+import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 
+@TGElementType(name="Station", printInOneLine=true)
 public class Station extends TrainGraphPart<NullPart> {
-	@TGPProperty
+	@TGProperty
 	public boolean hide = false;
-	@TGPProperty
+	@TGProperty
 	public int level = 0;
-	@TGPProperty
+	@TGProperty
 	public int dist = 0;
 
 	public boolean isCrossover = false;
@@ -85,44 +89,4 @@ public class Station extends TrainGraphPart<NullPart> {
 	public String toString() {
 		return name + ":" + level + ":" + dist + ":" + hide;
 	}
-	
-	
-	
-	
-	
-	
-	
-	/**
-	 * Implements method inherited from abstract base class TrainGraphPart
-	 */
-	@Override
-	protected String getStartSectionString() { return START_SECTION_STATION; }
-	@Override
-	protected String getEndSectionString() { return END_SECTION_STATION; }
-	@Override 
-	String createTGPNameById(int id) { 
-		return String.format(__("Station %d"), id);
-	}
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return Station::new;
-	}
-	@Override
-	public void registerSubclasses() {}
-
-	/* Element array */
-	@Override
-	protected Vector<NullPart> getTGPElements() {return null;}
-
-	@Override
-	protected void addTGPElement(NullPart element) {}
-
-	@Override
-	protected boolean isOfElementType(TrainGraphPart part) {
-		return part != null && part instanceof NullPart;
-	}
-	
-	/* Do complete work after all data loaded from file */
-	@Override
-	protected void loadComplete() {};
 }

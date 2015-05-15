@@ -10,8 +10,8 @@ import javax.swing.event.TableModelListener;
 import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
-import org.paradise.etrc.data.RailNetwork;
-import org.paradise.etrc.data.RailroadLine;
+import org.paradise.etrc.data.v1.RailNetwork;
+import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 
 public class RailroadLineTableModel extends DefaultJEditTableModel {

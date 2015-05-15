@@ -4,9 +4,9 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.Station;
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Station;
+import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.dialog.SliceDialog;
 
 public class ChartSlice {

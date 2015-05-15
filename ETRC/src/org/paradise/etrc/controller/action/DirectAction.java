@@ -6,6 +6,9 @@ import static org.paradise.etrc.ETRCUtil.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.paradise.etrc.util.function.MultiConsumer;
+import org.paradise.etrc.util.function.TriConsumer;
+
 /**
  * Action with no undo/redo support.
  * 
@@ -13,16 +16,6 @@ import java.util.function.Consumer;
  *
  */
 public class DirectAction extends UIAction {
-	@FunctionalInterface
-	public static interface TriConsumer<T1, T2, T3> {
-		void accept(T1 a1, T2 a2, T3 a3);
-	}
-	
-	@FunctionalInterface
-	public static interface MultiConsumer<T1, T2, T3, T4> {
-		void accept(T1 a1, T2 a2, T3 a3, T4... a4);
-	}
-	
 	private String actionDesc;
 	private Runnable action;
 	
@@ -46,9 +39,9 @@ public class DirectAction extends UIAction {
 		this.action = () -> action.accept(a1, a2, a3);
 	}
 	<T1, T2, T3, T4> DirectAction(String actionDesc, 
-			MultiConsumer<T1, T2, T3, T4> action, T1 a1, T2 a2, T3 a3, T4... args) {
+			MultiConsumer<T1, T2, T3, T4> action, T1 a1, T2 a2, T3 a3, T4 a4) {
 		this.actionDesc = actionDesc;
-		this.action = () -> action.accept(a1, a2, a3, args);
+		this.action = () -> action.accept(a1, a2, a3, a4);
 	}
 
 	@Override

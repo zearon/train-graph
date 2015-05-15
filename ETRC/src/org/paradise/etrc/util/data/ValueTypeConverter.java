@@ -1,4 +1,4 @@
-package org.paradise.etrc.util.ui.databinding;
+package org.paradise.etrc.util.data;
 
 import java.awt.Color;
 import java.util.Arrays;
@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Vector;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import org.paradise.etrc.data.util.Tuple;
 
 import com.sun.xml.internal.bind.v2.runtime.Name;
 
@@ -25,7 +23,7 @@ public class ValueTypeConverter {
 		double.class.getName(), Double.class.getName()};
 	static final List<String> PRIMITIVE_TYPES = Arrays.asList(PRIMITIVE_TYPES_ARRAY);
 	
-	static HashMap<Tuple<String, String>, Function<? extends Object, Object>> typeConverterDict = 
+	static HashMap<Tuple2<String, String>, Function<? extends Object, Object>> typeConverterDict = 
 			new LinkedHashMap<>();
 	
 	static {
@@ -53,19 +51,19 @@ public class ValueTypeConverter {
 			}
 			
 			if (isPrimitive) {
-				registerTypeConverter(Tuple.oF(String.class.getName(), typeName), converter);
+				registerTypeConverter(Tuple2.oF(String.class.getName(), typeName), converter);
 				String className = convertPrimitiveTypeNameToCName(typeName);
-				registerTypeConverter(Tuple.oF(String.class.getName(), className), converter);
+				registerTypeConverter(Tuple2.oF(String.class.getName(), className), converter);
 			}
 		});
 
-		registerTypeConverter(Tuple.oF(Color.class.getName(), String.class.getName()), 
+		registerTypeConverter(Tuple2.oF(Color.class.getName(), String.class.getName()), 
 				ValueTypeConverter::colorToString);
-		registerTypeConverter(Tuple.oF(String.class.getName(), Color.class.getName()), 
+		registerTypeConverter(Tuple2.oF(String.class.getName(), Color.class.getName()), 
 				ValueTypeConverter::stringToColor);
 	}
 	
-	public static void registerTypeConverter(Tuple<String, String> typeNamesTyple, 
+	public static void registerTypeConverter(Tuple2<String, String> typeNamesTyple, 
 			Function<? extends Object, Object> typeConverter) {
 		
 		typeConverterDict.put(typeNamesTyple, typeConverter);
@@ -80,7 +78,7 @@ public class ValueTypeConverter {
 		}
 		
 		Function<Object, Object> converter = (Function<Object, Object>) typeConverterDict.get(
-				Tuple.oF(srcTypeName, destTypeName));
+				Tuple2.oF(srcTypeName, destTypeName));
 		if (converter != null) {
 			return converter.apply(value);
 		}

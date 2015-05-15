@@ -1,4 +1,4 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 import static org.paradise.etrc.ETRC.__;
 
 import static org.paradise.etrc.ETRCUtil.*;
@@ -14,10 +14,14 @@ import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.util.data.Tuple2;
 
 import sun.misc.BASE64Decoder;
 
+@TGElementType(name="RailNetwork Map")
 public class RailNetworkMap extends Base64EncodingBinaryPart<NullPart> {
 	BufferedImage image;
 	int height;
@@ -84,35 +88,5 @@ public class RailNetworkMap extends Base64EncodingBinaryPart<NullPart> {
 	public void initElements() {
 //		loadFromFile(new File("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map.jpg"));
 	}
-	
-	
-	
 
-	/**
-	 * Implements method inherited from abstract base class TrainGraphPart
-	 */
-	@Override
-	protected String getStartSectionString() { return START_SECTION_RAILNETWORK_MAP; }
-	@Override
-	protected String getEndSectionString() { return END_SECTION_RAILNETWORK_MAP; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return RailNetworkMap::new;
-	}
-	@Override
-	public void registerSubclasses() {}
-
-	/* Element array */
-	@Override
-	protected Vector<NullPart> getTGPElements() {return null;}
-
-	@Override
-	protected void addTGPElement(NullPart element) {}
-
-	@Override
-	protected boolean isOfElementType(TrainGraphPart part) {return false;}
-	
-	/* Do complete work after all data loaded from file */
-	@Override
-	protected void loadComplete() {};
 }

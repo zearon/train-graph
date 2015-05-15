@@ -8,28 +8,38 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.data.v1.*;
 import org.paradise.etrc.data.annotation.*;
-import org.paradise.etrc.util.ui.databinding.ValueTypeConverter;
+import org.paradise.etrc.util.data.Tuple2;
+import org.paradise.etrc.util.data.Tuple3;
+import org.paradise.etrc.util.data.ValueTypeConverter;
+import org.paradise.etrc.util.function.MultiConsumer;
+import org.paradise.etrc.util.function.TriConsumer;
 
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.*;
 
 
@@ -53,74 +63,44 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	}
 	
 	public static final String IDENT_STR	= "  ";
-	public Boolean IN_ONE_LINE	= null;
-	
-	/* DO NOT CHANGE "{", "}", "\r\n" to other strings! 
-	 * Classes that have only simple properties can be written in one line, i.e. 
-	 * START_SECTION_ of these types could not end with "\r\n".
-	 * Classes that have object properties or element array can not be written
-	 * in one line, i.e. START_SECTION_ of these types must end with "\r\n"
-	 */
-	public static final String START_SECTION_TRAIN_GRAPH	 	= "TrainGraph {\r\n";
-	public static final String END_SECTION_TRAIN_GRAPH		 	= "} TrainGraph\r\n";	
-	
-	public static final String START_SECTION_GLOBAL_SETTINGS 	= "GlobalSettings {\r\n";
-	public static final String END_SECTION_GLOBAL_SETTINGS	 	= "} GlobalSettings\r\n";
-	
-	public static final String START_SECTION_RAILROAD_NETWORK 	= "RailNetwork {\r\n";
-	public static final String END_SECTION_RAILROAD_NETWORK 	= "} RailNetwork\r\n";
-	public static final String START_SECTION_RAILROAD_LINE 		= "RailLine {\r\n";
-	public static final String END_SECTION_RAILROAD_LINE 		= "} RailLine\r\n";
-	public static final String START_SECTION_STATION 			= "Station {";
-	public static final String END_SECTION_STATION 				= "}\r\n";
-	
-	public static final String START_SECTION_ALL_TRAIN_TYPES	= "All TrainTypes {\r\n";
-	public static final String END_SECTION_ALL_TRAIN_TYPES		= "} All TrainTypes\r\n";
-	public static final String START_SECTION_TRAIN_TYPE			= "TrainType {";
-	public static final String END_SECTION_TRAIN_TYPE			= "}\r\n";
-	
-	public static final String START_SECTION_ALL_TRAIN			= "All Trains {\r\n";
-	public static final String END_SECTION_ALL_TRAIN			= "} All Trains\r\n";
-	public static final String START_SECTION_TRAIN				= "Train {\r\n";
-	public static final String END_SECTION_TRAIN				= "} Train\r\n";
-	public static final String START_SECTION_STOP				= "Stop {";
-	public static final String END_SECTION_STOP 				= "}\r\n";
-	
-	public static final String START_SECTION_RAILNETWORK_CHART	= "RailNetwork Chart {\r\n";
-	public static final String END_SECTION_RAILNETWORK_CHART	= "} RailNetwork Chart\r\n";
-	public static final String START_SECTION_RAILINE_CHART		= "RailLine Chart {\r\n";
-	public static final String END_SECTION_RAILINE_CHART		= "} RailLine Chart\r\n";
-	public static final String START_SECTION_TRAIN_REF			= "Train Ref {";
-	public static final String END_SECTION_TRAIN_REF			= "}\r\n";
-	
-	public static final String START_SECTION_RAILNETWORK_MAP	= "RailNetwork Map {\r\n";
-	public static final String END_SECTION_RAILNETWORK_MAP		= "} RailNetwork Map\r\n";
-	
-	/* Field used by reflection code to determine the class of element.
-	 * No need to set value. */
-//	public ET _elementInstance = null;
-	
-	protected Vector<Tuple<String, TrainGraphPart>> objectProperties = new Vector<Tuple<String, TrainGraphPart>>();
-	/* Store a (Class, Class constructor) tuple for each sub-class */
-	protected static HashMap<String, 
-		Tuple<Class<? extends TrainGraphPart>, Supplier<? extends TrainGraphPart>>> _partClassMap = 
-			new HashMap<String, Tuple<Class<? extends TrainGraphPart>,Supplier<? extends TrainGraphPart>>> ();
-	
-	protected static LinkedHashMap<Tuple<String, String>, Function<TrainGraphPart, String>> simplePropertyGetterMap =
+	public static final String NEW_LINE_STR	= "\r\n";
+		
+	protected static LinkedHashMap<Tuple2<String, String>, Function<TrainGraphPart, String>> simplePropertyGetterMap =
 			new LinkedHashMap<> ();
-	protected static LinkedHashMap<Tuple<String, String>, BiConsumer<TrainGraphPart, String>> simplePropertySetterMap =
+	protected static LinkedHashMap<Tuple2<String, String>, BiConsumer<TrainGraphPart, String>> simplePropertySetterMap =
 			new LinkedHashMap<> ();
-	protected static HashMap<Tuple<String, String>, String> simplePropertyTypeMap =
+	protected static HashMap<Tuple2<String, String>, String> PropertyTypeMap =
 			new HashMap<> ();
 	/* a list of tuples in form of ((className, propName), (porpIndex, firstLine) ) */
-	protected static Vector<Tuple<Tuple<String, String>, Tuple<Integer,Boolean>>> simplePropertyIndexList =
+	protected static Vector<Tuple2<Tuple2<String, String>, Tuple2<Integer,Boolean>>> simplePropertyIndexList =
 			new Vector<> ();
 	/* a map whose key is className, and the value is a list of tuples 
 	   in form of ((className, propName), (porpIndex, firstLine) ) */
-	protected static Map<String, List<Tuple<Tuple<String, String>, Tuple<Integer,Boolean> >>> simplePropertyIndexMap;
+	protected static Map<String, List<Tuple2<Tuple2<String, String>, Tuple2<Integer,Boolean> >>> simplePropertyIndexMap;
 	
-	protected static LinkedHashMap<Tuple<String, String>, BiConsumer<TrainGraphPart, String>> elementPropertyGetterMap = 
+	protected static LinkedHashMap<Tuple2<String, String>, 
+		Tuple3<TGElementAttr, Class<?>, Function<TrainGraphPart, Object>> > elementGetterMap = 
 			new LinkedHashMap<> ();
+	protected static LinkedHashMap<Tuple2<String, String>, 
+	Tuple3<TGElementAttr, Class<?>, BiConsumer<TrainGraphPart, Object>> > elementSetterMap = 
+		new LinkedHashMap<> ();
+	protected static LinkedHashMap<Tuple2<String, String>, 
+	Tuple2<Class<?>, Supplier<? extends Object>> > elementCreatorMap = 
+		new LinkedHashMap<> ();
+	Vector<Tuple3<Class<?>, String, TGElementType>> registeredTypeList = new Vector<> ();
+
+	// (className) -> <ClassName, PropName) key in elementGetterMap
+	protected static Map<String, List<Tuple2<String, String>> > elementGetterKeyDict;
+	
+
+	protected static HashMap<Class<? extends TrainGraphPart>, Supplier<? extends TrainGraphPart>> registeredTypeCreatorDict = 
+			new HashMap<> ();
+	
+	static Map<Class<?>, String> typeToNameDict;
+	static Map<Class<?>, TGElementType> typeToAttrDict;
+	static Map<String, Class<?>> nameToTypeDict;
+	
+	
 	
 	public static String ELEMENT_REPR_PREFIX;
 	public static String ELEMENT_REPR_SUFFIX;
@@ -128,37 +108,6 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	public static Vector<Field> ELEMENT_SIMPLE_PROPERTY_FIELD_LIST;
 	
 	protected Supplier<String> _elementReprPreffix;
-	
-//	static {
-//		registerSubClasses();
-//		processAnnotations();
-//	}
-//	
-//	static void registerSubClasses() {
-//		_partClassMap.put(START_SECTION_TRAIN_GRAPH.trim(), 
-//				Tuple.of(TrainGraph.class, TrainGraph::new));
-//		_partClassMap.put(START_SECTION_RAILROAD_NETWORK.trim(), 
-//				Tuple.of(RailNetwork.class, RailNetwork::new));
-//		_partClassMap.put(START_SECTION_RAILROAD_LINE.trim(), 
-//				Tuple.of(RailroadLine.class, RailroadLine::new));
-//		_partClassMap.put(START_SECTION_STATION.trim(), 
-//				Tuple.of(Station.class, Station::new));
-//		
-//		_partClassMap.put(START_SECTION_ALL_TRAIN.trim(), 
-//				Tuple.of(AllTrains.class, AllTrains::new));
-//		_partClassMap.put(START_SECTION_TRAIN.trim(), 
-//				Tuple.of(Train.class, Train::new));
-//		_partClassMap.put(START_SECTION_STOP.trim(), 
-//				Tuple.of(Stop.class, Stop::new));
-//		
-//		_partClassMap.put(START_SECTION_RAILNETWORK_CHART.trim(), 
-//				Tuple.of(RailNetworkChart.class, RailNetworkChart::new));
-//		_partClassMap.put(START_SECTION_RAILINE_CHART.trim(), 
-//				Tuple.of(RailroadLineChart.class, RailroadLineChart::new));
-//		_partClassMap.put(START_SECTION_TRAIN_REF.trim(), 
-//				Tuple.of(TrainRef.class, TrainRef::new));
-//		
-//	}
 
 
 	static HashMap<String, Integer> _objectIdMap = new HashMap<String, Integer> ();
@@ -166,12 +115,12 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	protected int _id;
 	
 	public String name;
-	@TGPProperty(firstline=true)
+	@TGProperty(firstline=true)
 	public String getName() { return name; }
-	@TGPProperty
+	@TGProperty
 	public void setName(String name) { this.name = name; }
 	
-	TrainGraphPart() {
+	public TrainGraphPart() {
 		// Set ID
 		String className = getClass().getName();
 		int id = _objectIdMap.getOrDefault(className, -1);
@@ -184,11 +133,64 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		
 		_objectIdMap.put(className, id);
 	}
+
+	public static <T extends TrainGraphPart> T newInstance(Class<T> clazz) {
+		if (clazz == null) {
+			throw new IllegalArgumentException(__("can not load default instance for class NULL."));
+		}
+		
+		// Instantiate the object
+		Constructor<T> constructor = findDefaultConstructor(clazz);
+		
+		return newInstance(constructor);
+	}
+	
+	public static <T extends TrainGraphPart> Constructor<T> findDefaultConstructor(Class<T> clazz) {
+
+		if (clazz == null) {
+			throw new IllegalArgumentException(__("can not find constructor for class NULL."));
+		}
+
+		try {
+			// Instantiate the object
+			Constructor<T> constructor = clazz.getDeclaredConstructor();
+			constructor.setAccessible(true);
+			
+			return constructor;
+		} catch (NoSuchMethodException e) {
+			throw new IllegalArgumentException(String.format(
+					__("Class %s does not have a default non-argument constructor."),
+					clazz.getName()), e);
+		}
+
+	}
+	
+	public static <T extends TrainGraphPart> T newInstance(Constructor<T> constructor) {
+		if (constructor == null) {
+			throw new IllegalArgumentException(__("Can not instantiate class with NULL constructor."));
+		}
+
+		try {
+			constructor.setAccessible(true);
+			
+			T obj = constructor.newInstance();
+			
+			return obj;
+		} catch (SecurityException e) {
+			throw new IllegalArgumentException(String.format(
+					__("Constructor of class %s is not accessible."),
+					""), e);
+		} catch (IllegalAccessException | InvocationTargetException | InstantiationException | IllegalArgumentException e) {
+			throw new IllegalArgumentException(String.format(
+					__("Can not instantiate class %s with default constructor."),
+					""), e);
+		}
+	}
 	
 	@Override
 	public boolean equals(Object o) {
 		return o != null && o instanceof TrainGraphPart && ((TrainGraphPart) o)._id == _id &&
-				((TrainGraphPart) o).getStartSectionString().equals(getStartSectionString());
+				getClass().equals(o.getClass());
 				
 	}
 	
@@ -204,7 +206,11 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	
 	public String toDebugString() {
 		return repr(TO_STRING_SPECIFIC_TYPE_DEPTH.getOrDefault(
-				getStartSectionString(), 3), false, false);
+				getElementName(), 3), false, false);
+	}
+	
+	public String getElementName() {
+		return typeToNameDict.get(getClass());
 	}
 	
 	public static String reprJoining(Object[] array, String delimeter, boolean debug) {
@@ -229,54 +235,48 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	}
 	
 	public void prepareForFirstLoading() {
-		registerClasses();
-
-		processPropertyAnnotations();
+		processAnnotations();
 	}
 	
-	public void processPropertyAnnotations() {
+	protected void processAnnotations() {		
 		simplePropertyGetterMap.clear();
 		simplePropertySetterMap.clear();
 		simplePropertyIndexList.clear();
+		elementGetterMap.clear();
+		elementSetterMap.clear();
+		elementCreatorMap.clear();
 		
-		_partClassMap.values().stream().distinct().map(tuple->tuple.A).forEach(clazz -> {
-			try {
-				int[] propIndex = {0};
+		LinkedList<Class<? extends TrainGraphPart>> classList = new LinkedList<> ();
+		HashSet<Class<? extends TrainGraphPart>> processedClassSet = new HashSet<> ();
+		Class<? extends TrainGraphPart> clazz = getClass(); 
+		classList.addLast(clazz);
+		processedClassSet.add(clazz);
+		
+		while (!classList.isEmpty()) {
+			clazz = classList.pollFirst();
+			processedClassSet.add(clazz);
+			processClassAnnotations(clazz, classList, processedClassSet);
+		}
 
-				// Find declared fields and inherited public fields as simple properties.
-				Vector<Field> fields = new Vector<>();
-				fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
-				fields.addAll(Arrays.asList(clazz.getFields()));
-				fields.stream().distinct().forEach(field-> {
-					TGPProperty tp = field.getAnnotation(TGPProperty.class);
-					TGPElement te = field.getAnnotation(TGPElement.class);
-					if (tp != null)
-						processFieldAsSimpleProperty(clazz, tp, field, ++ propIndex[0]);
-					else if (te != null)
-						processFieldAsElement(clazz, te, field, ++ propIndex[0]);
-				});
-				
-				// Find public methods as simple property getters and setters
-				Vector<Method> methods = new Vector<>();
-				methods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
-				methods.addAll(Arrays.asList(clazz.getMethods()));
-				methods.stream().distinct().forEach(method -> {
-					TGPProperty tp = method.getAnnotation(TGPProperty.class);
-					TGPElement te = method.getAnnotation(TGPElement.class);
-					if (tp != null)
-						processMethodAsSimpleProperty(clazz, tp, method, ++ propIndex[0]);
-					else if (te != null)
-						processMethodAsElement(clazz, te, method, ++ propIndex[0]);
-				});
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		});
+		// Create maps for efficiency fetching.
+		typeToNameDict = registeredTypeList.stream().collect(Collectors.toMap(
+				(Tuple3<Class<?>, String, TGElementType> tuple) -> tuple.A   , 
+				(Tuple3<Class<?>, String, TGElementType> tuple) -> tuple.B));
+		typeToAttrDict = registeredTypeList.stream().collect(Collectors.toMap(
+				(Tuple3<Class<?>, String, TGElementType> tuple) -> tuple.A   , 
+				(Tuple3<Class<?>, String, TGElementType> tuple) -> tuple.C));
+		nameToTypeDict = registeredTypeList.stream().collect(Collectors.toMap(
+				(Tuple3<Class<?>, String, TGElementType> tuple) -> tuple.B   , 
+				(Tuple3<Class<?>, String, TGElementType> tuple) -> tuple.A));
 		
-		// Check missing setters and getters for all classes
+		elementGetterKeyDict = elementGetterMap.keySet().stream().collect(Collectors.groupingBy(
+				(Tuple2<String, String> tuple) -> tuple.A));
+		
+		
+		// Check missing setters and getters for simple properties in all classes
 		Vector<String> errorMsgs = new Vector<>();
-		Set<Tuple<String, String>> getterKeysSet = simplePropertyGetterMap.keySet();
-		Set<Tuple<String, String>> setterKeysSet = simplePropertySetterMap.keySet();
+		Set<Tuple2<String, String>> getterKeysSet = simplePropertyGetterMap.keySet();
+		Set<Tuple2<String, String>> setterKeysSet = simplePropertySetterMap.keySet();
 		getterKeysSet.stream().filter(getterTuple -> !setterKeysSet.contains(getterTuple))
 			.map(tuple -> String.format("Getter for %s.%s has no corresponding setter.", tuple.A, tuple.B))
 			.forEach(errorMsgs::add);
@@ -297,7 +297,57 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 				.collect(Collectors.groupingBy(tuple -> tuple.A.A));
 	}
 	
-	private void processFieldAsSimpleProperty(Class clazz, TGPProperty tp, 
+	public void processClassAnnotations(Class<? extends TrainGraphPart> clazz, 
+			LinkedList<Class<? extends TrainGraphPart>> classList, 
+			HashSet<Class<? extends TrainGraphPart>> processedClassSet) {
+		
+		// If the class is annotated with @TGElement.
+		TGElementType tgeType = (TGElementType) clazz.getAnnotation(TGElementType.class);
+		if (tgeType != null) {
+			Constructor<? extends TrainGraphPart> defaultConstructor = findDefaultConstructor(clazz);
+			Supplier<TrainGraphPart> creator = () -> TrainGraphPart.newInstance(defaultConstructor);
+			
+			DEBUG_MSG("Register class '%s' as %s", tgeType.name(), clazz.getName());
+			registeredTypeList.add(Tuple3.oF(clazz, tgeType.name(), tgeType));
+			elementCreatorMap.put(Tuple2.oF("", tgeType.name()), 
+					Tuple2.oF(clazz, (Supplier<? extends Object>) creator));
+			registeredTypeCreatorDict.put(clazz, creator);
+		} else {
+			throw new RuntimeException(String.format("Class %s must be annotabed with @TGElementType annotation.", 
+					clazz.getName()));
+		}
+		
+		int[] propIndex = {0};
+
+		// Find declared fields and inherited public fields as simple properties.
+		Vector<Field> fields = new Vector<>();
+		fields.addAll(Arrays.asList(clazz.getDeclaredFields()));
+		fields.addAll(Arrays.asList(clazz.getFields()));
+		fields.stream().distinct().forEach(field-> {
+			TGProperty tp = field.getAnnotation(TGProperty.class);
+			TGElement te = field.getAnnotation(TGElement.class);
+			if (tp != null)
+				processFieldAsSimpleProperty(clazz, tp, field, ++ propIndex[0]);
+			else if (te != null)
+				processFieldAsElement(clazz, te, field, classList, processedClassSet, 
+						++ propIndex[0]);
+		});
+		
+		// Find public methods as simple property getters and setters
+		Vector<Method> methods = new Vector<>();
+		methods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
+		methods.addAll(Arrays.asList(clazz.getMethods()));
+		methods.stream().distinct().forEach(method -> {
+			TGProperty tp = method.getAnnotation(TGProperty.class);
+			TGElement te = method.getAnnotation(TGElement.class);
+			if (tp != null)
+				processMethodAsSimpleProperty(clazz, tp, method, ++ propIndex[0]);
+			else if (te != null)
+				processMethodAsElement(clazz, te, method, classList, ++ propIndex[0]);
+		});
+	}
+	
+	private void processFieldAsSimpleProperty(Class clazz, TGProperty tp, 
 			Field field, int propIndex) {	
 		
 		String className = clazz.getName();	
@@ -306,7 +356,8 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		
 		String fieldName = "".equals(tp.name()) ? field.getName() : tp.name();
 		Class fieldClass = field.getType();
-		Tuple propTuple = Tuple.oF(className, fieldName);
+		Tuple2 propTuple = Tuple2.oF(className, fieldName);
+		field.setAccessible(true);
 		
 		// field is a simple property
 		simplePropertyGetterMap.put(propTuple, tgp -> {
@@ -329,18 +380,128 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 				e.printStackTrace();
 			}
 		});
-		int newPropIndex = Math.min(propIndex, tp.index());
-		Tuple attrTuple = Tuple.oF(newPropIndex, tp.firstline());
-		simplePropertyIndexList.add(Tuple.oF(propTuple, attrTuple));
+		DEBUG_MSG("Register Simple property field %s.'%s' in %s type", className, 
+				fieldName, fieldClass.getName());
+		
+		int newPropIndex = tp.index() == Integer.MAX_VALUE ? propIndex : tp.index();
+		Tuple2 attrTuple = Tuple2.oF(newPropIndex, tp.firstline());
+		simplePropertyIndexList.add(Tuple2.oF(propTuple, attrTuple));
 	}
 	
-	private void processFieldAsElement(Class clazz, TGPElement te, 
-			Field field, int propIndex) {	
+	private void processFieldAsElement(Class clazz, TGElement te, 
+			Field field, LinkedList<Class<? extends TrainGraphPart>> classList, 
+			HashSet<Class<? extends TrainGraphPart>> processedClassSet, 
+			int propIndex) {	
+		
+		String className = clazz.getName();	
+		if (te == null)
+			return;
+		
+		String fieldName = field.getName();
+		String propName = "".equals(te.name()) ? fieldName : te.name();
+		Class fieldClass = field.getType();
+		Class elementClass = fieldClass;
+		Tuple2 propTuple = Tuple2.oF(className, propName);
+		String elementType;
+		field.setAccessible(true);
+		
+		TGElementAttr tea = TGElementAttr.fromAnnotation(te);
+		tea.setName(propName);
+		tea.setIndex(te.index() == Integer.MAX_VALUE ? propIndex : te.index());
+		
+		Function<TrainGraphPart, Object> getter = tgp -> {
+			Object value;
+			try {
+				value = field.get(tgp);
+				return value;
+			} catch (IllegalArgumentException | IllegalAccessException e) {
+				e.printStackTrace();
+				return null;
+			}
+		};
+		BiConsumer<TrainGraphPart, Object> setter = null;
+		
+		
+		if (te.isList()) {
+			// List type
+			
+			elementType = "List property";
+			elementClass = tea.type();
+			boolean isListType = java.util.List.class.isAssignableFrom(fieldClass);
+			
+			if (!isListType) 
+				throw new RuntimeException(String.format("The %s field in %s class with "
+						+ "@TGElement should be a subclass of java.util.List<? extends %s>.",
+						field.getName(), className, TrainGraphPart.class.getName()));
+			
+			// Default value is used
+			if (elementClass.equals(TrainGraphPart.class)) 
+				throw new RuntimeException(String.format("The %s field in %s class with "
+						+ "@TGElement should has annotation attribute type set to the type parameter in "
+						+ "java.util.List<? extends %s>.",
+						field.getName(), className, TrainGraphPart.class.getName()));
+			
+			if (!processedClassSet.contains(elementClass)) {
+				processedClassSet.add(elementClass);
+				classList.addLast(elementClass);
+			}
+			
+			setter = (tgp, value) -> {
+				try {
+					List list = (List) field.get(tgp);
+					list.add(value);
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			};
+			
+			// List types will not have corresponding creator item in creator map, since
+			// List type is not a subclass of TrainGraphPart, and thus will not be processed
+			// in processClassANnotaitons method.
+			// As a result, an item should be created for the list property/
+			Supplier<Object> creator = () -> {
+				try {
+					return fieldClass.newInstance();
+				} catch (InstantiationException | IllegalAccessException e) {
+					throw new RuntimeException(String.format("Cannot create list property %s for class %s",
+							propName, className), e);
+				}
+			};
+			elementCreatorMap.put(propTuple, Tuple2.oF(fieldClass, creator));
+			
+		} else {
+			// Object property type
+
+			elementType = "Object property";
+			
+			if (!TrainGraphPart.class.isAssignableFrom(fieldClass))
+				throw new RuntimeException(String.format("The %s field in %s class with "
+						+ "@TGElement should be a subclass of %s.",
+						field.getName(), className, TrainGraphPart.class.getName()));
+
+			if (!processedClassSet.contains(elementClass)) {
+				processedClassSet.add(elementClass);
+				classList.addLast(elementClass);
+			}
+			
+			setter = (tgp, value) -> {
+				try {
+					field.set(tgp, value);
+				} catch (IllegalArgumentException | IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			};
+		}
+		
+		DEBUG_MSG("Register %s field %s.'%s' as %s", elementType, className, 
+				propName, fieldClass.getName());
+		elementGetterMap.put(propTuple, Tuple3.oF(tea, elementClass, getter));
+		elementSetterMap.put(propTuple, Tuple3.oF(tea, elementClass, setter));
 		
 	}
 	
 	private void processMethodAsSimpleProperty(Class<? extends TrainGraphPart> clazz,
-			TGPProperty tp, Method method, int propIndex) {
+			TGProperty tp, Method method, int propIndex) {
 
 		String className = clazz.getName();
 		if (tp != null) {
@@ -354,7 +515,8 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 				propName = tp.name();
 			}
 			
-			Tuple propTuple = Tuple.oF(className, propName);
+			Tuple2 propTuple = Tuple2.oF(className, propName);
+			method.setAccessible(true);
 			
 			// Setters
 			if (methodName.toLowerCase().startsWith("set")) {
@@ -365,9 +527,9 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 				}
 				Class propClass = method.getParameterTypes()[0];
 				String setterPropClass = propClass.getName();
-				String getterPropClass = simplePropertyTypeMap.get(propTuple);
+				String getterPropClass = PropertyTypeMap.get(propTuple);
 				if (getterPropClass == null) {
-					simplePropertyTypeMap.put(propTuple, setterPropClass);
+					PropertyTypeMap.put(propTuple, setterPropClass);
 				} else if (!setterPropClass.equals(getterPropClass)) {
 					throw new RuntimeException(String.format("The type of first argument of method %s in class %s with "
 							+ "@SimplePropertySetter should be %s, which is the return type of corresponding getter method.",
@@ -396,9 +558,9 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 				}
 				Class propClass = method.getReturnType();
 				String getterPropClass = propClass.getName();
-				String setterPropClass = simplePropertyTypeMap.get(propTuple);
+				String setterPropClass = PropertyTypeMap.get(propTuple);
 				if (setterPropClass == null) {
-					simplePropertyTypeMap.put(propTuple, getterPropClass);
+					PropertyTypeMap.put(propTuple, getterPropClass);
 				} else if (!setterPropClass.equals(getterPropClass)) {
 					throw new RuntimeException(String.format("The return type of method %s in class %s with "
 							+ "@SimplePropertySetter should be %s, which is the type of the first argument of corresponding setter method.",
@@ -418,8 +580,8 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 				});
 
 				int newPropIndex = Math.min(propIndex, tp.index());
-				Tuple attrTuple = Tuple.oF(newPropIndex, tp.firstline());
-				simplePropertyIndexList.add(Tuple.oF(propTuple, attrTuple));
+				Tuple2 attrTuple = Tuple2.oF(newPropIndex, tp.firstline());
+				simplePropertyIndexList.add(Tuple2.oF(propTuple, attrTuple));
 				
 				
 			}
@@ -428,11 +590,11 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	}
 	
 	private void processMethodAsElement(Class<? extends TrainGraphPart> clazz,
-			TGPElement te, Method method, int propIndex) {
+			TGElement te, Method method, LinkedList<Class<? extends TrainGraphPart>> classList, int propIndex) {
 		
 	}
 	
-	protected String getTGPProperty(Tuple<String, String> propTuple) {
+	private String getSimpleProperty(Tuple2<String, String> propTuple) {
 		Function<TrainGraphPart, String> getter = simplePropertyGetterMap.get(propTuple);
 		
 		if (getter != null) {
@@ -442,8 +604,8 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		}
 	}
 
-	protected void setTGPProperty(TrainGraphPart obj, String propName, String valueInStr) {
-		Tuple propTuple = Tuple.oF(obj.getClass().getName(), propName);
+	private void setSimpleProperty(TrainGraphPart obj, String propName, String valueInStr) {
+		Tuple2 propTuple = Tuple2.oF(obj.getClass().getName(), propName);
 		BiConsumer<TrainGraphPart, String> setter = simplePropertySetterMap.get(propTuple);
 		
 		if (setter != null) {
@@ -455,16 +617,10 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	 * Methods need to be implemented.
 	 * Element data accessers which will be used in save/load template methods
 	 **************************************************************************/
-	
 
-	
-	protected abstract String getStartSectionString();
-	protected abstract String getEndSectionString();
-	String createTGPNameById(int id) { return null; }
-	protected abstract Supplier<? extends TrainGraphPart> getConstructionFunc();	
-	public abstract void registerSubclasses();
-	void initElements() {}
-	void setToDefault() {}
+	String createTGPNameById(int id) { return String.format("%s %d", getElementName(), id); }
+	public void initElements() {}
+	public void setToDefault() {}
 	
 	/* Binary coding */
 	protected boolean isBase64Encoded() { return false; }
@@ -473,32 +629,11 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	protected void decodeFromBase64NewLine(String base64Line) {};
 	protected void decodeFromBase64End() {};
 	
-	/* Object Properties 
-	 * Must be overridden by sub-classes that has object properties */
-	protected void getObjectTGPProperties() {};
-	protected void setObjectTGPProperties(TrainGraphPart part) {};
-
-	/* Element array */
-	protected Vector<ET> getTGPElements() { return null; }
-	protected void addTGPElement(ET element) {}
-	protected boolean isOfElementType(TrainGraphPart part) {return false;}
-	
-	
 	/* Do complete work after all data loaded from file */
-	protected abstract void loadComplete();
+	protected void loadComplete() {}
 	
 	/**************************End of Abstract Methods*********************/
 
-	public void registerClasses() {		
-		_partClassMap.putIfAbsent(getStartSectionString().trim(), 
-				Tuple.of(getClass(), getConstructionFunc()) );
-		_partClassMap.putIfAbsent(getClass().getName(), 
-				Tuple.of(getClass(), getConstructionFunc()) );
-		
-		_objectIdMap.putIfAbsent(getClass().getName(), 0);
-		
-		registerSubclasses();
-	}
 	
 	public void saveToFile(String fileName) throws IOException {
 		FileOutputStream fs = new FileOutputStream(fileName);
@@ -517,21 +652,25 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	
 	public void saveToStream(OutputStream out) throws IOException {
 		Writer writer = new OutputStreamWriter(out, "utf-8");
-		saveToWriter(writer, 0);
+		saveToWriter(writer, 0, true);
 		writer.flush();
 	}
 	
 	public void saveToStream(OutputStream out, int identLevel) throws IOException {
 		Writer writer = new OutputStreamWriter(out, "utf-8");
-		saveToWriter(writer, identLevel);
+		saveToWriter(writer, identLevel, true);
 		writer.flush();
 	}
 	
-	protected void saveToWriter(Writer writer, int identLevel) throws IOException {
+	protected void saveToWriter(Writer writer, int identLevel, boolean printIdentOnFirstLine) 
+			throws IOException {
+		
 		Vector<ET> elements = null;
+		boolean elementPrinted = false;
 		// Write section begin string
-		_printIdent(writer, identLevel, false);
-		_print(writer, _getStartSectionString());
+		if (printIdentOnFirstLine)
+			_printIdent(writer, identLevel, false);
+		_print(writer, "%s {%s", getElementName(), isInOneLine() ? "" : NEW_LINE_STR);
 		
 		if (isBase64Encoded()) {
 			// Write base64 codes for binary contents
@@ -542,37 +681,29 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 			// Write simple properties
 			saveSimplePropertiesToWriter(writer, identLevel, isInOneLine());
 			
-			// Write object properties
-			getObjectTGPProperties();
-			if (objectProperties.size() > 0) {
-				_println(writer);
-				for (Tuple<String, TrainGraphPart> elementTuple : objectProperties) {
-					elementTuple.B.saveToWriter(writer, identLevel + 1);
+			// Write element properties recursively
+			elementPrinted = saveElementPropertiesToWriter(writer, identLevel, 
+					NEW_LINE_STR, NEW_LINE_STR, "", true, 
+					(element, te, eIdentLevel, printIdentOnFirstLine0) -> {
+				try {
+					element.saveToWriter(writer, eIdentLevel, printIdentOnFirstLine0);
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
-			}
-			
-			// Write element arrays
-			elements = getTGPElements();
-			if (elements != null) {
-				_println(writer);
-				for (ET element : getTGPElements()) {
-					element.saveToWriter(writer, identLevel + 1);
-				}
-			}
+			});
 		}
 		
 		// Write section end string
-		if (!isInOneLine() && objectProperties.size() == 0 && 
-				(elements == null || elements.size() == 0)) {
+		if (!isInOneLine() && !elementPrinted) {
 			_println(writer);
 		}
 		_printIdent(writer, identLevel, isInOneLine());
-		_print(writer, getEndSectionString());
+		_print(writer, "}");
 	}
 	
 	private void saveSimplePropertiesToWriter(Writer writer, int identLevel, boolean inOneLine) {
 		String className = getClass().getName();
-		List<Tuple<Tuple<String, String>, Tuple<Integer, Boolean> >> propKeyList= simplePropertyIndexMap.get(className);
+		List<Tuple2<Tuple2<String, String>, Tuple2<Integer, Boolean> >> propKeyList= simplePropertyIndexMap.get(className);
 		if (propKeyList == null) {
 			DEBUG_MSG("There is no fileds/accessor registered as simple property "
 					+ "in %s class with @SimpleProperty", className);
@@ -585,11 +716,11 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		
 		// A flag set up in sorting order and used in forEach
 		boolean[] boolFlags = {false, false}; // {hasFirstLineProperties, lineBreakPrinted}
-		int[] intFlags = {0}; // {iterationIndex}
+		int[] intFlags = {0, propKeyList.size() - 1}; // [iterationIndex, iterationMaxCount]
 		propKeyList.stream().sorted((tuple1, tuple2) -> {
 			// tuple.A is (className, propName), tuple.B is (propIndex, isFirstLine)
-			Tuple<Integer, Boolean> prop1Attr = tuple1.B;
-			Tuple<Integer, Boolean> prop2Attr = tuple2.B;
+			Tuple2<Integer, Boolean> prop1Attr = tuple1.B;
+			Tuple2<Integer, Boolean> prop2Attr = tuple2.B;
 			
 			if (prop1Attr.B || prop2Attr.B)
 				// Set has isFirstLine=true flag to true
@@ -607,8 +738,8 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 			
 		}).forEach(tuple-> {
 			// tuple.A is (className, propName), tuple.B is (propIndex, isFirstLine)
-			Tuple<String, String> propTuple = tuple.A;
-			Tuple<Integer, Boolean> propAttr = tuple.B;
+			Tuple2<String, String> propTuple = tuple.A;
+			Tuple2<Integer, Boolean> propAttr = tuple.B;
 			
 			if (!inOneLine) {
 				// If there are firstline=true properties
@@ -623,23 +754,79 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 				
 			}
 			
-			String propValue = getTGPProperty(propTuple);
+			String propValue = getSimpleProperty(propTuple);
 			propValue = _encode(propValue);
 			
+			_print(writer, "%s=%s", propTuple.B, propValue);
 
-			_print(writer, "%s=%s,", propTuple.B, propValue);
+			// ++ index and print , between properties.
+			if (intFlags[0] ++ != intFlags[1])
+				_print(writer, ", ");
 			
 			// ++ index
-			++ intFlags[0];
+//			++ intFlags[0];
 		});
 	}
-	
-	private String _getStartSectionString() {
-		String string = getStartSectionString();
 
-		IN_ONE_LINE = string == null || !string.endsWith("\r\n");
+	private boolean saveElementPropertiesToWriter(Writer writer, int identLevel,
+			String prefix, String delimiter, String suffix, boolean printLnAfterElement,
+			MultiConsumer<TrainGraphPart, TGElementAttr, Integer, Boolean> elementPrintAction) {
 		
-		return string;
+		boolean elementPrinted = false;
+		String newLineStrAfterElement = printLnAfterElement ? NEW_LINE_STR : "";
+		
+		List<Tuple2<String, String>> propKeyList = 
+			elementGetterKeyDict.get(getClass().getName());
+		if (propKeyList != null && propKeyList.size() > 0) {
+			elementPrinted = true;
+			_print(writer, prefix);
+			
+			int[] flags = {0, propKeyList.size() - 1};
+			propKeyList.stream().map(
+					propKey -> elementGetterMap.get(propKey))
+				.sorted((propTuple1, propTuple2) -> propTuple1.A.index() - propTuple2.A.index())
+				.forEach(propTuple -> {
+					TGElementAttr tea = propTuple.A;
+					Function<TrainGraphPart, Object> getter = propTuple.C;
+					if (tea.isList()) {
+						// List property
+						List<Object> elementList = (List<Object>) getter.apply(this);
+						if (printLnAfterElement)
+							_printIdent(writer, identLevel + 1, false);
+						_print(writer, "%s = %d[%s", tea.name(), elementList.size(), 
+								newLineStrAfterElement);
+						
+						for (int listItemIndex = 0; listItemIndex < elementList.size(); ++listItemIndex) {
+							TrainGraphPart element = (TrainGraphPart) elementList.get(listItemIndex);
+							elementPrintAction.accept(element, tea, identLevel + 2, true);
+							
+							if (printLnAfterElement)
+								_println(writer);
+						}
+
+						if (printLnAfterElement)
+							_printIdent(writer, identLevel + 1, false);
+						_print(writer, "]%s", printLnAfterElement ? NEW_LINE_STR : "");
+					} else {
+						// object property
+						
+						if (printLnAfterElement)
+							_printIdent(writer, identLevel + 1, false);
+						_print(writer, "%s = ", tea.name());
+						TrainGraphPart element = (TrainGraphPart) getter.apply(this);
+						elementPrintAction.accept(element, tea, identLevel + 1, false);
+					}
+					
+					 // index != size -1
+					if (flags[0] ++ != flags[1]) {
+						_print(writer, delimiter);
+					}
+				});
+			
+			_print(writer, suffix);
+		}
+		
+		return elementPrinted;
 	}
 	
 	/**
@@ -661,7 +848,8 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		TrainGraphPart classObjRoot = null;
 		String line = null;
 		int lineNum = 0;
-		Stack<TrainGraphPart> parsingNodeStack = new Stack<TrainGraphPart>();
+		// A stack objects being parsed. Each element is (object, name of object)
+		Stack<Tuple2<TrainGraphPart, Tuple2<String, String>>> parsingNodeStack = new Stack<>();
 		Vector<String> errMsgs = new Vector<> ();
 		while ((line = reader.readLine()) != null) {
 			line = line.trim();
@@ -685,15 +873,14 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	}
 	
 	protected static TrainGraphPart parseLine(String line, int lineNum, 
-			Stack<TrainGraphPart> parsingNodeStack, Vector<String> errMsgs, 
+			Stack<Tuple2<TrainGraphPart, Tuple2<String, String>>> parsingNodeStack, Vector<String> errMsgs, 
 			TrainGraphPart loadingNode) {
 		
-		TrainGraphPart parentPart = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
+		TrainGraphPart parentPart = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek().A;
 		
 		// Step 1. try to interpret this line as a start of an object.
-		TrainGraphPart thisObj = createObject(line, lineNum, parsingNodeStack, errMsgs, loadingNode);
-		if (thisObj != null)
-			parsingNodeStack.push(thisObj);
+		TrainGraphPart thisObj = createObject(line, lineNum, parsingNodeStack, 
+				errMsgs, loadingNode);
 		
 		if (thisObj instanceof UnknownPart)
 			return thisObj;
@@ -706,109 +893,130 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 			} else {
 				
 				// Step 2. try to find "name=value," patterns for properties
-				TrainGraphPart objToBeAssigned = parsingNodeStack.peek();
+				TrainGraphPart objToBeAssigned = parsingNodeStack.peek().A;
 				if (objToBeAssigned != null) {
 					String propLine = line.replaceFirst("^[^\\{]*\\{", "").replaceFirst("\\}.*", "");
 					String[] assignments = propLine.split(",");
 					for (String assignment : assignments) {
 						String[] strParts = assignment.split("=");
 						if (strParts.length >= 2) {
-							objToBeAssigned.setTGPProperty(objToBeAssigned, 
+							objToBeAssigned.setSimpleProperty(objToBeAssigned, 
 									strParts[0], _decode(strParts[1]));
 						} else {
-							objToBeAssigned.setTGPProperty(objToBeAssigned, 
+							objToBeAssigned.setSimpleProperty(objToBeAssigned, 
 									strParts[0], "");
 						}
 					}
 				}
 				
 				// Step 3. try to read as an object property or an element.
-				if (thisObj != null && parentPart != null) {
-					if (parentPart.isOfElementType(thisObj)) {
-						// Add thisObj as an element of parantPart
-						parentPart.addTGPElement(thisObj);
-					} else {
-						// Set thisObj as an object property of parantPart
-						parentPart.setObjectTGPProperties(thisObj);
-					}
-				}
+//				if (thisObj != null && parentPart != null) {
+//					setElementProperty(parentPart, thisObj);
+					
+//					if (parentPart.isOfElementType(thisObj)) {
+//						// Add thisObj as an element of parantPart
+//						parentPart.addTGPElement(thisObj);
+//					} else {
+//						// Set thisObj as an object property of parantPart
+//						parentPart.setObjectTGPProperties(thisObj);
+//					}
+//				}
 			}
 		}
 		
-		if (line.contains("}")) {
-			if (parentPart != null && parentPart.isBase64Encoded()) {
-				parentPart.decodeFromBase64End();
-			}
-			
-			TrainGraphPart part = parsingNodeStack.pop();
-			part.loadComplete();
-		}
+		finishObject(line, lineNum, parsingNodeStack, errMsgs);
 		
-		return parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
+		return parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek().A;
 	}
 	
-	protected static TrainGraphPart createObject(String line, int lineNum, 
-			Stack<TrainGraphPart> parsingNodeStack, Vector<String> errMsgs, 
+	private static TrainGraphPart createObject(String line, int lineNum, 
+			Stack<Tuple2<TrainGraphPart, Tuple2<String, String>>> parsingNodeStack, 
+			Vector<String> errMsgs, 
 			TrainGraphPart loadingNode) {
 		
 		// Part object starts with a "{". If no brace found, then no object is created.
 		if (!line.contains("{"))
 			return null;
+
+		TrainGraphPart obj = null;
+		TrainGraphPart stackTop = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek().A;
+		String parentName = stackTop == null ? "" : stackTop.getClass().getName();
+		String propName = line.replaceFirst("\\{.*", "").trim();
 		
-		TrainGraphPart stackTop = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
 		if (stackTop != null && stackTop instanceof UnknownPart) {
 			// If the current scope is an unknown part, then treat current part
 			// as an unknown part too, because there is no need to parse the content
 			// of an unknown part.
-			return new UnknownPart();
-		}
-		
-		String startSectionString = line.replaceFirst("\\{.*", "{");
-		Tuple<Class<? extends TrainGraphPart>, Supplier<? extends TrainGraphPart>> partClassTuple = 
-				_partClassMap.get(startSectionString);
-		
-		if (partClassTuple != null) {
-			/* If loadingNode is not null and it is an instance of corresponding
-			 * class to current line being parsed, then use it as the current object
-			 * instead of creating new one.
-			 */
-			if (loadingNode != null && partClassTuple.A.isInstance(loadingNode)) {
-				if (loadingNode.isBase64Encoded()) {
-					loadingNode.decodeFromBase64Start();
-				}
-				return loadingNode;
-			} else {
-				Class<? extends TrainGraphPart> clazz = partClassTuple.A;
-				String className = clazz.getName();
-				TrainGraphPart obj = null;
-				
-				try {
-					obj = partClassTuple.A.newInstance(); // partClassTuple.B.get();
-					obj.initElements();
-					
-					if (obj.isBase64Encoded()) {
-						obj.decodeFromBase64Start();
-					}
-				} catch (InstantiationException | IllegalAccessException e) {
-					obj = createUnknownPartint(line, lineNum, parsingNodeStack, errMsgs);
-					((UnknownPart) obj).message = 
-							String.format(__("Cannot call the default constructor with no arguments on %s class. "
-							+ "This object and all its content is skipped."), className);
-					e.printStackTrace();
-				} 
-				
-				return obj;
-			}
-		} else {
-			// A top level unknown part encountered during parsing.
-			UnknownPart obj = createUnknownPartint(line, lineNum, parsingNodeStack, errMsgs);
+			obj = new UnknownPart();
+		} 
+		else {
+			Tuple2<Class<?>, Supplier<? extends Object>> creatorTuple = 
+					elementCreatorMap.get(Tuple2.oF(parentName, propName));
 			
-			return obj;
+			if (creatorTuple != null) {
+				/* If loadingNode is not null and it is an instance of corresponding
+				 * class to current line being parsed, then use it as the current object
+				 * instead of creating new one.
+				 */
+				if (loadingNode != null && creatorTuple.A.isInstance(loadingNode)) {
+					if (loadingNode.isBase64Encoded()) {
+						loadingNode.decodeFromBase64Start();
+					}
+					obj = loadingNode;
+				} else {
+					Class<?> clazz = creatorTuple.A;
+					String className = clazz.getName();
+					obj = (TrainGraphPart) creatorTuple.B.get();
+					
+					// Failed to create an instance.
+					if (obj == null) {
+						obj = createUnknownPartint(line, lineNum, parsingNodeStack, errMsgs);
+						((UnknownPart) obj).message = 
+								String.format(__("Cannot create an instance of %s class. "
+								+ "This object and all its content is skipped."), className);
+					} else {
+	//					obj.initElements();
+						if (obj.isBase64Encoded()) {
+							obj.decodeFromBase64Start();
+						}
+					}
+				}
+			} else {
+				// A top level unknown part encountered during parsing.
+				obj = createUnknownPartint(line, lineNum, parsingNodeStack, errMsgs);
+			}
+		}	
+		
+		if (obj != null) {
+			parsingNodeStack.push(Tuple2.oF(obj, Tuple2.oF(parentName, propName)));
 		}
+		
+		return obj;
+	}
+	
+	private static void finishObject(String line, int lineNum, 
+			Stack<Tuple2<TrainGraphPart, Tuple2<String, String>>> parsingNodeStack, 
+			Vector<String> errMsgs) {
+		
+		if (!"}".equals(line))
+			return;
+		
+//		if (parsingNodeStack.isEmpty())
+//			throw new RuntimeException()
+		TrainGraphPart obj = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek().A;
+		if (obj != null && obj.isBase64Encoded()) {
+			obj.decodeFromBase64End();
+		}
+		
+//		TrainGraphPart part = parsingNodeStack.pop();
+//		part.loadComplete();
+		
+		// Object loading complete.
+		
 	}
 	
 	private static UnknownPart createUnknownPartint(String line, int lineNum, 
-			Stack<TrainGraphPart> parsingNodeStack, Vector<String> errMsgs) {
+			Stack<Tuple2<TrainGraphPart, Tuple2<String, String>>> parsingNodeStack, Vector<String> errMsgs) {
 
 		UnknownPart obj = new UnknownPart();
 		obj.startLineIndex = lineNum;
@@ -821,6 +1029,13 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	
 	
 	
+	private void _print(Writer writer, String msg) {
+		try {
+			writer.append(msg);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 	
 	private void _print(Writer writer, String formatStr, Object... params)  {
 		try {
@@ -832,14 +1047,14 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	
 	private void _println(Writer writer) {
 		try {
-			writer.append("\r\n");
+			writer.append(NEW_LINE_STR);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}	
 	
 	private boolean isInOneLine() {		
-		return IN_ONE_LINE;
+		return typeToAttrDict.get(getClass()).printInOneLine();
 	}
 	
 	private void _printIdent(Writer writer, int identLevel, boolean notNeedIdent) {
@@ -861,9 +1076,9 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 		// Init for toDebugString
 		TO_STRING_SHOW_TYPE = true;
 		TO_STRING_SHOW_PROPERTIES = false;
-		TO_STRING_SPECIFIC_TYPE_DEPTH.put(START_SECTION_ALL_TRAIN, 0);
-		TO_STRING_SPECIFIC_TYPE_DEPTH.put(START_SECTION_RAILINE_CHART, 0);
-		TO_STRING_SPECIFIC_TYPE_DEPTH.put(START_SECTION_RAILROAD_LINE, 0);
+		TO_STRING_SPECIFIC_TYPE_DEPTH.put(AllTrains.class.getName(), 0);
+		TO_STRING_SPECIFIC_TYPE_DEPTH.put(RailroadLineChart.class.getName(), 0);
+		TO_STRING_SPECIFIC_TYPE_DEPTH.put(RailroadLine.class.getName(), 0);
 	}
 	
 	public static void setDebugToString() {
@@ -880,74 +1095,52 @@ public abstract class TrainGraphPart<ET extends TrainGraphPart> {
 	
 	public String repr(int elementDepth, 
 			boolean showType, boolean showProperties) {
+
+		StringWriter writer = new StringWriter();
+		
+		repr0(writer, elementDepth, showType, showProperties);
+		
+		return writer.toString();
+	}
+	
+	private void repr0(Writer writer, int elementDepth, 
+			boolean showType, boolean showProperties) {
 		
 		if (elementDepth < 0) {
-			return getName();
+			_print(writer, getName());
 		} else {
-			StringWriter writer = new StringWriter();
-			
 			if (showType) {
-				writer.append(getStartSectionString().replace("{\r\n", "{"));
+				_print(writer, getElementName().replace("{\r\n", "{"));
 			} else {
-				writer.append("{");
+				_print(writer, "{");
 			}
 			
 			// Print simple properties
 			if (showProperties) {
-				writer.append("id=" + _id + ",");
+				_print(writer, "id=" + _id + ",");
 				saveSimplePropertiesToWriter(writer, 0, true);
 			} else {
 				if (showType) {
-					writer.append(String.format("id=%d,name=%s", _id, getName()));
+					_print(writer, String.format("id=%d,name=%s", _id, getName()));
 				} else {
-					writer.append(getName() + "@" + _id);
+					_print(writer, getName() + "@" + _id);
 				}
 			}
 			
 			String propertiesRepr=null, elementsRepr=null;
 			
-			// Print object properties
-			getObjectTGPProperties();
-			propertiesRepr = objectProperties.stream()
-				.map(propertyTuple -> {
-					String aString = propertyTuple.A + "=";
-					aString += propertyTuple.B.repr(
-						TO_STRING_SPECIFIC_TYPE_DEPTH.getOrDefault(
-								propertyTuple.B.getStartSectionString(), elementDepth - 1),
-						showType, showProperties);
-					return aString;})
-				.collect(Collectors.joining(","));
+			// Print element properties recursively
+			boolean elementPrinted = saveElementPropertiesToWriter(
+					writer, 0, ": ", ", ", "", false, 
+					(element, te, eIdentLevel, printIdentOnFirstLine0) -> {
+					
+				_print(writer, "%s=", te.name());
+				element.repr0(writer, TO_STRING_SPECIFIC_TYPE_DEPTH.getOrDefault(
+					element.getClass().getName(), elementDepth - 1),
+				showType, showProperties);
+			});
 			
-			// Print elements
-			if (elementDepth > 0) {
-				if (getTGPElements() != null) {
-					elementsRepr = getTGPElements().stream().map(element -> 
-										element.repr(TO_STRING_SPECIFIC_TYPE_DEPTH.getOrDefault(
-												element.getStartSectionString(), elementDepth - 1),
-											showType, showProperties))
-									.collect(Collectors.joining(",", "[", "]"));
-				}
-			}
-			
-			if (!"".equals(propertiesRepr) || elementsRepr != null) {
-				writer.append(": ");
-				if (propertiesRepr != null) {
-					writer.append(propertiesRepr);
-				}
-				if (elementsRepr != null) {
-					if (!"".equals(propertiesRepr)) {
-						writer.append(", ");
-					}
-
-					writer.append("elements=" + getTGPElements().size());
-					writer.append(elementsRepr);
-				}
-			}
-			
-			writer.append("}");
-			
-			
-			return writer.toString();
+			_print(writer, "}");
 		}
 	}
 	

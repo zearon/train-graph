@@ -1,4 +1,4 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -16,10 +16,13 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.paradise.etrc.data.annotation.TGPElement;
-import org.paradise.etrc.data.annotation.TGPProperty;
+import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.util.data.Tuple2;
 
 /**
  * 运行图的区间，可以是一整条线路，也可以是某条干线的一段
@@ -30,27 +33,28 @@ import org.paradise.etrc.data.util.Tuple;
  * 
  */
 
+@TGElementType(name="RailLine")
 public class RailroadLine extends TrainGraphPart<Station> {
 	private static int idCounter = 0;
 //	public static int MAX_STATION_NUM = 512;
 	
-	@TGPProperty
+	@TGProperty
 	public int length = 0;
-	@TGPProperty
+	@TGProperty
 	public int multiplicity = 2;
-	@TGPProperty
+	@TGProperty
 	public int zindex = 0;
-	@TGPProperty
+	@TGProperty
 	public float dispScale = 1.0f;
-	@TGPProperty
+	@TGProperty
 	public boolean visible = true;
-	@TGPProperty
+	@TGProperty
 	public boolean isProjection = false;
 	
 	public transient String dinfo = "";
 	private transient int id;
 
-	@TGPElement(name="All Stations", isList=true)
+	@TGElement(name="All Stations", isList=true, type=Station.class)
 	private Vector<Station> stations = new Vector<Station> (10);
 	
 	public int calIndex = 0;
@@ -69,7 +73,7 @@ public class RailroadLine extends TrainGraphPart<Station> {
 	}
 	
 	@Override
-	void setToDefault() {
+	public void setToDefault() {
 		this.length = 30;
 		this.multiplicity = 2;
 		this.zindex = 1;
@@ -157,10 +161,10 @@ public class RailroadLine extends TrainGraphPart<Station> {
 	 * @param index
 	 * @return
 	 */
-	public Tuple<Station, Integer> getCrossoverStationTuple(int index) {
+	public Tuple2<Station, Integer> getCrossoverStationTuple(int index) {
 		Station station = crossoverStations.get(index);
 		int stationIndex = stations.indexOf(station);
-		return Tuple.of(station, stationIndex);
+		return Tuple2.of(station, stationIndex);
 	}
 
 	/**
@@ -772,57 +776,5 @@ public class RailroadLine extends TrainGraphPart<Station> {
 			.forEach(action->action.accept(this));
 	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
-	
-	/**
-	 * Implements method inherited from abstract base class TrainGraphPart
-	 */
-	@Override
-	protected String getStartSectionString() { return START_SECTION_RAILROAD_LINE; }
-	@Override
-	protected String getEndSectionString() { return END_SECTION_RAILROAD_LINE; }
-	@Override 
-	String createTGPNameById(int id) { 
-		return String.format(__("Line %d"), id);
-	}
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return RailroadLine::new;
-	}
-	@Override
-	public void registerSubclasses() {
-		new Station().registerClasses();
-	}
-
-	/* Element array */
-	@Override
-	protected Vector<Station> getTGPElements() {
-		return stations;
-	}
-
-	@Override
-	protected void addTGPElement(Station element) {
-		stations.add(element);
-	}
-
-	@Override
-	protected boolean isOfElementType(TrainGraphPart part) {
-		return part != null && part instanceof Station;
-	}
-	
-	/* Do complete work after all data loaded from file */
-	@Override
-	protected void loadComplete() {
-		
-	};
 }

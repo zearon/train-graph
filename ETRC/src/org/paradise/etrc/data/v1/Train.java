@@ -1,4 +1,4 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -20,22 +20,27 @@ import java.util.Vector;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import org.paradise.etrc.data.annotation.TGPProperty;
+import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.util.data.Tuple2;
 
 /**
  * @author lguo@sina.com
  * @version 1.0
  */
 
+@TGElementType(name="Train")
 public class Train extends TrainGraphPart<Stop> {
 //	public static int MAX_STOP_NUM = 100;
 
-	@TGPProperty
+	@TGProperty
 	public String trainNameDown = "";
 
-	@TGPProperty
+	@TGProperty
 	public String trainNameUp = "";
 	
 	/**
@@ -59,10 +64,11 @@ public class Train extends TrainGraphPart<Stop> {
 //	private int stopNum = 0;
 
 //	private Stop[] _stops = new Stop[MAX_STOP_NUM];
+	@TGElement(name="Stops", isList=true, type=Stop.class)
 	private Vector<Stop> stops = new Vector<Stop>(15);
 
 
-	@TGPProperty(name="color")
+	@TGProperty(name="color")
 	public Color color = null;
 //	@TGPProperty(name="color")
 //	public String getColorStr() {
@@ -82,17 +88,17 @@ public class Train extends TrainGraphPart<Stop> {
 	Train() {
 	}
 
-	@TGPProperty
+	@TGProperty
 	public void setStartStation(String sta) {
 		startStation = sta;
 	}
 
-	@TGPProperty
+	@TGProperty
 	public void setTerminalStation(String sta) {
 		terminalStation = sta;
 	}
 
-	@TGPProperty
+	@TGProperty
 	public String getStartStation() {
 		if(!startStation.equalsIgnoreCase(""))
 			return startStation;
@@ -102,7 +108,7 @@ public class Train extends TrainGraphPart<Stop> {
 			return "";
 	}
 
-	@TGPProperty
+	@TGProperty
 	public String getTerminalStation() {
 		if(!terminalStation.equalsIgnoreCase(""))
 			return terminalStation;
@@ -908,56 +914,5 @@ public class Train extends TrainGraphPart<Stop> {
 	
 	
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 
-	
-	/**
-	 * Implements method inherited from abstract base class TrainGraphPart
-	 */
-	@Override
-	protected String getStartSectionString() { return START_SECTION_TRAIN; }
-	@Override
-	protected String getEndSectionString() { return END_SECTION_TRAIN; }
-	@Override 
-	String createTGPNameById(int id) { 
-		return String.format(__("Train %d"), id);
-	}
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return Train::new;
-	}
-	@Override
-	public void registerSubclasses() {
-		new Stop().registerClasses();
-	}
-
-	/* Element array */
-	@Override
-	protected Vector<Stop> getTGPElements() {
-		return stops;
-	}
-
-	@Override
-	protected void addTGPElement(Stop element) {
-		stops.add(element);
-	}
-
-	@Override
-	protected boolean isOfElementType(TrainGraphPart part) {
-		return part != null && part instanceof Stop;
-	}
-	
-	/* Do complete work after all data loaded from file */
-	@Override
-	protected void loadComplete() {
-		
-	};
 }

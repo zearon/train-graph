@@ -9,9 +9,9 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import org.paradise.etrc.controller.ActionManager;
-import org.paradise.etrc.controller.action.DirectAction.MultiConsumer;
-import org.paradise.etrc.controller.action.DirectAction.TriConsumer;
-import org.paradise.etrc.data.RailroadLine;
+import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.util.function.MultiConsumer;
+import org.paradise.etrc.util.function.TriConsumer;
 import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 import org.paradise.etrc.util.ui.table.JEditTable;
 import org.paradise.etrc.view.lineedit.StationTableModel;
@@ -99,13 +99,13 @@ public class ActionFactory {
 	 * @param a1 Parameter 1.
 	 * @param a2 Parameter 2
 	 * @param a3 Parameter 3
-	 * @param args Other parameters
+	 * @param a4 Parameter 4
 	 * @return The DirectAction created and executed
 	 */
 	public static <T1, T2, T3, T4> UIAction createDirectActionAndDoIt(String actionDesc, 
-			MultiConsumer<T1, T2, T3, T4> action4, T1 a1, T2 a2, T3 a3, T4... args) {
+			MultiConsumer<T1, T2, T3, T4> action4, T1 a1, T2 a2, T3 a3, T4 a4) {
 		
-		UIAction action = new DirectAction(actionDesc, action4, a1, a2, a3, args);
+		UIAction action = new DirectAction(actionDesc, action4, a1, a2, a3, a4);
 
 		ActionManager.getInstance().addActionAndDoIt(action);
 

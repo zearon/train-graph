@@ -1,6 +1,7 @@
 package org.paradise.etrc.dialog;
 
 import static org.paradise.etrc.ETRC.__;
+
 import static org.paradise.etrc.ETRCUtil.*;
 
 import java.awt.BorderLayout;
@@ -25,8 +26,8 @@ import javax.swing.Timer;
 import javax.swing.border.EmptyBorder;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.Train;
 import org.paradise.etrc.data.skb.ETRCSKB;
+import org.paradise.etrc.data.v1.Train;
 
 /**
  * @author lguo@sina.com

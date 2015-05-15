@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.function.Supplier;
 
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.data.v1.RailNetworkChart;
+import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.TrainGraph;
+import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -19,8 +23,15 @@ public class TrainGraphFactory {
 	 * 初始化ID列表, 并调用顶层对象的prepare方法, 初始化所有涉及到的TrainGraphPart
 	 */
 	private static void init() {
-		TrainGraph trainGraph = new TrainGraph();
-		trainGraph.prepareForFirstLoading();
+		TrainGraph trainGraph;
+		try {
+			trainGraph = TrainGraphPart.newInstance(TrainGraph.class);
+			trainGraph.prepareForFirstLoading();
+			
+			resetIDCounters();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -95,25 +106,9 @@ public class TrainGraphFactory {
 	 */
 	public static <T extends TrainGraphPart> T createInstance(
 			Class<T> clazz, String name) {
-		if (clazz == null) {
-			throw new IllegalArgumentException(__("can not load default instance for class NULL."));
-		}
-		
-		String className = clazz.getName();
-		Tuple<Class<? extends TrainGraphPart>, 
-			Supplier<? extends TrainGraphPart>> tuple = 
-				TrainGraphPart._partClassMap.get(className);
-		if (tuple == null) {
-			throw new IllegalArgumentException(String.format(
-					__("Class %s is not registered through method prepareForFirstLoading"),
-					className));
-		}
-		
-		// Instantiate the object
-		T obj = (T) tuple.B.get();
-		
+		T obj = TrainGraphPart.newInstance(clazz);
+
 		// Initialize the object
-		setID(clazz, obj);
 		obj.initElements();
 		obj.setToDefault();
 		
@@ -129,15 +124,6 @@ public class TrainGraphFactory {
 	
 	public static synchronized void setID(Class<? extends TrainGraphPart> clazz, 
 			TrainGraphPart instance) {
-		
-		// Moved into constructor of abstract class TrainGraphPart
-		
-//		String className = clazz.getName();
-//		int id = TrainGraph._objectIdMap.get(className);
-//		
-//		instance._id = ++ id;
-//		
-//		TrainGraphPart._objectIdMap.put(className, id);
 	}
 	
 	/**

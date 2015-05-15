@@ -19,13 +19,13 @@ import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.ChartSettings;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.RailroadLine;
-import org.paradise.etrc.data.Station;
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
-import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.v1.ChartSettings;
+import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Station;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.view.chart.traindrawing.DrawingModel;
 import org.paradise.etrc.view.chart.traindrawing.TrainDrawing;
 

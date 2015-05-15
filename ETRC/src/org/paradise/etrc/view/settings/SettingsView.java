@@ -18,8 +18,8 @@ import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.ChartSettings;
-import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.v1.ChartSettings;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.databinding.JComboBoxBinding;
 import org.paradise.etrc.util.ui.databinding.JTextFieldBinding;

@@ -1,4 +1,4 @@
-package org.paradise.etrc.data;
+package org.paradise.etrc.data.v1;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -6,8 +6,10 @@ import java.util.Iterator;
 import java.util.Vector;
 import java.util.function.Supplier;
 
-import org.paradise.etrc.data.annotation.TGPElement;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -16,6 +18,7 @@ import static org.paradise.etrc.ETRC.__;
  * @author Jeff Gong
  *
  */
+@TGElementType(name="All Trains")
 public class AllTrains extends TrainGraphPart<Train>
 implements Collection<Train>
 {
@@ -23,7 +26,7 @@ implements Collection<Train>
 	AllTrains() {
 	}
 
-	@TGPElement(name="All Trains", isList=true)
+	@TGElement(name="All Trains", isList=true, type=Train.class)
 	public Vector<Train> trains = new Vector<Train>();
 	protected HashMap<String, Train> trainDict = new HashMap<String, Train> ();
 	
@@ -176,58 +179,4 @@ implements Collection<Train>
 		return trains.containsAll(c);
 	}
 	
-	
-	
-	
-	
-	
-	
-
-
-	/**
-	 * Implements method inherited from abstract base class TrainGraphPart
-	 */
-	@Override
-	protected String getStartSectionString() { return START_SECTION_ALL_TRAIN; }
-	@Override
-	protected String getEndSectionString() { return END_SECTION_ALL_TRAIN; }
-	@Override
-	protected Supplier<? extends TrainGraphPart> getConstructionFunc() {
-		return AllTrains::new;
-	}
-	@Override
-	public void registerSubclasses() {
-		new Train().registerClasses();
-	}
-	@Override
-	public String getName() {
-		return String.format(__("%d trains in total"), trains.size());
-	}
-	@Override
-	public void setName(String name) {}
-
-	/* Element array */
-	@Override
-	protected Vector<Train> getTGPElements() {
-		return trains;
-	}
-
-	@Override
-	protected void addTGPElement(Train element) {
-		trains.add(element);
-	}
-
-	@Override
-	protected boolean isOfElementType(TrainGraphPart part) {
-		return part != null && part instanceof Train;
-	}
-	
-	/* Do complete work after all data loaded from file */
-	@Override
-	protected void loadComplete() {
-		updateTrainDict();
-	}
-	
-	/*********************End of TrainGraphPart method implementations*********/
-
 }

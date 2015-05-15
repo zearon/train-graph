@@ -36,11 +36,11 @@ import javax.swing.table.TableRowSorter;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
-import org.paradise.etrc.data.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.util.ui.table.JEditTable;
 import org.paradise.etrc.view.chart.ChartView;

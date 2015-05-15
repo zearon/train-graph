@@ -4,7 +4,7 @@ import java.awt.Point;
 import java.awt.geom.Line2D;
 import java.util.Vector;
 
-import org.paradise.etrc.data.Stop;
+import org.paradise.etrc.data.v1.Stop;
 
 public class ChartLine {
 	protected Stop stop1;

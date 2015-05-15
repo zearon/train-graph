@@ -16,7 +16,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import org.paradise.etrc.data.Stop;
+import org.paradise.etrc.data.v1.Stop;
 
 public class TrainTable extends JTable {
 	private static final long serialVersionUID = 356612888441359876L;

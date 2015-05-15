@@ -8,8 +8,8 @@ import static org.paradise.etrc.ETRCUtil.*;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.paradise.etrc.data.ChartSettings;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.v1.ChartSettings;
 import org.paradise.etrc.util.Config;
 
 public class UIBindingModelTest {

@@ -12,10 +12,10 @@ import java.util.Enumeration;
 import java.util.Optional;
 import java.util.Vector;
 
-import org.paradise.etrc.data.ChartSettings;
-import org.paradise.etrc.data.RailroadLineChart;
-import org.paradise.etrc.data.Stop;
-import org.paradise.etrc.data.Train;
+import org.paradise.etrc.data.v1.ChartSettings;
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.view.chart.ChartView;
 
 /**

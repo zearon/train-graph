@@ -1,6 +1,7 @@
 package org.paradise.etrc.util.data;
 
 import com.sun.accessibility.internal.resources.accessibility;
+import com.sun.swing.internal.plaf.basic.resources.basic;
 
 public class Tuple2 <T1, T2> {
 	
@@ -59,10 +60,12 @@ public class Tuple2 <T1, T2> {
 
 	@Override
 	public int hashCode() {
+		int a = A == null ? 1 : A.hashCode();
+		int b = B == null ? 1 : B.hashCode();
 		if (fullEqual)
-			return A.hashCode() * B.hashCode();
+			return a * b;
 		else
-			return A.hashCode();
+			return a;
 	}
 
 	@Override

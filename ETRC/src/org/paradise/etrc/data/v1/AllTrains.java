@@ -30,6 +30,11 @@ implements Collection<Train>
 	public Vector<Train> trains = new Vector<Train>();
 	protected HashMap<String, Train> trainDict = new HashMap<String, Train> ();
 	
+	@Override
+	public void loadComplete() {
+		updateTrainDict();
+	}
+	
 	
 	protected void updateTrainDict() {
 		trainDict.clear();

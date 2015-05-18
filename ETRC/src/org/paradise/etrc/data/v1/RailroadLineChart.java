@@ -17,6 +17,7 @@ import java.util.Vector;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.annotation.TGElement;
@@ -42,8 +43,20 @@ public class RailroadLineChart extends TrainGraphPart {
 	public Vector<Train> trains = new Vector<Train> (100);
 	
 	//由于车次跨多条线路,因此序列化线路运行图时只保留途径该线路的车次的引用
+	Vector<TrainRef> trainRefs = null;
+
 	@TGElement(name="All TrainRefs", isList=true, type=TrainRef.class)
-	Vector<TrainRef> trainRefs = new Vector<TrainRef> ();
+	Vector<TrainRef> getTrainRefs() {
+		trainRefs = trains.stream().map(train -> new TrainRef(train.name))
+				.collect(Collectors.toCollection(Vector::new));
+		
+		return trainRefs;
+	}
+
+	@TGElement(name="All TrainRefs", isList=true, type=TrainRef.class)
+	void setTrainRefs(Vector<TrainRef> trainRefs) {
+		this.trainRefs = trainRefs;
+	}
 
 	//本运行图的车次总数
 //	private int trainNum = 0;
@@ -69,8 +82,7 @@ public class RailroadLineChart extends TrainGraphPart {
 	@Override
 	@TGProperty(name="railroadLineName")
 	public String getName() {
-		name = railroadLine != null ? railroadLine.getName() : __("NO_RAILLINE");
-		return name;
+		return railroadLine != null ? railroadLine.getName() : __("NO_RAILLINE");
 	}
 	@Override
 	@TGProperty(name="railroadLineName")

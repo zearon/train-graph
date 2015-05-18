@@ -37,10 +37,10 @@ import org.paradise.etrc.util.data.Tuple2;
 public class Train extends TrainGraphPart {
 //	public static int MAX_STOP_NUM = 100;
 
-	@TGProperty
+	@TGProperty(name="downName")
 	public String trainNameDown = "";
 
-	@TGProperty
+	@TGProperty(name="upName")
 	public String trainNameUp = "";
 	
 	/**

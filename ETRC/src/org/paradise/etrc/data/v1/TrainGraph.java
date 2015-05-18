@@ -12,7 +12,6 @@ import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.data.annotation.TGProperty;
-import org.paradise.etrc.data.annotation.TrainGraphElement;
 import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
@@ -32,6 +31,8 @@ public class TrainGraph extends TrainGraphPart {
 	public RailNetworkMap map;
 	@TGElement(isList=true, type=RailNetworkChart.class)
 	public Vector<RailNetworkChart> charts;
+	@TGElement(isList=true, type=RailNetworkChart.class)
+	public Vector<RailNetworkChart> charts2;
 	
 	TrainGraph() {
 	}
@@ -49,6 +50,7 @@ public class TrainGraph extends TrainGraphPart {
 		allTrains = TrainGraphFactory.createInstance(AllTrains.class);
 		map = TrainGraphFactory.createInstance(RailNetworkMap.class);
 		charts = new Vector<RailNetworkChart> ();
+//		charts2;
 	}
 	
 	public void syncLineChartsWithRailNetworks() {
@@ -106,20 +108,21 @@ public class TrainGraph extends TrainGraphPart {
 	/* Do complete work after all data loaded from file */
 	@Override
 	protected void loadComplete() {
-		charts.forEach(chart-> {
-			chart.railLineCharts.forEach(railineChart-> {
-				// Set railroadLine according to railroadLineName
-				railineChart.railroadLine = railNetwork.getAllRailroadLines().stream()
-						.filter(line->line.name.equals(railineChart.name))
-						.findFirst().orElse(null);				
-
-				// Set trains in terms of trainRefs
-				railineChart.trains.clear();
-				railineChart.trainRefs.stream()
-					.map(trainRef->allTrains.findTrain(trainRef.name))
-					.forEachOrdered(railineChart.trains::add);
+		if (charts != null)
+			charts.forEach(chart-> {
+				chart.railLineCharts.forEach(railineChart-> {
+					// Set railroadLine according to railroadLineName
+					railineChart.railroadLine = railNetwork.getAllRailroadLines().stream()
+							.filter(line->line.name.equals(railineChart.name))
+							.findFirst().orElse(null);				
+	
+					// Set trains in terms of trainRefs
+					railineChart.trains.clear();
+					railineChart.trainRefs.stream()
+						.map(trainRef->allTrains.findTrain(trainRef.name))
+						.forEachOrdered(railineChart.trains::add);
+				});
 			});
-		});
 
 	};	
 }

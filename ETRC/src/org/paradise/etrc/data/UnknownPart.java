@@ -18,8 +18,9 @@ public class UnknownPart extends TrainGraphPart {
 	public String startLine;
 	public String endLine;
 	public boolean topLevel = false;
+	
+	public boolean alerted = false;
 
 	public UnknownPart() {
-		// TODO Auto-generated constructor stub
 	}
 }

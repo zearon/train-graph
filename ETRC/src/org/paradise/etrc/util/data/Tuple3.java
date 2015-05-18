@@ -50,10 +50,13 @@ public class Tuple3 <T1, T2, T3> {
 
 	@Override
 	public int hashCode() {
+		int a = A == null ? 1 : A.hashCode();
+		int b = B == null ? 1 : B.hashCode();
+		int c = C == null ? 1 : C.hashCode();
 		if (fullEqual)
-			return A.hashCode() * B.hashCode() * C.hashCode();
+			return a * b * c;
 		else
-			return A.hashCode();
+			return a;
 	}
 
 	@Override

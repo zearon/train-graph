@@ -4,6 +4,7 @@ import java.util.Vector;
 import java.util.function.Supplier;
 
 import org.paradise.etrc.data.TrainGraphPart;
+import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.util.data.Tuple2;
 
 /**
@@ -11,11 +12,12 @@ import org.paradise.etrc.util.data.Tuple2;
  * @author Jeff Gong
  *
  */
+@TGElementType(name="NULL", printInOneLine=true)
 public class NullPart extends TrainGraphPart {
 
-	public NullPart() {
-		// TODO Auto-generated constructor stub
-	}
+	NullPart() {}
 	
-
+	/* Override name property in base class and make it not a TG property*/
+	public void setName(String name) {}
+	public String getName() {return ""; }
 }

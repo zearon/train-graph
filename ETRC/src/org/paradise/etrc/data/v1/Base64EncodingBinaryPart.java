@@ -28,7 +28,7 @@ public abstract class Base64EncodingBinaryPart extends
 	}
 
 	@Override
-	protected final String encodeToBase64() {
+	public final String encodeToBase64() {
 		String base64Codes = new sun.misc.BASE64Encoder().encode(encode());
 		return base64Codes;
 	}
@@ -41,6 +41,12 @@ public abstract class Base64EncodingBinaryPart extends
 
 	@Override
 	protected final void decodeFromBase64NewLine(String base64Line) {
+		if ("".equals(base64Line))
+			return;
+		
+		if (base64Line.contains("}"))
+			return;
+		
 		try {
 			out.write( decoder.decodeBuffer(base64Line) );
 		} catch (IOException e) {

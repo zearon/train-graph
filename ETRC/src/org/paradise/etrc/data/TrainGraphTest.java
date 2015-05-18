@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -19,6 +21,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.paradise.etrc.data.v1.RailNetworkChart;
+import org.paradise.etrc.data.v1.RailNetworkMap;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Station;
@@ -164,7 +167,7 @@ public class TrainGraphTest {
 		}
 	}
 	
-	@Test
+//	@Test
 	public void testSimplePropertyAnnotationLoad() {
 		System.out.println("-------      test SimpleProperty Annotation Load      ---------");
 		TrainGraphPart.setSimpleToString();
@@ -213,6 +216,29 @@ public class TrainGraphTest {
 		assertEquals("All Line Charts", groups[1]);
 		assertNull(groups[2]);
 		assertEquals("1", groups[3]);
+	}
+	
+	@Test
+	public void testBase64Region() throws IOException {
+		System.out.println("-------      test Base 64 region     ---------");
+		RailNetworkMap map = TrainGraphFactory.createInstance(RailNetworkMap.class);
+		map.loadFromFile(new File("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map.jpg"));
+		String base64Orig = map.encodeToBase64();
+		
+		FileWriter writer = new FileWriter("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map-base64-orig.txt");
+		writer.append(base64Orig);
+		writer.flush();
+		writer.close();
+		
+		load();
+		String base64Load = trainGraph.map.encodeToBase64();
+		
+		FileWriter writer2 = new FileWriter("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map-base64-load.txt");
+		writer2.append(base64Load);
+		writer2.flush();
+		writer2.close();
+		
+		assertEquals(base64Orig, base64Load);
 	}
 
 }

@@ -2,6 +2,7 @@ package org.paradise.etrc.data;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -86,7 +87,7 @@ public abstract class TrainGraphPart {
 	public static boolean TO_STRING_SHOW_PROPERTIES = false;
 	
 	public static final String IDENT_STR	= "  ";
-	public static final String NEW_LINE_STR	= "\r\n";
+	public static final String NEW_LINE_STR	= "\n";
 		
 	protected static LinkedHashMap<Tuple2<String, String>, Function<TrainGraphPart, String>> simplePropertyGetterMap =
 			new LinkedHashMap<> ();
@@ -284,8 +285,8 @@ public abstract class TrainGraphPart {
 			int errorCount = exceptions.stream().mapToInt(e -> e.errorCount).sum();
 			String msg = exceptions.stream().map(e -> e.getMessage())
 					.collect(Collectors.joining(NEW_LINE_STR, 
-							String.format("There are %d error%s found when parsing annotations:\r\n",
-									errorCount, (errorCount > 1 ? "s" : "") ), ""));
+							String.format("There are %d error%s found when parsing annotations:%s",
+									errorCount, (errorCount > 1 ? "s" : ""), NEW_LINE_STR ), ""));
 			System.err.println(msg);
 		}
 	}
@@ -883,7 +884,7 @@ public abstract class TrainGraphPart {
 		.forEach(errorMsgs::add);
 		
 		if (errorMsgs.size() > 0) {
-			String errMsg = errorMsgs.stream().collect(Collectors.joining("\r\n", "\r\n", ""));
+			String errMsg = errorMsgs.stream().collect(Collectors.joining(NEW_LINE_STR, NEW_LINE_STR, ""));
 			throw new AnnotationException(errorMsgs.size(), errMsg);
 		}
 	}
@@ -1180,9 +1181,10 @@ public abstract class TrainGraphPart {
 			int errorCount = exceptions.stream().mapToInt(e -> e.errorCount).sum();
 			String msg = exceptions.stream().map(e -> e.getMessage())
 					.collect(Collectors.joining(NEW_LINE_STR, 
-							String.format("There are %d error%s found when parsing annotations:\r\n",
-									errorCount, (errorCount > 1 ? "s" : "") ), ""));
+							String.format("There are %d error%s found when parsing annotations:",
+									errorCount, (errorCount > 1 ? "s" : ""), NEW_LINE_STR ), ""));
 			System.err.println(msg);
+			throw new ParsingException(__("Train graph file is corrupted."));
 		}
 		
 		if (clazz != null)
@@ -1190,6 +1192,17 @@ public abstract class TrainGraphPart {
 		else
 			return root;
 	}
+	
+//	private static FileWriter fw;
+//	static {
+//		try {
+//			fw = new FileWriter("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map-base64-load-debug.txt");
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+
 	
 	protected static TrainGraphPart parseLine(String line, int lineNum, 
 			Stack<TrainGraphPart> parsingNodeStack, 
@@ -1202,43 +1215,55 @@ public abstract class TrainGraphPart {
 		line = stripComment(line);
 		boolean emptyLine = "".equals(line);
 		
-		if (!emptyLine) {
+		TrainGraphPart parentObj = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
+		if (parentObj != null && parentObj.isBase64Encoded()) {
+			parentObj.decodeFromBase64NewLine(fullLine);
+			finishObject(line, fullLine, lineNum, parsingNodeStack, exceptions);
+//			try {
+//				fw.append(fullLine + "\r");
+//				fw.flush();
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+			modelModified |= true;
+		} else {
 			
-			// Step 1. try to interpret this line as a start of an object.
-			Tuple2<TrainGraphPart, String> objTuple = createObjectForLine(line, 
-					fullLine, lineNum, parsingNodeStack, exceptions, loadingNode);
-			TrainGraphPart thisObj = objTuple.A;
-			String remainingline = objTuple.B;
-			modelModified |= thisObj != null;
-			
-			TrainGraphPart parentObj = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
-			
-			if (parentObj != null) {
-				if (parentObj instanceof UnknownPart) {
-					// skip current line.
-					UnknownPart unknownElement = ((UnknownPart) parentObj);
-					if (! unknownElement.alerted) {
-						unknownElement.alerted = true;
-						throw ParsingException.create(lineNum, fullLine, ((UnknownPart) parentObj).message);
+			if (!emptyLine) {
+				
+				// Step 1. try to interpret this line as a start of an object.
+				Tuple2<TrainGraphPart, String> objTuple = createObjectForLine(line, 
+						fullLine, lineNum, parsingNodeStack, exceptions, loadingNode);
+				TrainGraphPart thisObj = objTuple.A;
+				String remainingline = objTuple.B;
+				modelModified |= thisObj != null;
+				
+				/*TrainGraphPart*/ parentObj = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
+				
+				if (parentObj != null) {
+					if (parentObj instanceof UnknownPart) {
+						// skip current line.
+						UnknownPart unknownElement = ((UnknownPart) parentObj);
+						if (! unknownElement.alerted) {
+							unknownElement.alerted = true;
+							throw ParsingException.create(lineNum, fullLine, ((UnknownPart) parentObj).message);
+						} else {
+							
+						}
 					} else {
 						
+						// Step 2. try to find simple property assignments, i.e.
+						// key-value pair matching "name=value" patterns.
+						Tuple2<Boolean, String> aspTuple = assignSimpleProperties(remainingline, fullLine, lineNum,
+								parsingNodeStack, exceptions);
+						modelModified |= aspTuple.A;
+						remainingline = aspTuple.B;
 					}
-				} if (parentObj.isBase64Encoded()) {
-					parentObj.decodeFromBase64NewLine(remainingline);
-				} else {
-					
-					// Step 2. try to find simple property assignments, i.e.
-					// key-value pair matching "name=value" patterns.
-					Tuple2<Boolean, String> aspTuple = assignSimpleProperties(remainingline, fullLine, lineNum,
-							parsingNodeStack, exceptions);
-					modelModified |= aspTuple.A;
-					remainingline = aspTuple.B;
 				}
+				
+				// Step 3. try to complete the object, which including assigning element properties
+				// and do load_complete job on the object.
+				modelModified |= finishObject(remainingline, fullLine, lineNum, parsingNodeStack, exceptions);
 			}
-			
-			// Step 3. try to complete the object, which including assigning element properties
-			// and do load_complete job on the object.
-			modelModified |= finishObject(remainingline, fullLine, lineNum, parsingNodeStack, exceptions);
 		}
 		
 		if (!emptyLine && !modelModified)
@@ -1408,20 +1433,20 @@ public abstract class TrainGraphPart {
 		return setter;
 	}
 	
-	private static Supplier<? extends Object> findCreatorForProperty(String fullLine, int lineNum, 
-			TrainGraphPart stackTop,  String propName) {
-		
-		String parentClassName = stackTop == null ? "" : stackTop.getClass().getName();
-		Tuple2<String, String> propTuple = Tuple2.oF(parentClassName, propName);
-		
-		Supplier<?> creator = elementCreatorMap.get(propTuple);
-		
-		if (creator == null)
-			throw ParsingException.create(lineNum, fullLine, __("There is no creator for property %s in class %s"), 
-					propName, parentClassName);
-		
-		return creator;
-	}	
+//	private static Supplier<? extends Object> findCreatorForProperty(String fullLine, int lineNum, 
+//			TrainGraphPart stackTop,  String propName) {
+//		
+//		String parentClassName = stackTop == null ? "" : stackTop.getClass().getName();
+//		Tuple2<String, String> propTuple = Tuple2.oF(parentClassName, propName);
+//		
+//		Supplier<?> creator = elementCreatorMap.get(propTuple);
+//		
+//		if (creator == null)
+//			throw ParsingException.create(lineNum, fullLine, __("There is no creator for property %s in class %s"), 
+//					propName, parentClassName);
+//		
+//		return creator;
+//	}	
 	
 	private static Function<TrainGraphPart, Object> findGetterForProperty(String fullLine, int lineNum, 
 			TrainGraphPart stackTop,  String propName) {
@@ -1525,7 +1550,7 @@ public abstract class TrainGraphPart {
 		obj.startLine = fullLine;
 		obj.topLevel = true;
 		
-		TrainGraphPart stackTop = parsingNodeStack == null ? null : parsingNodeStack.peek();
+		TrainGraphPart stackTop = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
 		String parentNodeClassName = "Root";
 		if (stackTop != null) {
 			if (stackTop instanceof ObjectPropertyAssignment)
@@ -1739,7 +1764,7 @@ public abstract class TrainGraphPart {
 			_print(writer, getName());
 		} else {
 			if (showType) {
-				_print(writer, getElementName().replace("{\r\n", "{"));
+				_print(writer, getElementName().replace("{" + NEW_LINE_STR, "{"));
 			} else {
 				_print(writer, "{");
 			}

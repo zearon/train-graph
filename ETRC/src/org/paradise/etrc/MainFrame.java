@@ -63,6 +63,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 
 import org.paradise.etrc.controller.ActionManager;
+import org.paradise.etrc.data.ParsingException;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.skb.ETRCLCB;
@@ -803,7 +804,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		if (Config.getInstance().getAutoLoadLastFile()) {
 			File file = new File(Config.getInstance().getLastFile(""));
 			if (file.exists())
-				do_OpenFile(file.getAbsolutePath());
+				try {
+					do_OpenFile(file.getAbsolutePath(), true);
+				} catch (Exception e) {
+					new MessageBox(__("A new file is created."))
+						.showMessage();
+					do_NewFile();
+				}
 			else {
 				new MessageBox(__("The last edited file do not exists. Thus a new file is created instead."))
 					.showMessage();
@@ -827,7 +834,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		setModel(trainGraph);
 	}
 	
-	private void do_OpenFile(String filePath) {
+	private void do_OpenFile(String filePath, boolean throwExceptions) {
 		try {
 			TrainGraphFactory.resetIDCounters();
 			trainGraph = TrainGraphFactory.loadTrainGraphFromFile(filePath);
@@ -840,12 +847,15 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			
 			setModel(trainGraph);
 			
-		} catch (IOException ioe) {
-			System.out.println("Loading graph failed.");
+		} catch (Exception ioe) {
+			String msg = "Loading graph failed.";
 			ioe.printStackTrace();
 			new MessageBox(String.format(__("Load train graph failed. Please check the %s file."
 					+ "\nReason:%s\nDetail:%s"), filePath, ioe.getMessage(), 
 					ioe.getCause() )).showMessage();
+			
+			if (throwExceptions)
+				throw new RuntimeException();
 		}
 	}
 	
@@ -892,7 +902,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		JMenuItem item = (JMenuItem) e.getSource();
 		String filePath = item.getName();
-		do_OpenFile(filePath);
+		do_OpenFile(filePath, false);
 	}
 
 	/**
@@ -1239,7 +1249,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			File f = chooser.getSelectedFile();
 			System.out.println(f);
 			
-			do_OpenFile(f.getAbsolutePath());
+			do_OpenFile(f.getAbsolutePath(), false);
 		}
 	}
 

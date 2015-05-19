@@ -86,11 +86,12 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 
 	private boolean ui_inited;
 
-	public LinesPanel(TrainGraph trainGraph, RailroadLineChart activeChart, ChartView chartView) {
+	public LinesPanel(TrainGraph trainGraph, ChartView chartView) {
 		this.chartView = chartView;
-		setModel(trainGraph, activeChart);
+		setModel(trainGraph);
 		
-		chartView.mainFrame.currentLineChart.addChartChangedListener(chart->this.updateBuffer());
+		if (chart != null)
+			chart.addChartChangedListener(chart->this.updateBuffer());
 		
 		try {
 			jbInit();
@@ -101,8 +102,8 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		}
 	}
 	
-	public void setModel(TrainGraph trainGraph, RailroadLineChart activeChart) {
-		this.chart = activeChart;
+	public void setModel(TrainGraph trainGraph) {
+		this.chart = trainGraph.currentLineChart;
 		this.settings = trainGraph.settings;
 		
 		if (ui_inited) {
@@ -215,8 +216,8 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		//如果有选中车次则
 		if(chartView.activeTrain != null) {
 			//如果是在选中车次的车次上单击右键，则弹出车次相关菜单
-			if(chartView.drawingModel.getActiveTrainDrawing().pointOnMe(e.getPoint()) || 
-			   chartView.drawingModel.getActiveTrainDrawing().pointOnMyRect(e.getPoint())) {
+			if(chartView.currentDrawingModel.getActiveTrainDrawing().pointOnMe(e.getPoint()) || 
+			   chartView.currentDrawingModel.getActiveTrainDrawing().pointOnMyRect(e.getPoint())) {
 				popupMenuOnActiveTrain(e.getPoint());
 			}
 			//不是在选中车次上单击右键，弹出车次无关菜单
@@ -338,21 +339,21 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		// 防锯齿
 		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		// 先画水印部分
-		for (TrainDrawing trainDrawing : chartView.drawingModel.getUnderDrawings() ) {
+		for (TrainDrawing trainDrawing : chartView.currentDrawingModel.getUnderDrawings() ) {
 			// 当前选中的车次放在最后画，确保在最上面
-			if (trainDrawing != chartView.drawingModel.getActiveTrainDrawing()) {
+			if (trainDrawing != chartView.currentDrawingModel.getActiveTrainDrawing()) {
 				trainDrawing.draw(g);
 			}			
 		}
 
 		// 再画非选中部分
-		for (Enumeration<TrainDrawing> e = chartView.drawingModel.getNormalDrawings().elements(); e
+		for (Enumeration<TrainDrawing> e = chartView.currentDrawingModel.getNormalDrawings().elements(); e
 				.hasMoreElements();) {
 			Object obj = e.nextElement();
 			if (obj instanceof TrainDrawing) {
 				TrainDrawing trainDrawing = ((TrainDrawing) obj);
 				// 当前选中的车次放在最后画，确保在最上面
-				if (trainDrawing != chartView.drawingModel.getActiveTrainDrawing()) {
+				if (trainDrawing != chartView.currentDrawingModel.getActiveTrainDrawing()) {
 					trainDrawing.draw(g);
 				}
 				// 把选中车次删掉再添加，以便在最后比较容易选择TrainLine
@@ -364,15 +365,15 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		}
 
 		// 最后画当前选中的车次
-		if (chartView.drawingModel.getActiveTrainDrawing() != null) {
+		if (chartView.currentDrawingModel.getActiveTrainDrawing() != null) {
 			// &&(mainFrame.chart.trainDrawings.contains(mainFrame.chart.activeTrain))) {
 			// System.out.println("Ac " + activeTrain.getTrainName());
-			chartView.drawingModel.getActiveTrainDrawing().draw(g);
+			chartView.currentDrawingModel.getActiveTrainDrawing().draw(g);
 		}
 	}
 
 	public Dimension getPreferredSize() {
-		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
+		RailroadLineChart chart = chartView.activeLineChart;
 		int w, h;
 		
 		w = Math.round( 60 * 24 * settings.minuteScale 
@@ -389,7 +390,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	}
 	
 	public void getBuffersize(int[] widthNHeight) {
-		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
+		RailroadLineChart chart = chartView.activeLineChart;
 		int w, h;
 		
 		w = 60 * 24 * 3//Chart.MAX_MINUTE_SCALE 
@@ -418,7 +419,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		Color oldColor = g.getColor();
 		g.setColor(chartView.gridColor);
 
-		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
+		RailroadLineChart chart = chartView.activeLineChart;
 		int start = Math.round( clock * 60 * settings.minuteScale + chartView.leftMargin );
 		int h = Math.round(chart.railroadLine.length * settings.distScale);
 		
@@ -454,7 +455,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		if (st.hide)
 			return;
 
-		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
+		RailroadLineChart chart = chartView.activeLineChart;
 
 		// 设置坐标线颜色
 		Color oldColor = g.getColor();
@@ -524,7 +525,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		Train nearTrain[] = findTrains(p);
 		for (int i = 0; i < nearTrain.length; i++)
 			chartView.mainFrame.statusBarMain.setText(
-					nearTrain[i].getTrainName(chartView.mainFrame.currentLineChart.railroadLine) + "次 " 
+					nearTrain[i].getTrainName(chartView.activeLineChart.railroadLine) + "次 " 
 					+ chartView.mainFrame.statusBarMain.getText());
 	}
 
@@ -538,7 +539,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	private Train[] findTrains(Point p) {
 		Vector<Train> trainsFound = new Vector<Train>();
 		// 正常部分
-		for (TrainDrawing trainDrawing : chartView.drawingModel.getNormalDrawings() ) {
+		for (TrainDrawing trainDrawing : chartView.currentDrawingModel.getNormalDrawings() ) {
 			if (trainDrawing.pointOnMe(p)) {
 				trainsFound.add(trainDrawing.train);
 			}
@@ -547,7 +548,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		// 水印部分
 		// 如果“水印显示反向车次”未选中则不给选水印车次
 		if(chartView.underDrawingColor != null) {
-			for (TrainDrawing trainDrawing : chartView.drawingModel.getUnderDrawings()) {
+			for (TrainDrawing trainDrawing : chartView.currentDrawingModel.getUnderDrawings()) {
 				if (trainDrawing.pointOnMe(p)) {
 					trainsFound.add(trainDrawing.train);
 				}
@@ -583,7 +584,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		else {
 			Stop stop = TrainGraphFactory.createInstance(Stop.class, staName)
 					.setProperties(theTime, theTime, false);
-			chartView.mainFrame.currentLineChart.insertNewStopToTrain(theTrain, stop);
+			chartView.activeLineChart.insertNewStopToTrain(theTrain, stop);
 //			Stop prevStop = chartView.mainFrame.chart.findPrevStop(theTrain, stop.stationName);
 //			if(prevStop == null)
 //				theTrain.appendStop(stop);
@@ -607,7 +608,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		// 先查水印部分的
 		// 如果“水印显示反向车次”未选中则不给选水印车次
 		if(chartView.underDrawingColor != null) {
-			for (Enumeration<TrainDrawing> e = chartView.drawingModel.getUnderDrawings().elements(); e.hasMoreElements();) {
+			for (Enumeration<TrainDrawing> e = chartView.currentDrawingModel.getUnderDrawings().elements(); e.hasMoreElements();) {
 				TrainDrawing trainDrawing = (TrainDrawing) e.nextElement();
 				if (trainDrawing.pointOnMyRect(p) || trainDrawing.pointOnMe(p)) {
 					// System.out.println(trainDrawing.getTrainName()+ " A");
@@ -617,7 +618,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		}
 
 		// 后查正常部分的，这样正常部分比较容易选中
-		for (Enumeration<TrainDrawing> e = chartView.drawingModel.getNormalDrawings().elements(); e
+		for (Enumeration<TrainDrawing> e = chartView.currentDrawingModel.getNormalDrawings().elements(); e
 				.hasMoreElements();) {
 			TrainDrawing trainDrawing = (TrainDrawing) e.nextElement();
 			if (trainDrawing.pointOnMyRect(p) || trainDrawing.pointOnMe(p)) {
@@ -687,7 +688,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	}
 
 	private void doDeleteActiveTrain() {
-		RailroadLineChart chart = chartView.mainFrame.currentLineChart;
+		RailroadLineChart chart = chartView.activeLineChart;
 		chart.delTrain(chartView.activeTrain);
 		chartView.setActiveTrain(null);
 		chartView.mainFrame.sheetView.updateData();
@@ -747,12 +748,12 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	public String getToolTipText(MouseEvent event) {
 		Point p = event.getPoint();
 
-		if (chartView.drawingModel.getActiveTrainDrawing() != null) {
-			TrainLine line = chartView.drawingModel.getActiveTrainDrawing().findNearTrainLine(p);
+		if (chartView.currentDrawingModel.getActiveTrainDrawing() != null) {
+			TrainLine line = chartView.currentDrawingModel.getActiveTrainDrawing().findNearTrainLine(p);
 			if (line != null)
 				return line.getInfo();
-			else if (chartView.drawingModel.getActiveTrainDrawing().pointOnMyRect(p))
-				return chartView.drawingModel.getActiveTrainDrawing().getInfo();
+			else if (chartView.currentDrawingModel.getActiveTrainDrawing().pointOnMyRect(p))
+				return chartView.currentDrawingModel.getActiveTrainDrawing().getInfo();
 		}
 
 		return null;
@@ -840,8 +841,8 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 			return;
 		
 		// 如果不在ActiveTrain上则返回
-		if (!chartView.drawingModel.getActiveTrainDrawing().pointOnMe(p) &&
-			!chartView.drawingModel.getActiveTrainDrawing().pointOnMyRect(p))
+		if (!chartView.currentDrawingModel.getActiveTrainDrawing().pointOnMe(p) &&
+			!chartView.currentDrawingModel.getActiveTrainDrawing().pointOnMyRect(p))
 			return;
 		
 		//菜单项
@@ -866,7 +867,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		MenuItem miTrainSlice = new MenuItem(__("Train Slice"));
 		miTrainSlice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new ChartSlice(chartView.mainFrame.currentLineChart).makeTrainSlice(chartView.activeTrain);
+				new ChartSlice(chartView.activeLineChart).makeTrainSlice(chartView.activeTrain);
 			}
 		});
 		/*		MenuItem miSaveAs = new MenuItem("另存为...");
@@ -897,10 +898,10 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 			if(train == null)
 				return;
 			
-			RailroadLineChart chart = chartView.mainFrame.currentLineChart;
+			RailroadLineChart chart = chartView.activeLineChart;
 			if(chart.containTrain(train)) {
 				if(new YesNoBox(chartView.mainFrame, String.format(__("Train %s is already in the graph, overwrite?"), train.getTrainName())).askForYes()) {
-					chartView.mainFrame.currentLineChart.delTrain(train);
+					chartView.activeLineChart.delTrain(train);
 					chartView.addTrain(train);
 				}
 			}
@@ -914,7 +915,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		final JColorChooser colorChooser = new JColorChooser();
 		ActionListener listener = new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				chartView.drawingModel.getActiveTrainDrawing().train.color = colorChooser.getColor();
+				chartView.currentDrawingModel.getActiveTrainDrawing().train.color = colorChooser.getColor();
 				LinesPanel.this.updateBuffer();
 			}
 		};
@@ -923,7 +924,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 				__("Select the color for the line"), true, // modal
 				colorChooser, listener, // OK button handler
 				null); // no CANCEL button handler
-		colorChooser.setColor(chartView.drawingModel.getActiveTrainDrawing().train.color);
+		colorChooser.setColor(chartView.currentDrawingModel.getActiveTrainDrawing().train.color);
 		ETRC.setFont(dialog);
 
 		Dimension dlgSize = dialog.getPreferredSize();

@@ -140,7 +140,16 @@ public class TrainListView extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				mainFrame.doLoadTrain();
 			}
+		});		
+		
+		JButton btImport = new JButton(__("Import From Schedule"));
+		btImport.setFont(new Font("dialog", 0, 12));
+		btImport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mainFrame.doImportTrains();
+			}
 		});
+
 		
 		JButton btEdit = new JButton(__("Edit"));
 		btEdit.setFont(new Font("dialog", 0, 12));
@@ -174,6 +183,7 @@ public class TrainListView extends JPanel {
 		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.add(btLoad);
+		buttonPanel.add(btImport);
 		buttonPanel.add(btAdd);
 		buttonPanel.add(btEdit);
 		buttonPanel.add(btDel);

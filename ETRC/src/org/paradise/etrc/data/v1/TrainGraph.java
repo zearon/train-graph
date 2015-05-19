@@ -68,7 +68,7 @@ public class TrainGraph extends TrainGraphPart {
 		updateTrainTypeDict();
 		setTrainTypeByNameForAllTrains();
 		
-		if (charts != null)
+		if (charts != null) {
 			charts.forEach(chart-> {
 				chart.railLineCharts.forEach(railineChart-> {
 					// Set railroadLine according to railroadLineName
@@ -77,6 +77,14 @@ public class TrainGraph extends TrainGraphPart {
 							.findFirst().orElse(null);
 				});
 			});
+		
+			if (charts.size() > 0) {
+				currentNetworkChart = charts.get(0);
+				if (currentNetworkChart != null && currentNetworkChart.allRailLineCharts().size() > 0) {
+					currentLineChart = currentNetworkChart.allRailLineCharts().get(0);
+				}
+			}
+		}
 
 	};	
 	
@@ -149,9 +157,10 @@ public class TrainGraph extends TrainGraphPart {
 	}
 	
 	public void setTrainTypeByNameForAllTrains() {
-		charts.forEach(networkChart -> {
-			networkChart.trains.parallelStream().forEach(this::setTrainTypeByName);
-		});
+		if (charts != null)
+			charts.forEach(networkChart -> {
+				networkChart.trains.parallelStream().forEach(this::setTrainTypeByName);
+			});
 	}
 
 	/*****************************************************

@@ -149,6 +149,7 @@ public abstract class TrainGraphPart {
 	protected TrainGraphPart root;
 	protected TrainGraphPart parent;
 	
+	public int getID() { return _id; }
 	@TGProperty(firstline=true)
 	public String getName() { return name; }
 	@TGProperty

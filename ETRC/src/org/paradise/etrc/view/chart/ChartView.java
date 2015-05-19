@@ -9,6 +9,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -69,7 +70,9 @@ public class ChartView extends JPanel {
 //	public TrainDrawing activeTrainDrawing;
 //	Vector<TrainDrawing> normalDrawings = new Vector<TrainDrawing>();
 //	Vector<TrainDrawing> underDrawings  = new Vector<TrainDrawing>();
-	DrawingModel drawingModel = new DrawingModel();
+	
+	HashMap<Integer, DrawingModel> drawingModelMap = new HashMap<Integer, DrawingModel> ();
+	DrawingModel currentDrawingModel;
 
 	public CircuitPanel panelCircuit;
 	public LinesPanel panelLines;
@@ -92,14 +95,14 @@ public class ChartView extends JPanel {
 
 	private boolean ui_inited;
 
-	public ChartView(TrainGraph trainGraph, RailroadLineChart activeChart, MainFrame _mainFrame) {
+	public ChartView(TrainGraph trainGraph, MainFrame _mainFrame) {
 		mainFrame = _mainFrame;
 		
-		setModel(trainGraph, activeChart);
+		setModel(trainGraph);
 		
-		panelCircuit = new CircuitPanel(trainGraph, activeLineChart, this);
+		panelCircuit = new CircuitPanel(trainGraph, this);
 		panelClock = new ClockPanel(trainGraph, this);
-		panelLines = new LinesPanel(trainGraph, activeLineChart, this);
+		panelLines = new LinesPanel(trainGraph, this);
 		
 		try {
 			jbInit();
@@ -109,20 +112,45 @@ public class ChartView extends JPanel {
 		}
 	}
 	
-	public void setModel(TrainGraph trainGraph, RailroadLineChart activeLineChart) {
+	public void setModel(TrainGraph trainGraph) {
 		this.trainGraph = trainGraph;
+		activeLineChart = trainGraph.currentLineChart;
 		this.settings = trainGraph.settings;
-		this.activeLineChart = activeLineChart;
+		
+		currentDrawingModel = new DrawingModel();
+		drawingModelMap.put(activeLineChart.getID(), currentDrawingModel);
 		
 		activeTrain = null;
 		
 		if (ui_inited) {
-			panelCircuit.setModel(trainGraph, activeLineChart);
+			panelCircuit.setModel(trainGraph);
 			panelClock.setModel(trainGraph);
-			panelLines.setModel(trainGraph, activeLineChart);
+			panelLines.setModel(trainGraph);
 			cornerControl.setModel(trainGraph);
 		
 			shouldUpdateDrawingModel = true;
+			repaint();
+		}
+	}
+	
+	public void switchLineChart() {
+		activeLineChart = trainGraph.currentLineChart;
+		
+		currentDrawingModel = drawingModelMap.get(activeLineChart.getID());
+		if (currentDrawingModel == null) {
+			currentDrawingModel = new DrawingModel();
+			drawingModelMap.put(activeLineChart.getID(), currentDrawingModel);
+		
+			shouldUpdateDrawingModel = true;
+		} else {
+			shouldUpdateDrawingModel = currentDrawingModel.empty;
+		}
+		
+		if (ui_inited) {
+			panelCircuit.setModel(trainGraph);
+			panelClock.setModel(trainGraph);
+			panelLines.setModel(trainGraph);
+			cornerControl.setModel(trainGraph);
 			repaint();
 		}
 	}
@@ -131,7 +159,7 @@ public class ChartView extends JPanel {
 //		System.out.println("findAndMoveToTrain:" + trainName);
 //		
 		boolean found = false;
-		TrainDrawing trainDrawing = drawingModel.findTrainDrawingByName(trainName);
+		TrainDrawing trainDrawing = currentDrawingModel.findTrainDrawingByName(trainName);
 		if (trainDrawing != null) {
 			found = true;
 			panelLines.moveToTrainDrawing(trainDrawing);
@@ -151,7 +179,7 @@ public class ChartView extends JPanel {
 		if (train == null)
 			return;
 		
-		TrainDrawing trainDrawing = drawingModel.findTrainDrawing(train);
+		TrainDrawing trainDrawing = currentDrawingModel.findTrainDrawing(train);
 		panelLines.moveToTrainDrawing(trainDrawing);
 	}
 	
@@ -160,7 +188,7 @@ public class ChartView extends JPanel {
 		
 		// 设置MainFrame的标题和ToolTip
 		if (activeTrain != null) {
-			mainFrame.setActiceTrainName(activeTrain.getTrainName(mainFrame.currentLineChart.railroadLine));
+			mainFrame.setActiceTrainName(activeTrain.getTrainName(trainGraph.currentLineChart.railroadLine));
 			//ADD For SheetView
 			mainFrame.sheetView.selectTrain(activeTrain);
 			//打开ToolTip
@@ -171,7 +199,7 @@ public class ChartView extends JPanel {
 			panelLines.setToolTipText(null);
 		}
 		
-		drawingModel.setActiveTrain(train, showUpDownState);
+		currentDrawingModel.setActiveTrain(train, showUpDownState);
 
 		// 重绘
 		repaint();
@@ -184,9 +212,11 @@ public class ChartView extends JPanel {
 			return;
 		}
 		
-		drawingModel.updateCurrentCircuit(activeLineChart, activeLineChart.railroadLine, settings, this);
-		drawingModel.updateUpDownTrainOption(showUpDownState);
-		drawingModel.setActiveTrain(activeTrain, showUpDownState);
+		currentDrawingModel.updateCurrentCircuit(activeLineChart, activeLineChart.railroadLine, settings, this);
+		currentDrawingModel.updateUpDownTrainOption(showUpDownState);
+		currentDrawingModel.setActiveTrain(activeTrain, showUpDownState);
+		
+		currentDrawingModel.empty = false;
 	}
 
 	//水印颜色
@@ -233,7 +263,7 @@ public class ChartView extends JPanel {
 	 * @return int
 	 */
 	public int getPelsY(String stationName) {
-		return getPelsY(mainFrame.currentLineChart.railroadLine.getStationDist(stationName));
+		return getPelsY(trainGraph.currentLineChart.railroadLine.getStationDist(stationName));
 	}
 
 	/**
@@ -246,7 +276,7 @@ public class ChartView extends JPanel {
 	}
 
 	public String getStationName(int py) {
-		return mainFrame.currentLineChart.railroadLine.getStationName(getDist(py));
+		return trainGraph.currentLineChart.railroadLine.getStationName(getDist(py));
 	}
 
 	public int getMinute(int px) {
@@ -340,7 +370,7 @@ public class ChartView extends JPanel {
 			break;
 		}
 		
-		drawingModel.updateUpDownTrainOption(showUpDownState);
+		currentDrawingModel.updateUpDownTrainOption(showUpDownState);
 		
 		panelLines.updateBuffer();
 	}
@@ -365,7 +395,7 @@ public class ChartView extends JPanel {
 		int minutes = Math.round( ((p.x - leftMargin) / settings.minuteScale) );
 		cornerCoordinate.setText("(" + getClockString(minutes) + ","
 				+ getDistString(dist) + ")");
-		mainFrame.statusBarMain.setText(mainFrame.currentLineChart.railroadLine.getStationName(dist, true));
+		mainFrame.statusBarMain.setText(trainGraph.currentLineChart.railroadLine.getStationName(dist, true));
 	}
 
 	public String getDistString(Point p) {
@@ -382,7 +412,7 @@ public class ChartView extends JPanel {
 		if (distUpDownState == SHOW_DOWN)
 			return "" + dist;
 		else
-			return "" + (mainFrame.currentLineChart.railroadLine.length - dist);
+			return "" + (trainGraph.currentLineChart.railroadLine.length - dist);
 	}
 	
 	private String getClockString(int minutes) {
@@ -466,7 +496,7 @@ public class ChartView extends JPanel {
 	 * 取在图chart上画的停站
 	 */
 	public Stop[] getDrawStops(Train train) {
-		RailroadLine circuit = mainFrame.currentLineChart.railroadLine;
+		RailroadLine circuit = trainGraph.currentLineChart.railroadLine;
 		Stop[] drawStops = new Stop[circuit.getStationNum()];
 
 		int iDraw = 0;
@@ -501,7 +531,7 @@ public class ChartView extends JPanel {
 		panelClock.setSize(panelClock.getPreferredSize());
 		panelLines.setSize(panelLines.getPreferredSize());
 		
-		drawingModel.updateScale();
+		currentDrawingModel.updateScale();
 	}
 	
 //	public BufferedImage getBufferedImage() {
@@ -549,8 +579,8 @@ public class ChartView extends JPanel {
 
 	public void setActiveSation(int y) {
 		int dist = this.getDist(y);
-		int index = mainFrame.currentLineChart.railroadLine.getStationIndex(dist);
-		setActiveStation(mainFrame.currentLineChart.railroadLine.getStation(index));
+		int index = trainGraph.currentLineChart.railroadLine.getStationIndex(dist);
+		setActiveStation(trainGraph.currentLineChart.railroadLine.getStation(index));
 	}
 	
 	public void setActiveStation(Station station) {
@@ -571,7 +601,7 @@ public class ChartView extends JPanel {
 	}
 
 	public void addTrain(Train train) {
-		mainFrame.currentLineChart.addTrain(train);
+		trainGraph.currentLineChart.addTrain(train);
 		mainFrame.sheetView.updateData();
 		
 		this.setActiveTrain(train);

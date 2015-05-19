@@ -148,8 +148,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //	private String workingFileName;
 	
 	public TrainGraph trainGraph;
-	RailNetworkChart currentNetworkChart;
-	public RailroadLineChart currentLineChart;
 
 	private static final int MAX_TRAIN_SELECT_HISTORY_RECORD = 12;
 	public Vector<String> trainSelectHistory;
@@ -212,9 +210,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	public void setModel(TrainGraph trainGraph) {
 		setTitle();
-		
-		currentNetworkChart = trainGraph.allCharts().get(0);
-		currentLineChart = currentNetworkChart.allRailLineCharts().get(0);
 		
 		if (ui_inited) {
 			// Set Navigator in terms of train Graph
@@ -323,9 +318,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	//Component initialization
 	private void jbInit() throws Exception {
 		
-		chartView = new ChartView(trainGraph, currentLineChart, this);
-		runView = new DynamicView(trainGraph, currentLineChart, this);
-		sheetView = new SheetView(trainGraph, currentLineChart, this);
+		chartView = new ChartView(trainGraph, this);
+		runView = new DynamicView(trainGraph, this);
+		sheetView = new SheetView(trainGraph, this);
 		
 		settingsView = new SettingsView(trainGraph);
 		railNetworkEditorView = new RailNetworkEditorView(trainGraph);
@@ -358,7 +353,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				railLineEditView);
 		navigatorContentPanel.add(NavigatorNodeType.TRAIN_TYPES.name(), 
 				trainTypesView);
-		navigatorContentPanel.add(NavigatorNodeType.ALL_TRAINS.name(), 
+		navigatorContentPanel.add(NavigatorNodeType.RAILNETWORK_ALL_TRAINS.name(), 
 				allTrainsView);
 		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLES.name(),
 				timetableListView);
@@ -925,7 +920,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		} else if (command.equalsIgnoreCase(Tools_Circuit)) {
 			this.doCircuitTools();
 		} else if (command.equalsIgnoreCase(Tools_Train)) {
-			this.doTrainTools();
+			this.doImportTrains();
 		} else if (command.equalsIgnoreCase(Setup_Margin)) {
 			this.doMarginSet();
 		} else if (command.equalsIgnoreCase(Setup_Time)) {
@@ -965,9 +960,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		}
 	}
 	
-	private void doTrainTools() {
+	public void doImportTrains() {
 		//new MessageBox(this, "todo：从网络获取数据生成车次描述文件(.trf文件)。").showMessage();
-		if(new YesNoBox(this, __("This operation will delete all the train information on the graph, then import the train information from the default time table for this circuit. Continue?")).askForYes()) {
+		if(new YesNoBox(this, __("This operation will delete all the train information on the current railnetwork chart, then import the train information from the default time table for this circuit. Continue?")).askForYes()) {
 			FindTrainsDialog waitingBox = new FindTrainsDialog(this);
 			waitingBox.findTrains();
 		}
@@ -1080,7 +1075,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = currentLineChart.railroadLine.name + df.format(new Date());
+		String fileName = trainGraph.currentLineChart.railroadLine.name + df.format(new Date());
 		chooser.setSelectedFile(new File(fileName));
 
 		int returnVal = chooser.showSaveDialog(this); 
@@ -1304,15 +1299,15 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //							+ Train.toTrainFormat(loadingTrain.stops[i].leave)
 //							+ " 发");
 
-				if(loadingTrain.isDownTrain(currentLineChart.railroadLine, false) > 0)
-					currentLineChart.addTrain(loadingTrain);
+				if(loadingTrain.isDownTrain(trainGraph.currentLineChart.railroadLine, false) > 0)
+					trainGraph.currentLineChart.addTrain(loadingTrain);
 			}
 
 			//System.out.println("1.Move to: "+loadingTrain.getTrainName());
 			//mainView.buildTrainDrawings();
 			chartView.repaint();
 			sheetView.updateData();
-			chartView.findAndMoveToTrain(loadingTrain.getTrainName(currentLineChart.railroadLine));
+			chartView.findAndMoveToTrain(loadingTrain.getTrainName(trainGraph.currentLineChart.railroadLine));
 			runView.refresh();
 			//panelChart.panelLines.repaint();
 		}
@@ -1402,15 +1397,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	private void onNavigatorNodeChanged(NavigatorNodeType nodeType, 
 			int index, Object... params) {
-		DEBUG_ACTION(() -> {
-//			new MessageBox(this, 
-//					String.format("Type=%s, index=%d, params=[%s]", 
-//							nodeType.toString(), index, 
-//							Stream.of(params).map(obj->obj==null?"null":obj.toString())
-//							.reduce((a,b) -> a+", "+b).orElse("")
-//							))
-//				.showMessage();
-		}, TrainGraphPart.reprJoining(params, "\r\n", true));
+//		DEBUG_ACTION(() -> {
+//		}, TrainGraphPart.reprJoining(params, "\r\n", true));
 		
 		switch (nodeType) {
 		case GLOBAL_SETTINGS:
@@ -1436,25 +1424,27 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			break;
 		case TRAIN_TYPE_SPECIFIC:
 			/**********************************************/
-			currentLineChart = (RailroadLineChart) params[0];
+			trainGraph.currentLineChart = (RailroadLineChart) params[0];
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.TRAIN_TYPES.name());
-			break;
-		case ALL_TRAINS:
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.ALL_TRAINS.name());
 			break;
 		case TIME_TABLES:
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.TIME_TABLES.name());
 			break;
-		case TIME_TABLE_LINE:
-			currentLineChart = (RailroadLineChart) params[0];
-			currentNetworkChart = (RailNetworkChart) params[1];
+		case RAILNETWORK_ALL_TRAINS:
+			trainGraph.currentNetworkChart = (RailNetworkChart) params[1];
 
-			chartView.setModel(trainGraph, currentLineChart);
-			runView.setModel(trainGraph, currentLineChart);
-			sheetView.setModel(trainGraph, currentLineChart);
+			switchLineChart();
+			
+			navigatorContentCard.show(navigatorContentPanel, 
+					NavigatorNodeType.RAILNETWORK_ALL_TRAINS.name());
+			break;
+		case TIME_TABLE_LINE:
+			trainGraph.currentLineChart = (RailroadLineChart) params[0];
+			trainGraph.currentNetworkChart = (RailNetworkChart) params[1];
+
+			switchLineChart();
 
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.TIME_TABLE_LINE.name());
@@ -1464,6 +1454,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		}
 		navigatorContentPanel.revalidate();
 		
+	}
+	
+	private void switchLineChart() {
+		chartView.switchLineChart();
+		runView.setModel(trainGraph);
+		sheetView.setModel(trainGraph);
 	}
 	
 	//Overridden so we can exit when window is closed

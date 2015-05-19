@@ -22,6 +22,9 @@ public class SheetModel extends DefaultJEditTableModel {
 	}
 	
 	public int getColumnCount() {
+		if (chart == null)
+			return 0;
+		
 		return chart.getTrainNum() + 1;
 	}
 

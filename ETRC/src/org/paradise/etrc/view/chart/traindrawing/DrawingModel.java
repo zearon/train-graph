@@ -19,6 +19,7 @@ import org.paradise.etrc.view.chart.ChartView;
  */
 public class DrawingModel {
 	
+	public boolean empty = true;
 	protected RailroadLine currentCircuit;
 
 	protected Vector<TrainDrawing> allTrainDrawings = new Vector<TrainDrawing>();

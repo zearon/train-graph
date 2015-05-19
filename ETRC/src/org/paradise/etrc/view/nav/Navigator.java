@@ -41,7 +41,7 @@ public class Navigator extends JTree {
 		UNKNOWN, ROOT,
 		COMPREHENSIVE_VIEW, GLOBAL_SETTINGS, RAILROAD_NETWORK, RAILROAD_LINES,
 		RAILROAD_LINE_SPECIFIC, TRAIN_TYPES, TRAIN_TYPE_SPECIFIC,
-		ALL_TRAINS, TIME_TABLES, TIME_TABLE_SPECIFIC, TIME_TABLE_LINE,
+		RAILNETWORK_ALL_TRAINS, TIME_TABLES, TIME_TABLE_SPECIFIC, TIME_TABLE_LINE,
 		TIME_TABLE_LINE_DOWN, TIME_TABLE_LINE_UP, 
 		REMARKS
 		};
@@ -52,8 +52,9 @@ public class Navigator extends JTree {
 				int index, Object... param);
 	}
 
-	static final String DOWNWARD_LABEL = __("DOWNWARD");
-	static final String UPWARD_LABEL = __("UPWARD");
+	static final String ALL_TRAIN_LABEL = __("All Trains");
+	static final String DOWNWARD_LABEL = __("Down-going Trains");
+	static final String UPWARD_LABEL = __("Up-going Trains");
 	
 	
 	protected DefaultTreeModel treeModel;
@@ -64,7 +65,6 @@ public class Navigator extends JTree {
 	protected DefaultMutableTreeNode railroadNetworkNode;
 	protected DefaultMutableTreeNode railroadLinesNode;
 	protected DefaultMutableTreeNode trainTypesNode;
-	protected DefaultMutableTreeNode allTrainsNode;
 	protected DefaultMutableTreeNode timeTablesNode;
 	protected DefaultMutableTreeNode remarksNode;
 	
@@ -90,7 +90,6 @@ public class Navigator extends JTree {
 		railroadNetworkNode = new DefaultMutableTreeNode(__("Railroad Network"));
 		railroadLinesNode = new DefaultMutableTreeNode(__("Railroad Lines"));
 		trainTypesNode = new DefaultMutableTreeNode(__("Train Types"));
-		allTrainsNode = new DefaultMutableTreeNode(__("All Trains"));
 		timeTablesNode = new DefaultMutableTreeNode(__("Timetables"));
 		remarksNode = new DefaultMutableTreeNode(__("Remarks"));
 		
@@ -100,7 +99,6 @@ public class Navigator extends JTree {
 		rootNode.add(railroadNetworkNode);
 		rootNode.add(railroadLinesNode);
 		rootNode.add(trainTypesNode);
-		rootNode.add(allTrainsNode);
 		rootNode.add(timeTablesNode);
 		rootNode.add(remarksNode);
 
@@ -137,6 +135,9 @@ public class Navigator extends JTree {
 			DefaultMutableTreeNode parentNode = new DefaultMutableTreeNode(railnetworkChart);
 			timeTableNodes.add(parentNode);
 			timeTablesNode.add(parentNode);
+
+			DefaultMutableTreeNode allTrainsNode = new DefaultMutableTreeNode(ALL_TRAIN_LABEL);
+			parentNode.add(allTrainsNode);
 			
 			trainGraph.railNetwork.getAllRailroadLines().forEach(line -> {
 				
@@ -216,8 +217,6 @@ public class Navigator extends JTree {
 			nodeType = NavigatorNodeType.RAILROAD_LINES;
 		} else if (node == trainTypesNode) {
 			nodeType = NavigatorNodeType.TRAIN_TYPES;
-		} else if (node == allTrainsNode) {
-			nodeType = NavigatorNodeType.ALL_TRAINS;
 		} else if (node == timeTablesNode) {
 			nodeType = NavigatorNodeType.TIME_TABLES;
 		} else if (node == remarksNode) {
@@ -246,11 +245,15 @@ public class Navigator extends JTree {
 				grandParentNode = path.getPathComponent(pathNodeCount - 3);
 				parentNode = path.getPathComponent(pathNodeCount - 2);
 				if (grandParentNode == timeTablesNode) {
-					nodeType = NavigatorNodeType.TIME_TABLE_LINE;
 					// get model node
 					params = new Object[2];
 					params[0] = ((DefaultMutableTreeNode) node).getUserObject();
 					params[1] = ((DefaultMutableTreeNode) parentNode).getUserObject();
+					
+					if (params[0] instanceof RailroadLineChart)
+						nodeType = NavigatorNodeType.TIME_TABLE_LINE;
+					else
+						nodeType = NavigatorNodeType.RAILNETWORK_ALL_TRAINS;
 				}
 			} else if (pathNodeCount > 2) {
 				parentNode = path.getPathComponent(pathNodeCount - 2);

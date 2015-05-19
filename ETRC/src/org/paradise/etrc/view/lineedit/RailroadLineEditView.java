@@ -1273,9 +1273,9 @@ public class RailroadLineEditView extends JPanel {
 	}
 
 	private void doRailNetwork_Complete() {
-		mainFrame.currentLineChart.allCircuits.clear();
-		mainFrame.currentLineChart.allCircuits.addAll(railroadLineTableModel.raillines);
-		mainFrame.currentLineChart.railroadLine = railroadLineTableModel.raillines.get(0);
+		mainFrame.trainGraph.currentLineChart.allCircuits.clear();
+		mainFrame.trainGraph.currentLineChart.allCircuits.addAll(railroadLineTableModel.raillines);
+		mainFrame.trainGraph.currentLineChart.railroadLine = railroadLineTableModel.raillines.get(0);
 		
 		mainFrame.trainGraph.railNetwork.replaceAllRailroadLines(
 				railroadLineTableModel.raillines);

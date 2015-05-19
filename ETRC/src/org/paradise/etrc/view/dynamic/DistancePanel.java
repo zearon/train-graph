@@ -33,9 +33,9 @@ public class DistancePanel extends JPanel {
 
 	private boolean ui_inited = false;
 
-	public DistancePanel(DynamicView _dView) {
+	public DistancePanel(TrainGraph trainGraph, DynamicView _dView) {
 		dView = _dView;
-		chart = _dView.mainFrame.currentLineChart;
+		setModel(trainGraph);
 
 		try {
 			jbInit();
@@ -45,9 +45,9 @@ public class DistancePanel extends JPanel {
 		}
 	}
 	
-	public void setModel(TrainGraph trainGraph, RailroadLineChart chart) {
+	public void setModel(TrainGraph trainGraph) {
 		this.settings = trainGraph.settings;
-		this.chart = chart;
+		this.chart = trainGraph.currentLineChart;
 		
 		if (ui_inited)
 			repaint();

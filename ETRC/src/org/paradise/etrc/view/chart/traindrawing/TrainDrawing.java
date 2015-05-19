@@ -83,7 +83,7 @@ public void rebuild() {
 }
 
   private void buildUp() {
-	RailroadLineChart chart = chartView.mainFrame.currentLineChart;
+	RailroadLineChart chart = chartView.activeLineChart;
     int direction = train.isDownTrain(chart.railroadLine);
     String trainName = getTrainName();
 
@@ -364,7 +364,7 @@ public void rebuild() {
   }
 
   String getTrainName() {
-    return train.getTrainName(chartView.mainFrame.currentLineChart.railroadLine);
+    return train.getTrainName(chartView.activeLineChart.railroadLine);
   }
 
   /**
@@ -412,7 +412,7 @@ public void rebuild() {
     if(min < 0)
       min += 24*60;
 
-	RailroadLineChart chart = chartView.mainFrame.currentLineChart;
+	RailroadLineChart chart = chartView.activeLineChart;
     int dist = Math.abs(chart.railroadLine.getStationDist(stop[0].name)
                       - chart.railroadLine.getStationDist(stop[stop.length-1].name));
     

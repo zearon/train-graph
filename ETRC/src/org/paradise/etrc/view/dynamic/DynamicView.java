@@ -51,8 +51,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 	public MainFrame mainFrame;
 	public int scale = DEFAULT_SCALE;
 
-	private RailroadLineChart activeChart;
-
+	private TrainGraph trainGraph;
 	private ChartSettings settings;
 
 	private boolean ui_inited;
@@ -75,13 +74,13 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 		refresh();
 	}
 
-	public DynamicView(TrainGraph trainGraph, RailroadLineChart activeChart, MainFrame _mainFrame) {
+	public DynamicView(TrainGraph trainGraph, MainFrame _mainFrame) {
 		mainFrame = _mainFrame;
-		setModel(trainGraph, activeChart);
+		setModel(trainGraph);
 		
-		panelDistance = new DistancePanel(this);
+		panelDistance = new DistancePanel(trainGraph, this);
 		panelClock = new ClockPanel(this);
-		panelRunning = new RunningPanel(trainGraph, activeChart, this);
+		panelRunning = new RunningPanel(trainGraph, this);
 
 		try {
 			jbInit();
@@ -94,13 +93,13 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 		thr.start();
 	}
 	
-	public void setModel(TrainGraph trainGraph, RailroadLineChart activeChart) {
-		this.activeChart = activeChart;
+	public void setModel(TrainGraph trainGraph) {
+		this.trainGraph = trainGraph;
 		this.settings = trainGraph.settings;
 		
 		if (ui_inited) {
-			panelRunning.setModel(trainGraph, activeChart);
-			panelDistance.setModel(trainGraph, activeChart);
+			panelRunning.setModel(trainGraph);
+			panelDistance.setModel(trainGraph);
 			
 			refresh();
 		}
@@ -121,7 +120,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 	 * @return int
 	 */
 	public int getPelsX(String stationName) {
-		return getPelsX(mainFrame.currentLineChart.railroadLine.getStationDist(stationName));
+		return getPelsX(trainGraph.currentLineChart.railroadLine.getStationDist(stationName));
 	}
 
 	/**
@@ -139,7 +138,7 @@ public class DynamicView extends JPanel implements KeyListener, Runnable {
 	 * @return int
 	 */
 	public String getStationName(int px) {
-		return mainFrame.currentLineChart.railroadLine.getStationName(getDist(px));
+		return trainGraph.currentLineChart.railroadLine.getStationName(getDist(px));
 	}
 
 	/*

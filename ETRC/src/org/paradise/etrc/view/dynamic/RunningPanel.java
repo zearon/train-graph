@@ -44,9 +44,9 @@ public class RunningPanel extends JPanel {
 	private ChartSettings settings;
 	
 
-	public RunningPanel(TrainGraph trainGraph, RailroadLineChart activeChart, DynamicView _dView) {
+	public RunningPanel(TrainGraph trainGraph, DynamicView _dView) {
 		dView = _dView;
-		setModel(trainGraph, activeChart);
+		setModel(trainGraph);
 
 		try {
 			jbInit();
@@ -55,9 +55,9 @@ public class RunningPanel extends JPanel {
 		}
 	}
 	
-	public void setModel(TrainGraph trainGraph, RailroadLineChart activeChart) {
+	public void setModel(TrainGraph trainGraph) {
 		this.settings = trainGraph.settings;
-		this.chart = activeChart;
+		this.chart = trainGraph.currentLineChart;
 	}
 
 	void jbInit() throws Exception {

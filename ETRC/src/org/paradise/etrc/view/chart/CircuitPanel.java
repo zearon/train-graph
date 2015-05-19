@@ -39,9 +39,9 @@ public class CircuitPanel extends JPanel {
 
 	private boolean ui_inited;
 
-	public CircuitPanel(TrainGraph trainGraph, RailroadLineChart _chart, ChartView chartView) {
+	public CircuitPanel(TrainGraph trainGraph, ChartView chartView) {
 		this.chartView = chartView;
-		setModel(trainGraph, _chart);
+		setModel(trainGraph);
 
 		try {
 			jbInit();
@@ -62,15 +62,15 @@ public class CircuitPanel extends JPanel {
 					chartView.setActiveSation(e.getPoint().y + 12);
 					if(e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() >= 2)
 						if(chartView.activeStation != null)
-							new ChartSlice(chartView.mainFrame.currentLineChart).makeStationSlice(chartView.activeStation);
+							new ChartSlice(chartView.activeLineChart).makeStationSlice(chartView.activeStation);
 					chartView.panelLines.updateBuffer();
 				}
 			}
 		});
 	}
 	
-	public void setModel(TrainGraph trainGraph, RailroadLineChart activeChart) {
-		this.chart = activeChart;
+	public void setModel(TrainGraph trainGraph) {
+		this.chart = trainGraph.currentLineChart;
 		this.settings = trainGraph.settings;
 		
 		if (ui_inited) {

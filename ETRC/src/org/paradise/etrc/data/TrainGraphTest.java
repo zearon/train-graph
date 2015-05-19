@@ -164,7 +164,7 @@ public class TrainGraphTest {
 		});
 	}
 	
-//	@Test
+	@Test
 	public void testSimplePropertyAnnotationSave() {
 		System.out.println("-------      test SimpleProperty Annotation Save      ---------");
 		TrainGraphPart.setFullToString();

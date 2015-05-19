@@ -40,14 +40,15 @@ public class SheetView extends JPanel {
 
 	private boolean ui_inited;
 
+	private TrainGraph trainGraph;
 	private ChartSettings settings;
 
-	private RailroadLineChart activeLineChart;
+	public RailroadLineChart activeLineChart;
 
-	public SheetView(TrainGraph trainGraph, RailroadLineChart activeChart, MainFrame _mainFrame) {
+	public SheetView(TrainGraph trainGraph, MainFrame _mainFrame) {
 		mainFrame = _mainFrame;
 		
-		setModel(trainGraph, activeChart);
+		setModel(trainGraph);
 
 		table = new SheetTable(__("timetable"), this);
 		rowHeader = buildeRowHeader(table);
@@ -71,10 +72,10 @@ public class SheetView extends JPanel {
 		ui_inited = true;
 	}
 	
-	public void setModel(TrainGraph trainGraph, RailroadLineChart activeLineChart) {
-//		this.trainGraph = trainGraph;
+	public void setModel(TrainGraph trainGraph) {
+		this.trainGraph = trainGraph;
 		this.settings = trainGraph.settings;
-		this.activeLineChart = activeLineChart;
+		this.activeLineChart = trainGraph.currentLineChart;
 		
 		if (ui_inited) {
 			SheetModel model = (SheetModel) table.getModel();
@@ -116,7 +117,7 @@ public class SheetView extends JPanel {
 //	}
 		
 	private JList<?> buildeRowHeader(final JTable table) {
-		RowHeaderModel listModel = new RowHeaderModel(mainFrame.currentLineChart);
+		RowHeaderModel listModel = new RowHeaderModel(trainGraph.currentLineChart);
         JList<?> rowHeader = new JList<Object>(listModel);
         rowHeader.setFixedCellWidth(80);
         rowHeader.setFixedCellHeight(table.getRowHeight());
@@ -131,12 +132,12 @@ public class SheetView extends JPanel {
 				if(me.getClickCount() >= 2 && me.getButton() == MouseEvent.BUTTON1) {
 					String rowHeaderName = (String) ((JList<?>)me.getSource()).getSelectedValue();
 					String staName = rowHeaderName.substring(0, rowHeaderName.length()-3);
-					Station station = mainFrame.currentLineChart.railroadLine.getStation(staName);
+					Station station = trainGraph.currentLineChart.railroadLine.getStation(staName);
 //					new MessageBox(mainFrame, "TODO: 给出 "
 //							   + station.name
 //							   + "站 所有列车停靠、通过（推算）时刻表。 ").showMessage();
 					
-					new ChartSlice(mainFrame.currentLineChart).makeStationSlice(station);
+					new ChartSlice(trainGraph.currentLineChart).makeStationSlice(station);
 				}
 			}
         });
@@ -153,7 +154,7 @@ public class SheetView extends JPanel {
 	}
 
 	public void selectStation(Station station) {
-		RailroadLine circuit = mainFrame.currentLineChart.railroadLine;
+		RailroadLine circuit = trainGraph.currentLineChart.railroadLine;
 		for(int i=0; i<circuit.getStationNum(); i++) {
 			if(station.equals(circuit.getStation(i)))
 				rowHeader.setSelectedIndex(i*2);
@@ -162,7 +163,7 @@ public class SheetView extends JPanel {
 	
 	public void selectTrain(Train train) {
 		for(int i=0; i<table.getColumnCount(); i++) {
-			if(table.getColumnName(i).equals(train.getTrainName(mainFrame.currentLineChart.railroadLine))) {
+			if(table.getColumnName(i).equals(train.getTrainName(trainGraph.currentLineChart.railroadLine))) {
 				int row = table.getSelectedRow();
 				table.changeSelection(row, i, false, false);
 				table.editCellAt(row, i);
@@ -179,7 +180,10 @@ public class SheetView extends JPanel {
 	}
 
 	public void updateData() {
-		conner.setText("D:" + mainFrame.currentLineChart.dNum + " U:" + mainFrame.currentLineChart.uNum + "");
+		if (activeLineChart == null)
+			return;
+		
+		conner.setText("D:" + trainGraph.currentLineChart.dNum + " U:" + trainGraph.currentLineChart.uNum + "");
 		
 		SheetModel model = (SheetModel) table.getModel();
 		model.fireTableDataChanged();

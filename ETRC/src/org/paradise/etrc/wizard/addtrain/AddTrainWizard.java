@@ -116,11 +116,11 @@ public class AddTrainWizard extends Wizard {
 				System.out.println(train);
 				break;
 			case 3:
-				step3.setData(chartView.mainFrame.currentLineChart, train);
+				step3.setData(chartView.activeLineChart, train);
 				rt = step3.doModal();
 				break;
 			case 4:
-				step4.setData(chartView.mainFrame.currentLineChart, train);
+				step4.setData(chartView.activeLineChart, train);
 				rt = step4.doModal();
 				break;
 			}

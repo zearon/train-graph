@@ -65,7 +65,7 @@ public class ChartSetDialog extends JDialog {
 	private void init() {
 		tbPane = new JTabbedPane();
 		
-		RailroadLineChart chart = mainFrame.currentLineChart;
+//		RailroadLineChart chart = mainFrame.trainGraph.currentLineChart;
 		
 		d0 = createJTextField("" + settings.distScale);
 		d1 = createJTextField("" + settings.displayLevel);
@@ -292,7 +292,7 @@ public class ChartSetDialog extends JDialog {
 	}
 	
 	private void setValues() {
-		RailroadLineChart chart = mainFrame.currentLineChart;
+//		RailroadLineChart chart = mainFrame.trainGraph.currentLineChart;
 		
 	    String stDistScale = d0.getText();
 	    String stDisplay = d1.getText();

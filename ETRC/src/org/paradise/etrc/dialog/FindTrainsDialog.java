@@ -27,7 +27,9 @@ import javax.swing.border.EmptyBorder;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.skb.ETRCSKB;
+import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.Train;
+import org.paradise.etrc.data.v1.TrainGraph;
 
 /**
  * @author lguo@sina.com
@@ -104,7 +106,8 @@ public class FindTrainsDialog extends JDialog {
 	class LoadingThread implements Runnable {
 		public void run() {
 			hold(500);
-//			mainFrame.trainGraph.allTrains.clear();
+			RailNetworkChart networkChart = mainFrame.trainGraph.currentNetworkChart;
+			networkChart.clearTrains();
 			mainFrame.chartView.repaint();
 			
 			msgLabel.setText(__("Please wait while imporing train information..."));
@@ -117,7 +120,20 @@ public class FindTrainsDialog extends JDialog {
 				instant1= Instant.now();
 			
 			// Add to all trains
-//			mainFrame.trainGraph.allTrains.addAll(trains);
+			networkChart.addAllTrains(trains);
+			
+			networkChart.parallelTrainStream()
+				.forEach(train-> {
+					msgLabel.setText(String.format(__("Importing train information %s"), 
+							train.getTrainName()));
+					
+					networkChart.allRailLineCharts().forEach(lineChart -> {
+						if (train.isDownTrain(lineChart.railroadLine) > 0) {
+							lineChart.addTrain(train);
+						}
+					});
+				});
+			
 			mainFrame.allTrainsView.setModel(mainFrame.trainGraph);
 			
 			// Add train to railroad line charts.

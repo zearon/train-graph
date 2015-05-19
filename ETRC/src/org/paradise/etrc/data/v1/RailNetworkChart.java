@@ -90,7 +90,7 @@ public class RailNetworkChart extends TrainGraphPart {
 		return trains.stream();
 	}
 
-	public Stream<Train> parallelStream() {
+	public Stream<Train> parallelTrainStream() {
 		return trains.parallelStream();
 	}
 

@@ -4,6 +4,7 @@ import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.*;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.util.Vector;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -24,7 +25,7 @@ public class TrainType extends TrainGraphPart {
 	public static TrainType defaultTrainType = new TrainType(__("Default"));
 	static {
 		defaultTrainType.setProperties(__("Default"), ".*", Color.decode("#000000"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#000000")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#000000")).loadComplete();
 	}
 	
 	@TGProperty
@@ -39,6 +40,8 @@ public class TrainType extends TrainGraphPart {
 	public float lineWidth;
 	@TGProperty
 	public String fontFamily;
+	@TGProperty
+	public int fontStyle;
 	@TGProperty
 	public int fontSize;
 	@TGProperty
@@ -61,13 +64,14 @@ public class TrainType extends TrainGraphPart {
 	 * @return current object, for convenience of link-style invocation
 	 */
 	public TrainType setProperties(String abbriveation, String pattern, Color color, String lineStype, 
-			float lineWidth, String fontFamily, int fontSize, Color fontColor) {
+			float lineWidth, String fontFamily, int fontStyle, int fontSize, Color fontColor) {
 		this.abbriveation = abbriveation;
 		this.pattern = pattern;
 		this.color = color;
 		this.lineStype = lineStype;
 		this.lineWidth = lineWidth;
 		this.fontFamily = fontFamily;
+		this.fontStyle = fontStyle;
 		this.fontSize = fontSize;
 		this.fontColor = fontColor;
 		
@@ -79,7 +83,8 @@ public class TrainType extends TrainGraphPart {
 	 */	
 	@Override
 	public void setToDefault() {
-		setProperties("", "", Color.decode("#ff0000"), LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), 12, Color.decode("#700000"));
+		setProperties("", "", Color.decode("#ff0000"), LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), 
+				Font.PLAIN, 12, Color.decode("#700000"));
 	}	
 	
 	@Override

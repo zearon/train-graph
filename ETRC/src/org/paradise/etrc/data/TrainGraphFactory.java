@@ -1,6 +1,7 @@
 package org.paradise.etrc.data;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
@@ -103,23 +104,23 @@ public class TrainGraphFactory {
 		types[8] = createInstance(TrainType.class, "High Speed G");
 		
 		types[0].setProperties("Reg.", "\\d+", Color.decode("#008000"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#008000")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#008000")).loadComplete();
 		types[1].setProperties("Temp", "L\\d+", Color.decode("#804000"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#804000")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#804000")).loadComplete();
 		types[2].setProperties("K", "K\\d+", Color.decode("#ff0000"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#ff0000")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#ff0000")).loadComplete();
 		types[3].setProperties("T", "T\\d+", Color.decode("#0000ff"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#0000ff")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#0000ff")).loadComplete();
 		types[4].setProperties("Z", "Z\\d+", Color.decode("#cc33ff"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#cc33ff")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#cc33ff")).loadComplete();
 		types[5].setProperties("Q", "QK\\d+", Color.decode("#0099ff"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#0099ff")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#0099ff")).loadComplete();
 		types[6].setProperties("D", "D\\d+", Color.decode("#800080"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#008000")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#008000")).loadComplete();
 		types[7].setProperties("C", "C\\d+", Color.decode("#800080"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#008000")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#008000")).loadComplete();
 		types[8].setProperties("G", "G\\d+", Color.decode("#00ffbe"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), 12, Color.decode("#00ffbe")).loadComplete();
+				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#00ffbe")).loadComplete();
 		tg.addAllTrainTypes(Arrays.asList(types));
 		
 		tg.syncLineChartsWithRailNetworks();

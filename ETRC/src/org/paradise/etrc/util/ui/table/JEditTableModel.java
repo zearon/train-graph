@@ -23,12 +23,12 @@ interface IncrementalCellTableModel {
 	public <T> T getCopyOfMutableCellValue(T obj);
 	
 	/**
-	 * Get the increment of newObj comparing with baseObj
+	 * Get the difference of newObj and baseObj. (newObj - baseObj)
 	 * @param baseObj
 	 * @param newObj
-	 * @return the increment
+	 * @return the difference
 	 */
-	public <T> int getIncrement(T baseObj, T newObj);
+	public <T> int getDifference(T baseObj, T newObj);
 	
 	/**
 	 * Determine the going direction of changing cells.

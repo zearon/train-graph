@@ -153,17 +153,23 @@ public class TimetableListView extends JPanel {
 	}
 	
 	protected void initTable() {
-		table = new JEditTable("timetable list");
+		table = new JEditTable(__("timetable list"));
 		tableModel = new TimetableListTableModel(table);
 		tableModel.trainGraph = this.trainGraph;
-		
-		scrollPane.getViewport().add(table);
+		scrollPane.setViewportView(table);
 	}
 	
 	protected void do_MoveDown() {
 		// Move down a timetable
+<<<<<<< HEAD
 		int selectedStatonIndex = table.getSelectedRow();
 		if (selectedStatonIndex == trainGraph.allCharts()
+=======
+		int selectedIndex = table.getSelectedRow();
+		if (selectedIndex < 0 || selectedIndex >= trainGraph.getCharts().size())
+			return;
+		if (selectedIndex == trainGraph.getCharts()
+>>>>>>> TrainTypes引发存档错误
 				.size() - 1) {
 			new MessageBox(
 					__("This is already the last timetable and thus cannot be moved down any more."))
@@ -172,15 +178,22 @@ public class TimetableListView extends JPanel {
 		}
 		
 		ActionFactory.createTableElementMoveActionAndDoIt(__("timetable list"), 
+<<<<<<< HEAD
 				table, trainGraph.allCharts(), 
 				selectedStatonIndex, selectedStatonIndex + 1, true,
+=======
+				table, trainGraph.getCharts(), 
+				selectedIndex, selectedIndex + 1, true,
+>>>>>>> TrainTypes引发存档错误
 				_mainFrame.navigator::updateNavigatorByTimetables);
 	}
 
 	protected void do_MoveUp() {
 		// Move down a timetable
-		int selectedStatonIndex = table.getSelectedRow();
-		if (selectedStatonIndex == 0) {
+		int selectedIndex = table.getSelectedRow();
+		if (selectedIndex < 0 || selectedIndex >= trainGraph.getCharts().size())
+			return;
+		if (selectedIndex == 0) {
 			new MessageBox(
 					__("This is already the first timetable and thus cannot be moved down any more."))
 					.showMessage();
@@ -188,8 +201,13 @@ public class TimetableListView extends JPanel {
 		}
 		
 		ActionFactory.createTableElementMoveActionAndDoIt(__("timetable list"), 
+<<<<<<< HEAD
 				table, trainGraph.allCharts(), 
 				selectedStatonIndex, selectedStatonIndex - 1, true,
+=======
+				table, trainGraph.getCharts(), 
+				selectedIndex, selectedIndex - 1, true,
+>>>>>>> TrainTypes引发存档错误
 				_mainFrame.navigator::updateNavigatorByTimetables);
 	}
 
@@ -210,7 +228,13 @@ public class TimetableListView extends JPanel {
 
 	protected void do_RemoveTimetable() {
 		int index = table.getSelectedRow();
+<<<<<<< HEAD
 		if (index == 0 && trainGraph.allCharts().size() == 1) {
+=======
+		if (index < 0 || index >= trainGraph.getCharts().size() )
+			return;
+		if (index == 0 && trainGraph.getCharts().size() == 1) {
+>>>>>>> TrainTypes引发存档错误
 			new MessageBox(__("Cannot remove the last railroad line.")).showMessage();
 			return;
 		}

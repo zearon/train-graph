@@ -149,15 +149,6 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 		}
 	}
 
-	/**
-	 * removeTableModelListener
-	 *
-	 * @param l
-	 *            TableModelListener
-	 */
-	public void removeTableModelListener(TableModelListener l) {
-	}
-
 	@Override
 	public boolean nextCellIsBelow(int row, int column, int increment) {
 		return true;

@@ -163,7 +163,7 @@ public class TimetableListView extends JPanel {
 	protected void do_MoveDown() {
 		// Move down a timetable
 		int selectedStatonIndex = table.getSelectedRow();
-		if (selectedStatonIndex == trainGraph.getCharts()
+		if (selectedStatonIndex == trainGraph.allCharts()
 				.size() - 1) {
 			new MessageBox(
 					__("This is already the last timetable and thus cannot be moved down any more."))
@@ -172,7 +172,7 @@ public class TimetableListView extends JPanel {
 		}
 		
 		ActionFactory.createTableElementMoveActionAndDoIt(__("timetable list"), 
-				table, trainGraph.getCharts(), 
+				table, trainGraph.allCharts(), 
 				selectedStatonIndex, selectedStatonIndex + 1, true,
 				_mainFrame.navigator::updateNavigatorByTimetables);
 	}
@@ -188,19 +188,19 @@ public class TimetableListView extends JPanel {
 		}
 		
 		ActionFactory.createTableElementMoveActionAndDoIt(__("timetable list"), 
-				table, trainGraph.getCharts(), 
+				table, trainGraph.allCharts(), 
 				selectedStatonIndex, selectedStatonIndex - 1, true,
 				_mainFrame.navigator::updateNavigatorByTimetables);
 	}
 
 	protected void do_CreateTimetable() {
-		int selectedIndex = trainGraph.getCharts().size();
+		int selectedIndex = trainGraph.allCharts().size();
 
 		RailNetworkChart chart = TrainGraphFactory.createInstance(RailNetworkChart.class);
 		
 		ActionFactory.createAddTableElementActionAndDoIt(__("timetable list"), 
-				table, true, selectedIndex, chart, trainGraph.getCharts()::add,
-				trainGraph.getCharts()::removeElementAt, 
+				table, true, selectedIndex, chart, trainGraph.allCharts()::add,
+				trainGraph.allCharts()::removeElementAt, 
 				() -> {
 					table.revalidate();
 					
@@ -210,16 +210,16 @@ public class TimetableListView extends JPanel {
 
 	protected void do_RemoveTimetable() {
 		int index = table.getSelectedRow();
-		if (index == 0 && trainGraph.getCharts().size() == 1) {
+		if (index == 0 && trainGraph.allCharts().size() == 1) {
 			new MessageBox(__("Cannot remove the last railroad line.")).showMessage();
 			return;
 		}
 
 		ActionFactory.createRemoveTableElementActionAndDoIt(__("timetable list"), 
 				table, true, new int[] {index}, 
-				trainGraph.getCharts()::elementAt,
-				trainGraph.getCharts()::add, 
-				trainGraph.getCharts()::removeElementAt, 
+				trainGraph.allCharts()::elementAt,
+				trainGraph.allCharts()::add, 
+				trainGraph.allCharts()::removeElementAt, 
 				() -> {
 					table.revalidate();
 					

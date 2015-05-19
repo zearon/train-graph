@@ -42,7 +42,7 @@ public class TimetableListTableModel extends DefaultJEditTableModel {
 
 	@Override
 	public int getRowCount() {
-		return trainGraph.getCharts().size();
+		return trainGraph.allCharts().size();
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class TimetableListTableModel extends DefaultJEditTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		RailNetworkChart chart = trainGraph.getCharts().get(rowIndex);
+		RailNetworkChart chart = trainGraph.allCharts().get(rowIndex);
 		switch(columnIndex) {
 		case 0:
 			return chart.name;
@@ -63,7 +63,7 @@ public class TimetableListTableModel extends DefaultJEditTableModel {
 
 	@Override
 	public void _setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		RailNetworkChart chart = trainGraph.getCharts().get(rowIndex);
+		RailNetworkChart chart = trainGraph.allCharts().get(rowIndex);
 		switch(columnIndex) {
 		case 0:
 			chart.name = (String) aValue;

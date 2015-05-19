@@ -70,7 +70,8 @@ public class CircuitMakeDialog extends JDialog {
 		cir.getAllStations().clear();
 		
 		for(int i=0; i<staLCB.size(); i++) {
-			Station station = (Station) staLCB.get(i);
+//			Station station = (Station) staLCB.get(i);
+			Station station = staLCB.get(i).copy();
 			
 			station.dist = Math.abs(station.dist - fisrtDist);
 			cir.appendStation(station);

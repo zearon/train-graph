@@ -87,6 +87,15 @@ public class Train extends TrainGraphPart {
 
 	Train() {
 	}
+	
+	@Override
+	@TGProperty
+	public void setName(String name) {
+		super.setName(name);
+//		if (trainGraph != null) {
+//			trainGraph.setTrainTypeByName(this);
+//		}
+	}
 
 	@TGProperty
 	public void setStartStation(String sta) {
@@ -125,6 +134,8 @@ public class Train extends TrainGraphPart {
 	public void setStop(int index, Stop stop) {
 		//
 	}
+	
+	public TrainType trainType = TrainType.defaultTrainType;
 	
 //	private Stop[] getStops() {
 //		return _stops;

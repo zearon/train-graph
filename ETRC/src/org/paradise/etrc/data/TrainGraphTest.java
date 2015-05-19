@@ -5,10 +5,13 @@ import static org.junit.Assert.*;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.net.URISyntaxException;
 import java.util.Random;
 import java.util.Vector;
 import java.util.function.IntConsumer;
@@ -71,11 +74,11 @@ public class TrainGraphTest {
 
 		int trainCount = 2;
 		Random rand = new Random();
-		Vector<Train> ts = trainGraph.allTrains.trains;
-		RailroadLineChart lineChart0 = trainGraph.charts.get(0).getRailLineCharts().get(0);
+		RailNetworkChart networkChart0 = trainGraph.allCharts().get(0);
+		RailroadLineChart lineChart0 = networkChart0.allRailLineCharts().get(0);
 		for (int i = 1; i <= trainCount; ++ i) {
 			Train t = TrainGraphFactory.createInstance(Train.class);
-			ts.add(t);
+			networkChart0.addTrain(t);
 			
 			int station1 = rand.nextInt(stationCount);
 			int station2 = station1;
@@ -102,6 +105,14 @@ public class TrainGraphTest {
 			}
 			
 			lineChart0.addTrain(t);
+		}
+		
+		RailNetworkMap map = trainGraph.map;
+		try {
+			map.loadFromFile(new File(this.getClass().getResource("/pic/gmap.jpg").toURI()));
+		} catch (IOException | URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 
@@ -143,7 +154,7 @@ public class TrainGraphTest {
 		for (int i = 0; i< 2; ++ i) {
 			RailNetworkChart chart = TrainGraphFactory.createInstance(RailNetworkChart.class);
 			
-			trainGraph.getCharts().add(chart);
+			trainGraph.allCharts().add(chart);
 		}
 		
 		IntStream.range(1, 3).forEach(i -> {
@@ -167,16 +178,22 @@ public class TrainGraphTest {
 		}
 	}
 	
-//	@Test
+	@Test
 	public void testSimplePropertyAnnotationLoad() {
 		System.out.println("-------      test SimpleProperty Annotation Load      ---------");
 		TrainGraphPart.setSimpleToString();
 		
+		PrintStream fileout;
 		try {
 			load();
 			
 			System.out.println("********* trainGraph");
-			trainGraph.saveToStream(System.out, 0);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			trainGraph.saveToStream(baos, 0);
+			System.out.print(baos);
+			fileout = new PrintStream(new File("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2-load.trc"));
+			fileout.print(baos);
+			fileout.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -218,7 +235,7 @@ public class TrainGraphTest {
 		assertEquals("1", groups[3]);
 	}
 	
-	@Test
+//	@Test
 	public void testBase64Region() throws IOException {
 		System.out.println("-------      test Base 64 region     ---------");
 		RailNetworkMap map = TrainGraphFactory.createInstance(RailNetworkMap.class);

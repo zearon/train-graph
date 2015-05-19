@@ -6,6 +6,7 @@ import static org.paradise.etrc.ETRCUtil.*;
 import java.awt.Color;
 import java.util.Vector;
 import java.util.function.Supplier;
+import java.util.regex.Pattern;
 
 import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.annotation.TGElement;
@@ -19,6 +20,12 @@ public class TrainType extends TrainGraphPart {
 	public static final String LINE_STYLE_DASH = "DASH";
 	public static final String LINE_STYLE_DOT_DASH = "DOT_DASH";
 	public static final String LINE_STYLE_DOT = "DOT";
+	
+	public static TrainType defaultTrainType = new TrainType(__("Default"));
+	static {
+		defaultTrainType.setProperties(__("Default"), ".*", Color.decode("#000000"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#000000")).loadComplete();
+	}
 	
 	@TGProperty
 	public String abbriveation;
@@ -36,6 +43,8 @@ public class TrainType extends TrainGraphPart {
 	public int fontSize;
 	@TGProperty
 	public Color fontColor;
+	
+	public Pattern namePattern;
 	
 	TrainType() {}	
 	
@@ -73,47 +82,10 @@ public class TrainType extends TrainGraphPart {
 		setProperties("", "", Color.decode("#ff0000"), LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), 12, Color.decode("#700000"));
 	}	
 	
-
-//
-//	@TGPProperty(name="color")
-//	public String getColorStr() {
-//		return color == null ? "" : "#" + Integer.toHexString(color.getRGB() & 0x11ffffff);
-//	}
-//
-//	@TGPProperty(name="color")
-//	public void setColorStr(String colorStr) {
-//		try {
-//			color = Color.decode(colorStr);
-//		} catch (Exception e) {
-//			System.err.println("Invalid color string:" + colorStr);
-//		}
-//	}
-//
-//	@TGPProperty(name="fontColor")
-//	public String getFontColorStr() {
-//		return fontColor == null ? "" : "#" + Integer.toHexString(fontColor.getRGB() & 0x11ffffff);
-//	}
-//
-//	@TGPProperty(name="fontColor")
-//	public void setFontColorStr(String colorStr) {
-//		try {
-//			fontColor = Color.decode(colorStr);
-//		} catch (Exception e) {
-//			System.err.println("Invalid color string:" + colorStr);
-//		}
-//	}
-//	
-	
-	
-	
-	
-
-	
-	
-	
-	
-	
-	
+	@Override
+	public void loadComplete() {
+		namePattern = Pattern.compile(pattern);
+	}
 
 	
 }

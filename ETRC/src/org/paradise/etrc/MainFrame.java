@@ -213,8 +213,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public void setModel(TrainGraph trainGraph) {
 		setTitle();
 		
-		currentNetworkChart = trainGraph.getCharts().get(0);
-		currentLineChart = currentNetworkChart.getRailLineCharts().get(0);
+		currentNetworkChart = trainGraph.allCharts().get(0);
+		currentLineChart = currentNetworkChart.allRailLineCharts().get(0);
 		
 		if (ui_inited) {
 			// Set Navigator in terms of train Graph

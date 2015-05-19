@@ -146,10 +146,19 @@ public abstract class TrainGraphPart {
 	protected int _id;
 	
 	public String name;
+	protected TrainGraphPart root;
+	protected TrainGraphPart parent;
+	
 	@TGProperty(firstline=true)
 	public String getName() { return name; }
 	@TGProperty
 	public void setName(String name) { this.name = name; }
+	public TrainGraphPart getParent() { return parent; }
+	public <T> T getParent(Class<T> clazz) { return (T) parent; }
+	public void setParent(TrainGraphPart parent) { this.parent = parent; }
+	public TrainGraphPart getRoot() { return root; }
+	public <T> T getRoot(Class<T> clazz) { return (T) parent; }
+	public void setRoot(TrainGraphPart root) { this.root = root; }
 	
 	/**************************************************************************
 	 * Methods need to be implemented.
@@ -1137,6 +1146,7 @@ public abstract class TrainGraphPart {
 	
 	// {{ Load from file
 	
+	private static TrainGraphPart parsingRoot;
 	/**
 	 * Load a train graph part from a reader.
 	 * @param reader0
@@ -1153,7 +1163,7 @@ public abstract class TrainGraphPart {
 		BufferedReader reader = new BufferedReader(reader0);
 		
 		TrainGraphPart root = null;
-		TrainGraphPart classObjRoot = null;
+		parsingRoot = null;
 		String line = null;
 		int lineNum = 0;
 		Vector<ParsingException> exceptions = new Vector<> ();
@@ -1162,13 +1172,13 @@ public abstract class TrainGraphPart {
 		while ((line = reader.readLine()) != null) {
 			line = line.trim();
 			
-			TrainGraphPart loadingNodeArg = classObjRoot == null ? loadingNode : null;
+			TrainGraphPart loadingNodeArg = parsingRoot == null ? loadingNode : null;
 			
 			try {
 				root = parseLine(line, ++lineNum, parsingNodeStack, exceptions, loadingNodeArg);
 				
-				if (classObjRoot == null && clazz.isInstance(root)) {
-					classObjRoot = root;
+				if (parsingRoot == null && clazz.isInstance(root)) {
+					parsingRoot = root;
 				}
 			} catch (ParsingException e) {
 				exceptions.add(e);
@@ -1188,7 +1198,7 @@ public abstract class TrainGraphPart {
 		}
 		
 		if (clazz != null)
-			return classObjRoot;
+			return parsingRoot;
 		else
 			return root;
 	}
@@ -1493,6 +1503,7 @@ public abstract class TrainGraphPart {
 							+ "This object and all its content is skipped."), elementTypeName);
 							
 				} else {
+					obj.setRoot(parsingRoot);
 					if (obj.isBase64Encoded()) {
 						obj.decodeFromBase64Start();
 					}
@@ -1681,8 +1692,15 @@ public abstract class TrainGraphPart {
 		}
 	}	
 	
-	private boolean isInOneLine() {		
-		return typeToAttrDict.get(getClass()).printInOneLine();
+	private boolean isInOneLine() {
+		Class clazz = getClass();
+		TGElementType tgeType = null;
+		do {
+			tgeType = typeToAttrDict.get(clazz);
+			clazz = clazz.getSuperclass();
+		} while (tgeType != null && !clazz.equals(TrainGraphPart.class));
+		
+		return tgeType != null ? tgeType.printInOneLine() : false;
 	}
 	
 	private void _printIdent(Writer writer, int identLevel, boolean notNeedIdent) {

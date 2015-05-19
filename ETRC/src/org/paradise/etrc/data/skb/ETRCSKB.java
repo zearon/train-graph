@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Instant;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -142,12 +143,12 @@ public class ETRCSKB {
 		};
 	}
 	
-	public List<Train> findTrains(Stream<RailroadLine> circuits) {
+	public List<Train> findTrains(Collection<RailroadLine> circuits) {
 		Instant instant1 = null, instant2 = null, instant3 = null;
 		if (IS_DEBUG())
 			instant1= Instant.now();
 		HashSet<String> allStationsOnCircuits = 
-				circuits.flatMap(cir->cir.getAllStations().stream()).distinct()
+				circuits.stream().flatMap(cir->cir.getAllStations().stream()).distinct()
 				.map(station->station.name.toLowerCase())
 				.collect(Collectors.toCollection(HashSet::new));
 
@@ -156,8 +157,8 @@ public class ETRCSKB {
 		List<Train> trains = 
 				tk.stream().parallel()
 				.filter(tkinfo->allStationsOnCircuits.contains(tkinfo[1].toLowerCase()))				// filter stops only matching the station lists.
-				.distinct()
 				.map(tkinfo->getTrainByFullName(tkinfo[0]))
+				.distinct()
 				.collect(Collectors.toList());
 		
 		if (IS_DEBUG())

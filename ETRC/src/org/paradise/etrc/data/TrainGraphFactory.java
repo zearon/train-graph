@@ -1,7 +1,9 @@
 package org.paradise.etrc.data;
 
+import java.awt.Color;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.function.Supplier;
 
@@ -9,6 +11,7 @@ import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.TrainGraph;
+import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
@@ -82,8 +85,40 @@ public class TrainGraphFactory {
 				.createInstance(RailroadLineChart.class).setProperties(line);
 		RailNetworkChart networkChart = TrainGraphFactory
 				.createInstance(RailNetworkChart.class);
-		networkChart.getRailLineCharts().add(lineChart);
-		tg.charts.add(networkChart);
+		networkChart.allRailLineCharts().add(lineChart);
+		tg.allCharts().add(networkChart);
+		
+		// Add default train types
+		TrainType[] types = new TrainType[9];
+		types[0] = createInstance(TrainType.class, "Regular");
+		types[1] = createInstance(TrainType.class, "Temp L");
+		types[2] = createInstance(TrainType.class, "Express K");
+		types[3] = createInstance(TrainType.class, "Ultra Express T");
+		types[4] = createInstance(TrainType.class, "None-stop Express Z");
+		types[5] = createInstance(TrainType.class, "International/Transregional Q");
+		types[6] = createInstance(TrainType.class, "CRH D");
+		types[7] = createInstance(TrainType.class, "Inter-city C");
+		types[8] = createInstance(TrainType.class, "High Speed G");
+		
+		types[0].setProperties("Reg.", "\\d+", Color.decode("#008000"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#008000")).loadComplete();
+		types[1].setProperties("Temp", "L\\d+", Color.decode("#804000"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#804000")).loadComplete();
+		types[2].setProperties("K", "K\\d+", Color.decode("#ff0000"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#ff0000")).loadComplete();
+		types[3].setProperties("T", "T\\d+", Color.decode("#0000ff"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#0000ff")).loadComplete();
+		types[4].setProperties("Z", "Z\\d+", Color.decode("#800080"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#800080")).loadComplete();
+		types[5].setProperties("Q", "QK\\d+", Color.decode("#008000"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#008000")).loadComplete();
+		types[6].setProperties("D", "D\\d+", Color.decode("#800080"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#008000")).loadComplete();
+		types[7].setProperties("C", "C\\d+", Color.decode("#800080"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#008000")).loadComplete();
+		types[8].setProperties("G", "G\\d+", Color.decode("#800080"), TrainType.LINE_STYLE_SOLID, 
+				1.0f, __("Lucida Grande"), 12, Color.decode("#008000")).loadComplete();
+		tg.addAllTrainTypes(Arrays.asList(types));
 		
 		tg.syncLineChartsWithRailNetworks();
 		

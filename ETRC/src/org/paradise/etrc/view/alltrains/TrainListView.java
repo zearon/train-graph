@@ -1,7 +1,5 @@
 package org.paradise.etrc.view.alltrains;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -16,7 +14,6 @@ import java.util.Arrays;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -24,11 +21,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
-import javax.swing.RowSorter;
 import javax.swing.SwingConstants;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -37,13 +30,12 @@ import javax.swing.table.TableRowSorter;
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.TrainGraphFactory;
-import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.YesNoBox;
-import org.paradise.etrc.util.ui.table.JEditTable;
-import org.paradise.etrc.view.chart.ChartView;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com
@@ -80,6 +72,8 @@ public class TrainListView extends JPanel {
 	public void setModel(TrainGraph trainGraph) {
 		this.trainGraph = trainGraph;
 		table.setRowSorter(new TableRowSorter<TrainsTableModel> ((TrainsTableModel)table.getModel()));
+		
+		updateUI();
 	}
 
 	private void jbInit() throws Exception {
@@ -155,7 +149,7 @@ public class TrainListView extends JPanel {
 //				TrainsDialog.this.setVisible(false);
 				if(table.getSelectedRow() < 0)
 					return;
-				doEditTrain(trainGraph.allTrains.get(table.convertRowIndexToModel(table.getSelectedRow())));
+				doEditTrain(trainGraph.currentNetworkChart.getTrain(table.convertRowIndexToModel(table.getSelectedRow())));
 			}
 		});
 		
@@ -169,7 +163,7 @@ public class TrainListView extends JPanel {
 				int[] selectedRows = table.getSelectedRows();
 				Arrays.sort(selectedRows);
 				for (int i = selectedRows.length - 1; i>=0; --i) {
-					trainGraph.allTrains.remove(selectedRows[i]);
+					trainGraph.currentNetworkChart.removeTrainAt(selectedRows[i]);
 				}
 
 				table.revalidate();
@@ -198,13 +192,13 @@ public class TrainListView extends JPanel {
 
 		trainView.editTrain(editedTrain -> {
 			//没有改车次的情况，更新
-			if(trainGraph.allTrains.contains(editedTrain)) {
-				trainGraph.allTrains.updateTrain(editedTrain);
+			if(trainGraph.currentNetworkChart.containsTrain(editedTrain)) {
+				trainGraph.currentNetworkChart.updateTrain(editedTrain);
 			}
 			//改了车次的情况，删掉原来的，增加新的
 			else {
-				trainGraph.allTrains.remove(train);
-				trainGraph.allTrains.add(editedTrain);
+				trainGraph.currentNetworkChart.removeTrain(train);
+				trainGraph.currentNetworkChart.addTrain(editedTrain);
 			}
 			
 			table.revalidate();
@@ -246,12 +240,12 @@ public class TrainListView extends JPanel {
 		trainView.setModel(newTrain);
 
 		trainView.editTrain(addingTrain -> {
-			if(trainGraph.allTrains.contains(addingTrain)) {
+			if(trainGraph.currentNetworkChart.containsTrain(addingTrain)) {
 				if(new YesNoBox(mainFrame, String.format(__("%s is already in the graph. Overwrite?"), addingTrain.getTrainName())).askForYes())
-					trainGraph.allTrains.updateTrain(addingTrain);
+					trainGraph.currentNetworkChart.updateTrain(addingTrain);
 			}
 			else {
-				trainGraph.allTrains.add(addingTrain);
+				trainGraph.currentNetworkChart.addTrain(addingTrain);
 			}
 			
 			table.revalidate();
@@ -344,7 +338,7 @@ public class TrainListView extends JPanel {
 					super.paint(g);
 				}
 			};
-			colorButton.setText(trainGraph.allTrains.get(
+			colorButton.setText(trainGraph.currentNetworkChart.getTrain(
 					table.convertRowIndexToModel(row))
 					.getTrainName());
 			colorButton.setForeground(currentColor);
@@ -382,8 +376,8 @@ public class TrainListView extends JPanel {
 				return new JLabel("wrong");
 
 			final Color color = (Color) value;
-			final boolean selected = isSelected;
-			final Color background = table.getSelectionBackground();
+//			final boolean selected = isSelected;
+//			final Color background = table.getSelectionBackground();
 
 			JLabel colorLabel = new JLabel();
 //			{
@@ -445,7 +439,7 @@ public class TrainListView extends JPanel {
 		 * @return int
 		 */
 		public int getRowCount() {
-			return trainGraph.allTrains.count();
+			return trainGraph.currentNetworkChart.trainCount();
 		}
 
 		/**
@@ -488,13 +482,13 @@ public class TrainListView extends JPanel {
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			switch (columnIndex) {
 			case 0:
-				return trainGraph.allTrains.get(rowIndex).getTrainName();
+				return trainGraph.currentNetworkChart.getTrain(rowIndex).getTrainName();
 			case 1:
-				return trainGraph.allTrains.get(rowIndex).getStartStation();
+				return trainGraph.currentNetworkChart.getTrain(rowIndex).getStartStation();
 			case 2:
-				return trainGraph.allTrains.get(rowIndex).getTerminalStation();
+				return trainGraph.currentNetworkChart.getTrain(rowIndex).getTerminalStation();
 			case 3:
-				return trainGraph.allTrains.get(rowIndex).color;
+				return trainGraph.currentNetworkChart.getTrain(rowIndex).color;
 			default:
 				return null;
 			}
@@ -509,7 +503,7 @@ public class TrainListView extends JPanel {
 		 */
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			if (columnIndex == 3) {
-				trainGraph.allTrains.get(rowIndex).color = (Color) aValue;
+				trainGraph.currentNetworkChart.getTrain(rowIndex).color = (Color) aValue;
 				//System.out.println("SET: " + ((Color)aValue));
 				fireTableCellUpdated(rowIndex, columnIndex);
 			}
@@ -550,7 +544,7 @@ public class TrainListView extends JPanel {
 				public void mouseClicked(MouseEvent e) {
 					if   (e.getClickCount()   ==   2){ //双击  
 	                    int row = getSelectedRow();
-	                    doEditTrain(trainGraph.allTrains.get(convertRowIndexToModel(row)));
+	                    doEditTrain(trainGraph.currentNetworkChart.getTrain(convertRowIndexToModel(row)));
 					}
 				}
 			});

@@ -40,6 +40,7 @@ public class ObjectPropertyAssignment extends TrainGraphPart {
 		
 		try {
 			setter.accept(parentObj, element);
+			element.setParent(parentObj);
 		} catch (Exception e) {
 			String msg;
 			if (element != null && elementClass.isInstance(element))

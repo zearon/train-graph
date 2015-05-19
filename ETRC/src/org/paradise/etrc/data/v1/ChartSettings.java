@@ -23,6 +23,7 @@ public class ChartSettings extends TrainGraphPart {
 	public int startHour;
 	@TGProperty
 	public float minuteScale;
+	@TGProperty
 	public int timeInterval;
 	@TGProperty
 	public String distUnit;

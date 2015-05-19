@@ -104,24 +104,33 @@ public class FindTrainsDialog extends JDialog {
 	class LoadingThread implements Runnable {
 		public void run() {
 			hold(500);
-			mainFrame.currentLineChart.clearTrains();
+//			mainFrame.trainGraph.allTrains.clear();
 			mainFrame.chartView.repaint();
 			
 			msgLabel.setText(__("Please wait while imporing train information..."));
 			
 			ETRCSKB skb = mainFrame.getSKB();
-			List<Train> trains = skb.findTrains(mainFrame.currentLineChart.allCircuits.stream());		//skb.findTrains(mainFrame.chart.trunkCircuit);
+			List<Train> trains = skb.findTrains(mainFrame.trainGraph.railNetwork.getAllRailroadLines());		//skb.findTrains(mainFrame.chart.trunkCircuit);
 
 			Instant instant1 = null, instant2 = null;
 			if (IS_DEBUG())
 				instant1= Instant.now();
 			
-			trains.stream().parallel()
-				.filter(train-> (train.isDownTrain(mainFrame.currentLineChart.railroadLine) > 0))
-				.forEach(train-> {
-					mainFrame.currentLineChart.addTrain(train);
-					msgLabel.setText(String.format(__("Importing train information %s"), train.getTrainName()));
-				});
+			// Add to all trains
+//			mainFrame.trainGraph.allTrains.addAll(trains);
+			mainFrame.allTrainsView.setModel(mainFrame.trainGraph);
+			
+			// Add train to railroad line charts.
+//			mainFrame.trainGraph.charts.forEach(networkChart -> {
+//				networkChart.get
+//			});
+			
+//			trains.stream().parallel()
+//			.filter(train-> (train.isDownTrain(mainFrame.currentLineChart.railroadLine) > 0))
+//			.forEach(train-> {
+//				mainFrame.currentLineChart.addTrain(train);
+//				msgLabel.setText(String.format(__("Importing train information %s"), train.getTrainName()));
+//			});
 			
 			if (IS_DEBUG())
 				instant2= Instant.now();

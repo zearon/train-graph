@@ -67,7 +67,7 @@ public class ListElementAssignment extends TrainGraphPart {
 		return parentObj.getClass();
 	}
 
-	public void addElement(int lineNum, String line, Object element) {
+	public void addElement(int lineNum, String line, TrainGraphPart element) {
 		if (element instanceof UnknownPart)
 			return;
 		
@@ -76,8 +76,10 @@ public class ListElementAssignment extends TrainGraphPart {
 					__("Add to list failed due to value type %s is not compatible with the element type of property %s."),
 					element.getClass().getName(), elementClass.getName());
 
-		if (listElements != null)
+		if (listElements != null) {
 			listElements.add(element);
+			element.setParent(parentObj);
+		}
 	}
 	
 	public void assign() {

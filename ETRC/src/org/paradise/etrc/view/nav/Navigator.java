@@ -133,7 +133,7 @@ public class Navigator extends JTree {
 		
 		timeTableNodes.clear();
 		timeTablesNode.removeAllChildren();
-		trainGraph.getCharts().forEach(railnetworkChart -> {
+		trainGraph.allCharts().forEach(railnetworkChart -> {
 			DefaultMutableTreeNode parentNode = new DefaultMutableTreeNode(railnetworkChart);
 			timeTableNodes.add(parentNode);
 			timeTablesNode.add(parentNode);

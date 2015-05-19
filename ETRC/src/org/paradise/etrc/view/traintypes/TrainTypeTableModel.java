@@ -5,9 +5,9 @@ import static org.paradise.etrc.ETRCUtil.*;
 
 import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
-import org.paradise.etrc.data.TrainGraph;
-import org.paradise.etrc.data.TrainType;
-import org.paradise.etrc.data.util.Tuple;
+import org.paradise.etrc.data.v1.TrainGraph;
+import org.paradise.etrc.data.v1.TrainType;
+import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 import org.paradise.etrc.util.ui.table.JEditTable;
 
@@ -64,7 +64,7 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 	
 	@Override
 	public int getRowCount() {
-		return trainGraph.allTrainTypes.size();
+		return trainGraph.trainTypeCount();
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TrainType trainType = trainGraph.allTrainTypes.get(rowIndex);
+		TrainType trainType = trainGraph.getTrainType(rowIndex);
 		switch (columnIndex) {
 		case 0:
 			// index
@@ -95,7 +95,7 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 
 	@Override
 	public void _setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		TrainType trainType = trainGraph.allTrainTypes.get(rowIndex);
+		TrainType trainType = trainGraph.getTrainType(rowIndex);
 		switch (columnIndex) {
 		case 1:
 			trainType.setName((String) aValue);

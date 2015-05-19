@@ -21,21 +21,17 @@ import java.awt.Font;
 
 import javax.swing.JButton;
 
-<<<<<<< HEAD
-import org.paradise.etrc.data.v1.TrainGraph;
-=======
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.data.RailNetworkChart;
-import org.paradise.etrc.data.TrainGraph;
+import org.paradise.etrc.data.v1.RailNetworkChart;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
-import org.paradise.etrc.data.TrainType;
+import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.util.ui.table.JEditTable;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
->>>>>>> TrainTypes引发存档错误
 
 public class TrainTypesView extends JPanel {
 
@@ -182,13 +178,13 @@ public class TrainTypesView extends JPanel {
 	}
 
 	protected void do_CreateTrainType() {
-		int selectedIndex = trainGraph.allTrainTypes.size();
+		int selectedIndex = trainGraph.trainTypeCount();
 
 		TrainType trainType = TrainGraphFactory.createInstance(TrainType.class);
 		
 		ActionFactory.createAddTableElementActionAndDoIt(__("train types table"), 
-				table, true, selectedIndex, trainType, trainGraph.allTrainTypes.trainTypes::add,
-				trainGraph.allTrainTypes.trainTypes::removeElementAt, 
+				table, true, selectedIndex, trainType, trainGraph::addTrainType,
+				trainGraph::removeTrainTypeAt, 
 				() -> {
 					table.revalidate();
 					
@@ -198,18 +194,18 @@ public class TrainTypesView extends JPanel {
 
 	protected void do_RemoveTrainTeyp() {
 		int index = table.getSelectedRow();
-		if (index < 0 || index >= trainGraph.allTrainTypes.size() )
+		if (index < 0 || index >= trainGraph.trainTypeCount() )
 			return;
-		if (index == 0 && trainGraph.allTrainTypes.size() == 1) {
+		if (index == 0 && trainGraph.trainTypeCount() == 1) {
 			new MessageBox(__("Cannot remove the last train typee.")).showMessage();
 			return;
 		}
 
 		ActionFactory.createRemoveTableElementActionAndDoIt(__("train types table"), 
 				table, true, new int[] {index}, 
-				trainGraph.allTrainTypes.trainTypes::elementAt,
-				trainGraph.allTrainTypes.trainTypes::add, 
-				trainGraph.allTrainTypes.trainTypes::removeElementAt, 
+				trainGraph::getTrainType,
+				trainGraph::addTrainType, 
+				trainGraph::removeTrainTypeAt, 
 				() -> {
 					table.revalidate();
 					
@@ -220,9 +216,9 @@ public class TrainTypesView extends JPanel {
 	protected void do_MoveDown() {
 		// Move down a timetable
 		int selectedIndex = table.getSelectedRow();
-		if (selectedIndex < 0 || selectedIndex >= trainGraph.allTrainTypes.size())
+		if (selectedIndex < 0 || selectedIndex >= trainGraph.trainTypeCount())
 			return;
-		if (selectedIndex == trainGraph.allTrainTypes.size() - 1) {
+		if (selectedIndex == trainGraph.trainTypeCount() - 1) {
 			new MessageBox(
 					__("This is already the last timetable and thus cannot be moved down any more."))
 					.showMessage();
@@ -230,7 +226,7 @@ public class TrainTypesView extends JPanel {
 		}
 		
 		ActionFactory.createTableElementMoveActionAndDoIt(__("train types table"), 
-				table, trainGraph.allTrainTypes.trainTypes, 
+				table, trainGraph.allTrainTypes(), 
 				selectedIndex, selectedIndex + 1, true,
 				_mainFrame.navigator::updateNavigatorByTrainTypes);
 	}
@@ -238,7 +234,7 @@ public class TrainTypesView extends JPanel {
 	protected void do_MoveUp() {
 		// Move down a timetable
 		int selectedIndex = table.getSelectedRow();
-		if (selectedIndex < 0 || selectedIndex >= trainGraph.allTrainTypes.size())
+		if (selectedIndex < 0 || selectedIndex >= trainGraph.trainTypeCount())
 			return;
 		if (selectedIndex == 0) {
 			new MessageBox(
@@ -248,7 +244,7 @@ public class TrainTypesView extends JPanel {
 		}
 		
 		ActionFactory.createTableElementMoveActionAndDoIt(__("train types table"), 
-				table, trainGraph.allTrainTypes.trainTypes, 
+				table, trainGraph.allTrainTypes(), 
 				selectedIndex, selectedIndex - 1, true,
 				_mainFrame.navigator::updateNavigatorByTrainTypes);
 	}

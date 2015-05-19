@@ -11,8 +11,8 @@ import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.paradise.etrc.data.TrainGraph;
-import org.paradise.etrc.data.TrainType;
+import org.paradise.etrc.data.v1.TrainGraph;
+import org.paradise.etrc.data.v1.TrainType;
 
 public class TrainTypeTableCellRenderer extends DefaultTableCellRenderer {
 	
@@ -28,7 +28,7 @@ public class TrainTypeTableCellRenderer extends DefaultTableCellRenderer {
 			boolean isSelected, boolean hasFocus, int row, int column) {
 		
 		TrainGraph trainGraph = ((TrainTypeTableModel) table.getModel()).trainGraph;
-		TrainType trainType = trainGraph.allTrainTypes.get(row);
+		TrainType trainType = trainGraph.getTrainType(row);
 
 		Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
 				row, column);

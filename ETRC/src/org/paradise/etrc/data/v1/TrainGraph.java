@@ -93,6 +93,10 @@ public class TrainGraph extends TrainGraphPart {
 	 * Train type Operations
 	 *****************************************************/
 	
+	public Vector<TrainType> allTrainTypes() {
+		return trainTypes;
+	}
+	
 	public int trainTypeCount() {
 		return trainTypes.size();
 	}

@@ -26,6 +26,9 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
 
 public class RailNetworkEditorView extends JPanel {
 
@@ -60,6 +63,16 @@ public class RailNetworkEditorView extends JPanel {
 		
 		JPanel topPanel = new JPanel();
 		add(topPanel, BorderLayout.NORTH);
+		
+		JSlider slider = new JSlider();
+		slider.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent e) {
+				mapPanel.alpha_value = 255 - slider.getValue();
+				mapPanel.repaint();
+			}
+		});
+		slider.setMaximum(255);
+		topPanel.add(slider);
 		
 		JPanel leftPanel = new JPanel();
 		add(leftPanel, BorderLayout.WEST);

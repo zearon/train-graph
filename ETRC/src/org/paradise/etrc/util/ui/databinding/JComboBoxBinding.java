@@ -6,6 +6,7 @@ import static org.paradise.etrc.ETRCUtil.*;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.util.function.Consumer;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -43,7 +44,7 @@ public class JComboBoxBinding<M, U> extends UIBinding<M, U> implements ItemListe
 	boolean uiChangedByCode = false;
 	
 	JComboBoxBinding(JComboBox<U> comboBox, Object model, String propertyName, 
-			String propertyDesc, Runnable callback) {
+			String propertyDesc, Consumer<String> callback) {
 		super(model, propertyName, propertyDesc, callback);
 		this.comboBox = comboBox;
 	}
@@ -77,6 +78,11 @@ public class JComboBoxBinding<M, U> extends UIBinding<M, U> implements ItemListe
 		comboBox.setSelectedItem(uiValue);
 		
 		uiChangedByCode = false;
+	}
+
+	@Override
+	public void addEventListenersOnUI() {
+		comboBox.addItemListener(this);
 	}
 
 }

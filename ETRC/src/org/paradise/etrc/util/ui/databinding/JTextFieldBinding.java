@@ -5,6 +5,8 @@ import static org.paradise.etrc.ETRCUtil.*;
 
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
@@ -28,7 +30,7 @@ import javax.swing.JTextField;
  * @author Jeff Gong
  * 
  */
-public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusListener {
+public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusListener, KeyListener {
 	JTextField textField;
 	String oldValue;
 
@@ -40,7 +42,7 @@ public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusL
 	 * False if the property is accessed through a getter and a setter.
 	 */
 	JTextFieldBinding(JTextField textField, Object model, String propertyName, 
-			String propertyDesc, Runnable callback) {
+			String propertyDesc, Consumer<String> callback) {
 		super(model, propertyName, propertyDesc, callback);
 		this.textField = textField;
 	}
@@ -54,6 +56,18 @@ public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusL
 	public void focusLost(FocusEvent e) {
 		updateModel();
 	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		if (e.getKeyChar() == KeyEvent.VK_ENTER)
+			updateModel();
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {}
+	@Override
+	public void keyReleased(KeyEvent e) {}
+	
 	
 	@Override
 	public String getOldUIValue() { 
@@ -70,14 +84,11 @@ public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusL
 		textField.setText(uiValue);
 	}
 
-//	@Override
-//	public String modelValueToUIValue(M modelValue) {
-//		return modelValue == null ? "" : modelValue.toString();
-//	}
+	@Override
+	public void addEventListenersOnUI() {
+		textField.addFocusListener(this);
+		textField.addKeyListener(this);
+	}
 
-//	@Override
-//	public M uiValueToModelValue(String modelValue) {
-//		return (M) UIBinding.stringValueToKnownTypesValue(modelValue);
-//	}
 
 }

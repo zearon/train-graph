@@ -236,26 +236,26 @@ public class TrainGraphTest {
 	}
 	
 //	@Test
-	public void testBase64Region() throws IOException {
-		System.out.println("-------      test Base 64 region     ---------");
-		RailNetworkMap map = TrainGraphFactory.createInstance(RailNetworkMap.class);
-		map.loadFromFile(new File("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map.jpg"));
-		String base64Orig = map.encodeToBase64();
-		
-		FileWriter writer = new FileWriter("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map-base64-orig.txt");
-		writer.append(base64Orig);
-		writer.flush();
-		writer.close();
-		
-		load();
-		String base64Load = trainGraph.map.encodeToBase64();
-		
-		FileWriter writer2 = new FileWriter("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map-base64-load.txt");
-		writer2.append(base64Load);
-		writer2.flush();
-		writer2.close();
-		
-		assertEquals(base64Orig, base64Load);
-	}
+//	public void testBase64Region() throws IOException {
+//		System.out.println("-------      test Base 64 region     ---------");
+//		RailNetworkMap map = TrainGraphFactory.createInstance(RailNetworkMap.class);
+//		map.loadFromFile(new File("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map.jpg"));
+//		String base64Orig = map.encodeToBase64(null);
+//		
+//		FileWriter writer = new FileWriter("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map-base64-orig.txt");
+//		writer.append(base64Orig);
+//		writer.flush();
+//		writer.close();
+//		
+//		load();
+//		String base64Load = trainGraph.map.encodeToBase64(null);
+//		
+//		FileWriter writer2 = new FileWriter("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map-base64-load.txt");
+//		writer2.append(base64Load);
+//		writer2.flush();
+//		writer2.close();
+//		
+//		assertEquals(base64Orig, base64Load);
+//	}
 
 }

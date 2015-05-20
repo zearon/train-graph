@@ -749,6 +749,7 @@ public class RailroadLineEditView extends JPanel {
 		switchRailLine(line, index);
 		
 		railroadLineTable.setRowSelectionInterval(index, index);
+		railroadLineTable.setColumnSelectionInterval(1, 1);
 		railroadLineTable.revalidate();
 	}
 

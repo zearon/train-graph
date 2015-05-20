@@ -36,6 +36,8 @@ import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.YesNoBox;
 
 import static org.paradise.etrc.ETRC.__;
+import javax.swing.JComboBox;
+import javax.swing.ComboBoxModel;
 
 /**
  * @author lguo@sina.com
@@ -566,4 +568,5 @@ public class TrainListView extends JPanel {
 			return super.isRowSelected(row);
 		}
 	}
+
 }

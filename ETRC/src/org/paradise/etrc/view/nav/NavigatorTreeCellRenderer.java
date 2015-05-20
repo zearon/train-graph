@@ -6,7 +6,10 @@ import static org.paradise.etrc.ETRCUtil.*;
 import java.awt.Component;
 
 import javax.swing.JTree;
+import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
+
+import org.paradise.etrc.data.v1.TrainType;
 
 public class NavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
 
@@ -18,6 +21,13 @@ public class NavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
 		// TODO:重要!重要! 导航栏节点自定义绘制
 		Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf,
 				row, hasFocus);
+		
+		if (value instanceof DefaultMutableTreeNode) {
+			Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
+			
+			if (userObject instanceof TrainType)
+				component.setForeground(((TrainType) userObject).fontColor);
+		}
 		
 
 //        setText(value.toString());  

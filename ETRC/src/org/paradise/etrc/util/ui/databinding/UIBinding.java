@@ -8,6 +8,9 @@ import java.util.function.Function;
 
 import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.util.data.Tuple2;
+import org.paradise.etrc.util.ui.databinding.converter.IModelValueConverter;
+import org.paradise.etrc.util.ui.databinding.converter.IValueTypeConverter;
+import org.paradise.etrc.util.ui.databinding.converter.ValueConverterManager;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -19,6 +22,7 @@ import static org.paradise.etrc.ETRC.__;
  * @param <U> Type of UI value. For example, UVT should be text for JTextField
  */
 public abstract class UIBinding<M, U> {
+	//
 	static HashMap<Tuple2<String, String>, IValueTypeConverter<? extends Object, ? extends Object>> modelValueConverterMap = 
 			new HashMap<>();
 	static HashMap<Tuple2<String, String>, IValueTypeConverter<? extends Object, ? extends Object>> uiValueConverterMap = 
@@ -52,10 +56,11 @@ public abstract class UIBinding<M, U> {
 				converter.getBValueType().getName()), converter);
 	}
 	
-	
+	String modelObjID;
 	protected Object model;
 	protected String propertyName;
 	protected String propertyDesc;
+	protected IModelValueConverter<M, U> converter;
 	
 	protected Function<Object, M> getter = null;
 	protected BiConsumer<Object, M> setter = null;
@@ -63,7 +68,7 @@ public abstract class UIBinding<M, U> {
 	protected String propertyClassName = null;
 	protected String uiValueClassName = null;
 	
-	protected Runnable callback;
+	protected Consumer<String> callback;
 	
 	protected static Consumer<Exception> exceptionHandler;	
 	public static void setExceptionHandler(Consumer<Exception> exceptionHandler) {
@@ -77,7 +82,7 @@ public abstract class UIBinding<M, U> {
 	 * @param propertyDesc
 	 * @param callback Actions to be taken after model are updated by UI component. Can be null.
 	 */
-	UIBinding(Object model, String propertyName, String propertyDesc, Runnable callback) {
+	UIBinding(Object model, String propertyName, String propertyDesc, Consumer<String> callback) {
 		this.model = model;
 		this.propertyName = propertyName;
 		this.propertyDesc = propertyDesc;
@@ -94,6 +99,15 @@ public abstract class UIBinding<M, U> {
 		if (model != null) {
 			updateUI();
 		}
+	}
+
+	public void setConverter(IModelValueConverter<M, U> converter) {
+		this.converter = converter;
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setConverter(String convertID) {
+		this.converter = (IModelValueConverter<M, U>) ValueConverterManager.getConverter(convertID);
 	}
 
 	public void updateModel() {
@@ -140,7 +154,7 @@ public abstract class UIBinding<M, U> {
 	
 	public void callbackAfterModelUpdated() {
 		if (callback != null) {
-			callback.run();
+			callback.accept(modelObjID);
 		}
 	}
 	
@@ -174,8 +188,12 @@ public abstract class UIBinding<M, U> {
 	
 	public abstract void setUIValue(U uiValue);
 	
+	public abstract void addEventListenersOnUI();
+	
 	@SuppressWarnings("unchecked")
 	protected U convertModelValueToUIValue(M modelValue) {
+		if (converter != null)
+			return converter.modelValueToUI(modelValue);
 		
 		// Directly return if the model type is the same with the ui value type.
 		if (isModelTypeAndUiTypeTheSame()) {
@@ -215,6 +233,8 @@ public abstract class UIBinding<M, U> {
 	
 	@SuppressWarnings("unchecked")
 	protected M convertUiValueToModelValue(U uiValue) {
+		if (converter != null)
+			return converter.UIvalueToModel(uiValue);
 		
 		// Directly return if the model type is the same with the ui value type.
 		if (isModelTypeAndUiTypeTheSame()) {
@@ -388,6 +408,7 @@ public abstract class UIBinding<M, U> {
 		try {
 			Class<? extends Object> clazz = model.getClass();
 			field = clazz.getField(fieldName);
+			field.setAccessible(true);
 			propertyClassName = field.getType().getName();
 
 			try {
@@ -409,13 +430,14 @@ public abstract class UIBinding<M, U> {
 				
 				return "";
 			} catch (Exception e) {
-				System.err.println(String.format("Cannot get property value from model field."));
+				System.err.println(String.format("Cannot get property value from model field %s in class.", 
+						fieldName, model.getClass().getName()));
 				e.printStackTrace();
 			}
 		} catch (Exception e) {
 		}
 		
-		return "Cannot find field.";
+		return "Cannot find field " + fieldName + " in class " + model.getClass().getName();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -436,6 +458,8 @@ public abstract class UIBinding<M, U> {
 				// Getter
 				if (method.getName().equals(getterName) && method.getParameterCount() == 0) {
 					propertyClassName = method.getReturnType().getName();
+					method.setAccessible(true);
+					
 					try {
 						method.invoke(model);
 
@@ -450,19 +474,21 @@ public abstract class UIBinding<M, U> {
 						break;
 					} catch (Exception e) {
 						e.printStackTrace();
-						return "Cannot invoke property getter method.";
+						return "Cannot invoke property getter method " + method.getName() + 
+								" in class " + model.getClass().getName();
 					}
 				}
 			}
 			
 			if (getter == null) {
-				return "Cannot find property getter";
+				return "Cannot find getter for property " + propertyName + " in class " + model.getClass().getName();
 			}
 			
 			for (Method method : clazz.getMethods()) {
 				// Setter
 				if (method.getName().equals(setterName) && method.getParameterCount() == 1 
 						&& method.getParameters()[0].getType().getName().equals(propertyClassName)) {
+					method.setAccessible(true);
 
 					setter = (obj, value) -> { 
 						try { 
@@ -473,13 +499,13 @@ public abstract class UIBinding<M, U> {
 			}
 			
 			if (setter == null) {
-				return "Cannot find property setter";
+				return "Cannot find setter for property " + propertyName + " in class " + model.getClass().getName();
 			} else {
 				return "";
 			}
 		} catch (Exception e) {
 		}
 		
-		return "Cannot find getter/setter methods";
+		return "Cannot find getter/setter methods for property " + propertyName + " in class " + model.getClass().getName();
 	}
 }

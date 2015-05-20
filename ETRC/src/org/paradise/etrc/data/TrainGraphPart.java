@@ -176,7 +176,7 @@ public abstract class TrainGraphPart {
 	
 	/* Binary coding */
 	protected boolean isBase64Encoded() { return false; }
-	protected String encodeToBase64() { return ""; }
+	protected void encodeToBase64(OutputStream out) throws IOException {}
 	protected void decodeFromBase64Start() {};
 	protected void decodeFromBase64NewLine(String base64Line) {};
 	protected void decodeFromBase64End() {};
@@ -920,20 +920,21 @@ public abstract class TrainGraphPart {
 		System.gc();
 	}
 	
+	
 	public void saveToStream(OutputStream out) throws IOException {
 		Writer writer = new OutputStreamWriter(out, "utf-8");
-		saveToWriter(writer, 0, true);
+		saveToWriter(writer, out, 0, true);
 		writer.flush();
 	}
 	
 	public void saveToStream(OutputStream out, int identLevel) throws IOException {
 		Writer writer = new OutputStreamWriter(out, "utf-8");
-		saveToWriter(writer, identLevel, true);
+		saveToWriter(writer, out, identLevel, true);
 		writer.flush();
 	}
 	
-	protected void saveToWriter(Writer writer, int identLevel, boolean printIdentOnFirstLine) 
-			throws IOException {
+	protected void saveToWriter(Writer writer, OutputStream out, int identLevel, 
+			boolean printIdentOnFirstLine) throws IOException {
 		
 		boolean elementPrinted = false;
 		// Write section begin string
@@ -944,8 +945,10 @@ public abstract class TrainGraphPart {
 		if (isBase64Encoded()) {
 			// Write base64 codes for binary contents
 			
-			writer.append( encodeToBase64() );
-			_println(writer);
+			writer.flush();
+			encodeToBase64(out);
+//			writer.append( encodeToBase64() );
+//			_println(writer);
 			
 			elementPrinted = true;
 		} else {			
@@ -957,7 +960,7 @@ public abstract class TrainGraphPart {
 					NEW_LINE_STR, ", " + NEW_LINE_STR, "", true, 
 					(element, te, eIdentLevel, printIdentOnFirstLine0) -> {
 				try {
-					element.saveToWriter(writer, eIdentLevel, printIdentOnFirstLine0);
+					element.saveToWriter(writer, out, eIdentLevel, printIdentOnFirstLine0);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}

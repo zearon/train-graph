@@ -30,7 +30,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testIntFieldGetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "displayLevel", "", null, true);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "displayLevel", "", null, true);
 		
 		int expected = 100;
 		settings.displayLevel = expected;
@@ -41,7 +41,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testIntFieldSetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "displayLevel", "", null, true);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "displayLevel", "", null, true);
 		
 		int expected = 100;
 		model.setModelValue(expected);
@@ -52,7 +52,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testFloatFieldGetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "minuteScale", "", null, true);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "minuteScale", "", null, true);
 		
 		float expected = 7.5f;
 		settings.minuteScale = expected;
@@ -63,7 +63,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testFloatFieldSetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "minuteScale", "", null, true);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "minuteScale", "", null, true);
 		
 		float expected = 7.5f;
 		model.setModelValue(expected);
@@ -74,7 +74,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testStringFieldGetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "name", "", null, true);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "name", "", null, true);
 		
 		String expected = "test string";
 		settings.name = expected;
@@ -85,7 +85,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testStringFieldSetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "name", "", null, true);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "name", "", null, true);
 		
 		String expected = "test string";
 		model.setModelValue(expected);
@@ -101,7 +101,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testIntMethodGetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "displayLevel", "", null, false);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "displayLevel", "", null, false);
 		
 		int expected = 100;
 		settings.displayLevel = expected;
@@ -112,7 +112,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testIntMethodSetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "displayLevel", "", null, false);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "displayLevel", "", null, false);
 		
 		int expected = 100;
 		model.setModelValue(expected);
@@ -123,7 +123,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testFloatMethodGetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "minuteScale", "", null, false);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "minuteScale", "", null, false);
 		
 		float expected = 7.5f;
 		settings.minuteScale = expected;
@@ -134,7 +134,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testFloatMethodSetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "minuteScale", "", null, false);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "minuteScale", "", null, false);
 		
 		float expected = 7.5f;
 		model.setModelValue(expected);
@@ -145,7 +145,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testStringMethodGetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "name", "", null, false);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "name", "", null, false);
 		
 		String expected = "test string";
 		settings.name = expected;
@@ -156,7 +156,7 @@ public class UIBindingModelTest {
 	
 	@Test
 	public void testStringMethodSetter() {
-		UIBinding model = UIBindingFactory.getUIBinding(settings, "name", "", null, false);
+		UIBinding model = UIBindingManager.getUIBinding(settings, "name", "", null, false);
 		
 		String expected = "test string";
 		model.setModelValue(expected);

@@ -1,4 +1,4 @@
-package org.paradise.etrc.util.ui.databinding;
+package org.paradise.etrc.util.ui.databinding.converter;
 
 public interface IValueTypeConverter<A, B> {
 	public Class<A> getAValueType();

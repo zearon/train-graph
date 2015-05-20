@@ -21,6 +21,7 @@ public class TrainType extends TrainGraphPart {
 	public static final String LINE_STYLE_DASH = "DASH";
 	public static final String LINE_STYLE_DOT_DASH = "DOT_DASH";
 	public static final String LINE_STYLE_DOT = "DOT";
+	public static final String LINE_STYLE_CUSTOM = "CUSTOM";
 	
 	public static TrainType defaultTrainType = new TrainType(__("Default"));
 	static {
@@ -35,7 +36,7 @@ public class TrainType extends TrainGraphPart {
 	@TGProperty
 	public Color color;
 	@TGProperty
-	public String lineStype;
+	public String lineStyle;
 	@TGProperty
 	public float lineWidth;
 	@TGProperty
@@ -68,7 +69,7 @@ public class TrainType extends TrainGraphPart {
 		this.abbriveation = abbriveation;
 		this.pattern = pattern;
 		this.color = color;
-		this.lineStype = lineStype;
+		this.lineStyle = lineStype;
 		this.lineWidth = lineWidth;
 		this.fontFamily = fontFamily;
 		this.fontStyle = fontStyle;
@@ -90,6 +91,86 @@ public class TrainType extends TrainGraphPart {
 	@Override
 	public void loadComplete() {
 		namePattern = Pattern.compile(pattern);
+	}
+
+	public String getAbbriveation() {
+		return abbriveation;
+	}
+
+	public void setAbbriveation(String abbriveation) {
+		this.abbriveation = abbriveation;
+	}
+
+	public String getPattern() {
+		return pattern;
+	}
+
+	public void setPattern(String pattern) {
+		this.pattern = pattern;
+	}
+
+	public Color getColor() {
+		return color;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+	}
+
+	public String getLineStyle() {
+		return lineStyle;
+	}
+
+	public void setLineStyle(String lineStype) {
+		this.lineStyle = lineStype;
+	}
+
+	public float getLineWidth() {
+		return lineWidth;
+	}
+
+	public void setLineWidth(float lineWidth) {
+		this.lineWidth = lineWidth;
+	}
+
+	public String getFontFamily() {
+		return fontFamily;
+	}
+
+	public void setFontFamily(String fontFamily) {
+		this.fontFamily = fontFamily;
+	}
+
+	public int getFontStyle() {
+		return fontStyle;
+	}
+
+	public void setFontStyle(int fontStyle) {
+		this.fontStyle = fontStyle;
+	}
+
+	public int getFontSize() {
+		return fontSize;
+	}
+
+	public void setFontSize(int fontSize) {
+		this.fontSize = fontSize;
+	}
+
+	public Color getFontColor() {
+		return fontColor;
+	}
+
+	public void setFontColor(Color fontColor) {
+		this.fontColor = fontColor;
+	}
+
+	public Pattern getNamePattern() {
+		return namePattern;
+	}
+
+	public void setNamePattern(Pattern namePattern) {
+		this.namePattern = namePattern;
 	}
 
 	

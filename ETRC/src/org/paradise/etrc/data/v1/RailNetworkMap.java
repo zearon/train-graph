@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 
+import org.paradise.etrc.data.Base64EncodingBinaryPart;
 import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementType;

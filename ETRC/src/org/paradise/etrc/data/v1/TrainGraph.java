@@ -58,6 +58,10 @@ public class TrainGraph extends TrainGraphPart {
 		return charts;
 	}
 	
+	public TrainType getDefaultTrainType() {
+		return defaultTrainType;
+	}
+	
 	/**
 	 * Implements method inherited from abstract base class TrainGraphPart
 	 */

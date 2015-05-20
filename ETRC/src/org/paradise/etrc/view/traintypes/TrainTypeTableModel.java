@@ -14,6 +14,8 @@ import org.paradise.etrc.util.ui.table.JEditTable;
 public class TrainTypeTableModel extends DefaultJEditTableModel {
 	public TrainGraph trainGraph;
 	JEditTable table;
+	int emptyRowIndex;
+	int defaultRowIndex;
 	
 	public TrainTypeTableModel(JEditTable table) {
 		this.table = table;
@@ -29,7 +31,7 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 		case 1:
 			return __("Name");
 		case 2:
-			return __("Train Name Regex Pattern");
+			return __("Train Name Pattern");
 		case 3:
 			// Use font family, font color and font size to draw this text.
 			return __("Abbr.");
@@ -64,7 +66,10 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 	
 	@Override
 	public int getRowCount() {
-		return trainGraph.trainTypeCount();
+		int typeCount = trainGraph.trainTypeCount();
+		emptyRowIndex = typeCount;
+		defaultRowIndex = emptyRowIndex + 1;
+		return typeCount + 2;
 	}
 
 	@Override
@@ -74,11 +79,28 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		TrainType trainType = trainGraph.getTrainType(rowIndex);
+		TrainType trainType = getTrainTypeAtRow(rowIndex);
+		if (trainType == null)
+			return "";
+		
+		return getObjectAttribute(trainType, rowIndex, columnIndex);
+	}
+	
+	public TrainType getTrainTypeAtRow(int rowIndex) {
+		if (rowIndex == emptyRowIndex)
+			return null;
+		
+		if (rowIndex == defaultRowIndex)
+			return trainGraph.getDefaultTrainType();
+		else
+			return trainGraph.getTrainType(rowIndex);
+	}
+	
+	private Object getObjectAttribute(TrainType trainType, int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 0:
 			// index
-			return rowIndex;
+			return rowIndex < emptyRowIndex ? rowIndex + 1 : "0";
 		case 1:
 			return trainType.getName();
 		case 2:
@@ -112,7 +134,8 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 
 	@Override
 	public boolean isCellEditable(int rowIndex, int columnIndex) {
-		return columnIndex > 0 && columnIndex < 4;
+		return (rowIndex < emptyRowIndex && columnIndex > 0 && columnIndex < 4) ||
+				(rowIndex == defaultRowIndex && (columnIndex == 1 || columnIndex == 3));
 	}
 
 

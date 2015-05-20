@@ -1,4 +1,4 @@
-package org.paradise.etrc.data.v1;
+package org.paradise.etrc.data;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -6,8 +6,7 @@ import static org.paradise.etrc.ETRCUtil.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-
-import org.paradise.etrc.data.TrainGraphPart;
+import java.io.OutputStream;
 
 import sun.misc.BASE64Decoder;
 import sun.misc.BASE64Encoder;
@@ -18,7 +17,7 @@ public abstract class Base64EncodingBinaryPart extends
 	ByteArrayOutputStream out;
 	BASE64Decoder decoder;
 	
-	Base64EncodingBinaryPart() {
+	public Base64EncodingBinaryPart() {
 		super();
 	}
 
@@ -28,9 +27,8 @@ public abstract class Base64EncodingBinaryPart extends
 	}
 
 	@Override
-	public final String encodeToBase64() {
-		String base64Codes = new sun.misc.BASE64Encoder().encode(encode());
-		return base64Codes;
+	public final void encodeToBase64(OutputStream out) throws IOException {
+		new sun.misc.BASE64Encoder().encode(encode(), out);
 	}
 
 	@Override

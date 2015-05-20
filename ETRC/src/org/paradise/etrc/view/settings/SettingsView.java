@@ -1,6 +1,7 @@
 package org.paradise.etrc.view.settings;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.Vector;
@@ -24,7 +25,7 @@ import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.databinding.JComboBoxBinding;
 import org.paradise.etrc.util.ui.databinding.JTextFieldBinding;
 import org.paradise.etrc.util.ui.databinding.UIBinding;
-import org.paradise.etrc.util.ui.databinding.UIBindingFactory;
+import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -43,11 +44,9 @@ public class SettingsView extends JPanel {
 	// Use static fields to keep this object because 
 	// eclipse window builder only support static factory methods
 	// to create ui components.
-	private static Vector<JTextField> allTextFields = new Vector<>();
-	private static Vector<JComboBox> allComboBoxes = new Vector<JComboBox>();
+	private static Vector<Component> allDataBindingComponent = new Vector<>();
+	private UIBindingManager uiBindingManager = UIBindingManager.getInstance(this);
 	
-	private Vector<UIBinding<? extends Object, ? extends Object>> allUIBindings = 
-			new Vector<UIBinding<? extends Object, ? extends Object>>();
 	private JTextField txtGlobalhttpproxyserver;
 	private JTextField txtGlobalhttpproxyport;
 
@@ -58,8 +57,6 @@ public class SettingsView extends JPanel {
 		mainFrame = MainFrame.getInstance();
 		setModel(trainGraph);
 
-		allTextFields.clear();
-		allComboBoxes.clear();
 		initUI();
 		
 		setupUIDataBinding();
@@ -71,11 +68,13 @@ public class SettingsView extends JPanel {
 		settings = trainGraph.settings;
 		
 		if(ui_inited) {
-			allUIBindings.forEach(binding -> binding.setModel(settings));
+			uiBindingManager.setModel(this::getModelObject, null);
 		}
 	}
 
-	private void initUI() {
+	private synchronized void initUI() {
+		allDataBindingComponent.clear();
+		
 		setLayout(new BorderLayout(0, 0));
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -251,14 +250,15 @@ public class SettingsView extends JPanel {
 		lblHttpProxyServer.setBounds(7, 92, 112, 15);
 		lblHttpProxyServer.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JComboBox cbAutoLoadLastFile = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.AutoLoadLastFile");
+		JComboBox cbAutoLoadLastFile = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.AutoLoadLastFile:YesNo");
 		cbAutoLoadLastFile.setBounds(112, 15, 93, 27);
 		cbAutoLoadLastFile.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JComboBox cbHttpProxyUse = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.HttpProxyUse");
+		JComboBox cbHttpProxyUse = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.HttpProxyUse:YesNo");
 		cbHttpProxyUse.setBounds(112, 49, 93, 27);
 		
 		txtGlobalhttpproxyserver = SettingsView.createJTextField("global.HttpProxyServer");
+		txtGlobalhttpproxyserver.setName("global.HttpProxyServer");
 		txtGlobalhttpproxyserver.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		txtGlobalhttpproxyserver.setBounds(122, 85, 181, 28);
 		txtGlobalhttpproxyserver.setColumns(10);
@@ -296,59 +296,19 @@ public class SettingsView extends JPanel {
 		lblTip.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 	}
 	
-	private void setupUIDataBinding() {
-		for (JTextField tf : allTextFields) {
-			// Such as "runningChart.distScale"
-			String[] parts = tf.getText().split("\\.");
-			String propertyGroup = parts[0];
-			String propertyName = parts[1];
-			
-			// TODO: 配置界面, 实现 getPropertyDesc, 如果GLobal settings不止包含运行图的配置,则
-			// mainFrame.raillineChartView::updateUI 应该改为对应的界面更新.
-			JTextFieldBinding binding = UIBindingFactory.getJTextFieldBinding(tf, 
-					getModelObject(propertyGroup), propertyName, getPropertyDesc(propertyName),
-					() -> {
-						updateUIforModel(propertyGroup);
-					});
-			tf.addFocusListener(binding);
-			binding.updateUI();
-			
-			allUIBindings.add(binding);
-		}
-		
-		for (JComboBox<? extends Object> cb : allComboBoxes) {
-			// Such as "runningChart.distScale"
-			String[] parts = cb.getName().split("\\.");
-			String propertyGroup = parts[0];
-			String propertyName = parts[1];
-
-			// TODO: 配置界面, 实现 getPropertyDesc, 如果GLobal settings不止包含运行图的配置,则
-			// mainFrame.raillineChartView::updateUI 应该改为对应的界面更新.
-			JComboBoxBinding<Object, ? extends Object> binding = UIBindingFactory.getJComboBoxBindingBinding(cb, 
-					getModelObject(propertyGroup), propertyName, getPropertyDesc(propertyName), 
-					() -> {
-						updateUIforModel(propertyGroup);
-					});
-			cb.addItemListener(binding);
-			binding.updateUI();
-			
-			allUIBindings.add(binding);
-		}
-	}
-	
 	/**
 	 * @wbp.factory
-	 * @wbp.factory.parameter.source text ""
+	 * @wbp.factory.parameter.source name ""
 	 */
-	public static JTextField createJTextField(String text) {
+	public static JTextField createJTextField(String name) {
 		// Use text value of JTextfield to keep property of data source model
 		
 		JTextField textField = new JTextField();
 		textField.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		textField.setColumns(5);
-		textField.setText(text);
+		textField.setName(name);
 		
-		allTextFields.add(textField);
+		allDataBindingComponent.add(textField);
 		
 		return textField;
 	}
@@ -369,9 +329,20 @@ public class SettingsView extends JPanel {
 		comboBox.setSelectedIndex(selectedIndex);
 		comboBox.setName(name);
 		
-		allComboBoxes.add(comboBox);
+		allDataBindingComponent.add(comboBox);
 		
 		return comboBox;
+	}
+	
+	// {{ Data Bindings
+	
+	private void setupUIDataBinding() {
+		for (Component component : allDataBindingComponent) {
+			uiBindingManager.addDataBinding(component, this::getModelObject, 
+					this::getPropertyDesc, this::updateUIforModel);
+		}
+		
+		uiBindingManager.updateUI(null);
 	}
 	
 	public Object getModelObject(String propertyGroup) {
@@ -424,4 +395,6 @@ public class SettingsView extends JPanel {
 		
 		return desc;
 	}
+	
+	// }}
 }

@@ -56,6 +56,8 @@ import org.paradise.etrc.view.alltrains.TrainListView;
 import javax.swing.border.Border;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
+import java.awt.event.ItemListener;
+import java.awt.event.ItemEvent;
 
 public class TrainTypesView extends JPanel {
 
@@ -78,6 +80,7 @@ public class TrainTypesView extends JPanel {
 	private TrainType selectedTrainType;
 	private int selectedTrainTypeIndex;
 	private JPanel panelTrainTypeEdit;
+	private JComboBox<String> cbLineStyle;
 	private JTextField txtDashstroke;
 
 	/**
@@ -205,12 +208,20 @@ public class TrainTypesView extends JPanel {
 		lblLineWidth.setBounds(16, 248, 66, 16);
 		panelTrainTypeEdit.add(lblLineWidth);
 		
-		JComboBox<String> comboBox = createJComboBox("trainType.lineStyle:LineStyle", 
+		cbLineStyle = createJComboBox("trainType.lineStyle:LineStyle", 
 				new Font("Dialog", Font.PLAIN, 12), 
 				new DefaultComboBoxModel<String>(LineStyleConverter.LINE_STYLE_DESCS), 0);
-		comboBox.setFont(new Font("Dialog", Font.PLAIN, 12));
-		comboBox.setBounds(90, 272, 98, 27);
-		panelTrainTypeEdit.add(comboBox);
+		cbLineStyle.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.DESELECTED) {
+				} else if (e.getStateChange() == ItemEvent.SELECTED) {
+					do_ChangeLineStyle();
+				}
+			}
+		});
+		cbLineStyle.setFont(new Font("Dialog", Font.PLAIN, 12));
+		cbLineStyle.setBounds(90, 272, 98, 27);
+		panelTrainTypeEdit.add(cbLineStyle);
 		
 		txtLineWidth = TrainTypesView.createJTextField(new Font("Lucida Grande", Font.PLAIN, 12), 10, "trainType.lineWidth");
 		txtLineWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
@@ -243,7 +254,7 @@ public class TrainTypesView extends JPanel {
 		lblDashStroke.setBounds(16, 305, 69, 15);
 		panelTrainTypeEdit.add(lblDashStroke);
 		
-		txtDashstroke = TrainTypesView.createJTextField(new Font("Lucida Grande", Font.PLAIN, 12), 10, "trainType.dashStroke");
+		txtDashstroke = TrainTypesView.createJTextField(new Font("Lucida Grande", Font.PLAIN, 12), 10, "trainType.dashStroke:DashStroke");
 		txtDashstroke.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		txtDashstroke.setBounds(91, 298, 95, 28);
 		panelTrainTypeEdit.add(txtDashstroke);
@@ -430,7 +441,9 @@ public class TrainTypesView extends JPanel {
 	}
 	
 	// }}
-	
+
+	// {{ Event handlers for train type table and editor
+		
 	protected void do_ChangeSelectedTrainType() {
 		int rowIndex = table.getSelectedRow();
 		selectedTrainTypeIndex = rowIndex;
@@ -447,6 +460,17 @@ public class TrainTypesView extends JPanel {
 		
 		uiBindingManager.updateUI(null);
 	}
+
+	protected void do_ChangeLineStyle() {
+		if (cbLineStyle.getSelectedIndex() == 4) {
+			// Custom line style is selected
+			txtDashstroke.setEnabled(true);
+		} else {
+			txtDashstroke.setEnabled(false);
+		}
+	}
+	
+	// }}
 	
 	// {{ Property getters and setters for selected train type
 	

@@ -259,7 +259,7 @@ public class UIBindingManager {
 			throw new IllegalArgumentException("Both model and propertyName cannot be empty");
 		}
 		
-		Tuple2<String, String> property = Tuple2.oF(model.getClass().getName(), propertyName);
+		Tuple2<String, String> property = Tuple2.of(model.getClass().getName(), propertyName);
 		UIBinding<? extends Object, ? extends Object> oldbinding = 
 				bindingDict.get(property);
 		boolean notExists = oldbinding == null;

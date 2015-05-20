@@ -28,7 +28,7 @@ public class Tuple2 <T1, T2> {
 	 * @param B
 	 * @return
 	 */
-	public static <T1, T2> Tuple2<T1, T2>  of (T1 A, T2 B) {
+	public static <T1, T2> Tuple2<T1, T2>  ofKey (T1 A, T2 B) {
 		return of (A, B, false, false);
 	}
 	
@@ -38,19 +38,8 @@ public class Tuple2 <T1, T2> {
 	 * @param B
 	 * @return
 	 */
-	public static <T1, T2> Tuple2<T1, T2>  oF (T1 A, T2 B) {
+	public static <T1, T2> Tuple2<T1, T2>  of (T1 A, T2 B) {
 		return of (A, B, true, false);
-	}
-	
-	/**
-	 * Get instance. Apply equals on Both components and in reverse mode, 
-	 * which is (a, b) = (b, a)
-	 * @param A
-	 * @param B
-	 * @return
-	 */
-	public static <T1, T2> Tuple2<T1, T2>  OF (T1 A, T2 B) {
-		return of (A, B, true, true);
 	}
 	
 	public static <T1, T2> Tuple2<T1, T2>  of (T1 A, T2 B, 
@@ -63,8 +52,8 @@ public class Tuple2 <T1, T2> {
 		int a = A == null ? 1 : A.hashCode();
 		int b = B == null ? 1 : B.hashCode();
 		if (fullEqual)
-			return a * b;
-		else
+			return a << 1 + b;
+		else 
 			return a;
 	}
 
@@ -80,7 +69,7 @@ public class Tuple2 <T1, T2> {
 						&& ( (B == null && t2.A == null) || (B != null && B.equals(t2.A)) );
 			} else {
 				boolean aEqual = (A != null && A.equals(t2.A)) || (A == null && t2.A == null);
-				if (fullEqual) {
+				if (fullEqual || t2.fullEqual) {
 					boolean bEqual = B != null && B.equals(t2.B) || (B == null && t2.B == null);
 					return aEqual && bEqual;
 				} else {

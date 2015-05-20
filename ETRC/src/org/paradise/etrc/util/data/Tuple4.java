@@ -30,7 +30,7 @@ public class Tuple4 <T1, T2, T3, T4> {
 	 * @param C
 	 * @return
 	 */
-	public static <T1, T2, T3, T4> Tuple4<T1, T2, T3, T4>  of (T1 A, T2 B, T3 C, T4 D) {
+	public static <T1, T2, T3, T4> Tuple4<T1, T2, T3, T4>  ofKey (T1 A, T2 B, T3 C, T4 D) {
 		return of (A, B, C, D, false);
 	}
 	
@@ -40,7 +40,7 @@ public class Tuple4 <T1, T2, T3, T4> {
 	 * @param B
 	 * @return
 	 */
-	public static <T1, T2, T3, T4> Tuple4<T1, T2, T3, T4>  oF (T1 A, T2 B, T3 C, T4 D) {
+	public static <T1, T2, T3, T4> Tuple4<T1, T2, T3, T4>  of (T1 A, T2 B, T3 C, T4 D) {
 		return of (A, B, C, D, true);
 	}
 	
@@ -56,7 +56,7 @@ public class Tuple4 <T1, T2, T3, T4> {
 		int c = C == null ? 1 : C.hashCode();
 		int d = D == null ? 1 : D.hashCode();
 		if (fullEqual)
-			return a * b * c * d;
+			return a << 3 + (b << 2 + c << 1 + d);
 		else
 			return a;
 	}
@@ -70,7 +70,7 @@ public class Tuple4 <T1, T2, T3, T4> {
 			Tuple4 t2 = (Tuple4) obj;
 
 			boolean aEqual = (A != null && A.equals(t2.A)) || (A == null && t2.A == null);
-			if (fullEqual) {
+			if (fullEqual || t2.fullEqual) {
 				boolean bEqual = B != null && B.equals(t2.B) || (B == null && t2.B == null);
 				boolean cEqual = C != null && C.equals(t2.C) || (C == null && t2.C == null);
 				boolean dEqual = D != null && D.equals(t2.D) || (D == null && t2.D == null);

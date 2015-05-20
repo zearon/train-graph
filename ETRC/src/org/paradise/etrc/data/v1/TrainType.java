@@ -25,8 +25,9 @@ public class TrainType extends TrainGraphPart {
 	
 	public static TrainType defaultTrainType = new TrainType(__("Default"));
 	static {
-		defaultTrainType.setProperties(__("Default"), ".*", Color.decode("#000000"), TrainType.LINE_STYLE_SOLID, 
-				1.0f, __("Lucida Grande"), Font.PLAIN, 12, Color.decode("#000000")).loadComplete();
+		defaultTrainType.setProperties(__("Default"), ".*", Color.decode("#000000"), 
+				TrainType.LINE_STYLE_SOLID, 1.0f, new float[] {5, 2, 2, 2}, 
+				__("Lucida Grande"), Font.PLAIN, 12, Color.decode("#000000")).loadComplete();
 	}
 	
 	@TGProperty
@@ -36,9 +37,12 @@ public class TrainType extends TrainGraphPart {
 	@TGProperty
 	public Color color;
 	@TGProperty
-	public String lineStyle;
-	@TGProperty
 	public float lineWidth;
+	@TGProperty
+	public String lineStyle;
+	// This property only takes effect when lineStyle is set to custom.
+	@TGProperty(isArray=true)
+	public float[] dashStroke;
 	@TGProperty
 	public String fontFamily;
 	@TGProperty
@@ -65,12 +69,13 @@ public class TrainType extends TrainGraphPart {
 	 * @return current object, for convenience of link-style invocation
 	 */
 	public TrainType setProperties(String abbriveation, String pattern, Color color, String lineStype, 
-			float lineWidth, String fontFamily, int fontStyle, int fontSize, Color fontColor) {
+			float lineWidth, float[] dashStroke, String fontFamily, int fontStyle, int fontSize, Color fontColor) {
 		this.abbriveation = abbriveation;
 		this.pattern = pattern;
 		this.color = color;
 		this.lineStyle = lineStype;
 		this.lineWidth = lineWidth;
+		this.dashStroke = dashStroke;
 		this.fontFamily = fontFamily;
 		this.fontStyle = fontStyle;
 		this.fontSize = fontSize;
@@ -84,7 +89,8 @@ public class TrainType extends TrainGraphPart {
 	 */	
 	@Override
 	public void setToDefault() {
-		setProperties("", "", Color.decode("#ff0000"), LINE_STYLE_SOLID, 1.0f, __("Lucida Grande"), 
+		setProperties("", "", Color.decode("#ff0000"), LINE_STYLE_SOLID, 1.0f, 
+				new float[] {6, 2, 2, 2}, __("Lucida Grande"), 
 				Font.PLAIN, 12, Color.decode("#700000"));
 	}	
 	

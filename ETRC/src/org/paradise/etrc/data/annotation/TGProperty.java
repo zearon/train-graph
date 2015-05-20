@@ -33,6 +33,11 @@ public @interface TGProperty {
 	String name() default "";
 	
 	/**
+	 * 对于原生类型数组的简单属性,设置isArray为true; 如果不是数组,设置为false.
+	 */
+	boolean isArray() default false;
+	
+	/**
 	 * 用于决定序列化顺序的序号. 序列化一个TrainGraph元素时, 分两组进行. 第一组首先序列化其简单属性, 
 	 * 然后第二组序列化对象属性和数组属性. index值越大,序列化时顺序越靠后. 如果不指定该属性, 则按照
 	 * 属性在类中的定义顺序进行. 继承自基类的属性在本类属性之后进行. 通过指定index的值,可以改变属性的

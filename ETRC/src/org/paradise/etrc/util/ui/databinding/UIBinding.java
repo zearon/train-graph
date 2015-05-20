@@ -38,7 +38,7 @@ public abstract class UIBinding<M, U> {
 	public static <M, U> void registerModelValueTypeConverter(
 			IValueTypeConverter<M, U> converter) {
 		
-		modelValueConverterMap.put(Tuple2.oF(converter.getAValueType().getName(), 
+		modelValueConverterMap.put(Tuple2.of(converter.getAValueType().getName(), 
 				converter.getBValueType().getName()), converter);
 	}
 	
@@ -52,7 +52,7 @@ public abstract class UIBinding<M, U> {
 	public static <U, M> void registerUIValueTypeConverter(
 			IValueTypeConverter<U, M> converter) {
 		
-		uiValueConverterMap.put(Tuple2.oF(converter.getAValueType().getName(), 
+		uiValueConverterMap.put(Tuple2.of(converter.getAValueType().getName(), 
 				converter.getBValueType().getName()), converter);
 	}
 	
@@ -203,7 +203,7 @@ public abstract class UIBinding<M, U> {
 		// If ui value is String and no M->String converter is registered,
 		// then use modelValue.toString() as the default converter.
 		if (String.class.getName().equals(uiValueClassName) &&
-				!modelValueConverterMap.containsKey(Tuple2.oF(propertyClassName, 
+				!modelValueConverterMap.containsKey(Tuple2.of(propertyClassName, 
 						String.class.getName() )) ) {
 			
 			if (modelValue == null)
@@ -216,7 +216,7 @@ public abstract class UIBinding<M, U> {
 		else {
 			try {
 				IValueTypeConverter<M, U> converter = (IValueTypeConverter<M, U>) 
-					modelValueConverterMap.get(Tuple2.oF(propertyClassName, uiValueClassName));
+					modelValueConverterMap.get(Tuple2.of(propertyClassName, uiValueClassName));
 				if (converter == null)
 					throw new NullPointerException();
 				else
@@ -244,7 +244,7 @@ public abstract class UIBinding<M, U> {
 		// If ui value is String and no String->M converter is registered,
 		// then use the default converter.
 		if (String.class.getName().equals(uiValueClassName) &&
-				!uiValueConverterMap.containsKey(Tuple2.oF(String.class.getName(), 
+				!uiValueConverterMap.containsKey(Tuple2.of(String.class.getName(), 
 						propertyClassName )) ) {
 			
 			if (uiValue == null)
@@ -258,7 +258,7 @@ public abstract class UIBinding<M, U> {
 		else {
 			try {
 				IValueTypeConverter<U, M> converter = (IValueTypeConverter<U, M>) 
-					uiValueConverterMap.get(Tuple2.oF(uiValueClassName, propertyClassName));
+					uiValueConverterMap.get(Tuple2.of(uiValueClassName, propertyClassName));
 				if (converter == null)
 					throw new NullPointerException();
 				else

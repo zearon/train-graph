@@ -95,12 +95,12 @@ public abstract class TrainGraphPart {
 			new LinkedHashMap<> ();
 	protected static HashMap<Tuple2<String, String>, String> PropertyTypeMap =
 			new HashMap<> ();
-	/* a list of tuples in form of ((className, propName), (porpIndex, firstLine) ) */
-	protected static Vector<Tuple2<Tuple2<String, String>, Tuple2<Integer,Boolean>>> simplePropertyIndexList =
+	/* a list of tuples in form of ((className, propName), (porpIndex, firstLine, isArray) ) */
+	protected static Vector<Tuple2<Tuple2<String, String>, Tuple3<Integer,Boolean, Boolean>>> simplePropertyIndexList =
 			new Vector<> ();
 	/* a map whose key is className, and the value is a list of tuples 
-	   in form of ((className, propName), (porpIndex, firstLine) ) */
-	protected static Map<String, List<Tuple2<Tuple2<String, String>, Tuple2<Integer,Boolean> >>> simplePropertyIndexMap;
+	   in form of ((className, propName), (porpIndex, firstLine, isArray) ) */
+	protected static Map<String, List<Tuple2<Tuple2<String, String>, Tuple3<Integer,Boolean,Boolean> >>> simplePropertyIndexMap;
 	
 	protected static LinkedHashMap<Tuple2<String, String>, 
 		Tuple3<TGElementAttr, Class<?>, Function<TrainGraphPart, Object>> > elementGetterMap = 
@@ -155,9 +155,11 @@ public abstract class TrainGraphPart {
 	@TGProperty
 	public void setName(String name) { this.name = name; }
 	public TrainGraphPart getParent() { return parent; }
+	@SuppressWarnings("unchecked")
 	public <T> T getParent(Class<T> clazz) { return (T) parent; }
 	public void setParent(TrainGraphPart parent) { this.parent = parent; }
 	public TrainGraphPart getRoot() { return root; }
+	@SuppressWarnings("unchecked")
 	public <T> T getRoot(Class<T> clazz) { return (T) parent; }
 	public void setRoot(TrainGraphPart root) { this.root = root; }
 	
@@ -378,7 +380,7 @@ public abstract class TrainGraphPart {
 			Supplier<TrainGraphPart> creator = () -> TrainGraphPart.newInstance(defaultConstructor);
 			
 			DEBUG_MSG_ANO("%sRegister class '%s' as %s", NEW_LINE_STR, typeName, clazz.getName());
-			registeredTypeList.add(Tuple3.oF(clazz, typeName, tgeType));
+			registeredTypeList.add(Tuple3.of(clazz, typeName, tgeType));
 			elementCreatorMap.put(typeName, (Supplier<?>) creator);
 			registeredTypeCreatorDict.put(clazz, creator);
 		} else {
@@ -435,10 +437,11 @@ public abstract class TrainGraphPart {
 		String tpName = tp.name().trim();
 		String fieldName = "".equals(tpName) ? field.getName() : tpName;
 		Class<?> fieldClass = field.getType();
-		Tuple2<String, String> propTuple = Tuple2.oF(className, fieldName);
+		Tuple2<String, String> propTuple = Tuple2.of(className, fieldName);
 		field.setAccessible(true);
 		
 		// field is a simple property
+		// Save Getter
 		simplePropertyGetterMap.put(propTuple, tgp -> {
 			if (tgp == null) {
 				throw new RuntimeException(String.format(__("Cannot get value of '%s' field from NULL element"),
@@ -457,6 +460,7 @@ public abstract class TrainGraphPart {
 			return value == null ? "" : (String) ValueTypeConverter.convertType(value, 
 					fieldClass, String.class);
 		});
+		// Save Setter
 		simplePropertySetterMap.put(propTuple, (tgp, strValue) -> {
 			if (tgp == null) {
 				throw new RuntimeException(String.format(__("Cannot set value of '%s' field for NULL element"),
@@ -478,8 +482,8 @@ public abstract class TrainGraphPart {
 				fieldName, fieldClass.getName());
 		
 		int newPropIndex = tp.index() == Integer.MAX_VALUE ? propIndex : tp.index();
-		Tuple2 attrTuple = Tuple2.oF(newPropIndex, tp.firstline());
-		simplePropertyIndexList.add(Tuple2.oF(propTuple, attrTuple));
+		Tuple3 attrTuple = Tuple3.of(newPropIndex, tp.firstline(), tp.isArray());
+		simplePropertyIndexList.add(Tuple2.of(propTuple, attrTuple));
 	}
 	
 	private void processFieldAsElement(Class clazz, TGElement te, 
@@ -495,7 +499,7 @@ public abstract class TrainGraphPart {
 		String teName = te.name();
 		String propName = "".equals(teName) ? fieldName : teName;
 		Class fieldClass = field.getType();
-		Tuple2<String, String> propTuple = Tuple2.oF(className, propName);
+		Tuple2<String, String> propTuple = Tuple2.of(className, propName);
 		String elementType;
 		field.setAccessible(true);
 		
@@ -554,8 +558,8 @@ public abstract class TrainGraphPart {
 		
 		DEBUG_MSG_ANO("Register %s field %s.'%s' as %s", elementType, className, 
 				propName, fieldClass.getName());
-		elementGetterMap.put(propTuple, Tuple3.oF(tea, fieldClass, getter));
-		elementSetterMap.put(propTuple, Tuple3.oF(tea, fieldClass, setter));
+		elementGetterMap.put(propTuple, Tuple3.of(tea, fieldClass, getter));
+		elementSetterMap.put(propTuple, Tuple3.of(tea, fieldClass, setter));
 		
 	}
 	
@@ -582,7 +586,7 @@ public abstract class TrainGraphPart {
 				propName = propName.substring(0, 1).toLowerCase() + propName.substring(1);				
 		}
 		
-		Tuple2<String, String> propTuple = Tuple2.oF(className, propName);
+		Tuple2<String, String> propTuple = Tuple2.of(className, propName);
 		method.setAccessible(true);
 		
 		// Setters
@@ -661,8 +665,8 @@ public abstract class TrainGraphPart {
 			});
 
 			int newPropIndex = Math.min(propIndex, tp.index());
-			Tuple2 attrTuple = Tuple2.oF(newPropIndex, tp.firstline());
-			simplePropertyIndexList.add(Tuple2.oF(propTuple, attrTuple));
+			Tuple3 attrTuple = Tuple3.of(newPropIndex, tp.firstline(), tp.isArray());
+			simplePropertyIndexList.add(Tuple2.of(propTuple, attrTuple));
 			
 			
 		}
@@ -697,7 +701,7 @@ public abstract class TrainGraphPart {
 			if (propName.length() > 1)
 				propName = propName.substring(0, 1).toLowerCase() + propName.substring(1);				
 		}
-		Tuple2<String, String> propTuple = Tuple2.oF(className, propName);
+		Tuple2<String, String> propTuple = Tuple2.of(className, propName);
 		TGElementAttr tea = TGElementAttr.fromAnnotation(te);
 		tea.setName(propName);
 		tea.setIndex(te.index() == Integer.MAX_VALUE ? propIndex : te.index());
@@ -793,9 +797,9 @@ public abstract class TrainGraphPart {
 		DEBUG_MSG_ANO("Register %s %s %s.'%s' as %s", elementType, methodType, className, 
 				propName, propClass.getName());
 		if (isGetter)
-			elementGetterMap.put(propTuple, Tuple3.oF(tea, propClass, getter));
+			elementGetterMap.put(propTuple, Tuple3.of(tea, propClass, getter));
 		else
-			elementSetterMap.put(propTuple, Tuple3.oF(tea, propClass, setter));
+			elementSetterMap.put(propTuple, Tuple3.of(tea, propClass, setter));
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -984,7 +988,7 @@ public abstract class TrainGraphPart {
 	 */
 	private boolean saveSimplePropertiesToWriter(Writer writer, int identLevel, boolean inOneLine) {
 		String className = getClass().getName();
-		List<Tuple2<Tuple2<String, String>, Tuple2<Integer, Boolean> >> propKeyList= simplePropertyIndexMap.get(className);
+		List<Tuple2<Tuple2<String, String>, Tuple3<Integer, Boolean, Boolean> >> propKeyList= simplePropertyIndexMap.get(className);
 		if (propKeyList == null) {
 			DEBUG_MSG_ANO("There is no fileds/accessor registered as simple property "
 					+ "in %s class with @SimpleProperty", className);
@@ -999,9 +1003,9 @@ public abstract class TrainGraphPart {
 		boolean[] boolFlags = {false, false}; // {hasFirstLineProperties, lineBreakPrinted}
 		int[] intFlags = {0, propKeyList.size() - 1}; // [iterationIndex, iterationMaxCount]
 		propKeyList.stream().sorted((tuple1, tuple2) -> {
-			// tuple.A is (className, propName), tuple.B is (propIndex, isFirstLine)
-			Tuple2<Integer, Boolean> prop1Attr = tuple1.B;
-			Tuple2<Integer, Boolean> prop2Attr = tuple2.B;
+			// tuple.A is (className, propName), tuple.B is (propIndex, isFirstLine, isArray)
+			Tuple3<Integer, Boolean, Boolean> prop1Attr = tuple1.B;
+			Tuple3<Integer, Boolean, Boolean> prop2Attr = tuple2.B;
 			
 			if (prop1Attr.B || prop2Attr.B)
 				// Set has isFirstLine=true flag to true
@@ -1018,9 +1022,9 @@ public abstract class TrainGraphPart {
 			return firstLineSort != 0 ? firstLineSort : indexSort;
 			
 		}).forEach(tuple-> {
-			// tuple.A is (className, propName), tuple.B is (propIndex, isFirstLine)
+			// tuple.A is (className, propName), tuple.B is (propIndex, isFirstLine, isArray)
 			Tuple2<String, String> propTuple = tuple.A;
-			Tuple2<Integer, Boolean> propAttr = tuple.B;
+			Tuple3<Integer, Boolean, Boolean> propAttr = tuple.B;
 			
 			if (!inOneLine) {
 				// If there are firstline=true properties
@@ -1035,7 +1039,7 @@ public abstract class TrainGraphPart {
 				
 			}
 			
-			String propValue = getSimpleProperty(propTuple);
+			String propValue = getSimpleProperty(propTuple, propAttr.C);
 			propValue = _encode(propValue);
 			
 			_print(writer, "%s=%s", propTuple.B, propValue);
@@ -1051,13 +1055,13 @@ public abstract class TrainGraphPart {
 		return intFlags[1] > 0;
 	}
 	
-	private String getSimpleProperty(Tuple2<String, String> propTuple) {
+	private String getSimpleProperty(Tuple2<String, String> propTuple, boolean isArray) {
 		Function<TrainGraphPart, String> getter = simplePropertyGetterMap.get(propTuple);
 		
 		if (getter != null) {
 			return getter.apply(this);
 		} else {
-			return "";
+			return ValueTypeConverter.NULL_STR;
 		}
 	}
 
@@ -1321,14 +1325,17 @@ public abstract class TrainGraphPart {
 			remainingLine = line.substring(propLine.length());
 		}
 		
-		return Tuple2.oF(modelModified, remainingLine);
+		return Tuple2.of(modelModified, remainingLine);
 	}
 	
 	private void setSimpleProperty(TrainGraphPart obj, String propName, 
 			String valueInStr, int lineNum, String fullLine) {
 		
-		Tuple2 propTuple = Tuple2.oF(obj.getClass().getName(), propName);
+		Tuple2 propTuple = Tuple2.of(obj.getClass().getName(), propName);
 		BiConsumer<TrainGraphPart, String> setter = simplePropertySetterMap.get(propTuple);
+		
+		if (ValueTypeConverter.NULL_STR.equals(valueInStr))
+			valueInStr = null;
 		
 		if (setter != null) {
 			setter.accept(obj, valueInStr);
@@ -1349,7 +1356,7 @@ public abstract class TrainGraphPart {
 		boolean isObject = line.contains("{");
 		boolean isList = line.contains("[");
 		if (!isObject && !isList)
-			return Tuple2.oF(null, line);
+			return Tuple2.of(null, line);
 
 		// {remainingLine, propNameToBeAssigned, ElementNameOfObjectProperty, LengthOfListProperty}
 		String[] lineParts = matchObjectLine(line); 
@@ -1427,7 +1434,7 @@ public abstract class TrainGraphPart {
 			parsingNodeStack.push(obj);
 		}
 
-		return Tuple2.oF(obj, remainingLine);
+		return Tuple2.of(obj, remainingLine);
 	}
 	
 	private static Tuple3<TGElementAttr, Class<?>, BiConsumer<TrainGraphPart, Object>> 
@@ -1435,7 +1442,7 @@ public abstract class TrainGraphPart {
 				String propName) {
 		
 		String parentClassName = stackTop == null ? "" : stackTop.getClass().getName();
-		Tuple2<String, String> propTuple = Tuple2.oF(parentClassName, propName);
+		Tuple2<String, String> propTuple = Tuple2.of(parentClassName, propName);
 		
 		Tuple3<TGElementAttr, Class<?>, BiConsumer<TrainGraphPart, Object>> setter = 
 				elementSetterMap.get(propTuple);
@@ -1466,7 +1473,7 @@ public abstract class TrainGraphPart {
 			TrainGraphPart stackTop,  String propName) {
 		
 		String parentClassName = stackTop == null ? "" : stackTop.getClass().getName();
-		Tuple2<String, String> propTuple = Tuple2.oF(parentClassName, propName);
+		Tuple2<String, String> propTuple = Tuple2.of(parentClassName, propName);
 		
 		Tuple3<TGElementAttr, Class<?>, Function<TrainGraphPart, Object>> getter = 
 				elementGetterMap.get(propTuple);
@@ -1643,9 +1650,10 @@ public abstract class TrainGraphPart {
 	// {{ 辅助方法, encode, decode, print...
 	
 	private static Tuple2[] ESCAPE_CHARS = {
-		Tuple2.oF(",", "$COMMA$"), Tuple2.oF("=", "EQUAL"), Tuple2.oF("//", "$DOUBLE_SLASH$"), 
-		Tuple2.oF("{", "$BRACE_L$"), Tuple2.oF("}", "$BRACE_R$"), 
-		Tuple2.oF("[", "$BRACKET_L$"), Tuple2.oF("]", "$BRACKET_R$"), 
+		Tuple2.of(",", "$COMMA$"), Tuple2.of("=", "EQUAL"), 
+		Tuple2.of("//", "$DOUBLE_SLASH$"), 
+		Tuple2.of("{", "$BRACE_L$"), Tuple2.of("}", "$BRACE_R$"), 
+		Tuple2.of("[", "$BRACKET_L$"), Tuple2.of("]", "$BRACKET_R$"), 
 	};
 	
 	@SuppressWarnings("unchecked")

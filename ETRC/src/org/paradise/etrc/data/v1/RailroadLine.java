@@ -164,7 +164,7 @@ public class RailroadLine extends TrainGraphPart {
 	public Tuple2<Station, Integer> getCrossoverStationTuple(int index) {
 		Station station = crossoverStations.get(index);
 		int stationIndex = stations.indexOf(station);
-		return Tuple2.of(station, stationIndex);
+		return Tuple2.ofKey(station, stationIndex);
 	}
 
 	/**

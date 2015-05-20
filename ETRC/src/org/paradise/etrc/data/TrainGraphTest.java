@@ -54,7 +54,7 @@ public class TrainGraphTest {
 		trainGraph = TrainGraphFactory.loadTrainGraphFromFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2.trc");
 	}
 	
-	public void makeDefault() {
+	public void makeDefault(boolean loadMap) {
 		trainGraph = TrainGraphFactory.createDefaultTrainGraph();
 		
 		int stationCount = 6;
@@ -107,12 +107,13 @@ public class TrainGraphTest {
 			lineChart0.addTrain(t);
 		}
 		
-		RailNetworkMap map = trainGraph.map;
-		try {
-			map.loadFromFile(new File(this.getClass().getResource("/pic/gmap.jpg").toURI()));
-		} catch (IOException | URISyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		if (loadMap) {
+			RailNetworkMap map = trainGraph.map;
+			try {
+				map.loadFromFile(new File(this.getClass().getResource("/pic/gmap.jpg").toURI()));
+			} catch (IOException | URISyntaxException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -162,41 +163,6 @@ public class TrainGraphTest {
 			System.out.println(String.format("----------- Iteration %d -----------\r\n%s\r\n\r\n", 
 					i, trainGraph));
 		});
-	}
-	
-	@Test
-	public void testSimplePropertyAnnotationSave() {
-		System.out.println("-------      test SimpleProperty Annotation Save      ---------");
-		TrainGraphPart.setFullToString();
-		makeDefault();
-		try {
-			trainGraph.saveToStream(System.out, 0);
-			
-			trainGraph.saveToFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2-save.trc");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	@Test
-	public void testSimplePropertyAnnotationLoad() {
-		System.out.println("-------      test SimpleProperty Annotation Load      ---------");
-		TrainGraphPart.setSimpleToString();
-		
-		PrintStream fileout;
-		try {
-			load();
-			
-			System.out.println("********* trainGraph");
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			trainGraph.saveToStream(baos, 0);
-			System.out.print(baos);
-			fileout = new PrintStream(new File("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2-load.trc"));
-			fileout.print(baos);
-			fileout.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
 	}
 	
 //	@Test
@@ -257,5 +223,53 @@ public class TrainGraphTest {
 //		
 //		assertEquals(base64Orig, base64Load);
 //	}
+	
+	@Test
+	public void testSimplePropertyAnnotationSave() {
+		System.out.println("-------      test SimpleProperty Annotation Save      ---------");
+		TrainGraphPart.setFullToString();
+		makeDefault(false);
+		try {
+			trainGraph.saveToStream(System.out, 0);
+			
+			trainGraph.saveToFile("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2-save.trc");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testSimplePropertyAnnotationLoad() {
+		System.out.println("-------      test SimpleProperty Annotation Load      ---------");
+		TrainGraphPart.setSimpleToString();
+		
+		PrintStream fileout;
+		try {
+			load();
+			
+			System.out.println("********* trainGraph");
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			trainGraph.saveToStream(baos, 0);
+			System.out.print(baos);
+			fileout = new PrintStream(new File("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test3-2-load.trc"));
+			fileout.print(baos);
+			fileout.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@Test
+	public void testArrayClass() {
+		System.out.println("-------      test Array Class      ---------");
+		Object[] list = {new int[0], new Integer[0], new long[0], new Long[0], 
+				new boolean[0], new Boolean[0], new byte[0], new Byte[0], 
+				new float[0], new Float[0], new double[0], new Double[0], 
+				new String[0], new Color[0], new Object[0]};
+		for (Object array : list) {
+			Class<?> clazz = array.getClass();
+			System.out.println(clazz.getName());
+		}
+	}
 
 }

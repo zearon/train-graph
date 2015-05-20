@@ -89,18 +89,20 @@ public abstract class TrainGraphPart {
 	public static final String IDENT_STR	= "  ";
 	public static final String NEW_LINE_STR	= "\n";
 		
-	protected static LinkedHashMap<Tuple2<String, String>, Function<TrainGraphPart, String>> simplePropertyGetterMap =
-			new LinkedHashMap<> ();
-	protected static LinkedHashMap<Tuple2<String, String>, BiConsumer<TrainGraphPart, String>> simplePropertySetterMap =
-			new LinkedHashMap<> ();
+	// Value is a 2-tuple (getter, propIsArray)
+	protected static LinkedHashMap<Tuple2<String, String>, Tuple2<Function<TrainGraphPart, String>, Boolean> > 
+		simplePropertyGetterMap =new LinkedHashMap<> ();
+	// Value is a 2-tuple (setter, propIsArray)
+	protected static LinkedHashMap<Tuple2<String, String>, Tuple2<BiConsumer<TrainGraphPart, String>, Boolean> > 
+		simplePropertySetterMap = new LinkedHashMap<> ();
 	protected static HashMap<Tuple2<String, String>, String> PropertyTypeMap =
 			new HashMap<> ();
-	/* a list of tuples in form of ((className, propName), (porpIndex, firstLine, isArray) ) */
-	protected static Vector<Tuple2<Tuple2<String, String>, Tuple3<Integer,Boolean, Boolean>>> simplePropertyIndexList =
-			new Vector<> ();
+	/* a list of tuples in form of ((className, propName), (porpIndex, firstLine) ) */
+	protected static Vector<Tuple2<Tuple2<String, String>, Tuple2<Integer,Boolean>>> 
+		simplePropertyIndexList = new Vector<> ();
 	/* a map whose key is className, and the value is a list of tuples 
 	   in form of ((className, propName), (porpIndex, firstLine, isArray) ) */
-	protected static Map<String, List<Tuple2<Tuple2<String, String>, Tuple3<Integer,Boolean,Boolean> >>> simplePropertyIndexMap;
+	protected static Map<String, List<Tuple2<Tuple2<String, String>, Tuple2<Integer,Boolean> >>> simplePropertyIndexMap;
 	
 	protected static LinkedHashMap<Tuple2<String, String>, 
 		Tuple3<TGElementAttr, Class<?>, Function<TrainGraphPart, Object>> > elementGetterMap = 
@@ -441,8 +443,7 @@ public abstract class TrainGraphPart {
 		field.setAccessible(true);
 		
 		// field is a simple property
-		// Save Getter
-		simplePropertyGetterMap.put(propTuple, tgp -> {
+		Function<TrainGraphPart, String> getter = tgp -> {
 			if (tgp == null) {
 				throw new RuntimeException(String.format(__("Cannot get value of '%s' field from NULL element"),
 						fieldName));
@@ -459,9 +460,8 @@ public abstract class TrainGraphPart {
 			
 			return value == null ? "" : (String) ValueTypeConverter.convertType(value, 
 					fieldClass, String.class);
-		});
-		// Save Setter
-		simplePropertySetterMap.put(propTuple, (tgp, strValue) -> {
+		};
+		BiConsumer<TrainGraphPart, String> setter = (tgp, strValue) -> {
 			if (tgp == null) {
 				throw new RuntimeException(String.format(__("Cannot set value of '%s' field for NULL element"),
 						fieldName));
@@ -476,13 +476,15 @@ public abstract class TrainGraphPart {
 						fieldName, tgp.getClass().getName(), 
 						e.getClass().getName(), e.getMessage()));
 			}
-		});
+		};
+		simplePropertyGetterMap.put(propTuple, Tuple2.of(getter, tp.isArray()));
+		simplePropertySetterMap.put(propTuple, Tuple2.of(setter, tp.isArray()));
 		
 		DEBUG_MSG_ANO("Register Simple property field %s.'%s' in %s type", className, 
 				fieldName, fieldClass.getName());
 		
 		int newPropIndex = tp.index() == Integer.MAX_VALUE ? propIndex : tp.index();
-		Tuple3 attrTuple = Tuple3.of(newPropIndex, tp.firstline(), tp.isArray());
+		Tuple2 attrTuple = Tuple2.of(newPropIndex, tp.firstline());
 		simplePropertyIndexList.add(Tuple2.of(propTuple, attrTuple));
 	}
 	
@@ -608,7 +610,7 @@ public abstract class TrainGraphPart {
 			}
 			
 			Class<?> propClass0 = propClass;
-			simplePropertySetterMap.put(propTuple, (tgp, strValue) -> {
+			BiConsumer<TrainGraphPart, String> setter = (tgp, strValue) -> {
 				if (tgp == null) {
 					throw new RuntimeException(String.format(__("Cannot set value with '%s' method for NULL element"),
 							methodName));
@@ -623,7 +625,8 @@ public abstract class TrainGraphPart {
 							methodName, tgp.getClass().getName(), 
 							e.getClass().getName(), e.getMessage()));
 				}
-			});
+			};
+			simplePropertySetterMap.put(propTuple, Tuple2.of(setter, tp.isArray()));
 		}
 		
 		// Getters
@@ -645,7 +648,7 @@ public abstract class TrainGraphPart {
 			}
 
 			Class<?> propClass0 = propClass;
-			simplePropertyGetterMap.put(propTuple, tgp -> {
+			Function<TrainGraphPart, String> getter = tgp -> {
 				if (tgp == null) {
 					throw new RuntimeException(String.format(__("Cannot get value through '%s' method from NULL element"),
 							methodName));
@@ -662,10 +665,11 @@ public abstract class TrainGraphPart {
 				
 				return value == null ? "" : (String) ValueTypeConverter.convertType(value, 
 						propClass0, String.class);
-			});
+			};
+			simplePropertyGetterMap.put(propTuple, Tuple2.of(getter, tp.isArray()));
 
 			int newPropIndex = Math.min(propIndex, tp.index());
-			Tuple3 attrTuple = Tuple3.of(newPropIndex, tp.firstline(), tp.isArray());
+			Tuple2 attrTuple = Tuple2.of(newPropIndex, tp.firstline());
 			simplePropertyIndexList.add(Tuple2.of(propTuple, attrTuple));
 			
 			
@@ -988,7 +992,7 @@ public abstract class TrainGraphPart {
 	 */
 	private boolean saveSimplePropertiesToWriter(Writer writer, int identLevel, boolean inOneLine) {
 		String className = getClass().getName();
-		List<Tuple2<Tuple2<String, String>, Tuple3<Integer, Boolean, Boolean> >> propKeyList= simplePropertyIndexMap.get(className);
+		List<Tuple2<Tuple2<String, String>, Tuple2<Integer, Boolean> >> propKeyList= simplePropertyIndexMap.get(className);
 		if (propKeyList == null) {
 			DEBUG_MSG_ANO("There is no fileds/accessor registered as simple property "
 					+ "in %s class with @SimpleProperty", className);
@@ -1004,8 +1008,8 @@ public abstract class TrainGraphPart {
 		int[] intFlags = {0, propKeyList.size() - 1}; // [iterationIndex, iterationMaxCount]
 		propKeyList.stream().sorted((tuple1, tuple2) -> {
 			// tuple.A is (className, propName), tuple.B is (propIndex, isFirstLine, isArray)
-			Tuple3<Integer, Boolean, Boolean> prop1Attr = tuple1.B;
-			Tuple3<Integer, Boolean, Boolean> prop2Attr = tuple2.B;
+			Tuple2<Integer, Boolean> prop1Attr = tuple1.B;
+			Tuple2<Integer, Boolean> prop2Attr = tuple2.B;
 			
 			if (prop1Attr.B || prop2Attr.B)
 				// Set has isFirstLine=true flag to true
@@ -1024,7 +1028,7 @@ public abstract class TrainGraphPart {
 		}).forEach(tuple-> {
 			// tuple.A is (className, propName), tuple.B is (propIndex, isFirstLine, isArray)
 			Tuple2<String, String> propTuple = tuple.A;
-			Tuple3<Integer, Boolean, Boolean> propAttr = tuple.B;
+			Tuple2<Integer, Boolean> propAttr = tuple.B;
 			
 			if (!inOneLine) {
 				// If there are firstline=true properties
@@ -1039,8 +1043,7 @@ public abstract class TrainGraphPart {
 				
 			}
 			
-			String propValue = getSimpleProperty(propTuple, propAttr.C);
-			propValue = _encode(propValue);
+			String propValue = getSimpleProperty(propTuple);
 			
 			_print(writer, "%s=%s", propTuple.B, propValue);
 
@@ -1055,11 +1058,14 @@ public abstract class TrainGraphPart {
 		return intFlags[1] > 0;
 	}
 	
-	private String getSimpleProperty(Tuple2<String, String> propTuple, boolean isArray) {
-		Function<TrainGraphPart, String> getter = simplePropertyGetterMap.get(propTuple);
+	private String getSimpleProperty(Tuple2<String, String> propTuple) {
+		Tuple2<Function<TrainGraphPart, String>, Boolean> getterTuple =
+				simplePropertyGetterMap.get(propTuple);
+		Function<TrainGraphPart, String> getter = getterTuple.A;
+		boolean isArray = getterTuple.B;
 		
 		if (getter != null) {
-			return getter.apply(this);
+			return _encode(getter.apply(this), isArray);
 		} else {
 			return ValueTypeConverter.NULL_STR;
 		}
@@ -1311,7 +1317,7 @@ public abstract class TrainGraphPart {
 				if ("".equals(propName))
 					continue;
 				
-				String propValue = strParts.length >= 2 ? _decode(strParts[1]) : "";
+				String propValue = strParts.length >= 2 ? strParts[1] : "";
 				try {
 					objToBeAssigned.setSimpleProperty(objToBeAssigned, 
 							propName, propValue, lineNum, fullLine);
@@ -1332,13 +1338,16 @@ public abstract class TrainGraphPart {
 			String valueInStr, int lineNum, String fullLine) {
 		
 		Tuple2 propTuple = Tuple2.of(obj.getClass().getName(), propName);
-		BiConsumer<TrainGraphPart, String> setter = simplePropertySetterMap.get(propTuple);
+		Tuple2<BiConsumer<TrainGraphPart, String>, Boolean> setterTuple =
+				 simplePropertySetterMap.get(propTuple);
+		BiConsumer<TrainGraphPart, String> setter = setterTuple.A;
+		boolean isArray = setterTuple.B;
 		
 		if (ValueTypeConverter.NULL_STR.equals(valueInStr))
 			valueInStr = null;
 		
 		if (setter != null) {
-			setter.accept(obj, valueInStr);
+			setter.accept(obj, _decode(valueInStr, isArray));
 		} else {
 			throw ParsingException.create(lineNum, fullLine,
 					String.format(__("Undefined simple property '%s' encounted in '%s' element."), 
@@ -1650,18 +1659,25 @@ public abstract class TrainGraphPart {
 	// {{ 辅助方法, encode, decode, print...
 	
 	private static Tuple2[] ESCAPE_CHARS = {
+		// < and > should be at the beging, since _encode uses its index
+		Tuple2.of("<", "$LT$"), Tuple2.of(">", "$GT$"),
+		
+		Tuple2.of("[", "$BRACKET_L$"), Tuple2.of("]", "$BRACKET_R$"),
 		Tuple2.of(",", "$COMMA$"), Tuple2.of("=", "EQUAL"), 
-		Tuple2.of("//", "$DOUBLE_SLASH$"), 
-		Tuple2.of("{", "$BRACE_L$"), Tuple2.of("}", "$BRACE_R$"), 
-		Tuple2.of("[", "$BRACKET_L$"), Tuple2.of("]", "$BRACKET_R$"), 
+		Tuple2.of("//", "$DOUBLE_SLASH$"), Tuple2.of(";", "SEMICOLOM"), 
+		Tuple2.of("{", "$BRACE_L$"), Tuple2.of("}", "$BRACE_R$"),  
 	};
 	
 	@SuppressWarnings("unchecked")
-	private static String _encode(String str) {
+	public static String _encode(String str, boolean isArray) {
 		if (str == null)
 			return null;
 		
-		for (Tuple2<String, String> escapeChar : ESCAPE_CHARS) {
+		else if (isArray)
+			return str;
+		
+		for (int i = 0; i < ESCAPE_CHARS.length; ++ i) {
+			Tuple2<String, String> escapeChar = ESCAPE_CHARS[i];
 			str = str.replace(escapeChar.A, escapeChar.B);
 		}
 		
@@ -1669,7 +1685,7 @@ public abstract class TrainGraphPart {
 	}
 	
 	@SuppressWarnings("unchecked")
-	private static String _decode(String str) {
+	public static String _decode(String str, boolean isArray) {
 		if (str == null)
 			return null;
 		

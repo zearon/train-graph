@@ -28,6 +28,7 @@ import org.paradise.etrc.util.ui.databinding.UIBinding;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class SettingsView extends JPanel {
 	private JTextField txtDistscale;
@@ -49,6 +50,7 @@ public class SettingsView extends JPanel {
 	
 	private JTextField txtGlobalhttpproxyserver;
 	private JTextField txtGlobalhttpproxyport;
+	private JComboBox cbUseAntiAliasing;
 
 	/**
 	 * Create the panel.
@@ -132,55 +134,77 @@ public class SettingsView extends JPanel {
 		txtStarthour.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		txtStarthour.setColumns(5);
 		
-		JComboBox<Integer> comboBox = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel(new Integer[] {60, 30, 20, 15, 10, 5}), 4, "runningChart.timeInterval");
+		JComboBox<Integer> comboBox = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<Integer>(new Integer[] {60, 30, 20, 15, 10, 5}), 4, "runningChart.timeInterval");
+		
+		cbUseAntiAliasing = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "runningChart.useAntiAliasing:YesNo");
+		
+		JLabel lblUseAntialiasing = new JLabel("Use Anti-Aliasing");
+		lblUseAntialiasing.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 //		comboBox.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 //		comboBox.setModel(new DefaultComboBoxModel(new Integer[] {60, 30, 20, 15, 10, 5}));
 		GroupLayout gl_panel_runningChart = new GroupLayout(panel_runningChart);
 		gl_panel_runningChart.setHorizontalGroup(
 			gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_panel_runningChart.createSequentialGroup()
-					.addContainerGap()
 					.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addComponent(lblDistanceUnit)
-							.addGap(96)
-							.addComponent(cbDistanceUnit, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE))
+							.addContainerGap()
+							.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
+								.addGroup(gl_panel_runningChart.createSequentialGroup()
+									.addComponent(lblStationLevelFor)
+									.addGap(6)
+									.addComponent(txtBoldlinelevel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+									.addGap(108)
+									.addComponent(lblMinsXaxis))
+								.addGroup(gl_panel_runningChart.createSequentialGroup()
+									.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
+										.addGroup(gl_panel_runningChart.createSequentialGroup()
+											.addComponent(lblPixelsunit)
+											.addGap(110)
+											.addComponent(txtDistscale, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+										.addGroup(gl_panel_runningChart.createSequentialGroup()
+											.addComponent(lblDistanceUnit)
+											.addGap(96)
+											.addComponent(cbDistanceUnit, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)))
+									.addGap(108)
+									.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
+										.addComponent(lblPixelsmin)
+										.addComponent(lblUseAntialiasing))))
+							.addGap(12)
+							.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING, false)
+								.addComponent(cbUseAntiAliasing, 0, 0, Short.MAX_VALUE)
+								.addComponent(comboBox, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
 						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addComponent(lblPixelsunit)
-							.addGap(110)
-							.addComponent(txtDistscale, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(108)
-							.addComponent(lblPixelsmin)
-							.addGap(48)
+							.addGap(480)
 							.addComponent(txtMinutescale, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE))
 						.addGroup(gl_panel_runningChart.createSequentialGroup()
+							.addGap(6)
 							.addComponent(lblDisplaylevel)
 							.addGap(30)
 							.addComponent(txtDisplayLevel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
 							.addGap(108)
 							.addComponent(lblNewLabel)
 							.addGap(23)
-							.addComponent(txtStarthour, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addComponent(lblStationLevelFor)
-							.addGap(6)
-							.addComponent(txtBoldlinelevel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(108)
-							.addComponent(lblMinsXaxis)
-							.addGap(12)
-							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(13, Short.MAX_VALUE))
+							.addComponent(txtStarthour, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(11, Short.MAX_VALUE))
 		);
 		gl_panel_runningChart.setVerticalGroup(
-			gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-				.addGroup(Alignment.TRAILING, gl_panel_runningChart.createSequentialGroup()
-					.addContainerGap(29, Short.MAX_VALUE)
+			gl_panel_runningChart.createParallelGroup(Alignment.TRAILING)
+				.addGroup(gl_panel_runningChart.createSequentialGroup()
+					.addContainerGap(17, Short.MAX_VALUE)
 					.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(5)
-							.addComponent(lblDistanceUnit))
-						.addComponent(cbDistanceUnit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-					.addGap(6)
+						.addGroup(Alignment.TRAILING, gl_panel_runningChart.createSequentialGroup()
+							.addComponent(cbDistanceUnit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addGap(6))
+						.addGroup(Alignment.TRAILING, gl_panel_runningChart.createSequentialGroup()
+							.addComponent(cbUseAntiAliasing, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED))
+						.addGroup(Alignment.TRAILING, gl_panel_runningChart.createSequentialGroup()
+							.addComponent(lblDistanceUnit)
+							.addGap(12))
+						.addGroup(Alignment.TRAILING, gl_panel_runningChart.createSequentialGroup()
+							.addComponent(lblUseAntialiasing)
+							.addGap(12)))
 					.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
 						.addGroup(gl_panel_runningChart.createSequentialGroup()
 							.addGap(6)
@@ -218,6 +242,7 @@ public class SettingsView extends JPanel {
 							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
 					.addContainerGap())
 		);
+		gl_panel_runningChart.linkSize(SwingConstants.HORIZONTAL, new Component[] {comboBox, cbUseAntiAliasing});
 		panel_runningChart.setLayout(gl_panel_runningChart);
 		
 		JLabel lblPlanningSchedule = new JLabel(__("Planning Schedule"));
@@ -395,6 +420,4 @@ public class SettingsView extends JPanel {
 		
 		return desc;
 	}
-	
-	// }}
 }

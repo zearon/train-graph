@@ -104,7 +104,7 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 		case 1:
 			return trainType.getName();
 		case 2:
-			return trainType.pattern;
+			return trainType.getPattern();
 		case 3:
 			// Use font family, font color and font size to draw this text.
 			return trainType.abbriveation;
@@ -123,7 +123,7 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 			trainType.setName((String) aValue);
 			break;
 		case 2:
-			trainType.pattern = (String) aValue;
+			trainType.setPattern((String) aValue);
 			break;
 		case 3:
 			// Use font family, font color and font size to draw this text.

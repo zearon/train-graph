@@ -337,7 +337,11 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		chartView.updateDrawingModel();
 
 		// 防锯齿
-		((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		if (settings.useAntiAliasing)
+			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		else
+			((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+		
 		// 先画水印部分
 		for (TrainDrawing trainDrawing : chartView.currentDrawingModel.getUnderDrawings() ) {
 			// 当前选中的车次放在最后画，确保在最上面

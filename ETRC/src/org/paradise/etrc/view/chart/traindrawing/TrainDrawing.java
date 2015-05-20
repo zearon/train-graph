@@ -2,8 +2,10 @@ package org.paradise.etrc.view.chart.traindrawing;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Stroke;
 import java.security.cert.PKIXRevocationChecker.Option;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -195,16 +197,18 @@ public void rebuild() {
 	if (!drawMe)
 	  return;
 	
+	Graphics2D g2d = (Graphics2D) g;
+	
 	if(isActive)
-		drawActive(g);
+		drawActive(g2d);
 	else
-		if(isUnderDrawing)
-			drawUnder(g);
+		if(isUnderDrawing || !train.trainType.visible)
+			drawUnder(g2d);
 		else
-			drawNormal(g);
+			drawNormal(g2d);
   }
 
-  private void drawUnder(Graphics g) {
+  private void drawUnder(Graphics2D g) {
     if(chartView.underDrawingColor == null)
       return;
 
@@ -212,11 +216,14 @@ public void rebuild() {
     g.setColor(chartView.underDrawingColor);
     //System.out.println(train.getTrainName(chart.circuit) + color.toString());
 
+    Stroke origStroke = g.getStroke();
+	g.setStroke(train.trainType.getLineStroke());
     for (Enumeration<TrainLine> e = lines.elements(); e.hasMoreElements(); ) {
       Object obj = e.nextElement();
       if (obj instanceof TrainLine)
         ( (TrainLine) obj).draw(g);
     }
+    g.setStroke(origStroke);
 
     firstRect.drawInactive(g);
     lastRect.drawInactive(g);
@@ -229,16 +236,19 @@ public void rebuild() {
     g.setColor(oldColor);
   }
 
-  private void drawNormal(Graphics g) {
+  private void drawNormal(Graphics2D g) {
     Color oldColor = g.getColor();
-    g.setColor(train.color);
+    g.setColor(train.trainType.getLineColor());
     //System.out.println(train.getTrainName(chart.circuit) + color.toString());
 
+    Stroke origStroke = g.getStroke();
+	g.setStroke(train.trainType.getLineStroke());
     for (Enumeration<TrainLine> e = lines.elements(); e.hasMoreElements(); ) {
       Object obj = e.nextElement();
       if (obj instanceof TrainLine)
         ( (TrainLine) obj).draw(g);
     }
+    g.setStroke(origStroke);
 
     firstRect.drawInactive(g);
     lastRect.drawInactive(g);
@@ -256,9 +266,9 @@ public void rebuild() {
    *
    * @param g Graphics
    */
-  private void drawActive(Graphics g) {
+  private void drawActive(Graphics2D g) {
     Color oldColor = g.getColor();
-    g.setColor(train.color);
+    g.setColor(train.trainType.getLineColor());
 
     for (Enumeration<TrainLine> e = lines.elements(); e.hasMoreElements(); ) {
       Object obj = e.nextElement();

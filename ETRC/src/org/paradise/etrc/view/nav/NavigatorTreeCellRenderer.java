@@ -3,6 +3,7 @@ import static org.paradise.etrc.ETRC.__;
 
 import static org.paradise.etrc.ETRCUtil.*;
 
+import java.awt.Color;
 import java.awt.Component;
 
 import javax.swing.JTree;
@@ -25,8 +26,13 @@ public class NavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
 		if (value instanceof DefaultMutableTreeNode) {
 			Object userObject = ((DefaultMutableTreeNode) value).getUserObject();
 			
-			if (userObject instanceof TrainType)
-				component.setForeground(((TrainType) userObject).fontColor);
+			if (userObject instanceof TrainType) {
+				TrainType trainType = (TrainType) userObject;
+				if (trainType.visible)
+					component.setForeground(trainType.getFontColor());
+				else
+					component.setForeground(Color.GRAY);
+			}
 		}
 		
 

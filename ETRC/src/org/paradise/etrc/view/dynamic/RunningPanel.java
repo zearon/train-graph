@@ -323,7 +323,7 @@ public class RunningPanel extends JPanel {
 	}
 
 	private void drawTrainRect(Graphics g, Train train, int x, int y) {
-		g.setColor(train.color);
+		g.setColor(train.trainType.getLineColor());
 		g.fillRect(x-5, y-2, 11, 5);
 
 		//当前选中的车次

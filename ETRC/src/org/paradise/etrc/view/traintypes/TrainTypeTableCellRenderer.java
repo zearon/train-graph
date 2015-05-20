@@ -51,20 +51,9 @@ public class TrainTypeTableCellRenderer extends DefaultTableCellRenderer {
 						int y2 = y1;
 						
 						g2d.clearRect(rect.x, rect.y, rect.width, rect.height);
-						g2d.setColor(trainType.color);
-
-						Stroke lineStyle = new BasicStroke(trainType.lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
-								10.0f, new float[] {6, 2, 2, 2}, 0f);
-						// Dash
-//						Stroke lineStyle = new BasicStroke(trainType.lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
-//								10.0f, new float[] {10, 5}, 0f);
-						// Dot
-//						Stroke lineStyle = new BasicStroke(trainType.lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
-//								10.0f, new float[] {2, 1}, 0f);
-						// Dash and dot
-//						Stroke lineStyle = new BasicStroke(trainType.lineWidth, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL,
-//								10.0f, new float[] {6, 2, 2, 2}, 0f);
-						g2d.setStroke(lineStyle);
+						g2d.setColor(trainType.getLineColor());
+						
+						g2d.setStroke(trainType.getLineStroke());
 						g2d.drawLine(x1, y1, x2, y2);
 					}
 					
@@ -76,10 +65,9 @@ public class TrainTypeTableCellRenderer extends DefaultTableCellRenderer {
 				if (column == 3) {
 					// 缩写栏
 					
-					Color textColor = trainType.fontColor;
+					Color textColor = trainType.getFontColor();
 					component.setForeground(textColor);
-					Font font = new Font(trainType.fontFamily, trainType.fontStyle, trainType.fontSize);
-					component.setFont(font);
+					component.setFont(trainType.getFont());
 				}
 			}
 		}

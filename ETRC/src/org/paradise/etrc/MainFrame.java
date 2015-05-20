@@ -31,6 +31,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.rmi.server.ObjID;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
@@ -89,6 +90,7 @@ import org.paradise.etrc.filter.TRCFilter;
 import org.paradise.etrc.filter.TRFFilter;
 import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.databinding.UIBinding;
+import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 import org.paradise.etrc.view.alltrains.AllTrainsView;
 import org.paradise.etrc.view.alltrains.TrainListView;
 import org.paradise.etrc.view.chart.ChartView;
@@ -112,6 +114,8 @@ import com.sun.corba.se.spi.orbutil.fsm.Action;
 
 public class MainFrame extends JFrame implements ActionListener, Printable {
 	private static final long serialVersionUID = 1L;
+	
+	private UIBindingManager uiBindingManager = UIBindingManager.getInstance(this);
 	
 	private JMenu openRecentFilesMenu;
 	private Vector<JMenuItem> recentFileMenuItems = new Vector<>();
@@ -176,6 +180,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		uiBindingManager.updateUI(null);
 
 		ActionManager.getInstance().setUpdateUIHook(actionMgr -> this.setTitle());
 		
@@ -362,7 +367,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		// TODO: 设置主视图启动时的编辑视图
 				
 		navigator = new Navigator();
-		navigator.nodeSelectionListener = this::onNavigatorNodeChanged;
+		navigator.addNodeSelectionChangedListener(this::onNavigatorNodeChanged);
 		
 		navigatorSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, 
 				new JScrollPane(navigator), navigatorContentPanel);
@@ -512,6 +517,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public JToggleButton jtButtonShowRun;
 	public JToggleButton jtButtonUp;
 	public JToggleButton jtButtonShowWatermark;
+	public JToggleButton jtButtonAntiAliasing;
 
 	private JToolBar loadToolBar() {
 		JToolBar jToolBar = new JToolBar();
@@ -602,6 +608,16 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			chartView.repaint();
 		});
 		
+		//抗锯齿
+		jtButtonAntiAliasing = createTBToggleButton("/pic/AA.png", 
+				__("Use anti-aliasing drawing"), "chartSettings.useAntiAliasing");
+//		ImageIcon imageAA = new ImageIcon(this.getClass().getResource("/pic/AA.png"));
+//		jtButtonAntiAliasing = new JToggleButton(imageAA);
+//		jtButtonAntiAliasing.setToolTipText(__("Use anti-aliasing drawing"));
+//		jtButtonAntiAliasing.setName("chartSettings.useAntiAliasing");
+//		uiBindingManager.addDataBinding(jtButtonAntiAliasing, objID -> trainGraph.settings, 
+//				propName -> __("Use anti-aliasing drawing"), null);
+		
 		//读配置文件设置上下行状态按钮
 		chartView.showUpDownState = ChartView.SHOW_ALL;
 		jtButtonDown.setSelected(true);
@@ -630,6 +646,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		jToolBar.add(jtButtonDown);
 		jToolBar.add(jtButtonUp);
 		jToolBar.add(jtButtonShowWatermark);
+		jToolBar.add(jtButtonAntiAliasing);
 		
 		//历史记录
 		cbTrainSelectHistory.setFont(new Font("Dialog", Font.PLAIN, 12));
@@ -674,6 +691,26 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		jbOnToolBar.setActionCommand(Command);
 		
 		return jbOnToolBar;
+	}
+	
+	private JToggleButton createTBToggleButton(String imgName, String toolTipText, 
+			String dataBindingStr) {
+
+		ImageIcon image = new ImageIcon(this.getClass().getResource(imgName));
+		JToggleButton button = new JToggleButton(image);
+		button.setToolTipText(toolTipText);
+		button.setName(dataBindingStr);
+		uiBindingManager.addDataBinding(button, objID -> trainGraph.settings, 
+				propName -> toolTipText, (objID) -> navigatorContentPanel.repaint());
+		
+		return button;
+	}
+	
+	private Object getModelObjectByID(String objID) {
+		if ("chartSettings".equals(objID))
+			return trainGraph.settings;
+		
+		return null;
 	}
 
 	private final String File_Load_Chart = "File_Load_Chart";
@@ -1395,10 +1432,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			splitPaneV.setDividerLocation(runView.getPreferredSize().height);
 	}
 	
-	private void onNavigatorNodeChanged(NavigatorNodeType nodeType, 
-			int index, Object... params) {
+	private void onNavigatorNodeChanged(boolean triggeredByLeftButton,
+			NavigatorNodeType nodeType, int index, Object... params) {
 //		DEBUG_ACTION(() -> {
 //		}, TrainGraphPart.reprJoining(params, "\r\n", true));
+		if (!triggeredByLeftButton)
+			return;
 		
 		switch (nodeType) {
 		case GLOBAL_SETTINGS:
@@ -1424,9 +1463,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			break;
 		case TRAIN_TYPE_SPECIFIC:
 			/**********************************************/
-			trainGraph.currentLineChart = (RailroadLineChart) params[0];
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.TRAIN_TYPES.name());
+//			trainGraph.currentLineChart = (TrainType) params[0];
+//			navigatorContentCard.show(navigatorContentPanel, 
+//					NavigatorNodeType.TRAIN_TYPES.name());
 			break;
 		case TIME_TABLES:
 			navigatorContentCard.show(navigatorContentPanel, 

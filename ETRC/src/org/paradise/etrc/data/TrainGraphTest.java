@@ -258,18 +258,5 @@ public class TrainGraphTest {
 			e.printStackTrace();
 		}
 	}
-	
-	@Test
-	public void testArrayClass() {
-		System.out.println("-------      test Array Class      ---------");
-		Object[] list = {new int[0], new Integer[0], new long[0], new Long[0], 
-				new boolean[0], new Boolean[0], new byte[0], new Byte[0], 
-				new float[0], new Float[0], new double[0], new Double[0], 
-				new String[0], new Color[0], new Object[0]};
-		for (Object array : list) {
-			Class<?> clazz = array.getClass();
-			System.out.println(clazz.getName());
-		}
-	}
 
 }

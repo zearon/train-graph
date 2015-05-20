@@ -354,10 +354,13 @@ public abstract class UIBinding<M, U> {
 		return modelValue;
 	}
 	
-	public String init(boolean autoFind, boolean isField) {
+	public String init(boolean findAccessor, boolean autoFind, boolean isField) {
 		uiValueClassName = getNewUIValue().getClass().getName();
 		
-		return initGetterAndSetter(true, true);
+		if (findAccessor)
+			return initGetterAndSetter(true, true);
+		else
+			return "";
 	}
 	
 	/**
@@ -378,13 +381,13 @@ public abstract class UIBinding<M, U> {
 		
 		String status = "";
 		if (autoFind) {
-			// Find field first
-			status = findField(model, propertyName);
+			// Find property accessor first
+			status = findMethods(model, propertyName);
 			if ("".equals(status))
 				return status;
 			
-			// then find property method
-			status = findMethods(model, propertyName);
+			// then find field method
+			status = findField(model, propertyName);
 			return status;
 		} else {
 			if (isField) {

@@ -27,11 +27,13 @@ public class ChartSettings extends TrainGraphPart {
 	public int timeInterval;
 	@TGProperty
 	public String distUnit;
+	@TGProperty
+	public boolean useAntiAliasing;
 
 	ChartSettings() {}
 
-	public void setProperties(float distScale, int displayLevel,
-			int boldLevel, int startHour, float minuteScale, int timeInterval, String distUnit) {
+	public void setProperties(float distScale, int displayLevel, int boldLevel, 
+			int startHour, float minuteScale, int timeInterval, String distUnit, boolean useAntiAliasing) {
 		this.name = "";
 		this.distScale = distScale;
 		this.displayLevel = displayLevel;
@@ -40,11 +42,12 @@ public class ChartSettings extends TrainGraphPart {
 		this.minuteScale = minuteScale;
 		this.timeInterval = timeInterval;
 		this.distUnit = distUnit;
+		this.useAntiAliasing = useAntiAliasing;
 	}
 	
 	@Override
 	public void setToDefault() {
-		setProperties(3.0f, 4, 2, 18, 2.0f, 10, "km");
+		setProperties(3.0f, 4, 2, 18, 2.0f, 10, "km", false);
 	}
 	
 	public int getDisplayLevel() {

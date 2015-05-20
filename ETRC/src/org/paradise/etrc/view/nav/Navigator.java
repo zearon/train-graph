@@ -4,10 +4,20 @@ import static org.paradise.etrc.ETRC.__;
 
 import static org.paradise.etrc.ETRCUtil.*;
 
+import java.awt.Dimension;
+import java.awt.Point;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.util.Hashtable;
 import java.util.Optional;
 import java.util.Vector;
 
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.JTree;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
@@ -17,11 +27,14 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.event.RailroadLineChangeType;
 import org.paradise.etrc.data.v1.RailNetwork;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.TrainGraph;
+import org.paradise.etrc.data.v1.TrainType;
+import org.paradise.etrc.util.ui.table.JEditTable;
 
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 
@@ -30,7 +43,7 @@ import com.sun.org.apache.bcel.internal.generic.RETURN;
  * @author Jeff Gong
  *
  */
-public class Navigator extends JTree {
+public class Navigator extends JTree implements TreeSelectionListener {
 	
 	/**
 	 * 
@@ -48,8 +61,8 @@ public class Navigator extends JTree {
 		
 	@FunctionalInterface
 	public static interface NavigatorNodeSelectionListener {
-		public void onNavigatorNodeChanged(NavigatorNodeType nodeType, 
-				int index, Object... param);
+		public void onNavigatorNodeChanged(boolean isTriggerdByMouseLeftButton,
+				NavigatorNodeType nodeType, int index, Object... param);
 	}
 
 	static final String ALL_TRAIN_LABEL = __("All Trains");
@@ -72,25 +85,38 @@ public class Navigator extends JTree {
 	protected Vector<DefaultMutableTreeNode> trainTypeNodes;
 	protected Vector<DefaultMutableTreeNode> timeTableNodes;
 	protected Vector<DefaultMutableTreeNode> railroadLineTimeTableNodes;
+
+	private JPopupMenu trainTypePopupMenu;
+	private JMenuItem miHideTrainType;
+	private JMenuItem miShowTrainType;
+	private JMenuItem miHighLightTrainType;
 	
-	public NavigatorNodeSelectionListener nodeSelectionListener;
+	private JPopupMenu allTrainTypePopupMenu;
+	private JMenuItem miHideAllTrainTypes;
+	private JMenuItem miShowAllTrainTypes;
+	
+	private MouseAdapter contextMenuAdapter;
+	private int popupMenuX, popupMenuY;
+	
+	private Vector<NavigatorNodeSelectionListener> nodeSelectionListeners;
 	protected TrainGraph trainGraph;
+	protected TrainType selectedTrainType;
 
 	public Navigator() {
-		railroadLineNodes = new Vector<DefaultMutableTreeNode> ();
-		trainTypeNodes = new Vector<DefaultMutableTreeNode> ();
-		timeTableNodes = new Vector<DefaultMutableTreeNode> ();
-		railroadLineTimeTableNodes = new Vector<DefaultMutableTreeNode> ();
+		railroadLineNodes = new Vector<> ();
+		trainTypeNodes = new Vector<> ();
+		timeTableNodes = new Vector<> ();
+		railroadLineTimeTableNodes = new Vector<> ();
+		
+		nodeSelectionListeners = new Vector<> ();
 		
 		buildUI();	
-		
-		setCellRenderer(new NavigatorTreeCellRenderer());
 	}
 	
 	private void buildUI() {
 		rootNode = new DefaultMutableTreeNode(__("Train Graph"));
 		comprehensiveViewNode = new DefaultMutableTreeNode(__("Comprehensive View"));
-		globalSettingsNode = new DefaultMutableTreeNode(__("Global Settings"));
+		globalSettingsNode = new DefaultMutableTreeNode(__("Settings"));
 		railroadNetworkNode = new DefaultMutableTreeNode(__("Railroad Network"));
 		railroadLinesNode = new DefaultMutableTreeNode(__("Railroad Lines"));
 		trainTypesNode = new DefaultMutableTreeNode(__("Train Types"));
@@ -110,13 +136,151 @@ public class Navigator extends JTree {
 		
 		railroadLineTimeTableNodes = new Vector<DefaultMutableTreeNode>();
 		
+		setCellRenderer(new NavigatorTreeCellRenderer());
+		
+		setPreferredSize(new Dimension(200, 600));
+		
+		// Event handler for showing context menu
+		addContextMenu();
+		
+		addTreeSelectionListener(this);
+		
 		treeModel = new DefaultTreeModel(rootNode);
 		setModel(treeModel);
-		
-		// Event handler
-		addTreeSelectionListener(
-				(TreeSelectionEvent e) -> nodeSelectionChanged(e) );
 	}
+	
+	// {{ Train Type 右键菜单
+
+	/**
+	 * 添加右键菜单
+	 */
+	protected void addContextMenu() {
+		trainTypePopupMenu = new JPopupMenu();
+		trainTypePopupMenu.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+
+		miHideTrainType = createMenuItem(__("Hide Trains"), e -> toggleTrainTypeVisible(false));
+		trainTypePopupMenu.add(miHideTrainType);
+		
+		miShowTrainType = createMenuItem(__("Show Trains"), e -> toggleTrainTypeVisible(true));
+		trainTypePopupMenu.add(miShowTrainType);
+
+		miHighLightTrainType = createMenuItem(__("Highlight Trains"), e -> toggleHighlightTrainType());
+		trainTypePopupMenu.add(miHighLightTrainType);
+		
+		
+		allTrainTypePopupMenu = new JPopupMenu();
+		trainTypePopupMenu.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+		
+		miShowAllTrainTypes = createMenuItem(__("Show All Trains"), e -> toggleAllTrainTypeVisible(true));
+		allTrainTypePopupMenu.add(miShowAllTrainTypes);
+		
+		miHideAllTrainTypes = createMenuItem(__("Hide All Trains"), e -> toggleAllTrainTypeVisible(false));
+		allTrainTypePopupMenu.add(miHideAllTrainTypes);
+		
+
+		// Event handler for showing pop up menu
+		contextMenuAdapter = new MouseAdapter() {
+
+			@Override
+			public void mousePressed(MouseEvent e) {
+				int mods = e.getModifiers();
+				// 鼠标右键
+				if ((mods & InputEvent.BUTTON3_MASK) != 0) {
+					// 选中鼠标位置处节点
+					Point point = getLocationOnScreen();
+					TreePath path = getPathForLocation(e.getX(), e.getY());
+					TreePath[] paths = getSelectionPaths();
+					
+					popupMenuX = e.getXOnScreen() - point.x;
+					popupMenuY = e.getYOnScreen() - point.y;
+					
+//					setSelectionPath(path);
+					nodeSelectionChanged(false, path);
+				}
+			}
+
+		};
+		
+		addNodeSelectionChangedListener(this::onNodeChangedByRightButtonClick);
+		addMouseListener(contextMenuAdapter);
+	}
+
+	/**
+	 * 创建右键菜单的菜单项
+	 * 
+	 * @param name
+	 * @param listener
+	 * @return
+	 */
+	private JMenuItem createMenuItem(String name, ActionListener listener) {
+		JMenuItem menuItem = new JMenuItem(name);
+		menuItem.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+
+		// menuItem.setActionCommand(actionCommand);
+		if (listener != null)
+			menuItem.addActionListener(listener);
+
+		return menuItem;
+	}
+	
+	private void onNodeChangedByRightButtonClick(boolean triggeredByLeftButton,
+			NavigatorNodeType nodeType, int index, Object... params) {
+		
+		if (triggeredByLeftButton)
+			return;
+		
+		// Reset selected Train type
+		selectedTrainType = null;
+		
+		switch (nodeType) {
+		case TRAIN_TYPES:
+			showAllTrainTypePopupMenu(popupMenuX, popupMenuY);
+			break;
+		case TRAIN_TYPE_SPECIFIC:
+			selectedTrainType = (TrainType) params[0];
+			// 弹出菜单
+			showTrainTypePopupMenu(popupMenuX, popupMenuY);
+			break;
+		}
+	}
+	
+	private void showTrainTypePopupMenu(int x, int y) {
+		if (selectedTrainType == null)
+			return;
+		
+		trainTypePopupMenu.show(Navigator.this, x, y);
+	}
+	
+	private void toggleTrainTypeVisible(Boolean visible) {
+		if (visible == null)
+			selectedTrainType.visible = ! selectedTrainType.visible;
+		else
+			selectedTrainType.visible = visible;
+		
+		MainFrame.instance.repaint();
+	}
+	
+	private void toggleHighlightTrainType() {
+//		if (selectedTrainType.visible)
+		trainGraph.forEachTrainType(trainType -> trainType.visible = false);
+		selectedTrainType.visible = true;
+		
+		MainFrame.instance.repaint();
+	}
+	
+	private void showAllTrainTypePopupMenu(int x, int y) {
+		allTrainTypePopupMenu.show(Navigator.this, x, y);
+	}
+	
+	private void toggleAllTrainTypeVisible(boolean visible) {
+		trainGraph.forEachTrainType(trainType -> trainType.visible = visible);
+		
+		MainFrame.instance.repaint();
+	}
+	
+	// }}
+	
+	// {{ 设置TrainGraph模型, 以及根据TimeTables, RailNetwork, 或者Traintypes的变化更新的操作
 	
 	public void setTrainGraph(TrainGraph trainGraph) {
 		this.trainGraph = trainGraph;
@@ -205,11 +369,16 @@ public class Navigator extends JTree {
 		updateUI();
 	}
 	
-	public void nodeSelectionChanged(TreeSelectionEvent e) {
-		if (nodeSelectionListener == null)
-			return;
+	// }}
+
+	@Override
+	public void valueChanged(TreeSelectionEvent e) {
+		nodeSelectionChanged(true, e.getNewLeadSelectionPath());
+	}
+	
+	public void nodeSelectionChanged(boolean triggedByLeftButton, TreePath path) {
 		
-		TreePath path = e.getNewLeadSelectionPath();
+//		TreePath path = e.getNewLeadSelectionPath();
 		if (path == null)
 			return;
 		
@@ -280,11 +449,26 @@ public class Navigator extends JTree {
 					// get model node
 					params = new Object[1];
 					params[0] = ((DefaultMutableTreeNode) node).getUserObject();
+				} else if (parentNode == trainTypesNode) {
+					nodeType = NavigatorNodeType.TRAIN_TYPE_SPECIFIC;
+					// get model node
+					params = new Object[1];
+					params[0] = ((DefaultMutableTreeNode) node).getUserObject();
 				}
 			}
 		}
 		
-		nodeSelectionListener.onNavigatorNodeChanged(nodeType, index, params);
+		fireNodeSelectionChanged(triggedByLeftButton, nodeType, index, params);
+	}
+	
+	public void addNodeSelectionChangedListener(NavigatorNodeSelectionListener listener) {
+		nodeSelectionListeners.add(listener);
 	}
 
+	private void fireNodeSelectionChanged(Boolean triggedByLeftButton, 
+			NavigatorNodeType nodeType, int index, Object... params) {
+		
+		nodeSelectionListeners.forEach(listener -> 
+		listener.onNavigatorNodeChanged(triggedByLeftButton, nodeType, index, params));
+	}
 }

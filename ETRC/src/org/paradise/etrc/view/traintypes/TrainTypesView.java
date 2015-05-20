@@ -54,6 +54,7 @@ import javax.swing.ComboBoxModel;
 import org.paradise.etrc.view.alltrains.TrainListView;
 
 import javax.swing.border.Border;
+
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeEvent;
 import java.awt.event.ItemListener;
@@ -186,7 +187,7 @@ public class TrainTypesView extends JPanel {
 				new Font("Dialog", Font.PLAIN, 12), 
 				new DefaultComboBoxModel<String>(FontStyleConverter.FONT_STYLES), 0);
 		cbFontStyle.setFont(new Font("Dialog", Font.PLAIN, 12));
-		cbFontStyle.setBounds(90, 86, 98, 27);
+		cbFontStyle.setBounds(90, 86, 151, 27);
 		panelTrainTypeEdit.add(cbFontStyle);
 		
 		JLabel lblLineProperties = new JLabel("Line Properties");
@@ -195,7 +196,7 @@ public class TrainTypesView extends JPanel {
 		panelTrainTypeEdit.add(lblLineProperties);
 		
 		txtFontsize = createJTextField(new Font("Lucida Grande", Font.PLAIN, 12), 10, "trainType.fontSize");
-		txtFontsize.setBounds(91, 113, 95, 28);
+		txtFontsize.setBounds(91, 113, 148, 28);
 		panelTrainTypeEdit.add(txtFontsize);
 		
 		JLabel lblLineStyle = new JLabel("Line Style");
@@ -220,12 +221,12 @@ public class TrainTypesView extends JPanel {
 			}
 		});
 		cbLineStyle.setFont(new Font("Dialog", Font.PLAIN, 12));
-		cbLineStyle.setBounds(90, 272, 98, 27);
+		cbLineStyle.setBounds(90, 272, 151, 27);
 		panelTrainTypeEdit.add(cbLineStyle);
 		
 		txtLineWidth = TrainTypesView.createJTextField(new Font("Lucida Grande", Font.PLAIN, 12), 10, "trainType.lineWidth");
 		txtLineWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		txtLineWidth.setBounds(91, 242, 95, 28);
+		txtLineWidth.setBounds(91, 242, 148, 28);
 		panelTrainTypeEdit.add(txtLineWidth);
 		
 		JLabel lblLineColor = new JLabel("Line Color");
@@ -234,12 +235,12 @@ public class TrainTypesView extends JPanel {
 		panelTrainTypeEdit.add(lblLineColor);
 		
 		JLabel lblTraintypefontcolor = createJColorChooserLabel("trainType.fontColor", new LineBorder(new Color(0, 0, 0)));
-		lblTraintypefontcolor.setBounds(94, 30, 88, 24);
+		lblTraintypefontcolor.setBounds(94, 30, 47, 24);
 		panelTrainTypeEdit.add(lblTraintypefontcolor);
 		
 		JLabel label = TrainTypesView.createJColorChooserLabel("trainType.lineColor", new LineBorder(new Color(0, 0, 0)));
 		label.setBorder(new LineBorder(new Color(0, 0, 0)));
-		label.setBounds(94, 216, 88, 24);
+		label.setBounds(94, 216, 47, 24);
 		panelTrainTypeEdit.add(label);
 		
 		JComboBox<String> comboBox_1 = createJComboBox("trainType.fontFamilyName", 
@@ -254,9 +255,10 @@ public class TrainTypesView extends JPanel {
 		lblDashStroke.setBounds(16, 305, 69, 15);
 		panelTrainTypeEdit.add(lblDashStroke);
 		
-		txtDashstroke = TrainTypesView.createJTextField(new Font("Lucida Grande", Font.PLAIN, 12), 10, "trainType.dashStroke:DashStroke");
+		txtDashstroke = TrainTypesView.createJTextField(new Font("Lucida Grande", Font.PLAIN, 12), 10, "trainType.dashStrokeStr");
+		txtDashstroke.setEnabled(false);
 		txtDashstroke.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		txtDashstroke.setBounds(91, 298, 95, 28);
+		txtDashstroke.setBounds(91, 298, 148, 28);
 		panelTrainTypeEdit.add(txtDashstroke);
 		panelListActions.setLayout(null);
 		
@@ -438,6 +440,9 @@ public class TrainTypesView extends JPanel {
 
 	protected void do_UpdateTypeOfTrains() {
 		trainGraph.setTrainTypeByNameForAllTrains();
+		
+		MainFrame.instance.runView.repaint();
+		MainFrame.instance.chartView.repaint();
 	}
 	
 	// }}
@@ -475,48 +480,48 @@ public class TrainTypesView extends JPanel {
 	// {{ Property getters and setters for selected train type
 	
 	public Color getFontColor() {
-		return selectedTrainType.fontColor;
+		return selectedTrainType.getFontColor();
 	}
 	
 	public void setFontColor(Color color) {
 		if (selectedTrainType != null)
-			selectedTrainType.fontColor = color;
+			selectedTrainType.setFontColor(color);
 	}
 	
 	public String getFontFamilyName() {
-		return selectedTrainType.fontFamily;
+		return selectedTrainType.getFontFamily();
 	}
 	
 	public void setFontFamilyName(String fontFamily) {
 		if (selectedTrainType != null)
-			selectedTrainType.fontFamily = fontFamily;
+			selectedTrainType.setFontFamily(fontFamily);
 	}
 	
 	public Integer getFontStyle() {
-		return selectedTrainType.fontStyle;
+		return selectedTrainType.getFontStyle();
 	}
 	
 	public void setFontStyle(Integer fontStyle) {
 		if (selectedTrainType != null)
-			selectedTrainType.fontStyle = fontStyle;
+			selectedTrainType.setFontStyle(fontStyle);
 	}
 	
 	public Integer getFontSize() {
-		return selectedTrainType.fontSize;
+		return selectedTrainType.getFontSize();
 	}
 	
 	public void setFontSize(Integer fontSize) {
 		if (selectedTrainType != null)
-			selectedTrainType.fontSize = fontSize;
+			selectedTrainType.setFontSize(fontSize);
 	}
 	
 	public Color getLineColor() {
-		return selectedTrainType.getColor();
+		return selectedTrainType.getLineColor();
 	}
 
 	public void setLineColor(Color color) {
 		if (selectedTrainType != null)
-			selectedTrainType.setColor(color);
+			selectedTrainType.setLineColor(color);
 	}
 
 	public float getLineWidth() {
@@ -528,13 +533,22 @@ public class TrainTypesView extends JPanel {
 			selectedTrainType.setLineWidth(lineWidth);
 	}
 	
-	public String getLineStyle() {
+	public Integer getLineStyle() {
 		return selectedTrainType.getLineStyle();
 	}
 
-	public void setLineStyle(String lineStype) {
+	public void setLineStyle(Integer lineStype) {
 		if (selectedTrainType != null)
 			selectedTrainType.setLineStyle(lineStype);
+	}
+
+	public String getDashStrokeStr() {
+		return selectedTrainType.getDashStrokeStr();
+	}
+
+	public void setDashStrokeStr(String dashStrokeStr) {
+		if (selectedTrainType != null)
+			selectedTrainType.setDashStrokeStr(dashStrokeStr);
 	}
 	
 	// }}
@@ -542,6 +556,7 @@ public class TrainTypesView extends JPanel {
 	
 	// {{ Data Bindings
 	
+
 	/**
 	 * @wbp.factory
 	 * @wbp.factory.parameter.source name "trainType.fontFamily"
@@ -608,6 +623,8 @@ public class TrainTypesView extends JPanel {
 		if ("trainType".equals(propertyGroup)) {
 			tableModel.fireTableRowsUpdated(selectedTrainTypeIndex, selectedTrainTypeIndex);
 			MainFrame.instance.navigator.updateNavigatorByTrainTypes();
+			
+			MainFrame.instance.repaint();
 		}
 	}
 	

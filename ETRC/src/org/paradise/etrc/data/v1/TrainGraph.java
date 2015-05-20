@@ -159,7 +159,7 @@ public class TrainGraph extends TrainGraphPart {
 
 		String trainName = train.getName().split("/")[0];
 		TrainType type = trainTypes.stream()
-			.filter(trainType -> trainType.namePattern.matcher(trainName).matches())
+			.filter(trainType -> trainType.getNamePattern().matcher(trainName).matches())
 			.findFirst().orElse(defaultTrainType);
 		train.trainType = type;
 	}

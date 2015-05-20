@@ -10,6 +10,8 @@ import java.util.Vector;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.paradise.etrc.data.TrainGraphPart;
+
 import com.sun.xml.internal.bind.v2.runtime.Name;
 
 import static org.paradise.etrc.ETRC.__;
@@ -114,7 +116,7 @@ public class ValueTypeConverter {
 			Function<Object, Object> elementToStringConverter) {
 		
 		if (array == null)
-			return null;
+			return NULL_STR;
 		
 		if (!arrayType.isInstance(array))
 			throw new IllegalArgumentException(String.format("Array to be converted is not an instance of %s[]", 
@@ -122,14 +124,17 @@ public class ValueTypeConverter {
 		
 		StringBuilder sb = new StringBuilder();
 		int arrayLen = Array.getLength(array);
+		sb.append(arrayLen);
+		sb.append("<");
 		for (int i = 0; i < arrayLen; ++ i) {
 			Object element = Array.get(array, i);
-			Object str = elementToStringConverter.apply(element);
-			str = str == null ? NULL_STR : str;
+			String str = (String) elementToStringConverter.apply(element);
+			str = str == null ? NULL_STR : TrainGraphPart._encode(str, false);
 			if (i != 0)
-				sb.append(":");
+				sb.append(";");
 			sb.append(str);
 		}
+		sb.append(">");
 		
 		return sb.toString();
 	}
@@ -139,11 +144,18 @@ public class ValueTypeConverter {
 		
 		if (!(arrayRepr instanceof String))
 			return null;
+		
+		if (NULL_STR.equals(arrayRepr))
+			return null;
 			
-		String[] elementReprs = ((String) arrayRepr).split(":");
-		Object array = Array.newInstance(componentType, elementReprs.length);
-		for (int i = 0; i < elementReprs.length; ++ i) {
-			String repr = elementReprs[i];
+		// strip out < and >
+		boolean isEmpty = "0<>".equals(arrayRepr);
+		String elementReprs = arrayRepr.replaceFirst("^.*?<", "").replaceFirst(">$", "");
+		String[] elements = ((String) elementReprs).split(";");
+		int arrayLen = isEmpty ? 0 : elements.length;
+		Object array = Array.newInstance(componentType, arrayLen);
+		for (int i = 0; i < arrayLen; ++ i) {
+			String repr = elements[i];
 			Object element = null;
 			if (!NULL_STR.equals(repr)) {
 				element = stringToElementConverter.apply(repr);
@@ -176,7 +188,7 @@ public class ValueTypeConverter {
 		
 		if (String.class.getName().equals(destTypeName) ) {
 			if (value == null)
-				return null;
+				return NULL_STR;
 			
 			String repr = value.toString();
 			

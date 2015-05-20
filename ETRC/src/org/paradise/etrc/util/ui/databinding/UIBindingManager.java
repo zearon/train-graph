@@ -13,6 +13,7 @@ import java.util.function.Function;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 
 import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.JColorChooserLabel;
@@ -124,7 +125,7 @@ public class UIBindingManager {
 			throw new NullPointerException("Component and modelMapper cannot be null.");
 		
 		String dataBindingStr = component.getName();
-		if (component == null || modelMapper == null)
+		if (dataBindingStr == null)
 			throw new NullPointerException("Cannot read data binding string from name property.");
 		
 		String[] attrs = getUIBindingAttr(dataBindingStr);
@@ -222,6 +223,9 @@ public class UIBindingManager {
 		else if (component instanceof JColorChooserLabel)
 			return getJColorChooserLabelBinding((JColorChooserLabel) component, model, 
 					propertyName, propertyDesc, callback);
+		else if (component instanceof JToggleButton)
+			return getJToggleButtonBinding((JToggleButton) component, model, 
+					propertyName, propertyDesc, callback);
 		
 		throw new RuntimeException("There is no ui binding supporting " + 
 				component.getClass().getName() + " yet.");
@@ -251,6 +255,15 @@ public class UIBindingManager {
 				propertyName, propertyDesc, callback);
 		return binding;
 	}
+	
+	public JToggleButtonBinding getJToggleButtonBinding(JToggleButton component, Object model, 
+			String propertyName, String propertyDesc, Consumer<String> callback) {
+		
+		JToggleButtonBinding binding = new JToggleButtonBinding(component, model, 
+				propertyName, propertyDesc, callback);
+		return binding;
+	}
+
 
 	private static <M, U> void getBinding(Object model, String propertyName, UIBinding<M, U> binding, 
 			boolean autoFind, boolean isField) {
@@ -264,12 +277,13 @@ public class UIBindingManager {
 				bindingDict.get(property);
 		boolean notExists = oldbinding == null;
 		if (!cacheEnabled || notExists) {
-			String status = binding.init(autoFind, isField);
+			String status = binding.init(true, autoFind, isField);
 			if (!"".equals(status)) {
 				throw new IllegalArgumentException(status);
 			}
 			bindingDict.putIfAbsent(property, binding);
 		} else {
+			binding.init(false, autoFind, isField);
 			binding.copySetterAndGetter((UIBinding<M, ? extends Object>) oldbinding);
 		}
 	}

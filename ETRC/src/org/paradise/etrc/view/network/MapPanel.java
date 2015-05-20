@@ -28,6 +28,8 @@ public class MapPanel extends JPanel {
 	Dimension size;
 	private boolean ui_inited;
 	
+	public int alpha_value = 155;
+	
 	/**
 	 * Create the panel.
 	 */
@@ -89,7 +91,7 @@ public class MapPanel extends JPanel {
 		}
 		
 		// Add a opaque cover above the map
-		g.setColor(new Color(255, 255, 255, 155));
+		g.setColor(new Color(255, 255, 255, alpha_value));
 		g.fillRect(0, 0, width, height);
 	}
 

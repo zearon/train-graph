@@ -375,6 +375,7 @@ public class TrainTypesView extends JPanel {
 				table, true, selectedIndex, trainType, trainGraph::addTrainType,
 				trainGraph::removeTrainTypeAt, 
 				() -> {
+					trainGraph.updateTrainTypeDisplayOrder();
 					table.revalidate();
 					
 					_mainFrame.navigator.updateNavigatorByTrainTypes();
@@ -396,6 +397,7 @@ public class TrainTypesView extends JPanel {
 				trainGraph::addTrainType, 
 				trainGraph::removeTrainTypeAt, 
 				() -> {
+					trainGraph.updateTrainTypeDisplayOrder();
 					table.revalidate();
 					
 					_mainFrame.navigator.updateNavigatorByTrainTypes();
@@ -417,7 +419,10 @@ public class TrainTypesView extends JPanel {
 		ActionFactory.createTableElementMoveActionAndDoIt(__("train types table"), 
 				table, trainGraph.allTrainTypes(), 
 				selectedIndex, selectedIndex + 1, true,
-				_mainFrame.navigator::updateNavigatorByTrainTypes);
+				() -> {
+					trainGraph.updateTrainTypeDisplayOrder();
+					_mainFrame.navigator.updateNavigatorByTrainTypes();
+				});
 	}
 
 	protected void do_MoveUp() {
@@ -435,7 +440,10 @@ public class TrainTypesView extends JPanel {
 		ActionFactory.createTableElementMoveActionAndDoIt(__("train types table"), 
 				table, trainGraph.allTrainTypes(), 
 				selectedIndex, selectedIndex - 1, true,
-				_mainFrame.navigator::updateNavigatorByTrainTypes);
+				() -> {
+					trainGraph.updateTrainTypeDisplayOrder();
+					_mainFrame.navigator.updateNavigatorByTrainTypes();
+				});
 	}
 
 	protected void do_UpdateTypeOfTrains() {

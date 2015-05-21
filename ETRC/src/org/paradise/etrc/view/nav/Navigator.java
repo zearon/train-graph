@@ -257,6 +257,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 		else
 			selectedTrainType.visible = visible;
 		
+		MainFrame.instance.chartView.updateTrainTypeDisplayOrder();
 		MainFrame.instance.repaint();
 	}
 	
@@ -264,7 +265,8 @@ public class Navigator extends JTree implements TreeSelectionListener {
 //		if (selectedTrainType.visible)
 		trainGraph.forEachTrainType(trainType -> trainType.visible = false);
 		selectedTrainType.visible = true;
-		
+
+		MainFrame.instance.chartView.updateTrainTypeDisplayOrder();
 		MainFrame.instance.repaint();
 	}
 	
@@ -275,6 +277,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 	private void toggleAllTrainTypeVisible(boolean visible) {
 		trainGraph.forEachTrainType(trainType -> trainType.visible = visible);
 		
+		MainFrame.instance.chartView.updateTrainTypeDisplayOrder();
 		MainFrame.instance.repaint();
 	}
 	

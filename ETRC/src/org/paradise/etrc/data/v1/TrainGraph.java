@@ -70,6 +70,7 @@ public class TrainGraph extends TrainGraphPart {
 	@Override
 	protected void loadComplete() {
 		updateTrainTypeDict();
+		updateTrainTypeDisplayOrder();
 		setTrainTypeByNameForAllTrains();
 		
 		if (charts != null) {
@@ -96,7 +97,6 @@ public class TrainGraph extends TrainGraphPart {
 	/*****************************************************
 	 * Train type Operations
 	 *****************************************************/
-	
 	public Vector<TrainType> allTrainTypes() {
 		return trainTypes;
 	}
@@ -151,6 +151,12 @@ public class TrainGraph extends TrainGraphPart {
 	public void updateTrainTypeDict() {
 		trainTypeDict.clear();
 		trainTypes.forEach(trainType -> trainTypeDict.put(trainType.getName(), trainType));
+	}
+	
+	public void updateTrainTypeDisplayOrder() {
+		for (int i = 0; i < trainTypes.size(); ++ i) {
+			trainTypes.get(i).displayOrder = i;
+		}
 	}
 	
 	public void setTrainTypeByName(Train train) {

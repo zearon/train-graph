@@ -122,7 +122,7 @@ public class ControlPanel extends JPanel {
 		}
 		
 		// TODO: settings.minuteScale 改为浮点
-		settings.timeInterval = minuteGrids[(int) settings.minuteScale-1];
+//		settings.timeInterval = minuteGrids[(int) settings.minuteScale-1];
 		chartView.resetSize();
 		chartView.panelLines.updateBuffer();
 	}

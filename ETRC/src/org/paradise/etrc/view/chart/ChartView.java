@@ -218,6 +218,10 @@ public class ChartView extends JPanel {
 		
 		currentDrawingModel.empty = false;
 	}
+	
+	public void updateTrainTypeDisplayOrder() {
+		currentDrawingModel.updateTrainTypeDisplayOrder();
+	}
 
 	//水印颜色
 	public final static Color DEFAULT_UNDER_COLOR = new Color(220, 220, 220);
@@ -371,6 +375,7 @@ public class ChartView extends JPanel {
 		}
 		
 		currentDrawingModel.updateUpDownTrainOption(showUpDownState);
+		updateTrainTypeDisplayOrder();
 		
 		panelLines.updateBuffer();
 	}

@@ -202,18 +202,20 @@ public void rebuild() {
 	if(isActive)
 		drawActive(g2d);
 	else
-		if(isUnderDrawing || !train.trainType.visible)
-			drawUnder(g2d);
+		if(isUnderDrawing)
+			drawUnder(g2d, chartView.underDrawingColor);
+		else if (!train.trainType.visible)
+			drawUnder(g2d, ChartView.DEFAULT_UNDER_COLOR);
 		else
 			drawNormal(g2d);
   }
 
-  private void drawUnder(Graphics2D g) {
-    if(chartView.underDrawingColor == null)
+  private void drawUnder(Graphics2D g, Color color) {
+    if(color == null)
       return;
 
     Color oldColor = g.getColor();
-    g.setColor(chartView.underDrawingColor);
+    g.setColor(color);
     //System.out.println(train.getTrainName(chart.circuit) + color.toString());
 
     Stroke origStroke = g.getStroke();

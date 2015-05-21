@@ -114,6 +114,12 @@ public class DrawingModel {
 		}
 	}
 	
+	private int compareTrainDrawingByVisibility(TrainDrawing t1, TrainDrawing t2) {
+		int visibility = Boolean.compare(t1.train.trainType.visible, t2.train.trainType.visible);
+		int displayOrder = t1.train.trainType.displayOrder - t2.train.trainType.displayOrder;
+		return visibility != 0 ? visibility : displayOrder;
+	}
+	
 	public void setActiveTrain(Train activeTrain, int showUpDownState) {
 		if (activeTrainDrawing != null) {
 			activeTrainDrawing.setActive(false);
@@ -183,6 +189,14 @@ public class DrawingModel {
 		for (TrainDrawing trainDrawing : underDrawings) {
 			trainDrawing.setUnderDrawing(true);
 		}
+		
+		updateTrainTypeDisplayOrder();
+	}
+	
+	public void updateTrainTypeDisplayOrder() {
+		// let visible trains drawing are above invisible ones.
+		normalDrawings.sort(this::compareTrainDrawingByVisibility);
+		underDrawings.sort(this::compareTrainDrawingByVisibility);
 	}
 	
 	public void updateScale() {

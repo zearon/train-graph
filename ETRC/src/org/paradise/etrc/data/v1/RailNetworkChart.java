@@ -4,6 +4,7 @@ import static org.paradise.etrc.ETRC.__;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -71,12 +72,14 @@ public class RailNetworkChart extends TrainGraphPart {
 	public void removeTrainAt(int index) {
 		Train obj = getTrain(index);
 		trainDict.remove(obj.getName());
+		removeTrainInLineCharts(obj);
 		
 		trains.removeElementAt(index);
 	}
 
 	public boolean removeTrain(Train obj) {
 		trainDict.remove(obj.getName());
+		removeTrainInLineCharts(obj);
 		
 		return trains.removeElement(obj);
 	}
@@ -116,6 +119,30 @@ public class RailNetworkChart extends TrainGraphPart {
 			}
 		}
 	}
+	
+	public void removeTrainInLineCharts(Train train) {
+		for (RailroadLineChart lineChart : allRailLineCharts()) {
+			for (Iterator<Train> iter = lineChart.trains.iterator(); iter.hasNext(); ) {
+				Train train0 = iter.next();
+				
+				if (train0.equals(train))
+					iter.remove();
+			}
+		}
+	}
+	
+//	public void syncTrains() {
+//		// Set trains in terms of trainRefs
+//		railLineCharts.forEach(this::syncTrains);
+//	}
+//	
+//	public void syncTrains(RailroadLineChart lineChart) {
+//		for (Iterator<TrainRef> iter = lineChart.trainRefs.iterator(); iter.hasNext(); ) {
+//			TrainRef ref = iter.next();
+//			
+//			
+//		}
+//	}
 
 	/*****************************************************
 	 * End of Train Operations
@@ -143,7 +170,10 @@ public class RailNetworkChart extends TrainGraphPart {
 			lineChart.trains.clear();
 			lineChart.trainRefs.stream()
 				.map(trainRef->findTrain(trainRef.name))
+				.filter(train -> train != null)
 				.forEachOrdered(lineChart.trains::add);
+
+//			syncTrains(lineChart);
 		});
 	};
 	

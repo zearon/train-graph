@@ -60,7 +60,7 @@ public class TrainType extends TrainGraphPart {
 	protected Color fontColor;
 
 	public boolean visible = true;
-	public int displayOrder;
+	public int displayOrder = -1;
 	
 	private boolean patternUpdated = true;
 	protected Pattern namePattern;

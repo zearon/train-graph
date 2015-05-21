@@ -9,6 +9,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -18,7 +19,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.paradise.etrc.data.util.BOMStripperInputStream;
+import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
@@ -167,7 +170,9 @@ public class ETRCSKB {
 		DEBUG("Benchmark: [find for circuit]: GetName:%d, GetTrain:%d", instant2.toEpochMilli() - instant1.toEpochMilli(), instant3.toEpochMilli() - instant2.toEpochMilli());
 		
 		return trains;
-	}
+	}	
+	
+	
 	
 	/**
 	 * 查找经过某个circuit的车次
@@ -181,12 +186,66 @@ public class ETRCSKB {
 			Enumeration<Train> en = newTrains.elements();
 			while(en.hasMoreElements()) {
 				Train train = en.nextElement();
-				if(!trains.contains(train))
+				if(!trains.contains(train)) {
 					trains.add(train);
+				}
 			}
 		}
 		
 		return trains;
+	}	
+	
+	public void findTrains(RailNetworkChart networkChart) {
+		networkChart.allRailLineCharts().forEach(this::findTrains);
+		
+		networkChart.clearTrains();
+		networkChart.allRailLineCharts().stream().forEach(lineChart -> {
+				
+				lineChart.railroadLine.getAllStations().stream().forEach(station -> {
+					
+				});
+			});
+
+		Vector<String> addedTrainNames = new Vector<> ();
+		tk.stream().forEach(tkInfo -> {
+			String trainName = tkInfo[0];
+			String tkName = tkInfo[1];
+			
+			networkChart.allRailLineCharts().stream().forEach(lineChart -> {
+				
+				boolean stopAtLine = lineChart.railroadLine.getAllStations().stream()
+					.anyMatch(station -> tkName.equalsIgnoreCase(station.getName()));
+				if (stopAtLine) {
+					Train aTrain;
+					if (addedTrainNames.contains(trainName)) {
+						aTrain = networkChart.findTrain(trainName);
+					} else {
+						aTrain = getTrainByFullName(trainName);
+						addedTrainNames.add(trainName);
+						networkChart.addTrain(aTrain);
+					}
+					
+					lineChart.addTrain(aTrain);
+				}
+			});
+		});
+	}
+	
+	public void findTrains(RailroadLineChart lineChart) {
+		Vector<Train> trains = new Vector<Train>();
+		
+		for(int i=0; i<lineChart.railroadLine.getStationNum(); i++) {
+			Vector<Train> newTrains = findTrains(lineChart.railroadLine.getStation(i).name);
+			
+			Enumeration<Train> en = newTrains.elements();
+			while(en.hasMoreElements()) {
+				Train train = en.nextElement();
+				if(!trains.contains(train)) {
+					trains.add(train);
+					lineChart.addTrain(train);
+				}
+			}
+		}
 	}
 	
 	/**

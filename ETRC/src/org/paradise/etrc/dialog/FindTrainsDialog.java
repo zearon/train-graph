@@ -113,26 +113,30 @@ public class FindTrainsDialog extends JDialog {
 			msgLabel.setText(__("Please wait while imporing train information..."));
 			
 			ETRCSKB skb = mainFrame.getSKB();
-			List<Train> trains = skb.findTrains(mainFrame.trainGraph.railNetwork.getAllRailroadLines());		//skb.findTrains(mainFrame.chart.trunkCircuit);
-
+//			
+//			List<Train> trains = skb.findTrains(mainFrame.trainGraph.railNetwork.getAllRailroadLines());		//skb.findTrains(mainFrame.chart.trunkCircuit);
+//
 			Instant instant1 = null, instant2 = null;
 			if (IS_DEBUG())
 				instant1= Instant.now();
+
+			skb.findTrains(mainFrame.trainGraph.currentNetworkChart);
+			mainFrame.trainGraph.setTrainTypeByNameForAllTrains();
 			
-			// Add to all trains
-			networkChart.addAllTrains(trains);
-			
-			networkChart.parallelTrainStream()
-				.forEach(train-> {
-					msgLabel.setText(String.format(__("Importing train information %s"), 
-							train.getTrainName()));
-					
-					networkChart.allRailLineCharts().forEach(lineChart -> {
-						if (train.isDownTrain(lineChart.railroadLine) > 0) {
-							lineChart.addTrain(train);
-						}
-					});
-				});
+//			// Add to all trains
+//			networkChart.addAllTrains(trains);
+//			
+//			networkChart.parallelTrainStream()
+//				.forEach(train-> {
+//					msgLabel.setText(String.format(__("Importing train information %s"), 
+//							train.getTrainName()));
+//					
+//					networkChart.allRailLineCharts().forEach(lineChart -> {
+//						if (train.isDownTrain(lineChart.railroadLine) > 0) {
+//							lineChart.addTrain(train);
+//						}
+//					});
+//				});
 			
 			mainFrame.allTrainsView.setModel(mainFrame.trainGraph);
 			

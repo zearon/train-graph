@@ -89,6 +89,9 @@ public class SheetView extends JPanel {
 			// repaint sheet
 			model.fireTableStructureChanged();
 			table.setupColumnWidth();
+			
+//			sheetView.updateData();
+//			sheetView.refresh();
 		}
 	}
 	

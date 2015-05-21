@@ -420,4 +420,7 @@ public class SettingsView extends JPanel {
 		
 		return desc;
 	}
+	
+	// }}
+	
 }

@@ -107,7 +107,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		this.settings = trainGraph.settings;
 		
 		if (ui_inited) {
-			repaint();
+			updateBuffer();
 		}
 	}
 
@@ -277,7 +277,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	public void updateBuffer() {
 //		DEBUG("updateBuffer");
 		shouldRepaint = true;
-		super.repaint();
+		repaint();
 	}
 
 	public void paint(Graphics g) {

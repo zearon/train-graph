@@ -101,6 +101,7 @@ import org.paradise.etrc.view.nav.Navigator.NavigatorNodeType;
 import org.paradise.etrc.view.network.RailNetworkEditorView;
 import org.paradise.etrc.view.settings.SettingsView;
 import org.paradise.etrc.view.sheet.SheetView;
+import org.paradise.etrc.view.timetableedit.TimetableEditView;
 import org.paradise.etrc.view.timetables.TimetableListTableModel;
 import org.paradise.etrc.view.timetables.TimetableListView;
 import org.paradise.etrc.view.traintypes.TrainTypesView;
@@ -124,6 +125,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public Navigator navigator;
 	public JPanel navigatorContentPanel;
 	CardLayout navigatorContentCard;
+	CardLayout toolbarContentCard;
+	CardLayout statusbarContentCard;
 	public JSplitPane splitPaneV;
 	public JSplitPane splitPaneH;
 
@@ -138,6 +141,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public TrainTypesView trainTypesView;
 	public AllTrainsView allTrainsView;
 	public TimetableListView timetableListView;
+	public TimetableEditView timetableEditView;
 	
 //	public J
 	
@@ -225,6 +229,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			allTrainsView.setModel(trainGraph);
 			timetableListView.setModel(trainGraph);
 			
+			chartView.setModel(trainGraph);
+			sheetView.setModel(trainGraph);
+			runView.setModel(trainGraph);
 	
 			chartView.updateData();
 			chartView.resetSize();
@@ -333,6 +340,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		trainTypesView = new TrainTypesView(trainGraph);
 		allTrainsView = new AllTrainsView();
 		timetableListView = new TimetableListView(trainGraph);
+		timetableEditView = new TimetableEditView(trainGraph);
 		
 //		tbPane = new JTabbedPane();
 //		tbPane.setFont(new Font("Dialog", Font.PLAIN, 12));
@@ -364,6 +372,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				timetableListView);
 		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLE_LINE.name(), 
 				raillineChartView);
+		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLE_LINE_DOWN.name(),
+				timetableEditView);
+		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLE_LINE_UP.name(),
+				timetableEditView);
 		// TODO: 设置主视图启动时的编辑视图
 				
 		navigator = new Navigator();
@@ -418,7 +430,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		statusPanel.add(statusBarRight, BorderLayout.EAST);
 
 		contentPane.add(statusPanel, BorderLayout.SOUTH);
-		contentPane.add(loadToolBar(), BorderLayout.NORTH);
+		contentPane.add(loadMainBarTool(), BorderLayout.NORTH);
 		contentPane.add(navigatorSplitPane, BorderLayout.CENTER);
 
 		this.setTitle();
@@ -519,7 +531,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public JToggleButton jtButtonShowWatermark;
 	public JToggleButton jtButtonAntiAliasing;
 
-	private JToolBar loadToolBar() {
+	private JToolBar loadMainBarTool() {
 		JToolBar jToolBar = new JToolBar();
 		
 		//文件操作
@@ -744,14 +756,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 		JMenu menuFile = createMenu(__("File"));
 		menuFile.setMnemonic(KeyEvent.VK_F);
-		menuFile.add(createMenuItem(__("New"), File_New_Chart)).setMnemonic(KeyEvent.VK_N);
-		menuFile.add(createMenuItem(__("Open..."), File_Load_Chart)).setMnemonic(KeyEvent.VK_O);
+		menuFile.add(createMenuItem(__("New"), File_New_Chart, KeyEvent.VK_N)).setMnemonic(KeyEvent.VK_N);
+		menuFile.add(createMenuItem(__("Open..."), File_Load_Chart, KeyEvent.VK_O)).setMnemonic(KeyEvent.VK_O);
 		openRecentFilesMenu = createMenu(__("Open Recent Files"));
 		menuFile.add(openRecentFilesMenu);
 		do_UpdateRecentFilesMenu();
 		menuFile.addSeparator();
-		menuFile.add(createMenuItem(__("Save"), File_Save_Chart)).setMnemonic(KeyEvent.VK_S);
-		menuFile.add(createMenuItem(__("Save As..."), File_Save_Chart_As)).setMnemonic(KeyEvent.VK_A);
+		menuFile.add(createMenuItem(__("Save"), File_Save_Chart, KeyEvent.VK_S)).setMnemonic(KeyEvent.VK_S);
+		menuFile.add(createMenuItem(__("Save As..."), File_Save_Chart_As, KeyEvent.VK_S, InputEvent.SHIFT_DOWN_MASK)).setMnemonic(KeyEvent.VK_A);
 		menuFile.addSeparator();
 //		menuFile.add(createMenuItem("更改线路...", File_Circuit)); //Bug:更改线路后没有清空车次
 		menuFile.add(createMenuItem(__("Load Train..."), File_Train)).setMnemonic(KeyEvent.VK_L);
@@ -769,19 +781,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
         JMenu menuEdit = createMenu(__("EditMenu"));
 		menuEdit.setMnemonic(KeyEvent.VK_E);
-		JMenuItem undoMenuItem = menuEdit.add(createMenuItem(__("Undo"), Edit_Undo));
-		JMenuItem redoMenuItem = menuEdit.add(createMenuItem(__("Redo"), Edit_Redo));
-		if (isOSX10_7OrAbove()) {
-			undoMenuItem.setAccelerator(
-					KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.META_DOWN_MASK));
-			redoMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, 
-	    				InputEvent.META_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK));
-		} else {
-			undoMenuItem.setAccelerator(
-					KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_DOWN_MASK));
-			redoMenuItem.setAccelerator(
-					KeyStroke.getKeyStroke(KeyEvent.VK_Y, InputEvent.CTRL_DOWN_MASK));
-		}
+		JMenuItem undoMenuItem = menuEdit.add(createMenuItem(__("Undo"), Edit_Undo, KeyEvent.VK_Z));
+		JMenuItem redoMenuItem = menuEdit.add(createMenuItem(__("Redo"), Edit_Redo, KeyEvent.VK_Z, InputEvent.SHIFT_DOWN_MASK));
 		JMenu undoMenu = createMenu(__("Undo..."));
 		JMenu redoMenu = createMenu(__("Redo..."));
 		menuEdit.add(undoMenu);
@@ -823,11 +824,29 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 
 	private JMenuItem createMenuItem(String name, String actionCommand) {
+		return createMenuItem(name, actionCommand, -1, 0);
+	}
+
+	private JMenuItem createMenuItem(String name, String actionCommand, int shortcutKey) {
+		return createMenuItem(name, actionCommand, shortcutKey, 0);
+	}
+
+	private JMenuItem createMenuItem(String name, String actionCommand, int shortcutKey, int extraModifier) {
 		JMenuItem menuItem = new JMenuItem(name);
 		menuItem.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 
 		menuItem.setActionCommand(actionCommand);
 		menuItem.addActionListener(this);
+		
+		if (shortcutKey >= 0) {
+			if (isOSX10_7OrAbove()) {
+				menuItem.setAccelerator(
+						KeyStroke.getKeyStroke(shortcutKey, extraModifier | InputEvent.META_DOWN_MASK));
+			} else {
+				menuItem.setAccelerator(
+						KeyStroke.getKeyStroke(shortcutKey, extraModifier | InputEvent.CTRL_DOWN_MASK));
+			}
+		}
 
 		return menuItem;
 	}
@@ -900,6 +919,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			ActionManager.getInstance().markModelSaved();
 			
 			do_UpdateRecentFilesMenu();
+			this.statusBarMain.setText(__("File Saved."));
 		} catch (IOException ex) {
 			System.err.println("Err:" + ex.getMessage());
 			this.statusBarMain.setText(__("Unable to save the graph."));
@@ -1487,6 +1507,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.TIME_TABLE_LINE.name());
+			break;
+		case TIME_TABLE_LINE_DOWN:
+		case TIME_TABLE_LINE_UP:
+			trainGraph.currentLineChart = (RailroadLineChart) params[0];
+			trainGraph.currentNetworkChart = (RailNetworkChart) params[1];
+			
+			navigatorContentCard.show(navigatorContentPanel,
+					NavigatorNodeType.TIME_TABLE_LINE_UP.name());
 			break;
 		default:
 			break;

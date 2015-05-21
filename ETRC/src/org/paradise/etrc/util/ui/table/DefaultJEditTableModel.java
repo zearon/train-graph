@@ -182,6 +182,9 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 
 	public static int getStopTimeIncrement(Stop baseStop, Stop newStop) {
 		Optional<Integer> increment;
+		if (baseStop == null || newStop == null)
+			return 0;
+		
 		if (baseStop.arrive != null && newStop.arrive != null && !baseStop.arrive.equals(newStop.arrive)) {
 			increment = getTimeStringIncrement(baseStop.arrive, newStop.arrive);
 			if (increment.isPresent())

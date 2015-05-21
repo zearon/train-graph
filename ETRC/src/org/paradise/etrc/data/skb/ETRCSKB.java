@@ -196,15 +196,7 @@ public class ETRCSKB {
 	}	
 	
 	public void findTrains(RailNetworkChart networkChart) {
-		networkChart.allRailLineCharts().forEach(this::findTrains);
-		
 		networkChart.clearTrains();
-		networkChart.allRailLineCharts().stream().forEach(lineChart -> {
-				
-				lineChart.railroadLine.getAllStations().stream().forEach(station -> {
-					
-				});
-			});
 
 		Vector<String> addedTrainNames = new Vector<> ();
 		tk.stream().forEach(tkInfo -> {

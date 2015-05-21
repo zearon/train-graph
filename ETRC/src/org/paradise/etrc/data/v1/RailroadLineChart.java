@@ -31,15 +31,12 @@ public class RailroadLineChart extends TrainGraphPart {
 	public static final float MAX_DIST_SCALE = 10f;
 	public static final int  MAX_MINUTE_SCALE = 10;
 	
+	// {{ 属性
 	//本运行图的线路
 	public RailroadLine railroadLine;
-	// 用于序列化时引用RailNetwork中的线路
-//	String railroadLineName = "";
+
 	public Vector<RailroadLine> allCircuits = new Vector<RailroadLine>(6);
 
-	//本运行图所包含的车次，最多600趟
-//	public static final int MAX_TRAIN_NUM = 6000;
-//	private Train _trains[] = new Train[MAX_TRAIN_NUM];
 	public Vector<Train> trains = new Vector<Train> (100);
 	
 	//由于车次跨多条线路,因此序列化线路运行图时只保留途径该线路的车次的引用
@@ -65,14 +62,13 @@ public class RailroadLineChart extends TrainGraphPart {
 	//上行车次数目
 	public int uNum = 0;
 	
+	public boolean chartChanged = true;
+	
 
 	private List<Consumer<RailroadLineChart>> chartChangedListeners = new Vector<Consumer<RailroadLineChart>> ();
 
 	RailroadLineChart() {}
 	
-//	RailroadLineChart(RailroadLine cir) {
-//		railroadLine = cir;
-//	}
 	
 	public RailroadLineChart setProperties(RailroadLine line) {
 		this.railroadLine = line;
@@ -90,6 +86,9 @@ public class RailroadLineChart extends TrainGraphPart {
 		super.setName(name);
 	}
 	
+	// }}
+	
+	// {{ Train 列表操作
 	public Train getTrain(int index) {
 		return trains.get(index);
 	}
@@ -188,6 +187,108 @@ public class RailroadLineChart extends TrainGraphPart {
 		
 		theTrain.removeTrainChangedListener(this::onTrainChanged);
 		fireChartChangedEvent();
+	}	  
+	
+	public void clearTrains() {
+		dNum = 0;
+		uNum = 0;
+		trains.forEach(train->train.removeTrainChangedListener(this::onTrainChanged));
+		trains.clear();
+		
+		fireChartChangedEvent();
+	}
+
+	public void insertNewStopToTrain(Train theTrain, Stop stop) {
+		if (theTrain.isDownTrain(railroadLine) == Train.DOWN_TRAIN) {
+			insertNewStopToTrainDown(theTrain, stop);
+		} else
+			insertNewStopToTrainUp(theTrain, stop);
+		
+
+		theTrain.addTrainChangedListener(this::onTrainChanged);
+		fireChartChangedEvent();
+	}
+
+	private void insertNewStopToTrainUp(Train theTrain, Stop stop) {
+		int newDist = this.railroadLine.getStationDist(stop.name);
+		
+		//不在本线 返回 null
+		if(newDist < 0)
+			return;
+		
+		//新站在theTrain在本线的第一个停靠站之前 插在第一个站之前
+		Station firstStop = this.railroadLine.getFirstStopOnMe(theTrain);
+		if (firstStop == null) {
+			theTrain.insertStop(stop, 0);
+		}
+		else {
+			int firstDist = this.railroadLine.getStationDist(firstStop.name);
+			if(newDist > firstDist)
+				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
+		}
+		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
+		Station lastStop = this.railroadLine.getLastStopOnMe(theTrain);
+		if (lastStop == null) {
+			theTrain.appendStop(stop);
+		}
+		else {
+			int lastDist = this.railroadLine.getStationDist(lastStop.name);
+			if(newDist < lastDist)
+				theTrain.appendStop(stop);
+		}
+		//新站在theTrain的第一个停靠站和最后一个停靠站之间
+		//遍历theTrain的所有停站
+		for(int i=0; i<theTrain.getStopNum()-1; i++) {
+			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).name);
+			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).name);
+			
+			if(dist1 >= 0 && dist2 >=0)
+				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
+				if(dist1 > newDist  && newDist > dist2)
+					theTrain.insertStopAfter(theTrain.getStop(i), stop);
+		}
+	}
+
+	private void insertNewStopToTrainDown(Train theTrain, Stop stop) {
+		int newDist = this.railroadLine.getStationDist(stop.name);
+		
+		//不在本线 返回 null
+		if(newDist < 0)
+			return;
+		
+		//新站在theTrain在本线的第一个停靠站之前 插在第一个站之前
+		Station firstStop = this.railroadLine.getFirstStopOnMe(theTrain);
+		if (firstStop == null) {
+			theTrain.insertStop(stop, 0);
+		}
+		else
+		{
+			int firstDist = this.railroadLine.getStationDist(firstStop.name);
+			if(newDist < firstDist)
+				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
+		}
+		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
+		Station lastStop = this.railroadLine.getLastStopOnMe(theTrain);
+		if (lastStop == null) {
+			theTrain.appendStop(stop);
+		}
+		else
+		{
+			int lastDist = this.railroadLine.getStationDist(lastStop.name);
+			if(newDist > lastDist)
+				theTrain.appendStop(stop);
+		}
+		//新站在theTrain的第一个停靠站和最后一个停靠站之间
+		//遍历theTrain的所有停站
+		for(int i=0; i<theTrain.getStopNum()-1; i++) {
+			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).name);
+			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).name);
+			
+			if(dist1 >= 0 && dist2 >=0)
+				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
+				if(dist1 < newDist  && newDist < dist2)
+					theTrain.insertStopAfter(theTrain.getStop(i), stop);
+		}
 	}
 
 	//画运行线的颜色
@@ -224,6 +325,9 @@ public class RailroadLineChart extends TrainGraphPart {
 		return false;
 	}
 
+	// }}
+
+	// {{ 旧的存档读档操作
 	/*
 	 * 文件操作
 	 */
@@ -441,109 +545,9 @@ public class RailroadLineChart extends TrainGraphPart {
 	    
 	  }
 
-	public void clearTrains() {
-		dNum = 0;
-		uNum = 0;
-		trains.forEach(train->train.removeTrainChangedListener(this::onTrainChanged));
-		trains.clear();
-		
-		fireChartChangedEvent();
-	}
-
-	public void insertNewStopToTrain(Train theTrain, Stop stop) {
-		if (theTrain.isDownTrain(railroadLine) == Train.DOWN_TRAIN) {
-			insertNewStopToTrainDown(theTrain, stop);
-		} else
-			insertNewStopToTrainUp(theTrain, stop);
-		
-
-		theTrain.addTrainChangedListener(this::onTrainChanged);
-		fireChartChangedEvent();
-	}
-
-	private void insertNewStopToTrainUp(Train theTrain, Stop stop) {
-		int newDist = this.railroadLine.getStationDist(stop.name);
-		
-		//不在本线 返回 null
-		if(newDist < 0)
-			return;
-		
-		//新站在theTrain在本线的第一个停靠站之前 插在第一个站之前
-		Station firstStop = this.railroadLine.getFirstStopOnMe(theTrain);
-		if (firstStop == null) {
-			theTrain.insertStop(stop, 0);
-		}
-		else {
-			int firstDist = this.railroadLine.getStationDist(firstStop.name);
-			if(newDist > firstDist)
-				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
-		}
-		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
-		Station lastStop = this.railroadLine.getLastStopOnMe(theTrain);
-		if (lastStop == null) {
-			theTrain.appendStop(stop);
-		}
-		else {
-			int lastDist = this.railroadLine.getStationDist(lastStop.name);
-			if(newDist < lastDist)
-				theTrain.appendStop(stop);
-		}
-		//新站在theTrain的第一个停靠站和最后一个停靠站之间
-		//遍历theTrain的所有停站
-		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).name);
-			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).name);
-			
-			if(dist1 >= 0 && dist2 >=0)
-				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
-				if(dist1 > newDist  && newDist > dist2)
-					theTrain.insertStopAfter(theTrain.getStop(i), stop);
-		}
-	}
-
-	private void insertNewStopToTrainDown(Train theTrain, Stop stop) {
-		int newDist = this.railroadLine.getStationDist(stop.name);
-		
-		//不在本线 返回 null
-		if(newDist < 0)
-			return;
-		
-		//新站在theTrain在本线的第一个停靠站之前 插在第一个站之前
-		Station firstStop = this.railroadLine.getFirstStopOnMe(theTrain);
-		if (firstStop == null) {
-			theTrain.insertStop(stop, 0);
-		}
-		else
-		{
-			int firstDist = this.railroadLine.getStationDist(firstStop.name);
-			if(newDist < firstDist)
-				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
-		}
-		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
-		Station lastStop = this.railroadLine.getLastStopOnMe(theTrain);
-		if (lastStop == null) {
-			theTrain.appendStop(stop);
-		}
-		else
-		{
-			int lastDist = this.railroadLine.getStationDist(lastStop.name);
-			if(newDist > lastDist)
-				theTrain.appendStop(stop);
-		}
-		//新站在theTrain的第一个停靠站和最后一个停靠站之间
-		//遍历theTrain的所有停站
-		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).name);
-			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).name);
-			
-			if(dist1 >= 0 && dist2 >=0)
-				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
-				if(dist1 < newDist  && newDist < dist2)
-					theTrain.insertStopAfter(theTrain.getStop(i), stop);
-		}
-	}
+	  // }}
 	
-
+	// {{ 暂时未用的事件相关操作
 	
 	public void addChartChangedListener(Consumer<RailroadLineChart> eventHandler) {
 		chartChangedListeners.add(eventHandler);
@@ -565,6 +569,8 @@ public class RailroadLineChart extends TrainGraphPart {
 	protected void onCircuitChanged() {
 		fireChartChangedEvent();
 	}
+	
+	// }}
 	
 
 }

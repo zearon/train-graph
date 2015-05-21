@@ -37,6 +37,7 @@ import org.paradise.etrc.util.data.Tuple2;
 public class Train extends TrainGraphPart {
 //	public static int MAX_STOP_NUM = 100;
 
+	// {{ Properties and Constructors
 	@TGProperty(name="downName")
 	public String trainNameDown = "";
 
@@ -61,33 +62,11 @@ public class Train extends TrainGraphPart {
 //	再次添加，以便加入不全的点单，但采用set方法，不直接存取，get方法优先取本值
 	private String terminalStation = "";
 
-//	private int stopNum = 0;
-
-//	private Stop[] _stops = new Stop[MAX_STOP_NUM];
 	@TGElement(name="Stops", isList=true, type=Stop.class)
 	private Vector<Stop> stops = new Vector<Stop>(15);
-
-
-//	@TGProperty(name="color")
-//	public Color color = null;
-//	@TGPProperty(name="color")
-//	public String getColorStr() {
-//		return color == null ? "" : "#" + Integer.toHexString(color.getRGB() & 0x11ffffff);
-//	}
-//	@TGPProperty(name="color")
-//	public void setColorStr(String colorStr) {
-//		try {
-//			color = Color.decode(colorStr);
-//		} catch (Exception e) {
-//			System.err.println("Invalid color string:" + colorStr);
-//		}
-//	}
 	
 	private List<Consumer<Train>> trainChangedListeners = new Vector<Consumer<Train>> ();
 
-	Train() {
-	}
-	
 	@Override
 	@TGProperty
 	public void setName(String name) {
@@ -137,18 +116,10 @@ public class Train extends TrainGraphPart {
 	
 	public TrainType trainType = TrainType.defaultTrainType;
 	
-//	private Stop[] getStops() {
-//		return _stops;
-//	}
 
-//	public void setStops(Stop[] stops) {
-//		this._stops = stops;
-//	}
-
-	public int getStopNum() {
-		return stops.size();
+	Train() {
 	}
-
+	
 	public Train copy() {
 		Train tr = new Train();
 //		tr.color = color;
@@ -163,6 +134,14 @@ public class Train extends TrainGraphPart {
 			tr.stops.add(stops.get(i).copy());
 		}
 		return tr;
+	}
+	
+	// }}
+	
+	// {{ Stops 操作
+
+	public int getStopNum() {
+		return stops.size();
 	}
 
 	/**
@@ -255,6 +234,94 @@ public class Train extends TrainGraphPart {
 		
 		fireTrainChangedEvent();
 	}
+	public void insertStopAfter(Stop afterStop, String newStopName,	String arrive, String leave, boolean isSchedular) {
+		Stop newStop = TrainGraphFactory.createInstance(Stop.class, newStopName)
+				.setProperties(arrive, leave, isSchedular);
+		
+		insertStopAfter(afterStop, newStop);
+	}
+
+	public void insertStopAfter(Stop afterStop, Stop newStop) {
+		if(afterStop == null)
+			insertStopAtFirst(newStop);
+		
+//		Stop newStops[] = new Stop[MAX_STOP_NUM];
+//		int newStopNum = 0;
+		for (int i = 0; i < getStopNum(); i++) {
+//			newStops[newStopNum] = getStops()[i];
+//			newStopNum++;
+
+			if (stops.get(i).equals(afterStop)) {
+//				newStops[newStopNum] = newStop;
+//				newStopNum++;
+				stops.insertElementAt(newStop, i);
+			}
+		}
+
+//		setStops(newStops);
+//		setStopNum(newStopNum);
+		
+		fireTrainChangedEvent();
+	}
+
+	private void insertStopAtFirst(Stop newStop) {
+		insertStop(newStop, 0);
+	}
+
+	public void replaceStop(String oldName, String newName) {
+		for (int i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).name.equalsIgnoreCase(oldName))
+				stops.get(i).name = newName;
+		}
+		
+		fireTrainChangedEvent();
+	}
+
+	public String getTrainName() {
+		//LGuo 20070114 added 如果有全称则返回全称（主要用于三车次以上以及AB车的情形）
+		if (name != null)
+			return name;
+		else if (trainNameDown.trim().equalsIgnoreCase(""))
+			return trainNameUp;
+		else if (trainNameUp.trim().equalsIgnoreCase(""))
+			return trainNameDown;
+		else
+			return trainNameDown.compareToIgnoreCase(trainNameUp) < 0 ? 
+					trainNameDown + "/" + trainNameUp : 
+					trainNameUp + "/" + trainNameDown;
+	}
+
+	public String getTrainName(RailroadLine c) {
+		switch (isDownTrain(c)) {
+		case DOWN_TRAIN:
+			return trainNameDown == "" ? trainNameUp : trainNameDown;
+		case UP_TRAIN:
+			return trainNameUp == ""? trainNameDown : trainNameUp;
+		default:
+			return getTrainName();
+		}
+	}
+	
+
+	public void setArrive(String name, String _arrive) {
+		for (int i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).name.equalsIgnoreCase(name))
+				stops.get(i).arrive = _arrive;
+		}
+		
+		fireTrainChangedEvent();
+	}
+
+	public void setLeave(String name, String _leave) {
+		for (int i = 0; i < getStopNum(); i++) {
+			if (stops.get(i).name.equalsIgnoreCase(name))
+				stops.get(i).leave = _leave;
+		}
+		
+		fireTrainChangedEvent();
+	}
+	
+	// }}
 
 	// {{ 老式读档
 	public void loadFromFile2(String file) throws IOException {
@@ -434,160 +501,10 @@ public class Train extends TrainGraphPart {
 	}
 
 	// }}
+
+
+	// {{ Override Object 方法
 	
-	public static boolean isDownName(String trainName) {
-		if (trainName.endsWith("1") || trainName.endsWith("3")
-				|| trainName.endsWith("5") || trainName.endsWith("7")
-				|| trainName.endsWith("9"))
-			return true;
-
-		return false;
-	}
-
-	public static boolean isUpName(String trainName) {
-		if (trainName.endsWith("2") || trainName.endsWith("4")
-				|| trainName.endsWith("6") || trainName.endsWith("8")
-				|| trainName.endsWith("0"))
-			return true;
-
-		return false;
-	}
-
-	public String getTrainName() {
-		//LGuo 20070114 added 如果有全称则返回全称（主要用于三车次以上以及AB车的情形）
-		if (name != null)
-			return name;
-		else if (trainNameDown.trim().equalsIgnoreCase(""))
-			return trainNameUp;
-		else if (trainNameUp.trim().equalsIgnoreCase(""))
-			return trainNameDown;
-		else
-			return trainNameDown.compareToIgnoreCase(trainNameUp) < 0 ? 
-					trainNameDown + "/" + trainNameUp : 
-					trainNameUp + "/" + trainNameDown;
-	}
-
-	public String getTrainName(RailroadLine c) {
-		switch (isDownTrain(c)) {
-		case DOWN_TRAIN:
-			return trainNameDown == "" ? trainNameUp : trainNameDown;
-		case UP_TRAIN:
-			return trainNameUp == ""? trainNameDown : trainNameUp;
-		default:
-			return getTrainName();
-		}
-	}
-	
-	public void insertStopAfter(Stop afterStop, String newStopName,	String arrive, String leave, boolean isSchedular) {
-		Stop newStop = TrainGraphFactory.createInstance(Stop.class, newStopName)
-				.setProperties(arrive, leave, isSchedular);
-		
-		insertStopAfter(afterStop, newStop);
-	}
-
-	public void insertStopAfter(Stop afterStop, Stop newStop) {
-		if(afterStop == null)
-			insertStopAtFirst(newStop);
-		
-//		Stop newStops[] = new Stop[MAX_STOP_NUM];
-//		int newStopNum = 0;
-		for (int i = 0; i < getStopNum(); i++) {
-//			newStops[newStopNum] = getStops()[i];
-//			newStopNum++;
-
-			if (stops.get(i).equals(afterStop)) {
-//				newStops[newStopNum] = newStop;
-//				newStopNum++;
-				stops.insertElementAt(newStop, i);
-			}
-		}
-
-//		setStops(newStops);
-//		setStopNum(newStopNum);
-		
-		fireTrainChangedEvent();
-	}
-
-	private void insertStopAtFirst(Stop newStop) {
-		insertStop(newStop, 0);
-	}
-
-	public void replaceStop(String oldName, String newName) {
-		for (int i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(oldName))
-				stops.get(i).name = newName;
-		}
-		
-		fireTrainChangedEvent();
-	}
-
-	public void setArrive(String name, String _arrive) {
-		for (int i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(name))
-				stops.get(i).arrive = _arrive;
-		}
-		
-		fireTrainChangedEvent();
-	}
-
-	public void setLeave(String name, String _leave) {
-		for (int i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(name))
-				stops.get(i).leave = _leave;
-		}
-		
-		fireTrainChangedEvent();
-	}
-
-	public static final int UNKNOWN = 0;
-
-	public static final int DOWN_TRAIN = 1;
-
-	public static final int UP_TRAIN = 2;
-
-	public int isDownTrain(RailroadLine c) {
-		return isDownTrain(c, true);
-	}
-	public int isDownTrain(RailroadLine c, boolean isGuessByTrainName) {
-		int lastDist = -1;
-		for (int i = 0; i < getStopNum(); i++) {
-			int thisDist = c.getStationDist(stops.get(i).name);
-			//当上站距离不为-1时，即经过本线路第二站时可以判断上下行
-			if ((lastDist != -1) && (thisDist != -1)) {
-				//本站距离大于上站距离，下行
-				if (thisDist > lastDist)
-					return DOWN_TRAIN;
-				else
-					return UP_TRAIN;
-			}
-			lastDist = thisDist;
-		}
-		//遍历完仍然未能确定
-		return isGuessByTrainName?isDownTrainByTrainName(c):UNKNOWN;
-	}
-
-	private int isDownTrainByTrainName(RailroadLine c) {
-		String name = getTrainName();
-		if((name.endsWith("1")) ||
-		   (name.endsWith("3")) ||
-		   (name.endsWith("5")) ||
-		   (name.endsWith("7")) ||
-		   (name.endsWith("9")))
-			return Train.DOWN_TRAIN;
-		else
-			return Train.UP_TRAIN;
-	}
-
-	/**
-	 * 取时间字符串
-	 * @param time Date
-	 * @return String
-	 */
-//	public static String toTrainFormat(Date time) {
-//		SimpleDateFormat df = new SimpleDateFormat("HH:mm");
-//		return df.format(time);
-//	}
-
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null)
@@ -639,7 +556,69 @@ public class Train extends TrainGraphPart {
 			System.out.println("Error:" + ex.getMessage());
 		}
 	}
+	
+	// }}
+	
+	// {{ Gluo's 方法段
+	
+	public static boolean isDownName(String trainName) {
+		if (trainName.endsWith("1") || trainName.endsWith("3")
+				|| trainName.endsWith("5") || trainName.endsWith("7")
+				|| trainName.endsWith("9"))
+			return true;
 
+		return false;
+	}
+
+	public static boolean isUpName(String trainName) {
+		if (trainName.endsWith("2") || trainName.endsWith("4")
+				|| trainName.endsWith("6") || trainName.endsWith("8")
+				|| trainName.endsWith("0"))
+			return true;
+
+		return false;
+	}
+
+
+	public static final int UNKNOWN = 0;
+
+	public static final int DOWN_TRAIN = 1;
+
+	public static final int UP_TRAIN = 2;
+
+	public int isDownTrain(RailroadLine c) {
+		return isDownTrain(c, true);
+	}
+	public int isDownTrain(RailroadLine c, boolean isGuessByTrainName) {
+		int lastDist = -1;
+		for (int i = 0; i < getStopNum(); i++) {
+			int thisDist = c.getStationDist(stops.get(i).name);
+			//当上站距离不为-1时，即经过本线路第二站时可以判断上下行
+			if ((lastDist != -1) && (thisDist != -1)) {
+				//本站距离大于上站距离，下行
+				if (thisDist > lastDist)
+					return DOWN_TRAIN;
+				else
+					return UP_TRAIN;
+			}
+			lastDist = thisDist;
+		}
+		//遍历完仍然未能确定
+		return isGuessByTrainName?isDownTrainByTrainName(c):UNKNOWN;
+	}
+
+	private int isDownTrainByTrainName(RailroadLine c) {
+		String name = getTrainName();
+		if((name.endsWith("1")) ||
+		   (name.endsWith("3")) ||
+		   (name.endsWith("5")) ||
+		   (name.endsWith("7")) ||
+		   (name.endsWith("9")))
+			return Train.DOWN_TRAIN;
+		else
+			return Train.UP_TRAIN;
+	}
+	
 	/**
 	 * getNextStopName
 	 *
@@ -911,7 +890,10 @@ public class Train extends TrainGraphPart {
 			return 70;
 		}
 	}
+	
+	// }}
 
+	// {{ Event handlers
 	
 	public void addTrainChangedListener(Consumer<Train> eventHandler) {
 		trainChangedListeners.add(eventHandler);
@@ -926,7 +908,7 @@ public class Train extends TrainGraphPart {
 			.forEach(action->action.accept(this));
 	}
 	
-	
+	// }}
 	
 
 }

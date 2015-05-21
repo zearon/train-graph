@@ -141,16 +141,16 @@ public class TrainView extends JPanel {
 		table.setFont(new Font("Dialog", 0, 12));
 		table.getTableHeader().setFont(new Font("Dialog", 0, 12));
 
-		JButton btColor = new JButton(__("Color"));
-		btColor.setFont(new Font("dialog", 0, 12));
-		btColor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (table.getCellEditor() != null)
-					table.getCellEditor().stopCellEditing();
-
-				doSetColor(getTrain());
-			}
-		});
+//		JButton btColor = new JButton(__("Color"));
+//		btColor.setFont(new Font("dialog", 0, 12));
+//		btColor.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				if (table.getCellEditor() != null)
+//					table.getCellEditor().stopCellEditing();
+//
+//				doSetColor(getTrain());
+//			}
+//		});
 
 		JButton btLoad = new JButton(__("Load"));
 		btLoad.setFont(new Font("dialog", 0, 12));
@@ -161,10 +161,10 @@ public class TrainView extends JPanel {
 
 				Train loadingTrain = doLoadTrain();
 				if (loadingTrain != null) {
-					if (loadingTrain.color == null) {
-						Color c = ((TrainTableModel) table.getModel()).myTrain.color;
-						loadingTrain.color = c;
-					}
+//					if (loadingTrain.color == null) {
+//						Color c = ((TrainTableModel) table.getModel()).myTrain.color;
+//						loadingTrain.color = c;
+//					}
 
 					((TrainTableModel) table.getModel()).myTrain = loadingTrain;
 					tfName.setText(loadingTrain.getTrainName());
@@ -251,10 +251,10 @@ public class TrainView extends JPanel {
 
 					if (TrainView.this.isVisible()) {
 						if (loadingTrain != null ) {
-							if (loadingTrain.color == null) {
-								Color c = ((TrainTableModel) table.getModel()).myTrain.color;
-								loadingTrain.color = c;
-							}
+//							if (loadingTrain.color == null) {
+//								Color c = ((TrainTableModel) table.getModel()).myTrain.color;
+//								loadingTrain.color = c;
+//							}
 
 							((TrainTableModel) table.getModel()).myTrain = loadingTrain;
 							tfName.setText(loadingTrain.getTrainName());
@@ -288,7 +288,7 @@ public class TrainView extends JPanel {
 		});
 
 		JPanel buttonPanel = new JPanel();
-		buttonPanel.add(btColor);
+//		buttonPanel.add(btColor);
 		buttonPanel.add(btLoad);
 		buttonPanel.add(btSave);
 		buttonPanel.add(btOK);
@@ -654,30 +654,30 @@ public class TrainView extends JPanel {
 		}
 	}
 
-	private void doSetColor(final Train train) {
-		final JColorChooser colorChooser = new JColorChooser();
-		ActionListener listener = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				train.color = colorChooser.getColor();
-				mainFrame.chartView.panelLines.updateBuffer();
-			}
-		};
-
-		JDialog dialog = JColorChooser.createDialog(mainFrame,
-				__("Select the color for the line"), true, // modal
-				colorChooser, listener, // OK button handler
-				null); // no CANCEL button handler
-		ETRC.setFont(dialog);
-
-		colorChooser.setColor(train.color);
-
-		Dimension dlgSize = dialog.getPreferredSize();
-		Dimension frmSize = mainFrame.getSize();
-		Point loc = mainFrame.getLocation();
-		dialog.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
-				(frmSize.height - dlgSize.height) / 2 + loc.y);
-		dialog.setVisible(true);
-	}
+//	private void doSetColor(final Train train) {
+//		final JColorChooser colorChooser = new JColorChooser();
+//		ActionListener listener = new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				train.color = colorChooser.getColor();
+//				mainFrame.chartView.panelLines.updateBuffer();
+//			}
+//		};
+//
+//		JDialog dialog = JColorChooser.createDialog(mainFrame,
+//				__("Select the color for the line"), true, // modal
+//				colorChooser, listener, // OK button handler
+//				null); // no CANCEL button handler
+//		ETRC.setFont(dialog);
+//
+//		colorChooser.setColor(train.color);
+//
+//		Dimension dlgSize = dialog.getPreferredSize();
+//		Dimension frmSize = mainFrame.getSize();
+//		Point loc = mainFrame.getLocation();
+//		dialog.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
+//				(frmSize.height - dlgSize.height) / 2 + loc.y);
+//		dialog.setVisible(true);
+//	}
 
 	public void editTrain(Consumer<Train> editCallback) {
 //		Dimension dlgSize = getPreferredSize();

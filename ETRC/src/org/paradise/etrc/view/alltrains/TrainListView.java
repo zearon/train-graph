@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 
 import javax.swing.AbstractCellEditor;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -23,6 +24,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
@@ -33,9 +35,11 @@ import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
+import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.dialog.YesNoBox;
 
 import static org.paradise.etrc.ETRC.__;
+
 import javax.swing.JComboBox;
 import javax.swing.ComboBoxModel;
 
@@ -80,8 +84,8 @@ public class TrainListView extends JPanel {
 
 	private void jbInit() throws Exception {
 		table.setModel(new TrainsTableModel());
-		table.setDefaultRenderer(Color.class, new ColorCellRenderer());
-		table.setDefaultEditor(Color.class, new ColorCellEditor());
+		table.setDefaultRenderer(TrainType.class, new TrainTypeRenderer());
+//		table.setDefaultEditor(Color.class, new ColorCellEditor());
 
 		table.setFont(new Font("Dialog", 0, 12));
 		table.getTableHeader().setFont(new Font("Dialog", 0, 12));
@@ -427,6 +431,22 @@ public class TrainListView extends JPanel {
 
 	}
 
+	public class TrainTypeRenderer extends DefaultTableCellRenderer {
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table,
+				Object value, boolean isSelected, boolean hasFocus, int row,
+				int column) {
+			Component component = super.getTableCellRendererComponent(table, value, 
+					isSelected, hasFocus, row, column);
+			
+			((JLabel) component).setText(((TrainType) value).abbriveation);
+			component.setForeground(((TrainType) value).getFontColor());
+			
+			return component;
+		}
+	}
+	
 	public class TrainsTableModel extends AbstractTableModel {
 		/**
 		 * 
@@ -478,7 +498,7 @@ public class TrainListView extends JPanel {
 			case 2:
 				return String.class;
 			case 3:
-				return Color.class;
+				return TrainType.class;
 			default:
 				return null;
 			}
@@ -500,7 +520,7 @@ public class TrainListView extends JPanel {
 			case 2:
 				return trainGraph.currentNetworkChart.getTrain(rowIndex).getTerminalStation();
 			case 3:
-				return trainGraph.currentNetworkChart.getTrain(rowIndex).color;
+				return trainGraph.currentNetworkChart.getTrain(rowIndex).trainType;
 			default:
 				return null;
 			}
@@ -515,8 +535,7 @@ public class TrainListView extends JPanel {
 		 */
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			if (columnIndex == 3) {
-				trainGraph.currentNetworkChart.getTrain(rowIndex).color = (Color) aValue;
-				//System.out.println("SET: " + ((Color)aValue));
+				trainGraph.currentNetworkChart.getTrain(rowIndex).trainType = (TrainType) aValue;
 				fireTableCellUpdated(rowIndex, columnIndex);
 			}
 		}

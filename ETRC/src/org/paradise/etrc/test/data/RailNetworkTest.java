@@ -17,7 +17,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.TrainGraphPart;
-import org.paradise.etrc.data.v1.AllTrains;
 import org.paradise.etrc.data.v1.RailNetwork;
 import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.RailroadLineChart;

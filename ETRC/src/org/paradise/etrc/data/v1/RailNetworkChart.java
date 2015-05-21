@@ -110,8 +110,8 @@ public class RailNetworkChart extends TrainGraphPart {
 	public void updateTrain(Train newTrain) {
 		for (int i = 0; i < trains.size(); i++) {
 			if (newTrain.equals(trains.get(i))) {
-				if(newTrain.color == null)
-					newTrain.color = trains.get(i).color;
+//				if(newTrain.color == null)
+//					newTrain.color = trains.get(i).color;
 				trains.set(i, newTrain);
 			}
 		}

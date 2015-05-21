@@ -91,7 +91,7 @@ public class TrainGraphTest {
 				t.trainNameDown = t.name;
 			else
 				t.trainNameUp = t.name;
-			t.color = Color.RED;
+//			t.color = Color.RED;
 			
 			for (int j = station1; j != station2; j += step) {
 				Station s = line0.getStation(j);

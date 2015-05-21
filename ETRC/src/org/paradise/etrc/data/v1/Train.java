@@ -68,8 +68,8 @@ public class Train extends TrainGraphPart {
 	private Vector<Stop> stops = new Vector<Stop>(15);
 
 
-	@TGProperty(name="color")
-	public Color color = null;
+//	@TGProperty(name="color")
+//	public Color color = null;
 //	@TGPProperty(name="color")
 //	public String getColorStr() {
 //		return color == null ? "" : "#" + Integer.toHexString(color.getRGB() & 0x11ffffff);
@@ -151,7 +151,7 @@ public class Train extends TrainGraphPart {
 
 	public Train copy() {
 		Train tr = new Train();
-		tr.color = color;
+//		tr.color = color;
 //		tr.startStation = startStation;
 //		tr.terminalStation = terminalStation;
 		tr.trainNameDown = trainNameDown;
@@ -256,6 +256,7 @@ public class Train extends TrainGraphPart {
 		fireTrainChangedEvent();
 	}
 
+	// {{ 老式读档
 	public void loadFromFile2(String file) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(file)),"UTF-8"));
 
@@ -432,6 +433,8 @@ public class Train extends TrainGraphPart {
 		}
 	}
 
+	// }}
+	
 	public static boolean isDownName(String trainName) {
 		if (trainName.endsWith("1") || trainName.endsWith("3")
 				|| trainName.endsWith("5") || trainName.endsWith("7")

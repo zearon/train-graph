@@ -862,12 +862,12 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 				doEditActiveTrain();
 			}
 		});
-		MenuItem miColor = new MenuItem(__("Change Color"));
-		miColor.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				doSetColor();
-			}
-		});
+//		MenuItem miColor = new MenuItem(__("Change Color"));
+//		miColor.addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				doSetColor();
+//			}
+//		});
 		MenuItem miTrainSlice = new MenuItem(__("Train Slice"));
 		miTrainSlice.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -884,7 +884,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		// 弹出PopupMenu
 		PopupMenu pop = new PopupMenu();
 		pop.add(miDelTrain);
-		pop.add(miColor);
+//		pop.add(miColor);
 		pop.add(miEditTimes);
         pop.add(miTrainSlice);
 //		pop.addSeparator();
@@ -915,29 +915,29 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		}
 	}
 	
-	private void doSetColor() {
-		final JColorChooser colorChooser = new JColorChooser();
-		ActionListener listener = new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				chartView.currentDrawingModel.getActiveTrainDrawing().train.color = colorChooser.getColor();
-				LinesPanel.this.updateBuffer();
-			}
-		};
-
-		JDialog dialog = JColorChooser.createDialog(chartView.mainFrame,
-				__("Select the color for the line"), true, // modal
-				colorChooser, listener, // OK button handler
-				null); // no CANCEL button handler
-		colorChooser.setColor(chartView.currentDrawingModel.getActiveTrainDrawing().train.color);
-		ETRC.setFont(dialog);
-
-		Dimension dlgSize = dialog.getPreferredSize();
-		Dimension frmSize = chartView.mainFrame.getSize();
-		Point loc = chartView.mainFrame.getLocation();
-		dialog.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
-				(frmSize.height - dlgSize.height) / 2 + loc.y);
-		dialog.setVisible(true);
-	}
+//	private void doSetColor() {
+//		final JColorChooser colorChooser = new JColorChooser();
+//		ActionListener listener = new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				chartView.currentDrawingModel.getActiveTrainDrawing().train.color = colorChooser.getColor();
+//				LinesPanel.this.updateBuffer();
+//			}
+//		};
+//
+//		JDialog dialog = JColorChooser.createDialog(chartView.mainFrame,
+//				__("Select the color for the line"), true, // modal
+//				colorChooser, listener, // OK button handler
+//				null); // no CANCEL button handler
+//		colorChooser.setColor(chartView.currentDrawingModel.getActiveTrainDrawing().train.color);
+//		ETRC.setFont(dialog);
+//
+//		Dimension dlgSize = dialog.getPreferredSize();
+//		Dimension frmSize = chartView.mainFrame.getSize();
+//		Point loc = chartView.mainFrame.getLocation();
+//		dialog.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
+//				(frmSize.height - dlgSize.height) / 2 + loc.y);
+//		dialog.setVisible(true);
+//	}
 
 	//待优化：应该滚动到第一个段（可能分段显示）尽可能位于屏幕正中
 	public void moveToTrainDrawing(TrainDrawing trainDrawing) {

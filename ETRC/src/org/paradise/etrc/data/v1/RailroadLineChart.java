@@ -107,8 +107,8 @@ public class RailroadLineChart extends TrainGraphPart {
 			return;
 		}
 
-		if (loadingTrain.color == null)
-			loadingTrain.color = loadingTrain.getDefaultColor();
+//		if (loadingTrain.color == null)
+//			loadingTrain.color = loadingTrain.getDefaultColor();
 //			loadingTrain.color = getNextTrainColor();
 
 //		this._trains[getTrainNum()] = loadingTrain;
@@ -164,8 +164,8 @@ public class RailroadLineChart extends TrainGraphPart {
 	public void updateTrain(Train newTrain) {
 		for (int i = 0; i < trains.size(); i++) {
 			if (newTrain.equals(trains.get(i))) {
-				if(newTrain.color == null)
-					newTrain.color = trains.get(i).color;
+//				if(newTrain.color == null)
+//					newTrain.color = trains.get(i).color;
 				trains.set(i, newTrain);
 			}
 		}
@@ -398,7 +398,7 @@ public class RailroadLineChart extends TrainGraphPart {
 
 		for (int i = 0; i < readTrainNum; i++) {
 			if (readingTrains.get(i).getTrainName().equalsIgnoreCase(colorLine[0])) {
-				readingTrains.get(i).color = new Color(r, g, b);
+//				readingTrains.get(i).color = new Color(r, g, b);
 				//System.out.println(readingTrains[i].getTrainName()+":"+r+","+g+","+b);
 			}
 		}

@@ -1340,6 +1340,12 @@ public abstract class TrainGraphPart {
 		Tuple2 propTuple = Tuple2.of(obj.getClass().getName(), propName);
 		Tuple2<BiConsumer<TrainGraphPart, String>, Boolean> setterTuple =
 				 simplePropertySetterMap.get(propTuple);
+		if (setterTuple == null) {
+			DEBUG_MSG_LOAD(__("Unknown simple property '%s' ignored in class %s"),
+					propName, propTuple.A);
+			return;
+		}
+		
 		BiConsumer<TrainGraphPart, String> setter = setterTuple.A;
 		boolean isArray = setterTuple.B;
 		
@@ -1754,7 +1760,6 @@ public abstract class TrainGraphPart {
 		// Init for toDebugString
 		TO_STRING_SHOW_TYPE = true;
 		TO_STRING_SHOW_PROPERTIES = false;
-		TO_STRING_SPECIFIC_TYPE_DEPTH.put(AllTrains.class.getName(), 0);
 		TO_STRING_SPECIFIC_TYPE_DEPTH.put(RailroadLineChart.class.getName(), 0);
 		TO_STRING_SPECIFIC_TYPE_DEPTH.put(RailroadLine.class.getName(), 0);
 	}

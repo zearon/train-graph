@@ -2,6 +2,7 @@ package org.paradise.etrc.view.timetableedit;
 
 import static org.paradise.etrc.ETRC.__;
 
+import java.awt.EventQueue;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -21,10 +22,10 @@ import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 
 public class TimetableEditSheetModel extends DefaultJEditTableModel {
 	private static final long serialVersionUID = 6767541225039467460L;
-	private JTable table;
-	private TrainGraph trainGraph;
-	private RailroadLineChart chart;
-	private boolean downGoing;
+	protected JTable table;
+	protected TrainGraph trainGraph;
+	protected RailroadLineChart chart;
+	protected boolean downGoing;
 	IntSupplier sectionCounter;
 	IntFunction<TrainRouteSection> sectionGetter;
 	Consumer<TrainRouteSection> sectionAdder;
@@ -78,15 +79,17 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 	}
 
 	public int getRowCount() {
-		return chart.railroadLine.getStationNum() * 2;
+		return chart.railroadLine.getStationNum() * 2 + 1;
 	}
 
 	public Object getValueAt(int rowIndex, int colIndex) {
-		Stop stop = getStop(rowIndex, colIndex);
-		if (stop == null)
-			return null;
-		
-		return stop;
+//		Stop stop = getStop(rowIndex, colIndex);
+//		if (stop == null)
+//			return null;
+//		
+//		return stop;
+		TrainRouteSection trainSection = getTrainRouteSection(colIndex);
+		return trainSection;
 	}
 	
 	public TrainRouteSection getTrainRouteSection(int columnIndex) {
@@ -98,8 +101,12 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 		TrainRouteSection trainSection = sectionGetter.apply(columnIndex);
 		return trainSection;
 	}
+	
+	public boolean isRemarksRow(int row) {
+		return row == getRowCount() - 1;
+	}
 
-	private Stop getStop(int row, int column) {
+	public Stop getStop(int row, int column) {
 		TrainRouteSection trainSection = getTrainRouteSection(column);
 		if (trainSection == null)
 			return null;
@@ -120,7 +127,7 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 	}
 	
 	public Class<?> getColumnClass(int columnIndex) {
-		return Stop.class;
+		return TrainRouteSection.class;
 	}
 	
 	public boolean isCellEditable(int rowIndex, int columnIndex) {

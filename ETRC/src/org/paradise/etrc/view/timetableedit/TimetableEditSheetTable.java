@@ -1,8 +1,10 @@
 package org.paradise.etrc.view.timetableedit;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -10,9 +12,13 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.ListUI;
+import javax.swing.plaf.basic.BasicListUI;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -23,16 +29,24 @@ import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
+import org.paradise.etrc.data.v1.TrainRouteSection;
 //import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.slice.ChartSlice;
 import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.view.traintypes.TrainTypeTableCellRenderer;
+import org.paradise.etrc.view.traintypes.TrainTypeTableModel;
 
 import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.*;
 
 public class TimetableEditSheetTable extends JEditTable {
 	private static final long serialVersionUID = 1L;
 
 	JList<?> rowHeader;
+	JTable columnHeader;
+
+	TimetableEditSheetModel tableModel;
 	RowHeaderModel rowHeaderModel;
 	
 	private TrainGraph trainGraph;
@@ -55,12 +69,13 @@ public class TimetableEditSheetTable extends JEditTable {
 		getTableHeader().setFont(new Font("Dialog", 0, 12));
 
 		//设置数据
-		setModel(new TimetableEditSheetModel(this, trainGraph));
+		tableModel = new TimetableEditSheetModel(this, trainGraph);
+		setModel(tableModel);
 
 		//设置渲染器
-		setDefaultRenderer(Stop.class, new SheetCellRanderer());
+		setDefaultRenderer(TrainRouteSection.class, new SheetCellRanderer());
 		//设置编辑器
-		setDefaultEditor(Stop.class, new SheetCellEditor());
+//		setDefaultEditor(Stop.class, new SheetCellEditor());
 		
 		//禁止自动调整列宽
 		setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -91,16 +106,20 @@ public class TimetableEditSheetTable extends JEditTable {
 			}
 		});
 		
+		// 不画JTable默认的网格线,在cell renderer中根据格子的属性来画
+		setIntercellSpacing(new Dimension(0, 0));
+		
 		//设置列表头
 		setupTableHeader(this.getTableHeader());
-
-		//设置列宽
-		setupColumnWidth();
 		
 		//设置行表头
+		rowHeaderModel = new RowHeaderModel(trainGraph);
 		rowHeader = buildeRowHeader();
-		JScrollPane timeTableScrollPane = getScrollPane();
-		timeTableScrollPane.setRowHeaderView(rowHeader);
+
+		//设置列宽(包括column header table的列宽)
+		setupColumnWidth();
+		
+//		timeTableScrollPane.setColumnHeaderView(view);
 	}
 	
 	public void setTrainGraph(TrainGraph trainGraph) {
@@ -109,7 +128,10 @@ public class TimetableEditSheetTable extends JEditTable {
 	
 	public void switchChart(boolean downGoing) {
 		rowHeaderModel.switchChart(downGoing);
+        rowHeader.setFixedCellWidth(getRowHeaderWidth());
+		buildeRowHeader();
 		rowHeader.repaint();
+		
 		getTableModel().switchChart(downGoing);
 		setupColumnWidth();
 	}
@@ -130,10 +152,9 @@ public class TimetableEditSheetTable extends JEditTable {
 	
 	/* 行表头 */
 	private JList<?> buildeRowHeader() {
-		rowHeaderModel = new RowHeaderModel(trainGraph);
-        JList<?> rowHeader = new JList<Object>(rowHeaderModel);
-        rowHeader.setFixedCellWidth(80);
-        rowHeader.setFixedCellHeight(getRowHeight());
+        rowHeader = new JList<Object>(rowHeaderModel);
+        rowHeader.setFixedCellWidth(getRowHeaderWidth());
+//        rowHeader.setFixedCellHeight(getRowHeight());
         rowHeader.setCellRenderer(new RowHeaderRenderer(this));
         
         //只能选择单行
@@ -163,7 +184,26 @@ public class TimetableEditSheetTable extends JEditTable {
 			}
         });
         
+		JScrollPane timeTableScrollPane = getScrollPane();
+		timeTableScrollPane.setRowHeaderView(rowHeader);
+        
         return rowHeader;
+	}
+	
+	public int getRemarksRowHeight() {
+		return 250;
+	}
+	
+	public int getRowHeaderWidth() {
+		return 80;
+	}
+	
+	public int getCellWidth() {
+		return 40;
+	}
+	
+	public int getVehicleNameRowHeight() {
+		return 60;
 	}
 
 	//－－－－列表头设置－－－－//
@@ -224,8 +264,9 @@ public class TimetableEditSheetTable extends JEditTable {
 	public void setupColumnWidth() {
 		//设置列宽
 		for (int i = 0; i < getColumnCount(); i++) {
-			int with = getPreferredWidthForCloumn(this, i) + 16;
-			getColumnModel().getColumn(i).setPreferredWidth(with);
+//			int width = getPreferredWidthForCloumn(this, i) + 16;
+			int width = getCellWidth();
+			getColumnModel().getColumn(i).setPreferredWidth(width);
 		}
 	}	
 	

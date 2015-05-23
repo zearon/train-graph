@@ -39,12 +39,15 @@ public class RowHeaderModel extends AbstractListModel<Object> {
 	}
 	
     public int getSize() { 
-    	return stations.size() * 2;
+    	return stations.size() * 2 + 1;
     }
     
     public Object getElementAt(int index) { 
+    	if (index == getSize() - 1)
+    		return __("Remarks");
+    	
     	Station station = stations.get(index / 2);
 		String sta = station.getName();
-		return index % 2 == 0 ? sta + __("站 到") : station.dist + trainGraph.settings.distUnit + __(" 发");
+		return index % 2 == 0 ? String.format(__("%s站 到"), sta) : station.dist + trainGraph.settings.distUnit + __(" 发");
     }
 }

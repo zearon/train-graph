@@ -117,6 +117,7 @@ public class TimetableEditView extends JPanel {
 		toolBar.add(btnNewButton);
 		
 		btnNewButton_1 = createToolbarButton("New button 2", null, null);
+		btnNewButton_1.setToolTipText("hello");
 		toolBar.add(btnNewButton_1);
 //		toolBar.add(btnNewButton_1);
 		

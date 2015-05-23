@@ -27,6 +27,8 @@ public class TrainRouteSection extends TrainGraphPart {
 	
 	@TGProperty
 	public boolean downGoing = true;
+	@TGProperty
+	public String remarks = "";
 	
 	public RailroadLineChart getRailLineChart() {return (RailroadLineChart) getParent();}
 	public void setRailLineChart(RailroadLineChart raillineChart) {
@@ -42,6 +44,18 @@ public class TrainRouteSection extends TrainGraphPart {
 	@TGElement(isList=true, type=Stop.class)
 	private Vector<Stop> stops = new Vector<> ();
 	public Vector<Stop> allStops() { return stops; }
+	
+	public Train getTrain() {
+		RailroadLineChart lineChart = (RailroadLineChart) getParent();
+		if (lineChart == null)
+			throw new RuntimeException("The train route section is not set a railroad line chart parent.");
+		
+		RailNetworkChart networkChart = (RailNetworkChart) lineChart.getParent();
+		if (networkChart == null)
+			throw new RuntimeException("The train route section's parent railroad line chart is not set a railroad network chart parent.");
+		
+		return networkChart.findTrain(getName());
+	}
 	
 	public void setTrainNameForAllStops() {
 		stops.forEach(stop -> stop.setTrainName(getTrainName()));

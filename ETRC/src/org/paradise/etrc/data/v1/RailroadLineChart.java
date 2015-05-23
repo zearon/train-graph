@@ -365,16 +365,20 @@ public class RailroadLineChart extends TrainGraphPart {
 	
 	public void addDownwardTrainSection(TrainRouteSection obj) {
 		downgoings.add(obj);
+		obj.setParent(this);
 	}
 	public void addUpwardTrainSection(TrainRouteSection obj) {
 		upgoings.add(obj);
+		obj.setParent(this);
 	}
 	
 	public void insertDownwardTrainSectionAt(int index, TrainRouteSection obj) {
 		downgoings.add(index, obj);
+		obj.setParent(this);
 	}
 	public void insertUpwardTrainSectionAt(int index, TrainRouteSection obj) {
 		upgoings.add(index, obj);
+		obj.setParent(this);
 	}
 	
 	public void removeDownwardTrainSectionAt(int index) {

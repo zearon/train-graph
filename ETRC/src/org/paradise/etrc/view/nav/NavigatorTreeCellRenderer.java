@@ -29,7 +29,7 @@ public class NavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
 			if (userObject instanceof TrainType) {
 				TrainType trainType = (TrainType) userObject;
 				if (trainType.visible)
-					component.setForeground(trainType.getFontColor());
+					component.setForeground(trainType.getLineColor());
 				else
 					component.setForeground(Color.GRAY);
 			}

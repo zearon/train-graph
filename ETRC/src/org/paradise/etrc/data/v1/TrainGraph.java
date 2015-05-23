@@ -219,9 +219,14 @@ public class TrainGraph extends TrainGraphPart {
 
 					if (networkChart.allRailLineCharts().stream()
 							.noneMatch(lineChart -> lineChart.railroadLine.equals(line)) ) {
-						networkChart.allRailLineCharts()
-						.add(TrainGraphFactory.createInstance(RailroadLineChart.class).setProperties(line));
+						
+						RailroadLineChart lineChart = TrainGraphFactory.createInstance(
+								RailroadLineChart.class).setProperties(line);
+						lineChart.setParent(networkChart);
+						networkChart.allRailLineCharts().add(lineChart);
 					}
+					
+					networkChart.setParent(this);
 			});
 		
 		});

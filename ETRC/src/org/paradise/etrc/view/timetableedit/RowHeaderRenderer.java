@@ -2,11 +2,16 @@ package org.paradise.etrc.view.timetableedit;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.table.JTableHeader;
@@ -14,10 +19,10 @@ import javax.swing.table.JTableHeader;
 public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object> {
 	private static final long serialVersionUID = -3720951686492113933L;
 
-	JTable table;
+	TimetableEditSheetTable table;
 	int rowIndex;
 	
-    public RowHeaderRenderer(JTable _table) {
+    public RowHeaderRenderer(TimetableEditSheetTable _table) {
     	table = _table;
         JTableHeader header = table.getTableHeader();
         setOpaque(true);
@@ -26,7 +31,16 @@ public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object
         setFont(header.getFont());
     }
     
-    public void paint(Graphics g) {
+    @Override
+	public Dimension getPreferredSize() {
+    	Dimension d = super.getPreferredSize();
+    	d.height = rowIndex == table.getRowCount() - 1 ? 
+    			table.getRemarksRowHeight() : table.getRowHeight(rowIndex);
+    	return d;
+	}
+
+    @Override
+	public void paint(Graphics g) {
     	super.paint(g);
     	
     	g.setColor(Color.gray);
@@ -42,7 +56,8 @@ public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object
     	//右竖线
     	g.drawLine(getWidth()-1, 0, getWidth()-1, getHeight());
     }
-    
+
+    @Override
 	public Component getListCellRendererComponent(JList<?> list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 

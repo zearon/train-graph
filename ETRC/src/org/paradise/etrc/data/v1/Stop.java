@@ -59,7 +59,7 @@ public class Stop extends TrainGraphPart {
 		leaveTimeChanged = true;
 	}
 
-	private int arriveTime;
+	private int arriveTime = -1;
 	public int getArriveTime() { return arriveTime;}
 	public void setArriveTime(int arriveTime) {
 		this.arriveTime = arriveTime;
@@ -89,13 +89,16 @@ public class Stop extends TrainGraphPart {
 		case NOT_GO_THROUGH:
 			return "";
 		case PASS:
-			return "||";
+			if (arriveTime == -1)
+				return "||";
+			else
+				makeTimeStr(arriveTime);
 		default:
 			return makeTimeStr(arriveTime);
 		}
 	}
 	
-	private int leaveTime;
+	private int leaveTime = -1;
 	private boolean leaveTimeChanged = true;
 	public int getLeaveTime() { return leaveTime;}
 	public void setLeaveTime(int leaveTime) {
@@ -108,7 +111,10 @@ public class Stop extends TrainGraphPart {
 		case NOT_GO_THROUGH:
 			return "";
 		case PASS:
-			return "||";
+			if (leaveTime == -1)
+				return "||";
+			else
+				makeTimeStr(leaveTime);
 		default:
 			return makeTimeStr(leaveTime);
 		}
@@ -257,6 +263,9 @@ public class Stop extends TrainGraphPart {
 	 * is set to false.
 	 */
 	public static int makeTimeFromStr(String timeStr, boolean throwException) {
+		if ("0:0-1".equals(timeStr))
+			return -1;
+		
 		String hourStr = null, minuteStr = null;
 		int hour, minute, time = -1;
 		boolean error = false, strParsed = false;

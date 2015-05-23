@@ -18,7 +18,7 @@ public class RowHeaderModel extends AbstractListModel<Object> {
     }
     
     public Object getElementAt(int index) { 
-		String sta = chart.railroadLine.getStation(index / 2).name;
+		String sta = chart.railroadLine.getStation(index / 2).getName();
 		sta += index % 2 == 0 ? "站 到" : "站 发";
 		return sta;
     }

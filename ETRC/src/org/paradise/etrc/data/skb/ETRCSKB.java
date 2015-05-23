@@ -152,7 +152,7 @@ public class ETRCSKB {
 			instant1= Instant.now();
 		HashSet<String> allStationsOnCircuits = 
 				circuits.stream().flatMap(cir->cir.getAllStations().stream()).distinct()
-				.map(station->station.name.toLowerCase())
+				.map(station->station.getName().toLowerCase())
 				.collect(Collectors.toCollection(HashSet::new));
 
 		if (IS_DEBUG())
@@ -181,7 +181,7 @@ public class ETRCSKB {
 		Vector<Train> trains = new Vector<Train>();
 		
 		for(int i=0; i<cir.getStationNum(); i++) {
-			Vector<Train> newTrains = findTrains(cir.getStation(i).name);
+			Vector<Train> newTrains = findTrains(cir.getStation(i).getName());
 			
 			Enumeration<Train> en = newTrains.elements();
 			while(en.hasMoreElements()) {
@@ -227,7 +227,7 @@ public class ETRCSKB {
 		Vector<Train> trains = new Vector<Train>();
 		
 		for(int i=0; i<lineChart.railroadLine.getStationNum(); i++) {
-			Vector<Train> newTrains = findTrains(lineChart.railroadLine.getStation(i).name);
+			Vector<Train> newTrains = findTrains(lineChart.railroadLine.getStation(i).getName());
 			
 			Enumeration<Train> en = newTrains.elements();
 			while(en.hasMoreElements()) {
@@ -310,7 +310,7 @@ public class ETRCSKB {
 				String str_arrive = tkInfo[2];
 				String str_leave = tkInfo[3];
 				
-				train.appendStop(Stop.makeStop(tkName, str_arrive, str_leave, true));
+				train.appendStop(Stop.makeStop(tkName, trainName, str_arrive, str_leave, true));
 	
 //				SimpleDateFormat df = new SimpleDateFormat("H:mm");
 //				Date arrive = null;
@@ -340,9 +340,9 @@ public class ETRCSKB {
 		
 //		train.startStation = train.stops[0].stationName;
 //		train.terminalStation = train.stops[train.stopNum - 1].stationName;
-		train.name = trainName;
+		train.setName(trainName);
 		
-		String names[] = train.name.split("/");
+		String names[] = train.getName().split("/");
 		for(int i=0; i<names.length; i++) {
 			if(names[i].endsWith("A") || names[i].endsWith("B"))
 				names[i] = names[i].substring(0, names[i].length()-1);

@@ -39,7 +39,7 @@ public class TrainTableCellEditor extends AbstractCellEditor implements TableCel
 		//设置文本
 		stop = (Stop) value;
 		isArrive = (column == 1);
-		oldTime = (value == null) ? "" : (isArrive ? stop.arrive: stop.leave);
+		oldTime = (value == null) ? "" : (isArrive ? stop.getArrive(): stop.getLeave());
 		editor.setText(oldTime);
 		
 		return editor;
@@ -49,9 +49,9 @@ public class TrainTableCellEditor extends AbstractCellEditor implements TableCel
 		String time = Train.formatTime(oldTime, editor.getText());
 		
 		if(isArrive)
-			stop.arrive = time;
+			stop.setArrive(time);
 		else
-			stop.leave = time;
+			stop.setLeave(time);
 		
 		return stop;
 	}

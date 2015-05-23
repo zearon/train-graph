@@ -147,6 +147,10 @@ public class ChartView extends JPanel {
 		}
 		
 		if (ui_inited) {
+			if (currentDrawingModel.empty || activeLineChart.chartChanged) {
+				updateData();
+			}
+			
 			panelCircuit.setModel(trainGraph);
 			panelClock.setModel(trainGraph);
 			panelLines.setModel(trainGraph);
@@ -506,7 +510,7 @@ public class ChartView extends JPanel {
 
 		int iDraw = 0;
 		for (int i = 0; i < train.getStopNum(); i++) {
-			if (circuit.getStationDist(train.getStop(i).name) >= 0) {
+			if (circuit.getStationDist(train.getStop(i).getName()) >= 0) {
 				drawStops[iDraw] = train.getStop(i);
 				iDraw++;
 			}
@@ -524,7 +528,7 @@ public class ChartView extends JPanel {
 		Stop[] drawStops = getDrawStops(train);
 
 		for (int i = 0; i < drawStops.length; i++) {
-			if (drawStops[i].name.equalsIgnoreCase(stationName))
+			if (drawStops[i].getName().equalsIgnoreCase(stationName))
 				return i;
 		}
 

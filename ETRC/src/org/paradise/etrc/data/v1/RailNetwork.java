@@ -113,7 +113,7 @@ public class RailNetwork extends TrainGraphPart {
 	}
 
 	public String repr() {
-		StringBuffer sb = new StringBuffer(this.name);
+		StringBuffer sb = new StringBuffer(this.getName());
 		
 		sb.append(String.format(__("There are %d railroad lines in total.\n"),
 				getAllRailroadLines().size()));
@@ -357,7 +357,7 @@ public class RailNetwork extends TrainGraphPart {
 			return 1;
 		else {
 			int indexDiff = c1.calIndex - c2.calIndex;
-			return indexDiff != 0 ? indexDiff : c1.name.compareToIgnoreCase(c2.name);
+			return indexDiff != 0 ? indexDiff : c1.getName().compareToIgnoreCase(c2.getName());
 		}
 	}
 
@@ -389,7 +389,7 @@ public class RailNetwork extends TrainGraphPart {
 		String multiplicity = (circuit.multiplicity + "线").replace("1", "单").replace("2", "复").replace("4", "四");
 		out.printf(
 				"% 2d. %s %s, (%dkm), zIndex: % 2d. %s Phase:****%s****. It has the following stations: %n",
-				circuit.calIndex, circuit.name, multiplicity, circuit.length, 
+				circuit.calIndex, circuit.getName(), multiplicity, circuit.length, 
 				circuit.zindex, circuit.dispReverted?"(颠倒上下行)":"", circuit.dinfo);
 
 		for (Station station : circuit.getAllStations()) {
@@ -398,7 +398,7 @@ public class RailNetwork extends TrainGraphPart {
 	}
 
 	public void printStation(PrintStream out, Station station) {
-		out.printf("\t%s, \t%s \t% 5d/%5dkm, \tLevel:%d \t%s%n", station.name,
+		out.printf("\t%s, \t%s \t% 5d/%5dkm, \tLevel:%d \t%s%n", station.getName(),
 				station.isCrossover ? "Crossover" : "\t\t", station.dist,
 				station.scaledDist, station.level, station.hide ? "Hidden" : "");
 	}

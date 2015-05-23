@@ -127,9 +127,9 @@ public class WZInPointSet extends WizardDialog {
 			return "";
 		
 		//有这个停站
-		int stopIndex = train.findStopIndex(curStation.name);
+		int stopIndex = train.findStopIndex(curStation.getName());
 		if(stopIndex >= 0) {
-			return train.getStop(stopIndex).arrive;
+			return train.getStop(stopIndex).getArrive();
 		}
 		else {
 			Station firstStation = chart.railroadLine.getFirstStopOnMe(train);
@@ -140,9 +140,9 @@ public class WZInPointSet extends WizardDialog {
 			int distGap = curStation.dist - firstStation.dist;
 			int timeGap = distGap * 60 / Train.getDefaultVelocityByName(train.getTrainName());
 			
-			Stop stop = train.findStop(firstStation.name);
+			Stop stop = train.findStop(firstStation.getName());
 			
-			int timeA = Train.trainTimeToInt(stop.arrive);
+			int timeA = Train.trainTimeToInt(stop.getArrive());
 			int timeIn = 0;
 			if(train.isDownTrain(chart.railroadLine) == Train.DOWN_TRAIN)
 				timeIn = timeA + timeGap;
@@ -211,7 +211,7 @@ public class WZInPointSet extends WizardDialog {
 				strDist = " " + strDist;
 			}
 			dispNames[i] = String.format(__(" %s down-going direction %s km from %s station: %s station"), 
-					chart.railroadLine.name, strDist, chart.railroadLine.getStation(0).name,   chart.railroadLine.getStation(i).name); 
+					chart.railroadLine.getName(), strDist, chart.railroadLine.getStation(0).getName(),   chart.railroadLine.getStation(i).getName()); 
 			
 		}
 		circuitList.setListData(dispNames);
@@ -224,7 +224,7 @@ public class WZInPointSet extends WizardDialog {
 		else {
 			curStation = chart.railroadLine.getFirstStopOnMe(train);
 			if(curStation != null) {
-				info.setText(String.format(__("  The first stop of train %s in this section is %s, change the station and time if this is not correct."), train.getTrainName(), curStation.name));
+				info.setText(String.format(__("  The first stop of train %s in this section is %s, change the station and time if this is not correct."), train.getTrainName(), curStation.getName()));
 			}
 			else {
 				info.setText(String.format(__("  The train %s passes this section, set the start point manually."), train.getTrainName()));
@@ -233,7 +233,7 @@ public class WZInPointSet extends WizardDialog {
 
 		int index = -1;
 		if(curStation != null)
-			index = chart.railroadLine.getStationIndex(curStation.name);
+			index = chart.railroadLine.getStationIndex(curStation.getName());
 		
 		circuitList.setSelectedIndex(index);
 		circuitList.ensureIndexIsVisible(index);
@@ -249,8 +249,8 @@ public class WZInPointSet extends WizardDialog {
 			return;
 		else {
 			//TODO: train.xstop.setTime;
-			Stop stop = TrainGraphFactory.createInstance(Stop.class, curStation.name)
-					.setProperties(time, time, false);
+			Stop stop = TrainGraphFactory.createInstance(Stop.class, curStation.getName())
+					.setProperties(null, time, time, false);
 			chart.insertNewStopToTrain(train, stop);
 			
 			super.doNext();

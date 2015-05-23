@@ -28,10 +28,10 @@ public class ChartSlice {
 				
 		//展现
 		System.out.println("\n" + train.getTrainName() + "次列车 " + train.getStartStation() + "至" + train.getTerminalStation() + 
-				           " 在" + chart.railroadLine.name + "上(" + train.getTrainName(chart.railroadLine)+ ")的运行图切片");
+				           " 在" + chart.railroadLine.getName() + "上(" + train.getTrainName(chart.railroadLine)+ ")的运行图切片");
 		System.out.println(events);
 		new SliceDialog("\n" + train.getTrainName() + "次列车 " + train.getStartStation() + "至" + train.getTerminalStation() + 
-		           " 在" + chart.railroadLine.name + "上(" + train.getTrainName(chart.railroadLine)+ ")的运行图切片", 
+		           " 在" + chart.railroadLine.getName() + "上(" + train.getTrainName(chart.railroadLine)+ ")的运行图切片", 
 		           events.toString()).showMessage();
 	}
 
@@ -41,9 +41,9 @@ public class ChartSlice {
 		Vector<ChartEvent> events = getStationEventsOfStation(station);
 		
 		//展现
-		System.out.println(chart.railroadLine.name + " " + station.name + "站 的运行图切片");
+		System.out.println(chart.railroadLine.getName() + " " + station.getName() + "站 的运行图切片");
 		System.out.println(events);
-		new SliceDialog(chart.railroadLine.name + " " + station.name + "站 的运行图切片", events.toString()).showMessage();
+		new SliceDialog(chart.railroadLine.getName() + " " + station.getName() + "站 的运行图切片", events.toString()).showMessage();
 	}
 	
 	//初始化

@@ -122,6 +122,7 @@ public class FindTrainsDialog extends JDialog {
 
 			skb.findTrains(mainFrame.trainGraph.currentNetworkChart);
 			mainFrame.trainGraph.setTrainTypeByNameForAllTrains();
+			mainFrame.trainGraph.currentNetworkChart.createTrainRouteSectionsForTrainsInAllLines();
 			
 //			// Add to all trains
 //			networkChart.addAllTrains(trains);

@@ -99,21 +99,21 @@ public void rebuild() {
     //int lastY = -1;
     ChartPoint lastPoint = new ChartPoint(this, -1, -1, ChartPoint.UNKOW, true);
     for (int i = 0; i < drawStops.length; i++) {
-      String arriveClock = drawStops[i].arrive;
+      String arriveClock = drawStops[i].getArrive();
       int x0 = chartView.getPelsX(arriveClock);
-      String leaveClock = drawStops[i].leave;
+      String leaveClock = drawStops[i].getLeave();
       int x1 = chartView.getPelsX(leaveClock);
 
-      int y0 = chartView.getPelsY(drawStops[i].name);
-      int y1 = chartView.getPelsY(drawStops[i].name);
+      int y0 = chartView.getPelsY(drawStops[i].getName());
+      int y1 = chartView.getPelsY(drawStops[i].getName());
 
-      ChartPoint p0 = new ChartPoint(this, x0, y0, ChartPoint.STOP_ARRIVE, drawStops[i].isPassenger);
-      ChartPoint p1 = new ChartPoint(this, x1, y1, ChartPoint.STOP_LEAVE, drawStops[i].isPassenger);
+      ChartPoint p0 = new ChartPoint(this, x0, y0, ChartPoint.STOP_ARRIVE, drawStops[i].isPassenger());
+      ChartPoint p1 = new ChartPoint(this, x1, y1, ChartPoint.STOP_LEAVE, drawStops[i].isPassenger());
 
       //第一个停站的到达点，判断p0是入图还是始发
       if (i == 0) {
         //始发
-        if (drawStops[i].name.equalsIgnoreCase(train.getStartStation())) {
+        if (drawStops[i].getName().equalsIgnoreCase(train.getStartStation())) {
           p0.type = ChartPoint.START;
           firstRect = new TrainNameRect(p0, trainName, direction);
         }
@@ -127,7 +127,7 @@ public void rebuild() {
       //最后一个停站的出发点，判断p1是出图还是终到
       if (i == drawStops.length - 1) {
         //终到
-        if (drawStops[i].name.equalsIgnoreCase(train.getTerminalStation())) {
+        if (drawStops[i].getName().equalsIgnoreCase(train.getTerminalStation())) {
           p1.type = ChartPoint.TERMINAL;
           lastRect = new TrainNameRect(p1, trainName, direction);
         }
@@ -146,46 +146,46 @@ public void rebuild() {
 
       //在停车过程中过边界：停车线分两段画
       if (x1 < x0) {
-        pe0 = new ChartPoint(this, chartView.getPelsX(24 * 60), y0, ChartPoint.EDGE, drawStops[i].isPassenger);
-        pe1 = new ChartPoint(this, chartView.getPelsX(0), y0, ChartPoint.EDGE, drawStops[i].isPassenger);
-        lines.add(new TrainLine(this, p0, pe0, TrainLine.STOP_LINE, drawStops[i].isPassenger));
-        lines.add(new TrainLine(this, pe1, p1, TrainLine.STOP_LINE, drawStops[i].isPassenger));
+        pe0 = new ChartPoint(this, chartView.getPelsX(24 * 60), y0, ChartPoint.EDGE, drawStops[i].isPassenger());
+        pe1 = new ChartPoint(this, chartView.getPelsX(0), y0, ChartPoint.EDGE, drawStops[i].isPassenger());
+        lines.add(new TrainLine(this, p0, pe0, TrainLine.STOP_LINE, drawStops[i].isPassenger()));
+        lines.add(new TrainLine(this, pe1, p1, TrainLine.STOP_LINE, drawStops[i].isPassenger()));
         leftName = new TrainNameLR(pe1, trainName, true);
         rightName = new TrainNameLR(pe0, trainName, false);
         lastPoint = p1;
       }
       //最后一站（不需要判断下站过界问题）
       else if (i == drawStops.length - 1) {
-        lines.add(new TrainLine(this, p0, p1, TrainLine.STOP_LINE, drawStops[i].isPassenger));
+        lines.add(new TrainLine(this, p0, p1, TrainLine.STOP_LINE, drawStops[i].isPassenger()));
 
         lastPoint = p1;
       }
       else {
         //下一到站将过边界：停车线正常，但下段的行车线要先画一半到边界
-        if (chartView.getPelsX(drawStops[i + 1].arrive) < x1) {
-          int x2 = Math.round( chartView.getPelsX(drawStops[i + 1].arrive) +
+        if (chartView.getPelsX(drawStops[i + 1].getArrive()) < x1) {
+          int x2 = Math.round( chartView.getPelsX(drawStops[i + 1].getArrive()) +
               24 * 60 * settings.minuteScale );
-          int y2 = chartView.getPelsY(drawStops[i + 1].name);
+          int y2 = chartView.getPelsY(drawStops[i + 1].getName());
 
           //计算右边界点坐标
           int bx = chartView.getPelsX(24 * 60);
           int by = y1 + (bx - x1) * (y2 - y1) / (x2 - x1);
-          pe0 = new ChartPoint(this, bx, by, ChartPoint.EDGE, drawStops[i].isPassenger);
-          pe1 = new ChartPoint(this, chartView.getPelsX(0), by, ChartPoint.EDGE, drawStops[i].isPassenger);
+          pe0 = new ChartPoint(this, bx, by, ChartPoint.EDGE, drawStops[i].isPassenger());
+          pe1 = new ChartPoint(this, chartView.getPelsX(0), by, ChartPoint.EDGE, drawStops[i].isPassenger());
           leftName = new TrainNameLR(pe1, trainName, true);
           rightName = new TrainNameLR(pe0, trainName, false);
 
           //停车线
-          lines.add(new TrainLine(this, p0, p1, TrainLine.STOP_LINE, drawStops[i].isPassenger));
+          lines.add(new TrainLine(this, p0, p1, TrainLine.STOP_LINE, drawStops[i].isPassenger()));
           //行车线的上半段
-          lines.add(new TrainLine(this, p1, pe0, TrainLine.RUN_LINE, drawStops[i].isPassenger));
+          lines.add(new TrainLine(this, p1, pe0, TrainLine.RUN_LINE, drawStops[i].isPassenger()));
 
           //行车线下半段的起始坐标
           lastPoint = pe1;
         }
         //一般停站(下一站不过边界)
         else {
-          lines.add(new TrainLine(this, p0, p1, TrainLine.STOP_LINE, drawStops[i].isPassenger));
+          lines.add(new TrainLine(this, p0, p1, TrainLine.STOP_LINE, drawStops[i].isPassenger()));
 
           lastPoint = p1;
         }
@@ -412,8 +412,8 @@ public void rebuild() {
     
 	long min = 0;
 	try {
-		Date in = df.parse(stop[0].arrive);
-	    Date out = df.parse(stop[stop.length-1].leave);
+		Date in = df.parse(stop[0].getArrive());
+	    Date out = df.parse(stop[stop.length-1].getLeave());
 	    
 	    long time = out.getTime() - in.getTime();
 	    min = time/(1000*60);
@@ -425,15 +425,15 @@ public void rebuild() {
       min += 24*60;
 
 	RailroadLineChart chart = chartView.activeLineChart;
-    int dist = Math.abs(chart.railroadLine.getStationDist(stop[0].name)
-                      - chart.railroadLine.getStationDist(stop[stop.length-1].name));
+    int dist = Math.abs(chart.railroadLine.getStationDist(stop[0].getName())
+                      - chart.railroadLine.getStationDist(stop[stop.length-1].getName()));
     
     if(min == 0)
     	return train.getTrainName() + "Error!";
 
     return train.getTrainName() + "次 "
         + train.getStartStation() + "至" + train.getTerminalStation()
-        + " 在" + chart.railroadLine.name + "行驶" + dist + "公里 "
+        + " 在" + chart.railroadLine.getName() + "行驶" + dist + "公里 "
         + "耗时" + min + "分钟 旅行速度" + dist*60/min +"公里/小时";
   }
 

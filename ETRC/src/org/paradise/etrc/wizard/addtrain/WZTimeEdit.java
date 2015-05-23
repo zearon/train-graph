@@ -87,7 +87,7 @@ public class WZTimeEdit extends WizardDialog {
 
 				int row = table.getSelectedRow();
 				model.myTrain.insertStop(TrainGraphFactory.createInstance(Stop.class, __("Station"))
-						.setProperties("00:00", "00:00", false), row);
+						.setProperties(model.myTrain.getName(), "00:00", "00:00", false), row);
 				model.fireTableDataChanged();
 				
 				table.getSelectionModel().setSelectionInterval(row, row);
@@ -100,7 +100,7 @@ public class WZTimeEdit extends WizardDialog {
 
 				int row = table.getSelectedRow() + 1;
 				model.myTrain.insertStop(TrainGraphFactory.createInstance(Stop.class, __("Station"))
-						.setProperties("00:00", "00:00", false), row);
+						.setProperties(model.myTrain.getName(), "00:00", "00:00", false), row);
 				model.fireTableDataChanged();
 				
 				table.getSelectionModel().setSelectionInterval(row, row);

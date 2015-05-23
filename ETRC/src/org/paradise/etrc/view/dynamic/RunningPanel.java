@@ -219,7 +219,7 @@ public class RunningPanel extends JPanel {
 	private void drawStationName(Graphics g, Station station, int x) {
 		Color oldColor = g.getColor();
 
-		Rectangle r = g.getFontMetrics().getStringBounds(station.name, g).getBounds();
+		Rectangle r = g.getFontMetrics().getStringBounds(station.getName(), g).getBounds();
 		int left = x - r.width / 2;
 		int top = getHeight() / 2 + r.height / 2 - 2;
 
@@ -227,7 +227,7 @@ public class RunningPanel extends JPanel {
 		g.fillRect(left - 1, top - r.height + 2, r.width + 2, r.height);
 		
 		g.setColor(Color.black);
-		g.drawString(station.name, left, top);
+		g.drawString(station.getName(), left, top);
 		g.setColor(oldColor);
 	}
 	
@@ -275,7 +275,7 @@ public class RunningPanel extends JPanel {
 
 		//画停站的列车
 		for(int i=0; i<chart.railroadLine.getStationNum(); i++) {
-			String theStation = chart.railroadLine.getStation(i).name;
+			String theStation = chart.railroadLine.getStation(i).getName();
 			int stationDist = chart.railroadLine.getStation(i).dist;
 			Vector<Train> myTrains = new Vector<Train>();
 			

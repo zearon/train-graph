@@ -169,7 +169,7 @@ public class RailNetworkChart extends TrainGraphPart {
 
 			lineChart.trains.clear();
 			lineChart.trainRefs.stream()
-				.map(trainRef->findTrain(trainRef.name))
+				.map(trainRef->findTrain(trainRef.getName()))
 				.filter(train -> train != null)
 				.forEachOrdered(lineChart.trains::add);
 
@@ -177,10 +177,16 @@ public class RailNetworkChart extends TrainGraphPart {
 		});
 	};
 	
+	/**
+	 * Should only be used for imported trains
+	 */
+	public void createTrainRouteSectionsForTrainsInAllLines() {
+		railLineCharts.forEach(lineChart -> lineChart.createTrainRouteSectionsForAllTrains());
+	}
 	
 	@Override
 	public String toString() {
-		return this.name;
+		return this.getName();
 	}
 	
 	

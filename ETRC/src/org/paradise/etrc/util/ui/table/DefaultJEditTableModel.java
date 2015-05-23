@@ -133,15 +133,15 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 		if (isFirstInSeries) {
 			if (isArriveLine) {
 				// Change both arrival and departure time
-				stop.arrive = increaseTime(stop.arrive, increment);
-				stop.leave = increaseTime(stop.leave, increment);
+				stop.setArrive(increaseTime(stop.getArrive(), increment));
+				stop.setLeave(increaseTime(stop.getLeave(), increment));
 			} else {
 				// Only change departure time and remain arrival time unchanged
-				stop.leave = increaseTime(stop.leave, increment);
+				stop.setLeave(increaseTime(stop.getLeave(), increment));
 			}
 		} else {
-			stop.arrive = increaseTime(stop.arrive, increment);
-			stop.leave = increaseTime(stop.leave, increment);
+			stop.setArrive(increaseTime(stop.getArrive(), increment));
+			stop.setLeave(increaseTime(stop.getLeave(), increment));
 		}
 		
 		/* Do not need to set the value, since the object reference keep 
@@ -185,12 +185,12 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 		if (baseStop == null || newStop == null)
 			return 0;
 		
-		if (baseStop.arrive != null && newStop.arrive != null && !baseStop.arrive.equals(newStop.arrive)) {
-			increment = getTimeStringIncrement(baseStop.arrive, newStop.arrive);
+		if (baseStop.getArrive() != null && newStop.getArrive() != null && !baseStop.getArrive().equals(newStop.getArrive())) {
+			increment = getTimeStringIncrement(baseStop.getArrive(), newStop.getArrive());
 			if (increment.isPresent())
 				return increment.get();
-		} else if (baseStop.leave != null && newStop.leave != null) {
-			increment = getTimeStringIncrement(baseStop.leave, newStop.leave);
+		} else if (baseStop.getLeave() != null && newStop.getLeave() != null) {
+			increment = getTimeStringIncrement(baseStop.getLeave(), newStop.getLeave());
 			if (increment.isPresent())
 				return increment.get();
 		}

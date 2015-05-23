@@ -99,7 +99,7 @@ public class StationTableModel extends DefaultJEditTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			return railroadLine.getStation(rowIndex).name;
+			return railroadLine.getStation(rowIndex).getName();
 		case 1:
 			return new Integer(railroadLine.getStation(rowIndex).dist);
 		case 2:
@@ -132,7 +132,7 @@ public class StationTableModel extends DefaultJEditTableModel {
 	public void _setValueAt(Object aValue, int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			railroadLine.getStation(rowIndex).name = (String) aValue;
+			railroadLine.getStation(rowIndex).setName((String) aValue);
 			break;
 		case 1:
 			int offset = ((Integer) aValue).intValue()

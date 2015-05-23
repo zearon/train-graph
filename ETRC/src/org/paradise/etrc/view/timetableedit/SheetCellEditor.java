@@ -1,4 +1,4 @@
-package org.paradise.etrc.view.sheet;
+package org.paradise.etrc.view.timetableedit;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -17,6 +17,7 @@ import javax.swing.table.TableCellEditor;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
+import org.paradise.etrc.view.sheet.SheetModel;
 
 public class SheetCellEditor extends AbstractCellEditor implements
 		TableCellEditor {

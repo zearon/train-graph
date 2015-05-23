@@ -78,7 +78,7 @@ public class TrainGraph extends TrainGraphPart {
 				chart.railLineCharts.forEach(railineChart-> {
 					// Set railroadLine according to railroadLineName
 					railineChart.railroadLine = railNetwork.getAllRailroadLines().stream()
-							.filter(line->line.name.equals(railineChart.name))
+							.filter(line->line.getName().equals(railineChart.getOrigName()))
 							.findFirst().orElse(null);
 				});
 			});
@@ -91,7 +91,7 @@ public class TrainGraph extends TrainGraphPart {
 			}
 		}
 
-	};	
+	};
 	
 	// {{ Train type Operations
 	/*****************************************************

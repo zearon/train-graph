@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
@@ -18,6 +19,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.annotation.TGElement;
@@ -44,7 +46,7 @@ public class RailroadLineChart extends TrainGraphPart {
 
 	@TGElement(name="All TrainRefs", isList=true, type=TrainRef.class)
 	Vector<TrainRef> getTrainRefs() {
-		trainRefs = trains.stream().map(train -> new TrainRef(train.name))
+		trainRefs = trains.stream().map(train -> new TrainRef(train.getName()))
 				.collect(Collectors.toCollection(Vector::new));
 		
 		return trainRefs;
@@ -55,6 +57,17 @@ public class RailroadLineChart extends TrainGraphPart {
 		this.trainRefs = trainRefs;
 	}
 
+	@TGElement(isList=true, type=TrainRouteSection.class)
+	private Vector<TrainRouteSection> downgoings = new Vector<>();
+	public Stream<TrainRouteSection> getDowngoings() {
+		return downgoings.stream();
+	}
+	@TGElement(isList=true, type=TrainRouteSection.class)
+	private Vector<TrainRouteSection> upgoings = new Vector<>();
+	public Stream<TrainRouteSection> getUpgoings() {
+		return upgoings.stream();
+	}
+	
 	//本运行图的车次总数
 //	private int trainNum = 0;
 	//下行车次数目
@@ -75,6 +88,10 @@ public class RailroadLineChart extends TrainGraphPart {
 		return this;
 	}
 	
+	/* TrainGraph 的 loadComplte 函数中使用该值来查找对应的railraodLine */
+	public String getOrigName() {
+		return super.getName();
+	}
 	@Override
 	@TGProperty(name="railroadLineName")
 	public String getName() {
@@ -85,7 +102,7 @@ public class RailroadLineChart extends TrainGraphPart {
 	public void setName(String name) {
 		super.setName(name);
 	}
-	
+
 	// }}
 	
 	// {{ Train 列表操作
@@ -174,6 +191,8 @@ public class RailroadLineChart extends TrainGraphPart {
 		if ((index < 0) || index >= getTrainNum() /* (index >= MAX_TRAIN_NUM) */ )
 			return;
 		
+		Train train = trains.remove(index);
+		removeTrainRouteSectionForTrain(train.getName());
 		trains.remove(index).removeTrainChangedListener(this::onTrainChanged);
 
 		fireChartChangedEvent();
@@ -184,6 +203,7 @@ public class RailroadLineChart extends TrainGraphPart {
 			return;
 		
 		trains.remove(theTrain);
+		removeTrainRouteSectionForTrain(theTrain.getName());
 		
 		theTrain.removeTrainChangedListener(this::onTrainChanged);
 		fireChartChangedEvent();
@@ -210,7 +230,7 @@ public class RailroadLineChart extends TrainGraphPart {
 	}
 
 	private void insertNewStopToTrainUp(Train theTrain, Stop stop) {
-		int newDist = this.railroadLine.getStationDist(stop.name);
+		int newDist = this.railroadLine.getStationDist(stop.getName());
 		
 		//不在本线 返回 null
 		if(newDist < 0)
@@ -222,9 +242,9 @@ public class RailroadLineChart extends TrainGraphPart {
 			theTrain.insertStop(stop, 0);
 		}
 		else {
-			int firstDist = this.railroadLine.getStationDist(firstStop.name);
+			int firstDist = this.railroadLine.getStationDist(firstStop.getName());
 			if(newDist > firstDist)
-				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
+				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.getName()));
 		}
 		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
 		Station lastStop = this.railroadLine.getLastStopOnMe(theTrain);
@@ -232,15 +252,15 @@ public class RailroadLineChart extends TrainGraphPart {
 			theTrain.appendStop(stop);
 		}
 		else {
-			int lastDist = this.railroadLine.getStationDist(lastStop.name);
+			int lastDist = this.railroadLine.getStationDist(lastStop.getName());
 			if(newDist < lastDist)
 				theTrain.appendStop(stop);
 		}
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
 		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).name);
-			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).name);
+			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).getName());
+			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).getName());
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
@@ -250,7 +270,7 @@ public class RailroadLineChart extends TrainGraphPart {
 	}
 
 	private void insertNewStopToTrainDown(Train theTrain, Stop stop) {
-		int newDist = this.railroadLine.getStationDist(stop.name);
+		int newDist = this.railroadLine.getStationDist(stop.getName());
 		
 		//不在本线 返回 null
 		if(newDist < 0)
@@ -263,9 +283,9 @@ public class RailroadLineChart extends TrainGraphPart {
 		}
 		else
 		{
-			int firstDist = this.railroadLine.getStationDist(firstStop.name);
+			int firstDist = this.railroadLine.getStationDist(firstStop.getName());
 			if(newDist < firstDist)
-				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.name));
+				theTrain.insertStop(stop, theTrain.findStopIndex(firstStop.getName()));
 		}
 		//新站在theTrain在本线的最后一个停靠站之后 append在最后一个站之后
 		Station lastStop = this.railroadLine.getLastStopOnMe(theTrain);
@@ -274,15 +294,15 @@ public class RailroadLineChart extends TrainGraphPart {
 		}
 		else
 		{
-			int lastDist = this.railroadLine.getStationDist(lastStop.name);
+			int lastDist = this.railroadLine.getStationDist(lastStop.getName());
 			if(newDist > lastDist)
 				theTrain.appendStop(stop);
 		}
 		//新站在theTrain的第一个停靠站和最后一个停靠站之间
 		//遍历theTrain的所有停站
 		for(int i=0; i<theTrain.getStopNum()-1; i++) {
-			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).name);
-			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).name);
+			int dist1 = railroadLine.getStationDist(theTrain.getStop(i).getName());
+			int dist2 = railroadLine.getStationDist(theTrain.getStop(i+1).getName());
 			
 			if(dist1 >= 0 && dist2 >=0)
 				//如果新站距离在两个站之间，则应当插在第一个站之后（返回第一个站）
@@ -327,6 +347,73 @@ public class RailroadLineChart extends TrainGraphPart {
 
 	// }}
 
+	// {{ Train Route Section 操作
+	
+	public int getDownwardTrainSectionCount() {
+		return downgoings.size();
+	}
+	public int getUpwardTrainSectionCount() {
+		return upgoings.size();
+	}
+	
+	public TrainRouteSection getDownwardTrainSection(int i) {
+		return downgoings.get(i);
+	}
+	public TrainRouteSection getUpwardTrainSection(int i) {
+		return upgoings.get(i);
+	}
+	
+	public void addDownwardTrainSection(TrainRouteSection obj) {
+		downgoings.add(obj);
+	}
+	public void addUpwardTrainSection(TrainRouteSection obj) {
+		upgoings.add(obj);
+	}
+	
+	public void insertDownwardTrainSectionAt(int index, TrainRouteSection obj) {
+		downgoings.add(index, obj);
+	}
+	public void insertUpwardTrainSectionAt(int index, TrainRouteSection obj) {
+		upgoings.add(index, obj);
+	}
+	
+	public void removeDownwardTrainSectionAt(int index) {
+		downgoings.removeElementAt(index);
+	}
+	public void removeUpwardTrainSectionAt(int index) {
+		upgoings.removeElementAt(index);
+	}
+	
+	public void removeTrainRouteSectionForTrain(String trainName) {
+		for (Iterator<TrainRouteSection> iter = downgoings.iterator(); iter.hasNext(); ) {
+			TrainRouteSection section = iter.next();
+			if (trainName.equals(section.getName())) {
+				iter.remove();
+			}
+		}
+		for (Iterator<TrainRouteSection> iter = upgoings.iterator(); iter.hasNext(); ) {
+			TrainRouteSection section = iter.next();
+			if (trainName.equals(section.getName())) {
+				iter.remove();
+			}
+		}
+	}
+	
+	/**
+	 * Should only be used for imported trains
+	 */
+	public void createTrainRouteSectionsForAllTrains() {
+		if (railroadLine == null)
+			return;
+		
+		downgoings.clear();
+		upgoings.clear();
+		trains.stream()
+			.forEach(train -> TrainRouteSection.createTrainRouteSectionForTrain(this, train));
+	}
+	
+	// }}
+	
 	// {{ 旧的存档读档操作
 	/*
 	 * 文件操作

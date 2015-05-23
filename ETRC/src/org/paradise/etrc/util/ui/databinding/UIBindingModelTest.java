@@ -77,7 +77,7 @@ public class UIBindingModelTest {
 		UIBinding model = UIBindingManager.getUIBinding(settings, "name", "", null, true);
 		
 		String expected = "test string";
-		settings.name = expected;
+		settings.setName(expected);
 		
 		Object actual = (String) model.getModelValue();
 		assertEquals(expected, actual);
@@ -89,7 +89,7 @@ public class UIBindingModelTest {
 		
 		String expected = "test string";
 		model.setModelValue(expected);
-		Object actual = settings.name;
+		Object actual = settings.getName();
 		
 		assertEquals(expected, actual);
 	}
@@ -148,7 +148,7 @@ public class UIBindingModelTest {
 		UIBinding model = UIBindingManager.getUIBinding(settings, "name", "", null, false);
 		
 		String expected = "test string";
-		settings.name = expected;
+		settings.setName(expected);
 		
 		Object actual = (String) model.getModelValue();
 		assertEquals(expected, actual);
@@ -160,7 +160,7 @@ public class UIBindingModelTest {
 		
 		String expected = "test string";
 		model.setModelValue(expected);
-		Object actual = settings.name;
+		Object actual = settings.getName();
 		
 		assertEquals(expected, actual);
 	}

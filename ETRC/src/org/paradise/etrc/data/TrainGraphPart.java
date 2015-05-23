@@ -147,7 +147,7 @@ public abstract class TrainGraphPart {
 	// {{ 实例属性及抽象方法
 	protected int _id;
 	
-	public String name;
+	protected String name;
 	protected TrainGraphPart root;
 	protected TrainGraphPart parent;
 	
@@ -620,7 +620,11 @@ public abstract class TrainGraphPart {
 						String.class, propClass0);
 				try {
 					method.invoke(tgp, value);
-				}  catch (Exception e) {
+				} catch (InvocationTargetException ie) {
+					throw new RuntimeException(String.format(__("Cannot set value with %s method in %s class due to %s(%s)"), 
+							methodName, tgp.getClass().getName(), 
+							ie.getTargetException().getClass().getName(), ie.getTargetException().getMessage()));
+				} catch (Exception e) {
 					throw new RuntimeException(String.format(__("Cannot set value with %s method in %s class due to %s(%s)"), 
 							methodName, tgp.getClass().getName(), 
 							e.getClass().getName(), e.getMessage()));
@@ -657,6 +661,10 @@ public abstract class TrainGraphPart {
 				Object value;
 				try {
 					value = method.invoke(tgp);
+				} catch (InvocationTargetException ie) {
+					throw new RuntimeException(String.format(__("Cannot get value through %s method in %s class due to %s(%s)"), 
+							methodName, tgp.getClass().getName(), 
+							ie.getTargetException().getClass().getName(), ie.getTargetException().getMessage()));
 				} catch (Exception e) {
 					throw new RuntimeException(String.format(__("Cannot get value through %s method in %s class due to %s(%s)"), 
 							methodName, tgp.getClass().getName(),
@@ -742,6 +750,10 @@ public abstract class TrainGraphPart {
 					}
 					
 					method.invoke(tgp, value);
+				} catch (InvocationTargetException ie) {
+					throw new RuntimeException(String.format(__("Cannot set value with %s method in %s class due to %s(%s)"), 
+							methodName, tgp.getClass().getName(), 
+							ie.getTargetException().getClass().getName(), ie.getTargetException().getMessage()));
 				} catch (Exception e) {
 					throw new RuntimeException(String.format(__("Cannot set value with %s method in %s class due to %s(%s)"), 
 							methodName, tgp.getClass().getName(), 
@@ -774,6 +786,10 @@ public abstract class TrainGraphPart {
 					
 					value = method.invoke(tgp);
 					return value;
+				} catch (InvocationTargetException ie) {
+					throw new RuntimeException(String.format(__("Cannot get value through %s method in %s class due to %s(%s)"), 
+							methodName, tgp.getClass().getName(), 
+							ie.getTargetException().getClass().getName(), ie.getTargetException().getMessage()));
 				} catch (Exception e) {
 					throw new RuntimeException(String.format(__("Cannot get value through %s method in %s class due to %s(%s)"), 
 							methodName, tgp.getClass().getName(),
@@ -1200,6 +1216,11 @@ public abstract class TrainGraphPart {
 		}
 		
 		reader.close();
+		
+		if (!parsingNodeStack.isEmpty()) {
+			exceptions.add(ParsingException.create(lineNum, line, 
+					__("Unexpected end of file. '}' or ']' is missing.")));
+		}
 		
 		if (exceptions.size() > 0) {
 			int errorCount = exceptions.stream().mapToInt(e -> e.errorCount).sum();

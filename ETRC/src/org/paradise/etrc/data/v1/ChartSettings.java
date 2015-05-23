@@ -34,7 +34,7 @@ public class ChartSettings extends TrainGraphPart {
 
 	public void setProperties(float distScale, int displayLevel, int boldLevel, 
 			int startHour, float minuteScale, int timeInterval, String distUnit, boolean useAntiAliasing) {
-		this.name = "";
+		this.setName("");
 		this.distScale = distScale;
 		this.displayLevel = displayLevel;
 		this.boldLevel = boldLevel;

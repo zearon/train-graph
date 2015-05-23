@@ -71,9 +71,7 @@ public class Train extends TrainGraphPart {
 	@TGProperty
 	public void setName(String name) {
 		super.setName(name);
-//		if (trainGraph != null) {
-//			trainGraph.setTrainTypeByName(this);
-//		}
+		setTrainNameForAllStops();
 	}
 
 	@TGProperty
@@ -91,7 +89,7 @@ public class Train extends TrainGraphPart {
 		if(!startStation.equalsIgnoreCase(""))
 			return startStation;
 		else if(getStopNum() > 0)
-			return stops.get(0).name;
+			return stops.get(0).getName();
 		else
 			return "";
 	}
@@ -101,7 +99,7 @@ public class Train extends TrainGraphPart {
 		if(!terminalStation.equalsIgnoreCase(""))
 			return terminalStation;
 		else if(getStopNum() > 0)
-			return stops.get(getStopNum() - 1).name;
+			return stops.get(getStopNum() - 1).getName();
 		else
 			return "";
 	}
@@ -116,6 +114,14 @@ public class Train extends TrainGraphPart {
 	
 	public TrainType trainType = TrainType.defaultTrainType;
 	
+	@Override
+	public void loadComplete() {
+		setTrainNameForAllStops();
+	}
+	
+	public void setTrainNameForAllStops() {
+		stops.forEach(stop -> stop.setTrainName(getName()));
+	}
 
 	Train() {
 	}
@@ -127,7 +133,7 @@ public class Train extends TrainGraphPart {
 //		tr.terminalStation = terminalStation;
 		tr.trainNameDown = trainNameDown;
 		tr.trainNameUp = trainNameUp;
-		tr.name = name;
+		tr.setName(name);
 //		tr.setStopNum(stopNum);
 		for (int i = 0; i < getStopNum(); i++) {
 //			tr.getStops()[i] = getStops()[i].copy();
@@ -170,6 +176,7 @@ public class Train extends TrainGraphPart {
 //		setStopNum(getStopNum() + 1);
 		
 		stops.insertElementAt(stop, index);
+		stop.setTrainName(name);
 		
 		fireTrainChangedEvent();
 	}
@@ -191,6 +198,7 @@ public class Train extends TrainGraphPart {
 //		setStops(newStops);
 //		setStopNum(getStopNum() + 1);
 		stops.add(stop);
+		stop.setTrainName(name);
 		
 		fireTrainChangedEvent();
 	}
@@ -223,7 +231,7 @@ public class Train extends TrainGraphPart {
 
 //		int j = 0;
 		for (int i = 0; i < getStopNum(); i++) {
-			if (!stops.get(i).name.equalsIgnoreCase(name)) {
+			if (!stops.get(i).getName().equalsIgnoreCase(name)) {
 //				newStops[j++] = getStops()[i];
 				stops.remove(i);
 			}
@@ -236,12 +244,13 @@ public class Train extends TrainGraphPart {
 	}
 	public void insertStopAfter(Stop afterStop, String newStopName,	String arrive, String leave, boolean isSchedular) {
 		Stop newStop = TrainGraphFactory.createInstance(Stop.class, newStopName)
-				.setProperties(arrive, leave, isSchedular);
+				.setProperties(getName(), arrive, leave, isSchedular);
 		
 		insertStopAfter(afterStop, newStop);
 	}
 
 	public void insertStopAfter(Stop afterStop, Stop newStop) {
+		newStop.setTrainName(name);
 		if(afterStop == null)
 			insertStopAtFirst(newStop);
 		
@@ -265,13 +274,14 @@ public class Train extends TrainGraphPart {
 	}
 
 	private void insertStopAtFirst(Stop newStop) {
+		newStop.setTrainName(name);
 		insertStop(newStop, 0);
 	}
 
 	public void replaceStop(String oldName, String newName) {
 		for (int i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(oldName))
-				stops.get(i).name = newName;
+			if (stops.get(i).getName().equalsIgnoreCase(oldName))
+				stops.get(i).setName(newName);
 		}
 		
 		fireTrainChangedEvent();
@@ -279,8 +289,8 @@ public class Train extends TrainGraphPart {
 
 	public String getTrainName() {
 		//LGuo 20070114 added 如果有全称则返回全称（主要用于三车次以上以及AB车的情形）
-		if (name != null)
-			return name;
+		if (getName() != null)
+			return getName();
 		else if (trainNameDown.trim().equalsIgnoreCase(""))
 			return trainNameUp;
 		else if (trainNameUp.trim().equalsIgnoreCase(""))
@@ -305,8 +315,8 @@ public class Train extends TrainGraphPart {
 
 	public void setArrive(String name, String _arrive) {
 		for (int i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(name))
-				stops.get(i).arrive = _arrive;
+			if (stops.get(i).getName().equalsIgnoreCase(name))
+				stops.get(i).setArrive(_arrive);
 		}
 		
 		fireTrainChangedEvent();
@@ -314,8 +324,8 @@ public class Train extends TrainGraphPart {
 
 	public void setLeave(String name, String _leave) {
 		for (int i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(name))
-				stops.get(i).leave = _leave;
+			if (stops.get(i).getName().equalsIgnoreCase(name))
+				stops.get(i).setLeave(_leave);
 		}
 		
 		fireTrainChangedEvent();
@@ -396,10 +406,10 @@ public class Train extends TrainGraphPart {
 		out.newLine();
 		//停站
 		for (int i = 0; i < getStopNum(); i++) {
-			out.write(stops.get(i).name + ","
-					+ stops.get(i).arrive + ","
-					+ stops.get(i).leave + ","
-					+ stops.get(i).isPassenger); //20070224新增，是否图定
+			out.write(stops.get(i).getName() + ","
+					+ stops.get(i).getArrive() + ","
+					+ stops.get(i).getLeave() + ","
+					+ stops.get(i).isPassenger()); //20070224新增，是否图定
 			out.newLine();
 		}
 	}
@@ -456,7 +466,7 @@ public class Train extends TrainGraphPart {
 //		}
 
 		Stop stop = TrainGraphFactory.createInstance(Stop.class, stName)
-				.setProperties(stArrive, stLeave, isSchedular);
+				.setProperties(getName(), stArrive, stLeave, isSchedular);
 		stops.add(stop);
 //		getStops()[getStopNum()] = stop;
 //		setStopNum(getStopNum() + 1);
@@ -467,7 +477,7 @@ public class Train extends TrainGraphPart {
 		
 		//新版trf文件
 		if (line.startsWith("trf2")) {
-			name = trainName[1];
+			setName(trainName[1]);
 			
 			if(trainName.length == 4) {
 				if(isDownName(trainName[2]))
@@ -527,9 +537,9 @@ public class Train extends TrainGraphPart {
 				+ getTerminalStation() + "，共经停" + getStopNum() + "个车站\r\n";
 
 		for (int i = 0; i < getStopNum(); i++)
-			strRt += stops.get(i).name + "站 "
-					+ stops.get(i).arrive + " 到 "
-					+ stops.get(i).leave + " 发\r\n";
+			strRt += stops.get(i).getName() + "站 "
+					+ stops.get(i).getArrive() + " 到 "
+					+ stops.get(i).getLeave() + " 发\r\n";
 
 		return strRt;
 	}
@@ -543,9 +553,9 @@ public class Train extends TrainGraphPart {
 			System.out.println(t.getTrainName() + "次从" + t.getStartStation() + "到"
 					+ t.getTerminalStation() + "，共经停" + t.getStopNum() + "个车站");
 			for (int i = 0; i < t.getStopNum(); i++)
-				System.out.println(t.stops.get(i).name + "站 "
-						+ t.stops.get(i).arrive + " 到 "
-						+ t.stops.get(i).leave + " 发");
+				System.out.println(t.stops.get(i).getName() + "站 "
+						+ t.stops.get(i).getArrive() + " 到 "
+						+ t.stops.get(i).getLeave() + " 发");
 
 			File f = new File("c:\\test_w.trf");
 			BufferedWriter out = new BufferedWriter(new FileWriter(f));
@@ -592,7 +602,7 @@ public class Train extends TrainGraphPart {
 	public int isDownTrain(RailroadLine c, boolean isGuessByTrainName) {
 		int lastDist = -1;
 		for (int i = 0; i < getStopNum(); i++) {
-			int thisDist = c.getStationDist(stops.get(i).name);
+			int thisDist = c.getStationDist(stops.get(i).getName());
 			//当上站距离不为-1时，即经过本线路第二站时可以判断上下行
 			if ((lastDist != -1) && (thisDist != -1)) {
 				//本站距离大于上站距离，下行
@@ -628,11 +638,11 @@ public class Train extends TrainGraphPart {
 	public String getNextStopName(String stopName) {
 		int i = 0;
 		for (i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(stopName))
+			if (stops.get(i).getName().equalsIgnoreCase(stopName))
 				break;
 		}
 		if (i < getStopNum() - 1)
-			return stops.get(i + 1).name;
+			return stops.get(i + 1).getName();
 		else
 			return null;
 	}
@@ -640,11 +650,11 @@ public class Train extends TrainGraphPart {
 	public String getPrevStopName(String stopName) {
 		int i = 0;
 		for (i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(stopName))
+			if (stops.get(i).getName().equalsIgnoreCase(stopName))
 				break;
 		}
 		if (i > 1)
-			return stops.get(i - 1).name;
+			return stops.get(i - 1).getName();
 		else
 			return null;
 	}
@@ -834,7 +844,7 @@ public class Train extends TrainGraphPart {
 
 	public boolean hasStop(String staName) {
 		for (int i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(staName))
+			if (stops.get(i).getName().equalsIgnoreCase(staName))
 				return true;
 		}
 		
@@ -843,7 +853,7 @@ public class Train extends TrainGraphPart {
 	
 	public int findStopIndex(String staName) {
 		for (int i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(staName))
+			if (stops.get(i).getName().equalsIgnoreCase(staName))
 				return i;
 		}
 		
@@ -852,7 +862,7 @@ public class Train extends TrainGraphPart {
 
 	public Stop findStop(String staName) {
 		for (int i = 0; i < getStopNum(); i++) {
-			if (stops.get(i).name.equalsIgnoreCase(staName))
+			if (stops.get(i).getName().equalsIgnoreCase(staName))
 				return stops.get(i);
 		}
 		
@@ -860,7 +870,7 @@ public class Train extends TrainGraphPart {
 	}
 
 	public void setTrainNames(String[] myNames) {
-		name = makeFullName(myNames);
+		setName(makeFullName(myNames));
 		for(int i=0; i<myNames.length; i++) {
 			if(isDownName(myNames[i]))
 				trainNameDown = myNames[i];

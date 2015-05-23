@@ -49,22 +49,22 @@ public class TrainSlice {
 					//先进后出
 					if(myArriveTime<hisArriveTime && myLeaveTime>hisLeaveTime) {
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " ss站内会车（先到后走） " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(hisStopLine.time2, myStopLine.dist1, myStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.BOTH_STOP));
+						events.add(new TrainEvent(hisStopLine.time2, myStopLine.dist1, myStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.BOTH_STOP));
 					}
 					//后进先出
 					else if(myArriveTime>hisArriveTime && myLeaveTime<hisLeaveTime) {
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " ss站内会车（后到先走） " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(myStopLine.time2, hisStopLine.dist1, hisStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.BOTH_STOP));
+						events.add(new TrainEvent(myStopLine.time2, hisStopLine.dist1, hisStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.BOTH_STOP));
 					}
 					//先进先出
 					else if(myArriveTime<hisArriveTime && myLeaveTime<hisLeaveTime && myLeaveTime>=hisArriveTime) {
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " ss站内会车（先到先走） " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(myStopLine.time2, myStopLine.dist1, myStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.BOTH_STOP));
+						events.add(new TrainEvent(myStopLine.time2, myStopLine.dist1, myStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.BOTH_STOP));
 					}
 					//后进后出
 					else if(myArriveTime>hisArriveTime && myLeaveTime>hisLeaveTime && myArriveTime<=hisLeaveTime) {
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " ss站内会车（后到后走） " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(myStopLine.time1, myStopLine.dist1, myStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.BOTH_STOP));
+						events.add(new TrainEvent(myStopLine.time1, myStopLine.dist1, myStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.BOTH_STOP));
 					}
 				}
 				
@@ -84,7 +84,7 @@ public class TrainSlice {
 					int myLeaveTime = myStopLine.time2;
 					if(myArriveTime<=hisPassTime && hisPassTime<=myLeaveTime) {
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " sr站内会车（我停他不停，如果单线就是被踩） " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(hisPassTime, myStopLine.dist1, myStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.ME_STOP));
+						events.add(new TrainEvent(hisPassTime, myStopLine.dist1, myStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.ME_STOP));
 					}
 				}
 			}
@@ -107,7 +107,7 @@ public class TrainSlice {
 					int hisLeaveTime = hisStopLine.time2;
 					if(hisArriveTime<=myPassTime && myPassTime<=hisLeaveTime) {
 //						System.out.println(hisStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " rs站内会车（他停我不停，如果单线就是踩他） " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(myPassTime, hisStopLine.dist1, hisStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.HE_STOP));
+						events.add(new TrainEvent(myPassTime, hisStopLine.dist1, hisStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.HE_STOP));
 					}
 				}
 				
@@ -121,7 +121,7 @@ public class TrainSlice {
 					//站外会车（双线很常见，单线则是错误的情况）
 					if(p!=null) {
 //						System.out.println(train.getTrainName(circuit) + " 站外会车 " + he.train.getTrainName(circuit) + myRunLine.stop1.stationName + myRunLine.stop2.stationName + hisRunLine.stop1.stationName + hisRunLine.stop2.stationName + Train.intToTrainTime(p.x) + p.y);
-						events.add(new TrainEvent(p.x, p.y, myRunLine.stop1.name + "-" + myRunLine.stop2.name, he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.NONE_STOP));
+						events.add(new TrainEvent(p.x, p.y, myRunLine.stop1.getName() + "-" + myRunLine.stop2.getName(), he.train.getTrainName(circuit), TrainEvent.MEET, TrainEvent.NONE_STOP));
 					}
 				}
 			}
@@ -145,8 +145,8 @@ public class TrainSlice {
 				StopLine myStopLine = (StopLine) stopLines.get(myStopIndex);
 
 				//如果我是始发或者终到 则不判断 “越 让 领 跟”
-				if((train.getTerminalStation().equalsIgnoreCase(myStopLine.stop1.name)) ||
-				   (train.getStartStation().equalsIgnoreCase(myStopLine.stop1.name)))
+				if((train.getTerminalStation().equalsIgnoreCase(myStopLine.stop1.getName())) ||
+				   (train.getStartStation().equalsIgnoreCase(myStopLine.stop1.getName())))
 							continue;
 
 				//遍历他的停车线（停车线对停车线共有4种情况）
@@ -164,32 +164,32 @@ public class TrainSlice {
 					//先进后出－－被踩
 					if(myArriveTime<hisArriveTime && myLeaveTime>hisLeaveTime) {
 						//如果他是始发站或者终到站就不算我被踩
-						if((he.train.getTerminalStation().equalsIgnoreCase(hisStopLine.stop1.name)) ||
-						   (he.train.getStartStation().equalsIgnoreCase(hisStopLine.stop1.name)))
+						if((he.train.getTerminalStation().equalsIgnoreCase(hisStopLine.stop1.getName())) ||
+						   (he.train.getStartStation().equalsIgnoreCase(hisStopLine.stop1.getName())))
 							continue;
 						
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " ss被踩 " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(hisStopLine.time2, myStopLine.dist1, myStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.YIELD, TrainEvent.BOTH_STOP));
+						events.add(new TrainEvent(hisStopLine.time2, myStopLine.dist1, myStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.YIELD, TrainEvent.BOTH_STOP));
 					}
 					//后进先出－－踩他
 					else if(myArriveTime>hisArriveTime && myLeaveTime<hisLeaveTime) {
 						//如果我是始发或者终到站就不算踩他
-						if((train.getTerminalStation().equalsIgnoreCase(myStopLine.stop1.name)) ||
-						   (train.getStartStation().equalsIgnoreCase(myStopLine.stop1.name)))
+						if((train.getTerminalStation().equalsIgnoreCase(myStopLine.stop1.getName())) ||
+						   (train.getStartStation().equalsIgnoreCase(myStopLine.stop1.getName())))
 									continue;
 
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " ss踩他 " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(myStopLine.time2, hisStopLine.dist1, hisStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.EXCEED, TrainEvent.BOTH_STOP));
+						events.add(new TrainEvent(myStopLine.time2, hisStopLine.dist1, hisStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.EXCEED, TrainEvent.BOTH_STOP));
 					}
 					//先进先出，我走的时候他已经来了－－领跑
 					else if(myArriveTime<hisArriveTime && myLeaveTime<hisLeaveTime && myLeaveTime>=hisArriveTime) {
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " ss领跑 " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(myStopLine.time2, myStopLine.dist1, myStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.LEAD, TrainEvent.BOTH_STOP));
+						events.add(new TrainEvent(myStopLine.time2, myStopLine.dist1, myStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.LEAD, TrainEvent.BOTH_STOP));
 					}
 					//后进后出，我来的时候他还没走－－跟随
 					else if(myArriveTime>hisArriveTime && myLeaveTime>hisLeaveTime && myArriveTime<=hisLeaveTime) {
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " ss跟随 " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(myStopLine.time1, myStopLine.dist1, myStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.FOLLOW, TrainEvent.BOTH_STOP));
+						events.add(new TrainEvent(myStopLine.time1, myStopLine.dist1, myStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.FOLLOW, TrainEvent.BOTH_STOP));
 					}
 				}
 				
@@ -206,15 +206,15 @@ public class TrainSlice {
 					
 					//他经过本站的时候我在站上－－被踩
 					//如果他是始发站或者终到站就不算我被踩
-					if((he.train.getTerminalStation().equalsIgnoreCase(myStopLine.stop1.name)) ||
-					   (he.train.getStartStation().equalsIgnoreCase(myStopLine.stop1.name)))
+					if((he.train.getTerminalStation().equalsIgnoreCase(myStopLine.stop1.getName())) ||
+					   (he.train.getStartStation().equalsIgnoreCase(myStopLine.stop1.getName())))
 						continue;
 
 					int myArriveTime = myStopLine.time1;
 					int myLeaveTime = myStopLine.time2;
 					if(myArriveTime<hisPassTime && hisPassTime<myLeaveTime) {
 //						System.out.println(myStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " sr被踩 " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(hisPassTime, myStopLine.dist1, myStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.YIELD, TrainEvent.ME_STOP));
+						events.add(new TrainEvent(hisPassTime, myStopLine.dist1, myStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.YIELD, TrainEvent.ME_STOP));
 					}
 				}
 			}
@@ -234,14 +234,14 @@ public class TrainSlice {
 					
 					//我经过这个停站时他在站上－－踩他
 					//如果我是始发或者终到站就不算踩他
-					if((train.getTerminalStation().equalsIgnoreCase(hisStopLine.stop1.name)) ||
-					   (train.getStartStation().equalsIgnoreCase(hisStopLine.stop1.name)))
+					if((train.getTerminalStation().equalsIgnoreCase(hisStopLine.stop1.getName())) ||
+					   (train.getStartStation().equalsIgnoreCase(hisStopLine.stop1.getName())))
 								continue;
 					int hisArriveTime = hisStopLine.time1;
 					int hisLeaveTime = hisStopLine.time2;
 					if(hisArriveTime<myPassTime && myPassTime<hisLeaveTime) {
 //						System.out.println(hisStopLine.stop1.stationName + " " + train.getTrainName(circuit) + " rs踩他 " + he.train.getTrainName(circuit));
-						events.add(new TrainEvent(myPassTime, hisStopLine.dist1, hisStopLine.stop1.name, he.train.getTrainName(circuit), TrainEvent.EXCEED, TrainEvent.HE_STOP));
+						events.add(new TrainEvent(myPassTime, hisStopLine.dist1, hisStopLine.stop1.getName(), he.train.getTrainName(circuit), TrainEvent.EXCEED, TrainEvent.HE_STOP));
 					}
 				}
 				
@@ -255,7 +255,7 @@ public class TrainSlice {
 					//站外越行
 					if(p!=null) {
 //						System.out.println(train.getTrainName(circuit) + " 站外越行 " + he.train.getTrainName(circuit) + myRunLine.stop1.stationName + myRunLine.stop2.stationName + hisRunLine.stop1.stationName + hisRunLine.stop2.stationName + Train.intToTrainTime(p.x) + p.y);
-						events.add(new TrainEvent(p.x, p.y, myRunLine.stop1.name + "-" + myRunLine.stop2.name, he.train.getTrainName(circuit), TrainEvent.CROSS, TrainEvent.NONE_STOP));
+						events.add(new TrainEvent(p.x, p.y, myRunLine.stop1.getName() + "-" + myRunLine.stop2.getName(), he.train.getTrainName(circuit), TrainEvent.CROSS, TrainEvent.NONE_STOP));
 					}
 				}
 			}
@@ -292,37 +292,37 @@ public class TrainSlice {
 			StopLine line = (StopLine) sLines.get(0);
 			
 			//处理同距离隐藏站的情况
-			if(!line.stop1.name.equalsIgnoreCase(station.name))
+			if(!line.stop1.getName().equalsIgnoreCase(station.getName()))
 				return events;
 			
 			//到发点相同：始发、终到、图定通过
 			if(line.time1 == line.time2) {
 				//始发
-				if(train.getStartStation().equalsIgnoreCase(line.stop1.name)) {
-					events.add(new StationEvent(line.time1, station.dist, station.name, train.getTrainName(circuit), StationEvent.START, StationEvent.PASSENGER_STOP));
+				if(train.getStartStation().equalsIgnoreCase(line.stop1.getName())) {
+					events.add(new StationEvent(line.time1, station.dist, station.getName(), train.getTrainName(circuit), StationEvent.START, StationEvent.PASSENGER_STOP));
 				}
 				//终到
-				else if(train.getTerminalStation().equalsIgnoreCase(line.stop1.name)) {
-					events.add(new StationEvent(line.time2, station.dist, station.name, train.getTrainName(circuit), StationEvent.END, StationEvent.PASSENGER_STOP));
+				else if(train.getTerminalStation().equalsIgnoreCase(line.stop1.getName())) {
+					events.add(new StationEvent(line.time2, station.dist, station.getName(), train.getTrainName(circuit), StationEvent.END, StationEvent.PASSENGER_STOP));
 				}
 				//图定通过
 				else {
-					events.add(new StationEvent(line.time1, station.dist, station.name, train.getTrainName(circuit), StationEvent.PASS, StationEvent.FIXED_STOP));
+					events.add(new StationEvent(line.time1, station.dist, station.getName(), train.getTrainName(circuit), StationEvent.PASS, StationEvent.FIXED_STOP));
 				}
 			}
 			//到发点不同：图定停靠
 			else {
 				int pType;
 				//图定办客
-				if(line.stop1.isPassenger) {
+				if(line.stop1.isPassenger()) {
 					pType = StationEvent.PASSENGER_STOP;
 				}
 				//图定停车不办客
 				else {
 					pType = StationEvent.FIXED_STOP;
 				}
-				events.add(new StationEvent(line.time1, station.dist, station.name, train.getTrainName(circuit), StationEvent.ARRIVE, pType));
-				events.add(new StationEvent(line.time2, station.dist, station.name, train.getTrainName(circuit), StationEvent.LEAVE,  pType));
+				events.add(new StationEvent(line.time1, station.dist, station.getName(), train.getTrainName(circuit), StationEvent.ARRIVE, pType));
+				events.add(new StationEvent(line.time2, station.dist, station.getName(), train.getTrainName(circuit), StationEvent.LEAVE,  pType));
 			}
 		}
 		//没有扫描到停车线，扫描行车线
@@ -332,7 +332,7 @@ public class TrainSlice {
 			for(int lineIndex=0; lineIndex<rLines.size(); lineIndex++) {
 				RunLine line = (RunLine) rLines.get(lineIndex);
 				int time = line.getTimeOfTheDist(station.dist);
-				events.add(new StationEvent(time, station.dist, station.name, train.getTrainName(circuit), StationEvent.PASS, StationEvent.CALCULATE_STOP));
+				events.add(new StationEvent(time, station.dist, station.getName(), train.getTrainName(circuit), StationEvent.PASS, StationEvent.CALCULATE_STOP));
 			}
 		}
 		
@@ -467,11 +467,11 @@ public class TrainSlice {
 		Stop lastStop = null;
 		for(int i=0; i<train.getStopNum(); i++) {
 			Stop curStop = train.getStop(i);
-			int arrive_t = Train.trainTimeToInt(curStop.arrive);
-			int leave_t  = Train.trainTimeToInt(curStop.leave);
+			int arrive_t = Train.trainTimeToInt(curStop.getArrive());
+			int leave_t  = Train.trainTimeToInt(curStop.getLeave());
 			
 			int curDist = -1;
-			if(circuit.haveTheStation(curStop.name) >= 0)
+			if(circuit.haveTheStation(curStop.getName()) >= 0)
 				curDist = circuit.getDistOfTrain(train, arrive_t);
 			
 			if(curDist >=0)

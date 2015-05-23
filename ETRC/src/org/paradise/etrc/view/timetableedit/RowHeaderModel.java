@@ -1,0 +1,50 @@
+package org.paradise.etrc.view.timetableedit;
+
+import java.util.Comparator;
+import java.util.Vector;
+
+import javax.swing.AbstractListModel;
+
+import org.paradise.etrc.data.v1.RailroadLineChart;
+import org.paradise.etrc.data.v1.Station;
+import org.paradise.etrc.data.v1.TrainGraph;
+
+import sun.security.krb5.Config;
+
+import static org.paradise.etrc.ETRC.__;
+
+public class RowHeaderModel extends AbstractListModel<Object> {
+	private static final long serialVersionUID = 547009998890792058L;
+	
+	TrainGraph trainGraph;
+	RailroadLineChart chart;
+	Vector<Station> stations;
+	
+	public RowHeaderModel(TrainGraph trainGraph) {
+		setTrainGraph(trainGraph);
+	}
+	
+	public void setTrainGraph(TrainGraph trainGraph) {
+		this.trainGraph = trainGraph;
+		switchChart(true);
+	}
+	
+	public void switchChart(boolean downGoing) {
+		chart = trainGraph.currentLineChart;
+		stations = (Vector<Station>) chart.railroadLine.getAllStations().clone();
+		
+		Comparator<Station> comparator = (station1, station2) -> 
+			downGoing ? station1.dist - station2.dist : station2.dist - station1.dist;
+		stations.sort(comparator);
+	}
+	
+    public int getSize() { 
+    	return stations.size() * 2;
+    }
+    
+    public Object getElementAt(int index) { 
+    	Station station = stations.get(index / 2);
+		String sta = station.getName();
+		return index % 2 == 0 ? sta + __("站 到") : station.dist + trainGraph.settings.distUnit + __(" 发");
+    }
+}

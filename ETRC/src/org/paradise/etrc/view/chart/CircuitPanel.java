@@ -135,7 +135,7 @@ public class CircuitPanel extends JPanel {
 
 	private void DrawName(Graphics g, Station station, int y) {
 		//站名
-		g.drawString(station.name, myLeftMargin + 2, y - 2);
+		g.drawString(station.getName(), myLeftMargin + 2, y - 2);
 
 		Color oldColor = g.getColor();
 		String stDist;

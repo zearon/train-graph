@@ -98,7 +98,7 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 1:
-			return raillines.get(rowIndex).name;
+			return raillines.get(rowIndex).getName();
 		case 2:
 			return new Integer(raillines.get(rowIndex).zindex);
 		case 0:

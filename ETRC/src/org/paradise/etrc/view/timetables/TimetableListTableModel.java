@@ -55,7 +55,7 @@ public class TimetableListTableModel extends DefaultJEditTableModel {
 		RailNetworkChart chart = trainGraph.allCharts().get(rowIndex);
 		switch(columnIndex) {
 		case 0:
-			return chart.name;
+			return chart.getName();
 		}
 		
 		return "";
@@ -66,7 +66,7 @@ public class TimetableListTableModel extends DefaultJEditTableModel {
 		RailNetworkChart chart = trainGraph.allCharts().get(rowIndex);
 		switch(columnIndex) {
 		case 0:
-			chart.name = (String) aValue;
+			chart.setName((String) aValue);
 			break;
 		}
 	}

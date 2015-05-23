@@ -60,13 +60,13 @@ public class TrainTableModel extends AbstractTableModel {
 	public Object getValueAt(int rowIndex, int columnIndex) {
 		switch (columnIndex) {
 		case 0:
-			return (myTrain == null) ? "" : myTrain.getStop(rowIndex).name;
+			return (myTrain == null) ? "" : myTrain.getStop(rowIndex).getName();
 		case 1:
 			return (myTrain == null) ? null : myTrain.getStop(rowIndex);
 		case 2:
 			return (myTrain == null) ? null : myTrain.getStop(rowIndex);
 		case 3:
-			return (myTrain == null) ? new Boolean(true) : Boolean.valueOf(myTrain.getStop(rowIndex).isPassenger);
+			return (myTrain == null) ? new Boolean(true) : Boolean.valueOf(myTrain.getStop(rowIndex).isPassenger());
 		default:
 			return null;
 		}
@@ -78,7 +78,7 @@ public class TrainTableModel extends AbstractTableModel {
 		
 		switch (columnIndex) {
 		case 0:
-			myTrain.getStop(rowIndex).name = (String) aValue;
+			myTrain.getStop(rowIndex).setName((String) aValue);
 			break;
 		case 1:
 			myTrain.setStop(rowIndex, (Stop) aValue);
@@ -87,7 +87,7 @@ public class TrainTableModel extends AbstractTableModel {
 			myTrain.setStop(rowIndex, (Stop) aValue);
 			break;
 		case 3:
-			myTrain.getStop(rowIndex).isPassenger = ((Boolean) aValue).booleanValue();
+			myTrain.getStop(rowIndex).setPassenger(((Boolean) aValue).booleanValue());
 			break;
 		default:
 		}

@@ -73,7 +73,7 @@ public class ETRCLCB {
 		
 		for(int i=0; i<lc.size(); i++) {
 			LCBStation theStation = (LCBStation) lc.get(i);
-			if (theStation.name.equalsIgnoreCase(stationName))
+			if (theStation.getName().equalsIgnoreCase(stationName))
 			{
 				xlFound.add(theStation.xianlu.substring(2, theStation.xianlu.length()));
 			}

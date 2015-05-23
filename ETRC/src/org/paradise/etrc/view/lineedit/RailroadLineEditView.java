@@ -238,7 +238,7 @@ public class RailroadLineEditView extends JPanel {
 	 */
 	private void doSaveCircuit(RailroadLine circuit) throws IOException {
 
-		stationTableModel.railroadLine.name = tfName.getText();
+		stationTableModel.railroadLine.setName(tfName.getText());
 		try {
 			stationTableModel.railroadLine.multiplicity = Integer
 					.parseInt(cbMultiplicity.getSelectedItem().toString());
@@ -269,7 +269,7 @@ public class RailroadLineEditView extends JPanel {
 			chooser.setDialogTitle(__("Save Railroad Line"));
 			chooser.addChoosableFileFilter(new CIRFilter());
 			suffix = CIRFilter.suffix;
-			chooser.setSelectedFile(new File(circuit.name));
+			chooser.setSelectedFile(new File(circuit.getName()));
 		} else if (circuits != null && circuits.size() > 0) {
 			chooser.setDialogTitle(__("Export Railroad Network"));
 			chooser.addChoosableFileFilter(new CRSFilter());
@@ -591,7 +591,7 @@ public class RailroadLineEditView extends JPanel {
 
 		tfName = new JTextField(12);
 		tfName.setFont(new Font("dialog", 0, 12));
-		tfName.setText(stationTableModel.railroadLine.name);
+		tfName.setText(stationTableModel.railroadLine.getName());
 		tfName.addFocusListener(new FocusListener() {
 			String oldValue;
 			
@@ -759,7 +759,7 @@ public class RailroadLineEditView extends JPanel {
 		if (stationTable.getCellEditor() != null)
 			stationTable.getCellEditor().stopCellEditing();
 
-		tfName.setText(circuit.name);
+		tfName.setText(circuit.getName());
 		cbMultiplicity.setSelectedItem(circuit.multiplicity);
 		tfDispScale.setText("" + circuit.dispScale);
 		stationTableModel.railroadLine = circuit;
@@ -814,7 +814,7 @@ public class RailroadLineEditView extends JPanel {
 		stationNames.clear();
 		railroadLineTableModel.raillines.stream()
 				.flatMap(cir -> cir.getAllStations().stream())
-				.map(station -> station.name).forEachOrdered(name -> {
+				.map(station -> station.getName()).forEachOrdered(name -> {
 					if (stationNames.contains(name)) {
 						crossoverStations.put(name, 0);
 					}
@@ -826,12 +826,12 @@ public class RailroadLineEditView extends JPanel {
 				.stream()
 				.flatMap(cir -> cir.getAllStations().stream())
 				.filter(station -> crossoverStations.keySet().contains(
-						station.name))
+						station.getName()))
 				.distinct()
 				.forEachOrdered(station -> {
 					// DEBUG("Crossover station: %s@%dkm", station.name,
 					// station.dist);
-						crossoverStations.compute(station.name,
+						crossoverStations.compute(station.getName(),
 								(k, v) -> station.dist);
 					});
 	}
@@ -853,7 +853,7 @@ public class RailroadLineEditView extends JPanel {
 		ActionFactory.createSetValueActionAndDoIt(__("railroad line name"), 
 				oldValue, newValue, value -> {
 					
-			line.name = (String) value;
+			line.setName((String) value);
 			tfName.setText((String) value);
 		}, null);
 	}
@@ -909,7 +909,7 @@ public class RailroadLineEditView extends JPanel {
 		}
 
 		c.length = c.getStation(c.getStationNum() - 1).dist;
-		c.name = tfName.getText();
+		c.setName(tfName.getText());
 		try {
 			c.multiplicity = Integer.parseInt(cbMultiplicity.getSelectedItem()
 					.toString());
@@ -1215,23 +1215,23 @@ public class RailroadLineEditView extends JPanel {
 					.getAllStations()
 					.stream()
 					.filter(station -> crossoverStations.keySet().contains(
-							station.name)).toArray(Station[]::new);
+							station.getName())).toArray(Station[]::new);
 			Integer[] offsets = Stream
 					.of(crossoverStationsInCircuit)
-					.map(station -> (crossoverStations.get(station.name) - station.dist))
+					.map(station -> (crossoverStations.get(station.getName()) - station.dist))
 					.toArray(Integer[]::new);
 
 			if (IS_DEBUG())
 				for (int i = 0; i < offsets.length; ++i) {
 					DEBUG("Offset at crossover station %s on circuit %s is %d",
-							crossoverStationsInCircuit[i].name, circuit.name,
+							crossoverStationsInCircuit[i].getName(), circuit.getName(),
 							offsets[i]);
 				}
 
 			if (offsets.length > 2) {
 				DEBUG("Error circuit: There are more than 2 crossover stations on %s with circuit index %d. "
 						+ "They should be splitted into circuits with at most 2 crossover stations",
-						circuit.name, index);
+						circuit.getName(), index);
 				errorCircuitIndeces.add(++index);
 			} else if (offsets.length > 1) {
 				float scale = 1.0f;
@@ -1241,7 +1241,7 @@ public class RailroadLineEditView extends JPanel {
 				if (distDiff == 0) {
 					sb.append(String
 							.format(__("The distance of two crossover stations on circuit %s are the same. Please modify them."),
-									circuit.name));
+									circuit.getName()));
 					continue;
 				}
 				if (offsetDiff != 0)

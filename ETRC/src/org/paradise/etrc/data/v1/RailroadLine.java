@@ -88,7 +88,7 @@ public class RailroadLine extends TrainGraphPart {
 	public RailroadLine copy() {
 		RailroadLine cir = new RailroadLine();
 
-		cir.name = this.name;
+		cir.setName(this.getName());
 		cir.length = this.length;
 		cir.multiplicity = this.multiplicity;
 		cir.zindex = this.zindex;
@@ -232,7 +232,7 @@ public class RailroadLine extends TrainGraphPart {
 	
 	public int haveTheStation(String theName) {
 		for (int i = 0; i < getStationNum(); i++) {
-			if (theName.equalsIgnoreCase(stations.get(i).name))
+			if (theName.equalsIgnoreCase(stations.get(i).getName()))
 				return i;
 		}
 
@@ -257,8 +257,8 @@ public class RailroadLine extends TrainGraphPart {
 	//如果停靠于某站则返回站名，否则返回空字符串
 	public String getStationNameAtTheTime(Train train, int time) {
 		for(int i=0; i<train.getStopNum(); i++) {
-			int t1 = Train.trainTimeToInt(train.getStop(i).arrive);
-			int t2 = Train.trainTimeToInt(train.getStop(i).leave);
+			int t1 = Train.trainTimeToInt(train.getStop(i).getArrive());
+			int t2 = Train.trainTimeToInt(train.getStop(i).getLeave());
 
 			//跨越0点情况的处理
 			int myTime = time;
@@ -270,13 +270,13 @@ public class RailroadLine extends TrainGraphPart {
 
 			//t1 == t2时通过或者始发、终到，不作为停靠处理
 			if(t1<= myTime && t2 >= myTime && t1 != t2) {
-				int d = getStationDist(train.getStop(i).name);
+				int d = getStationDist(train.getStop(i).getName());
 //				System.out.println(train.getTrainName() + "^" + time + "~" + train.stops[i].stationName + 
 //						"~" + t1 + "~" + train.stops[i].arrive + 
 //						"~" + t2 + "~" + train.stops[i].leave +
 //						"~" + d);
 				if(d >= 0)
-					return train.getStop(i).name;
+					return train.getStop(i).getName();
 			}
 		}
 		
@@ -295,8 +295,8 @@ public class RailroadLine extends TrainGraphPart {
 	public int getDistOfTrain(Train train, int time) {
 		//停站的情况
 		for(int i=0; i<train.getStopNum(); i++) {
-			int t1 = Train.trainTimeToInt(train.getStop(i).arrive);
-			int t2 = Train.trainTimeToInt(train.getStop(i).leave);
+			int t1 = Train.trainTimeToInt(train.getStop(i).getArrive());
+			int t2 = Train.trainTimeToInt(train.getStop(i).getLeave());
 			
 			//跨越0点情况的处理
 			int myTime = time;
@@ -310,7 +310,7 @@ public class RailroadLine extends TrainGraphPart {
 //				System.out.println(train.getTrainName() + "^" + time + "~" + train.stops[i].stationName + 
 //						"~" + t1 + "~" + train.stops[i].arrive + 
 //						"~" + t2 + "~" + train.stops[i].leave);
-				int d = getStationDist(train.getStop(i).name);
+				int d = getStationDist(train.getStop(i).getName());
 				
 				if(d >= 0)
 					return d;
@@ -322,11 +322,11 @@ public class RailroadLine extends TrainGraphPart {
 			Stop s1 = train.getStop(i);
 			Stop s2 = train.getStop(i+1);
 			
-			int d1 = getStationDist(s1.name);
-			int d2 = getStationDist(s2.name);
+			int d1 = getStationDist(s1.getName());
+			int d2 = getStationDist(s2.getName());
 			
-			int t1 = Train.trainTimeToInt(s1.leave);
-			int t2 = Train.trainTimeToInt(s2.arrive);
+			int t1 = Train.trainTimeToInt(s1.getLeave());
+			int t2 = Train.trainTimeToInt(s2.getArrive());
 			
 			//不在本线路上-继续找（可能下一天会在本线路上的）
 			if(d1<0 || d2<0)
@@ -360,7 +360,7 @@ public class RailroadLine extends TrainGraphPart {
 
 		// 线路名
 		if ((line = in.readLine()) != null) {
-			this.name = line;
+			this.setName(line);
 		} else {
 			in.close();
 			throw new IOException(__("Error reading circuit name."));
@@ -423,14 +423,14 @@ public class RailroadLine extends TrainGraphPart {
 	 */
 	public int getStationDist(String stationName) {
 		for (int i = 0; i < getStationNum(); i++)
-			if (stations.get(i).name.equalsIgnoreCase(stationName))
+			if (stations.get(i).getName().equalsIgnoreCase(stationName))
 				return stations.get(i).dist;
 		return -1;
 	}
 
 	public Station getStation(String stationName) {
 		for (int i = 0; i < getStationNum(); i++)
-			if (stations.get(i).name.equalsIgnoreCase(stationName))
+			if (stations.get(i).getName().equalsIgnoreCase(stationName))
 				return stations.get(i);
 		return null;
 	}
@@ -446,7 +446,7 @@ public class RailroadLine extends TrainGraphPart {
 			if (stations.get(i).hide)
 				continue;
 
-			if (stations.get(i).name.equalsIgnoreCase(stationName))
+			if (stations.get(i).getName().equalsIgnoreCase(stationName))
 				return i;
 		}
 		return -1;
@@ -541,11 +541,11 @@ public class RailroadLine extends TrainGraphPart {
 
 		if (addSuffix) {
 			if (minGap > 1)
-				return String.format(__("Near %s Station"), stations.get(minIndex).name);
+				return String.format(__("Near %s Station"), stations.get(minIndex).getName());
 			else
-				return String.format(__("%s Station"), stations.get(minIndex).name);
+				return String.format(__("%s Station"), stations.get(minIndex).getName());
 		} else
-			return stations.get(minIndex).name;
+			return stations.get(minIndex).getName();
 	}
 
 	public String getStationName(int dist) {
@@ -553,12 +553,12 @@ public class RailroadLine extends TrainGraphPart {
 	}
 
 	public void writeTo(BufferedWriter out) throws IOException {
-		out.write(name);
+		out.write(getName());
 		out.newLine();
 		out.write(length + "," + multiplicity + "," + zindex + "," + dispScale);
 		out.newLine();
 		for (int i = 0; i < getStationNum(); i++) {
-			out.write(stations.get(i).name + "," + stations.get(i).dist + ","
+			out.write(stations.get(i).getName() + "," + stations.get(i).dist + ","
 					+ stations.get(i).level + "," + stations.get(i).hide);
 			out.newLine();
 		}
@@ -567,7 +567,7 @@ public class RailroadLine extends TrainGraphPart {
 	public void parseLine(String line, int lineNum) throws IOException {
 		switch (lineNum) {
 		case 0:
-			this.name = line;
+			this.setName(line);
 			break;
 		case 1:
 			try {
@@ -640,7 +640,7 @@ public class RailroadLine extends TrainGraphPart {
 	}
 
 	public String repr() {
-		StringBuffer sb = new StringBuffer(this.name);
+		StringBuffer sb = new StringBuffer(this.getName());
 
 		switch (multiplicity) {
 		case 1:
@@ -660,7 +660,7 @@ public class RailroadLine extends TrainGraphPart {
 				this.length).append("公里\n");
 
 		for (int i = 0; i < this.getStationNum(); i++)
-			sb.append(this.stations.get(i).name).append("站 距离：").append(
+			sb.append(this.stations.get(i).getName()).append("站 距离：").append(
 					this.stations.get(i).dist).append(" 等级:").append(
 					this.stations.get(i).level).append(" 隐藏：").append(
 					this.stations.get(i).hide).append("\n");
@@ -716,7 +716,7 @@ public class RailroadLine extends TrainGraphPart {
 
 	public Station getFirstStopOnMe(Train train) {
 		for(int i=0; i<train.getStopNum(); i++) {
-			Station sta = getStation(train.getStop(i).name);
+			Station sta = getStation(train.getStop(i).getName());
 			if(sta != null)
 				return sta;
 		}
@@ -726,7 +726,7 @@ public class RailroadLine extends TrainGraphPart {
 	
 	public Station getLastStopOnMe(Train train) {
 		for(int i=train.getStopNum() - 1; i>=0; i--) {
-			Station sta = getStation(train.getStop(i).name);
+			Station sta = getStation(train.getStop(i).getName());
 			if(sta != null)
 				return sta;
 		}
@@ -748,15 +748,15 @@ public class RailroadLine extends TrainGraphPart {
 		for (int i = 0; i < stationCount; ++ i) {
 			Station station = stations.get(i);
 			if (i == 0)
-				firstName = station.name;
+				firstName = station.getName();
 			
-			if (names.contains(station.name)) {
+			if (names.contains(station.getName())) {
 				if (i == stationCount - 1)
 					station.isLoopStation = true;
-				else if (i < stationCount - 1 || (firstName != null && !firstName.equals(station.name)))
-					duplicatedNames.add(station.name);
+				else if (i < stationCount - 1 || (firstName != null && !firstName.equals(station.getName())))
+					duplicatedNames.add(station.getName());
 			} else {
-				names.add(station.name);
+				names.add(station.getName());
 			}
 		}
 		

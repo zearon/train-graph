@@ -577,7 +577,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 
 		String theTime = chartView.getTime(p.x);
 		Train theTrain = chartView.activeTrain;
-		String staName = chartView.activeStation.name;
+		String staName = chartView.activeStation.getName();
 
 		if(theTrain.hasStop(staName)) {
 			if(isArrive)
@@ -587,7 +587,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		}
 		else {
 			Stop stop = TrainGraphFactory.createInstance(Stop.class, staName)
-					.setProperties(theTime, theTime, false);
+					.setProperties(theTrain.getName(), theTime, theTime, false);
 			chartView.activeLineChart.insertNewStopToTrain(theTrain, stop);
 //			Stop prevStop = chartView.mainFrame.chart.findPrevStop(theTrain, stop.stationName);
 //			if(prevStop == null)

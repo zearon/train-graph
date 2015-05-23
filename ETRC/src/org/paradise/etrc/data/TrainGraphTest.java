@@ -61,7 +61,7 @@ public class TrainGraphTest {
 		RailroadLine line0 = trainGraph.railNetwork.getAllRailroadLines().get(0);
 		for (int i = 3; i <= stationCount; ++ i) {
 			Station s = TrainGraphFactory.createInstance(Station.class);
-			s.name = "Station " + i;
+			s.setName("Station " + i);
 			s.dist = 30 * (i -1);
 			if (i % 2 == 0)
 				s.hide = true;
@@ -88,18 +88,18 @@ public class TrainGraphTest {
 			
 			int step = station1 <= station2 ? 1 : -1;
 			if (step > 0)
-				t.trainNameDown = t.name;
+				t.trainNameDown = t.getName();
 			else
-				t.trainNameUp = t.name;
+				t.trainNameUp = t.getName();
 //			t.color = Color.RED;
 			
 			for (int j = station1; j != station2; j += step) {
 				Station s = line0.getStation(j);
 				Stop stop = TrainGraphFactory.createInstance(Stop.class);
-				stop.name = s.name;
-				stop.isPassenger  = true;
-				stop.arrive = (j % 24) + ": 10";
-				stop.leave = (j % 24) + ": 15";
+				stop.setName(s.getName());
+				stop.setPassenger(true);
+				stop.setArrive((j % 24) + ": 10");
+				stop.setLeave((j % 24) + ": 15");
 				
 				t.appendStop(stop);
 			}

@@ -35,7 +35,7 @@ public class RailNetworkTest {
 	public static void setUpClass() throws Exception {
 		railNetwork = TrainGraphFactory.createInstance(RailNetwork.class);
 		railNetwork.loadFromFile2("/Users/zhiyuangong/Hobby/Railroad/列车运行图/Test.crs");
-		railNetwork.name = "Test Railroad Network";
+		railNetwork.setName("Test Railroad Network");
 		
 		File chartFile = new File("/Users/zhiyuangong/Hobby/Railroad/sample.trc");
 		RailroadLineChart chart = TrainGraphFactory.createInstance(RailroadLineChart.class);
@@ -43,7 +43,7 @@ public class RailNetworkTest {
 
 		
 		trainGraph = TrainGraphFactory.createInstance(TrainGraph.class);
-		trainGraph.name = "Test Train Graph";
+		trainGraph.setName("Test Train Graph");
 		trainGraph.railNetwork = railNetwork;
 //		trainGraph.allTrains.trains.addAll(chart.trains);
 		RailNetworkChart railNetworkChart = TrainGraphFactory.createInstance(RailNetworkChart.class);;
@@ -88,7 +88,7 @@ public class RailNetworkTest {
 		errMsgs.stream().map(msg->msg==null?"OK":msg).forEach(System.out::println);
 
 		List<String> expectedCrossoverStations = Arrays.asList(new String[] {"永宁镇", "武昌", "信阳", "长安集", "六安", "汉口", "武昌南", "武昌东", "何刘"});
-		String[] actualCrossoverStations = railNetwork.getCrossoverStations().stream().map(station->station.name).toArray(String[]::new);
+		String[] actualCrossoverStations = railNetwork.getCrossoverStations().stream().map(station->station.getName()).toArray(String[]::new);
 		Stream.of(actualCrossoverStations).forEach(station->System.out.print("\"" + station + "\", "));
 		
 		assertEquals(expectedCrossoverStations.size(), actualCrossoverStations.length);

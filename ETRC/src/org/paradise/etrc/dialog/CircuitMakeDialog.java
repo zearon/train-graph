@@ -61,7 +61,7 @@ public class CircuitMakeDialog extends JDialog {
 		System.out.println(staLCB);
 		
 		RailroadLine cir = TrainGraphFactory.createInstance(RailroadLine.class);
-		cir.name = xianlu;
+		cir.setName(xianlu);
 		
 		Station firstStation = (Station) staLCB.get(0);
 		Station lastStation = (Station) staLCB.get(staLCB.size()-1);
@@ -77,15 +77,15 @@ public class CircuitMakeDialog extends JDialog {
 			cir.appendStation(station);
 		}
 
-		if( xianluFirstStationName().equalsIgnoreCase(firstStation.name) &&
-			xianluLastStationName().equalsIgnoreCase(lastStation.name))
-			cir.name = xianlu;
-		else if( xianluFirstStationName().equalsIgnoreCase(lastStation.name) &&
-			     xianluLastStationName().equalsIgnoreCase(firstStation.name))
-			cir.name = xianlu;
+		if( xianluFirstStationName().equalsIgnoreCase(firstStation.getName()) &&
+			xianluLastStationName().equalsIgnoreCase(lastStation.getName()))
+			cir.setName(xianlu);
+		else if( xianluFirstStationName().equalsIgnoreCase(lastStation.getName()) &&
+			     xianluLastStationName().equalsIgnoreCase(firstStation.getName()))
+			cir.setName(xianlu);
 		else
-			cir.name = xianlu + firstStation.getOneName()
-			           + lastStation.getOneName() + __(" Section");
+			cir.setName(xianlu + firstStation.getOneName()
+			           + lastStation.getOneName() + __(" Section"));
 		
 		cir.length = cir.getStation(cir.getStationNum() - 1).dist;
 
@@ -94,12 +94,12 @@ public class CircuitMakeDialog extends JDialog {
 	
 	private String xianluFirstStationName() {
 		Vector<LCBStation> allStations = lcb.findLCBStation(xianlu);
-		return ( (Station) (allStations.get(0)) ).name; 
+		return ( (Station) (allStations.get(0)) ).getName(); 
 	}
 
 	private String xianluLastStationName() {
 		Vector<LCBStation> allStations = lcb.findLCBStation(xianlu);
-		return ( (Station) (allStations.get(allStations.size()-1)) ).name; 
+		return ( (Station) (allStations.get(allStations.size()-1)) ).getName(); 
 	}
 
 	private void jbInit() throws Exception {
@@ -162,7 +162,7 @@ public class CircuitMakeDialog extends JDialog {
 		Vector<String> allNames = new Vector<String>();
 		for(int i=0; i<allStations.size(); i++) {
 			Station sta = (Station) (allStations.get(i));
-			allNames.add(sta.name);
+			allNames.add(sta.getName());
 		}
 
 		JLabel lb1 = new JLabel(__("From:"));

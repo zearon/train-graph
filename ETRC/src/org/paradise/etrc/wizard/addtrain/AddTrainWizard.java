@@ -74,7 +74,7 @@ public class AddTrainWizard extends Wizard {
 						if(trains.size() == 0) {
 							new MessageBox(chartView.mainFrame, String.format(__("Unable to find information for the train %s, please input manually."), fullName)).showMessage();
 							train = TrainGraphFactory.createInstance(Train.class);
-							train.name = fullName;
+							train.setName(fullName);
 							train.trainNameDown = downName;
 							train.trainNameUp = upName;
 					    }
@@ -91,7 +91,7 @@ public class AddTrainWizard extends Wizard {
 					}
 					else if (train == null) {
 						train = TrainGraphFactory.createInstance(Train.class);
-						train.name = fullName;
+						train.setName(fullName);
 						train.trainNameDown = downName;
 						train.trainNameUp = upName;
 					}

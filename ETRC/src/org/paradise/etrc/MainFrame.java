@@ -218,6 +218,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 	
 	public void setModel(TrainGraph trainGraph) {
+		if (trainGraph.currentNetworkChart == null)
+			throw new ParsingException("There is no network chart in save file.");
+		
+		if (trainGraph.currentLineChart == null)
+			throw new ParsingException("There is no valid line chart in save file.");
+		
 		setTitle();
 		
 		if (ui_inited) {
@@ -228,6 +234,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			trainTypesView.setModel(trainGraph);
 			allTrainsView.setModel(trainGraph);
 			timetableListView.setModel(trainGraph);
+			timetableEditView.setModel(trainGraph);
 			
 			chartView.setModel(trainGraph);
 			sheetView.setModel(trainGraph);
@@ -241,6 +248,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			
 			runView.refresh();
 		}
+	}
+	
+	public void validateModel() {
+		
 	}
 	
 	static Boolean isOSX = null;
@@ -1132,7 +1143,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
 		
 		SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = trainGraph.currentLineChart.railroadLine.name + df.format(new Date());
+		String fileName = trainGraph.currentLineChart.railroadLine.getName() + df.format(new Date());
 		chooser.setSelectedFile(new File(fileName));
 
 		int returnVal = chooser.showSaveDialog(this); 
@@ -1468,12 +1479,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.RAILROAD_NETWORK.name());
 			break;
-		case RAILROAD_LINES:
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.RAILROAD_LINES.name());
-			break;
 		case RAILROAD_LINE_SPECIFIC:
 			railLineEditView.switchRailLine((RailroadLine) params[0]); 
+		case RAILROAD_LINES:
 			navigatorContentCard.show(navigatorContentPanel, 
 					NavigatorNodeType.RAILROAD_LINES.name());
 			break;
@@ -1509,9 +1517,20 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 					NavigatorNodeType.TIME_TABLE_LINE.name());
 			break;
 		case TIME_TABLE_LINE_DOWN:
+			trainGraph.currentLineChart = (RailroadLineChart) params[0];
+			trainGraph.currentNetworkChart = (RailNetworkChart) params[1];
+			
+			timetableEditView.switchChart(true);
+			
+			navigatorContentCard.show(navigatorContentPanel,
+					NavigatorNodeType.TIME_TABLE_LINE_UP.name());
+			break;
+
 		case TIME_TABLE_LINE_UP:
 			trainGraph.currentLineChart = (RailroadLineChart) params[0];
 			trainGraph.currentNetworkChart = (RailNetworkChart) params[1];
+			
+			timetableEditView.switchChart(false);
 			
 			navigatorContentCard.show(navigatorContentPanel,
 					NavigatorNodeType.TIME_TABLE_LINE_UP.name());

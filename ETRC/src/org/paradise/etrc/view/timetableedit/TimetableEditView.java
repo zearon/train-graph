@@ -94,6 +94,15 @@ public class TimetableEditView extends JPanel {
 		table.setupColumnWidth();
 		repaint();
 	}
+	
+	public void refreshChart() {
+		table.switchChart(downGoing);
+		
+		// update ui:
+		uiBindingManager.updateUI(null);
+		table.setupColumnWidth();
+		repaint();
+	}
 
 	private void initUI() {
 		setLayout(new BorderLayout(0, 0));

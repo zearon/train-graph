@@ -106,8 +106,8 @@ class HeaderRenderer extends JLabel implements ListCellRenderer<TrainRouteSectio
     		g.drawLine(0, 0, getWidth(), 0);
     	
     	//左竖线
-		if (column == 0)
-			g.drawLine(0, 0, 0, getHeight()-1);
+//		if (column == 0)
+//			g.drawLine(0, 0, 0, getHeight()-1);
     	//右竖线
     	g.drawLine(getWidth()-1, 0, getWidth()-1, getHeight());
     }

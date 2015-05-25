@@ -51,6 +51,10 @@ public class SettingsView extends JPanel {
 	private JTextField txtGlobalhttpproxyserver;
 	private JTextField txtGlobalhttpproxyport;
 	private JComboBox cbUseAntiAliasing;
+	private JTextField txtTimetableEditRowHeaderWidth;
+	private JTextField txtTimetableEditCellWidth;
+	private JTextField timetableEditVehicleNameRowHeight;
+	private JTextField timetableEditRemarksRowHeight;
 
 	/**
 	 * Create the panel.
@@ -96,163 +100,75 @@ public class SettingsView extends JPanel {
 		lblRuningChart.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblDistanceUnit = new JLabel(__("Distance Unit"));
+		lblDistanceUnit.setBounds(7, 24, 75, 15);
 		lblDistanceUnit.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblPixelsunit = new JLabel(__("Pixels/Unit"));
+		lblPixelsunit.setBounds(7, 57, 61, 15);
 		lblPixelsunit.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblDisplaylevel = new JLabel(__("Min Station Display Level"));
+		lblDisplaylevel.setBounds(7, 90, 141, 15);
 		lblDisplaylevel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblStationLevelFor = new JLabel(__("Level of Station as Bold Lines"));
+		lblStationLevelFor.setBounds(7, 123, 165, 15);
 		lblStationLevelFor.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JComboBox<String> cbDistanceUnit = createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"km", "hm", "dam", "m", "mile"}), 0, "runningChart.distUnit");
+		cbDistanceUnit.setBounds(178, 18, 69, 27);
 		
 		txtDistscale = createJTextField("runningChart.distScale");
+		txtDistscale.setBounds(178, 51, 69, 27);
 		
 		txtDisplayLevel = createJTextField("runningChart.displayLevel");
+		txtDisplayLevel.setBounds(178, 84, 69, 27);
 		
 		txtBoldlinelevel = SettingsView.createJTextField("runningChart.boldLevel");
+		txtBoldlinelevel.setBounds(178, 117, 69, 27);
 		txtBoldlinelevel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		txtBoldlinelevel.setColumns(5);
 		
 		JLabel lblPixelsmin = new JLabel(__("Pixels/minute"));
+		lblPixelsmin.setBounds(355, 57, 78, 15);
 		lblPixelsmin.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblNewLabel = new JLabel(__("Start hour in chart"));
+		lblNewLabel.setBounds(355, 90, 103, 15);
 		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblMinsXaxis = new JLabel(__("Minute/x-axis scale"));
+		lblMinsXaxis.setBounds(355, 123, 114, 15);
 		lblMinsXaxis.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		txtMinutescale = SettingsView.createJTextField("runningChart.minuteScale");
+		txtMinutescale.setBounds(481, 52, 72, 27);
 		txtMinutescale.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		txtMinutescale.setColumns(5);
 		
 		txtStarthour = SettingsView.createJTextField("runningChart.startHour");
+		txtStarthour.setBounds(481, 85, 72, 27);
 		txtStarthour.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		txtStarthour.setColumns(5);
 		
 		JComboBox<Integer> comboBox = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<Integer>(new Integer[] {60, 30, 20, 15, 10, 5}), 4, "runningChart.timeInterval");
+		comboBox.setBounds(481, 118, 72, 27);
 		
 		cbUseAntiAliasing = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "runningChart.useAntiAliasing:YesNo");
+		cbUseAntiAliasing.setBounds(481, 18, 72, 27);
 		
-		JLabel lblUseAntialiasing = new JLabel("Use Anti-Aliasing");
+		JLabel lblUseAntialiasing = new JLabel(__("Use Anti-Aliasing"));
+		lblUseAntialiasing.setBounds(355, 24, 98, 15);
 		lblUseAntialiasing.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-//		comboBox.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-//		comboBox.setModel(new DefaultComboBoxModel(new Integer[] {60, 30, 20, 15, 10, 5}));
-		GroupLayout gl_panel_runningChart = new GroupLayout(panel_runningChart);
-		gl_panel_runningChart.setHorizontalGroup(
-			gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_panel_runningChart.createSequentialGroup()
-					.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addContainerGap()
-							.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_runningChart.createSequentialGroup()
-									.addComponent(lblStationLevelFor)
-									.addGap(6)
-									.addComponent(txtBoldlinelevel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-									.addGap(108)
-									.addComponent(lblMinsXaxis))
-								.addGroup(gl_panel_runningChart.createSequentialGroup()
-									.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-										.addGroup(gl_panel_runningChart.createSequentialGroup()
-											.addComponent(lblPixelsunit)
-											.addGap(110)
-											.addComponent(txtDistscale, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-										.addGroup(gl_panel_runningChart.createSequentialGroup()
-											.addComponent(lblDistanceUnit)
-											.addGap(96)
-											.addComponent(cbDistanceUnit, GroupLayout.PREFERRED_SIZE, 69, GroupLayout.PREFERRED_SIZE)))
-									.addGap(108)
-									.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblPixelsmin)
-										.addComponent(lblUseAntialiasing))))
-							.addGap(12)
-							.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING, false)
-								.addComponent(cbUseAntiAliasing, 0, 0, Short.MAX_VALUE)
-								.addComponent(comboBox, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(480)
-							.addComponent(txtMinutescale, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE))
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(6)
-							.addComponent(lblDisplaylevel)
-							.addGap(30)
-							.addComponent(txtDisplayLevel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(108)
-							.addComponent(lblNewLabel)
-							.addGap(23)
-							.addComponent(txtStarthour, GroupLayout.PREFERRED_SIZE, 72, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap(11, Short.MAX_VALUE))
-		);
-		gl_panel_runningChart.setVerticalGroup(
-			gl_panel_runningChart.createParallelGroup(Alignment.TRAILING)
-				.addGroup(gl_panel_runningChart.createSequentialGroup()
-					.addContainerGap(17, Short.MAX_VALUE)
-					.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-						.addGroup(Alignment.TRAILING, gl_panel_runningChart.createSequentialGroup()
-							.addComponent(cbDistanceUnit, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addGap(6))
-						.addGroup(Alignment.TRAILING, gl_panel_runningChart.createSequentialGroup()
-							.addComponent(cbUseAntiAliasing, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-							.addPreferredGap(ComponentPlacement.RELATED))
-						.addGroup(Alignment.TRAILING, gl_panel_runningChart.createSequentialGroup()
-							.addComponent(lblDistanceUnit)
-							.addGap(12))
-						.addGroup(Alignment.TRAILING, gl_panel_runningChart.createSequentialGroup()
-							.addComponent(lblUseAntialiasing)
-							.addGap(12)))
-					.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(6)
-							.addComponent(lblPixelsunit))
-						.addComponent(txtDistscale, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(6)
-							.addComponent(lblPixelsmin))
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(1)
-							.addComponent(txtMinutescale, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addGap(5)
-					.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(6)
-							.addComponent(lblDisplaylevel))
-						.addComponent(txtDisplayLevel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(6)
-							.addComponent(lblNewLabel))
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(1)
-							.addComponent(txtStarthour, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addGap(5)
-					.addGroup(gl_panel_runningChart.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(6)
-							.addComponent(lblStationLevelFor))
-						.addComponent(txtBoldlinelevel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(6)
-							.addComponent(lblMinsXaxis))
-						.addGroup(gl_panel_runningChart.createSequentialGroup()
-							.addGap(1)
-							.addComponent(comboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-					.addContainerGap())
-		);
-		gl_panel_runningChart.linkSize(SwingConstants.HORIZONTAL, new Component[] {comboBox, cbUseAntiAliasing});
-		panel_runningChart.setLayout(gl_panel_runningChart);
 		
-		JLabel lblPlanningSchedule = new JLabel(__("Planning Schedule"));
-		lblPlanningSchedule.setBounds(19, 326, 103, 15);
-		lblPlanningSchedule.setOpaque(true);
-		lblPlanningSchedule.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		JLabel lblTimetableEdit = new JLabel(__("Timetable Edit Sheet"));
+		lblTimetableEdit.setBounds(19, 326, 126, 15);
+		lblTimetableEdit.setOpaque(true);
+		lblTimetableEdit.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JPanel panel_planningSchedule = new JPanel();
-		panel_planningSchedule.setBounds(6, 333, 565, 94);
-		panel_planningSchedule.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
+		JPanel panel_timetableEdit = new JPanel();
+		panel_timetableEdit.setBounds(6, 333, 565, 95);
+		panel_timetableEdit.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 		
 		JLabel lblGlobalSettings = new JLabel(__("Global Settings"));
 		lblGlobalSettings.setBounds(19, 12, 85, 15);
@@ -309,7 +225,80 @@ public class SettingsView extends JPanel {
 		panelGlobalSettings.add(lblHttpProxyServer);
 		panel.add(lblRuningChart);
 		panel.add(panel_runningChart);
+		panel_runningChart.setLayout(null);
+		panel_runningChart.add(lblStationLevelFor);
+		panel_runningChart.add(txtBoldlinelevel);
+		panel_runningChart.add(lblMinsXaxis);
+		panel_runningChart.add(lblPixelsunit);
+		panel_runningChart.add(txtDistscale);
+		panel_runningChart.add(lblDistanceUnit);
+		panel_runningChart.add(cbDistanceUnit);
+		panel_runningChart.add(lblPixelsmin);
+		panel_runningChart.add(lblUseAntialiasing);
+		panel_runningChart.add(cbUseAntiAliasing);
+		panel_runningChart.add(comboBox);
+		panel_runningChart.add(txtMinutescale);
+		panel_runningChart.add(lblDisplaylevel);
+		panel_runningChart.add(txtDisplayLevel);
+		panel_runningChart.add(lblNewLabel);
+		panel_runningChart.add(txtStarthour);
+		panel.add(lblTimetableEdit);
+		panel.add(panel_timetableEdit);
+		
+		txtTimetableEditRowHeaderWidth = SettingsView.createJTextField("timetableEdit.timetableEditRowHeaderWidth");
+		txtTimetableEditRowHeaderWidth.setBounds(178, 18, 69, 27);
+		txtTimetableEditRowHeaderWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtTimetableEditRowHeaderWidth.setColumns(5);
+		
+		txtTimetableEditCellWidth = SettingsView.createJTextField("timetableEdit.timetableEditCellWidth");
+		txtTimetableEditCellWidth.setBounds(178, 51, 69, 27);
+		txtTimetableEditCellWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtTimetableEditCellWidth.setColumns(5);
+		
+		timetableEditVehicleNameRowHeight = SettingsView.createJTextField("timetableEdit.timetableEditVehicleNameRowHeight");
+		timetableEditVehicleNameRowHeight.setBounds(481, 18, 69, 27);
+		timetableEditVehicleNameRowHeight.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		timetableEditVehicleNameRowHeight.setColumns(5);
+		
+		timetableEditRemarksRowHeight = SettingsView.createJTextField("timetableEdit.timetableEditRemarksRowHeight");
+		timetableEditRemarksRowHeight.setBounds(481, 51, 69, 27);
+		timetableEditRemarksRowHeight.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		timetableEditRemarksRowHeight.setColumns(5);
+		
+		JLabel lblRowHeaderWidth = new JLabel(__("Row Header Width"));
+		lblRowHeaderWidth.setBounds(7, 24, 107, 15);
+		lblRowHeaderWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		
+		JLabel lblCellWidth = new JLabel(__("Cell Width"));
+		lblCellWidth.setBounds(7, 57, 57, 15);
+		lblCellWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		
+		JLabel lblVehicleNameRow = new JLabel(__("Vehicle Name Row Height"));
+		lblVehicleNameRow.setBounds(318, 24, 148, 15);
+		lblVehicleNameRow.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		
+		JLabel lblRemarksRowHeight = new JLabel(__("Remarks Row Height"));
+		lblRemarksRowHeight.setBounds(318, 57, 120, 15);
+		lblRemarksRowHeight.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		panel_timetableEdit.setLayout(null);
+		panel_timetableEdit.add(txtTimetableEditRowHeaderWidth);
+		panel_timetableEdit.add(txtTimetableEditCellWidth);
+		panel_timetableEdit.add(timetableEditVehicleNameRowHeight);
+		panel_timetableEdit.add(timetableEditRemarksRowHeight);
+		panel_timetableEdit.add(lblRowHeaderWidth);
+		panel_timetableEdit.add(lblCellWidth);
+		panel_timetableEdit.add(lblVehicleNameRow);
+		panel_timetableEdit.add(lblRemarksRowHeight);
+		
+		JLabel lblPlanningSchedule = new JLabel("Planning Schedule");
+		lblPlanningSchedule.setOpaque(true);
+		lblPlanningSchedule.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		lblPlanningSchedule.setBounds(19, 440, 103, 15);
 		panel.add(lblPlanningSchedule);
+		
+		JPanel panel_planningSchedule = new JPanel();
+		panel_planningSchedule.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
+		panel_planningSchedule.setBounds(6, 447, 565, 94);
 		panel.add(panel_planningSchedule);
 		
 		JPanel panel_1 = new JPanel();
@@ -375,6 +364,8 @@ public class SettingsView extends JPanel {
 			return Config.getInstance();
 		} else if ("runningChart".equals(propertyGroup)) {
 			return settings;
+		} else if ("timetableEdit".equals(propertyGroup)) {
+			return settings;
 		}
 		
 		return null;
@@ -386,6 +377,8 @@ public class SettingsView extends JPanel {
 //			mainFrame.runView.setModel(mainFrame.trainGraph, mainFrame.currentLineChart);
 			mainFrame.chartView.updateData();
 			mainFrame.runView.updateUI();
+		} else if ("timetableEdit".equals(propertyGroup)) {
+			mainFrame.timetableEditView.refreshChart();
 		}
 	}
 	
@@ -418,9 +411,16 @@ public class SettingsView extends JPanel {
 			desc = String.format(__("%s in global settings"), __("http port value") );
 		}
 		
+		else if ("timetableEditRowHeaderWidth".equals(propertyName)) {
+			desc = String.format(__("%s in timetable edit sheet settings"), __("row header width"));
+		} else if ("timetableEditCellWidth".equals(propertyName)) {
+			desc = String.format(__("%s in timetable edit sheet settings"), __("cell width"));
+		} else if ("timetableEditVehicleNameRowHeight".equals(propertyName)) {
+			desc = String.format(__("%s in timetable edit sheet settings"), __("vehicle name row height"));
+		} else if ("timetableEditRemarksRowHeight".equals(propertyName)) {
+			desc = String.format(__("%s in timetable edit sheet settings"), __("remarks row height"));
+		}
+		
 		return desc;
 	}
-	
-	// }}
-	
 }

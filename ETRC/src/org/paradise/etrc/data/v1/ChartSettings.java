@@ -29,11 +29,23 @@ public class ChartSettings extends TrainGraphPart {
 	public String distUnit;
 	@TGProperty
 	public boolean useAntiAliasing;
+	@TGProperty
+	public int timetableEditRowHeaderWidth;
+	@TGProperty
+	public int timetableEditCellWidth;
+	@TGProperty
+	public int timetableEditVehicleNameRowHeight;
+	@TGProperty
+	public int timetableEditRemarksRowHeight;
 
-	ChartSettings() {}
+	ChartSettings() {
+		setToDefault();
+	}
 
 	public void setProperties(float distScale, int displayLevel, int boldLevel, 
-			int startHour, float minuteScale, int timeInterval, String distUnit, boolean useAntiAliasing) {
+			int startHour, float minuteScale, int timeInterval, String distUnit, boolean useAntiAliasing,
+			int timetableEditRowHeaderWidth, int timetableEditCellWidth,
+			int timetableEditVehicleNameRowHeight, int timetableEditRemarksRowHeight) {
 		this.setName("");
 		this.distScale = distScale;
 		this.displayLevel = displayLevel;
@@ -43,11 +55,15 @@ public class ChartSettings extends TrainGraphPart {
 		this.timeInterval = timeInterval;
 		this.distUnit = distUnit;
 		this.useAntiAliasing = useAntiAliasing;
+		this.timetableEditRowHeaderWidth = timetableEditRowHeaderWidth;
+		this.timetableEditCellWidth = timetableEditCellWidth;
+		this.timetableEditVehicleNameRowHeight = timetableEditVehicleNameRowHeight;
+		this.timetableEditRemarksRowHeight = timetableEditRemarksRowHeight;
 	}
 	
 	@Override
 	public void setToDefault() {
-		setProperties(3.0f, 4, 2, 18, 2.0f, 10, "km", false);
+		setProperties(3.0f, 4, 2, 18, 2.0f, 10, "km", false, 80, 40, 60, 250);
 	}
 	
 	public int getDisplayLevel() {

@@ -234,5 +234,6 @@ public class Config {
 			throw new IllegalArgumentException(__("Port number should be within 0 - 65535."));
 		
 		setValue(Prop_HTTP_Proxy_Port, value + "");
-	}
+	}	
+
 }

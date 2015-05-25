@@ -48,8 +48,8 @@ public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object
     	if (rowIndex % 2 == 1)
     		g.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
     	//上横线
-    	if (rowIndex == 0)
-    		g.drawLine(0, 0, getWidth(), 0);
+//    	if (rowIndex == 0)
+//    		g.drawLine(0, 0, getWidth(), 0);
     	
     	//左竖线
     	g.drawLine(0, 0, 0, getHeight()-1);

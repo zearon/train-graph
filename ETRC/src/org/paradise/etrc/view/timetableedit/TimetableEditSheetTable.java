@@ -32,6 +32,7 @@ import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
 //import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.slice.ChartSlice;
+import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.table.JEditTable;
 import org.paradise.etrc.view.traintypes.TrainTypeTableCellRenderer;
 import org.paradise.etrc.view.traintypes.TrainTypeTableModel;
@@ -109,6 +110,9 @@ public class TimetableEditSheetTable extends JEditTable {
 		// 不画JTable默认的网格线,在cell renderer中根据格子的属性来画
 		setIntercellSpacing(new Dimension(0, 0));
 		
+		//设置行列表头交接处的左上角
+		buildCorner();
+		
 		//设置列表头
 		setupTableHeader(this.getTableHeader());
 		
@@ -149,6 +153,16 @@ public class TimetableEditSheetTable extends JEditTable {
 		
 		return rt;
 	}	
+	
+	private void buildCorner() {
+		JList<String> corner = new JList<>(new String[] {__("车次"), __("类型"), __("车辆名")});
+		corner.setCellRenderer(new CornerRenderer(this));
+		
+		JScrollPane timeTableScrollPane = getScrollPane();
+		timeTableScrollPane.setRowHeaderView(rowHeader);
+		
+		timeTableScrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, corner);
+	}
 	
 	/* 行表头 */
 	private JList<?> buildeRowHeader() {
@@ -191,19 +205,19 @@ public class TimetableEditSheetTable extends JEditTable {
 	}
 	
 	public int getRemarksRowHeight() {
-		return 250;
+		return trainGraph.settings.timetableEditRemarksRowHeight;
 	}
 	
 	public int getRowHeaderWidth() {
-		return 80;
+		return trainGraph.settings.timetableEditRowHeaderWidth;
 	}
 	
 	public int getCellWidth() {
-		return 40;
+		return trainGraph.settings.timetableEditCellWidth;
 	}
 	
 	public int getVehicleNameRowHeight() {
-		return 60;
+		return trainGraph.settings.timetableEditVehicleNameRowHeight;
 	}
 
 	//－－－－列表头设置－－－－//

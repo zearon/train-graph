@@ -1690,9 +1690,11 @@ public abstract class TrainGraphPart {
 		Tuple2.of("<", "$LT$"), Tuple2.of(">", "$GT$"),
 		
 		Tuple2.of("[", "$BRACKET_L$"), Tuple2.of("]", "$BRACKET_R$"),
-		Tuple2.of(",", "$COMMA$"), Tuple2.of("=", "EQUAL"), 
-		Tuple2.of("//", "$DOUBLE_SLASH$"), Tuple2.of(";", "SEMICOLOM"), 
+		Tuple2.of(",", "$COMMA$"), Tuple2.of("=", "$EQUAL$"), 
+		Tuple2.of("//", "$DOUBLE_SLASH$"), Tuple2.of(";", "$SEMICOLOM$"), 
 		Tuple2.of("{", "$BRACE_L$"), Tuple2.of("}", "$BRACE_R$"),  
+		Tuple2.of("\r\n", "$NEWLINE_RN$"), Tuple2.of("\n\r", "$NEWLINE_NR$"),  
+		Tuple2.of("\r", "$NEWLINE_R$"), Tuple2.of("\n", "$NEWLINE_N$"),  
 	};
 	
 	@SuppressWarnings("unchecked")

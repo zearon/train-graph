@@ -69,6 +69,9 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 		newSection.setRailLineChart(chart);
 		
 		fireTableStructureChanged();
+		EventQueue.invokeLater(() -> {
+			table.setRowHeight(getRowCount() - 1, ((TimetableEditSheetTable) table).getRemarksRowHeight());
+		});
 	}
 	
 	public int getColumnCount() {
@@ -100,6 +103,10 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 		
 		TrainRouteSection trainSection = sectionGetter.apply(columnIndex);
 		return trainSection;
+	}
+	
+	public boolean isNewTrainColumn(int column) {
+		return column == sectionCounter.getAsInt();
 	}
 	
 	public boolean isRemarksRow(int row) {

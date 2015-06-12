@@ -29,6 +29,20 @@ public class TrainRouteSection extends TrainGraphPart {
 	public boolean downGoing = true;
 	@TGProperty
 	public String remarks = "";
+	private String vehicleName;
+	public String getVehicleName() {
+		Train train = getTrain();
+		if (train != null)
+			vehicleName = train.vehicleName;
+		
+		return vehicleName;
+	}
+	public void setVehicleName(String vehicleName) {
+		this.vehicleName = vehicleName;
+		Train train = getTrain();
+		if (train != null)
+			train.vehicleName = vehicleName;
+	}
 	
 	public RailroadLineChart getRailLineChart() {return (RailroadLineChart) getParent();}
 	public void setRailLineChart(RailroadLineChart raillineChart) {

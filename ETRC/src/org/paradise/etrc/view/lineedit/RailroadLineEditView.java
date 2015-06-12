@@ -127,7 +127,7 @@ public class RailroadLineEditView extends JPanel {
 		this.trainGraph = trainGraph;
 		
 		railroadLineTableModel.setRailNetwork(this.trainGraph.railNetwork);
-		stationTableModel.setRailroadLine(this.trainGraph.railNetwork
+		stationTableModel.setRailroadLine(this.trainGraph, this.trainGraph.railNetwork
 				.getRailroadLine(0));
 		
 		resetModel(null);
@@ -504,8 +504,6 @@ public class RailroadLineEditView extends JPanel {
 
 				if (isErrorCircuit(row)) {
 					setBackground(Color.RED);
-				} else if (row == 0) {
-					setBackground(Color.YELLOW);
 				} else {
 					setBackground(table.getBackground());
 				}
@@ -699,7 +697,7 @@ public class RailroadLineEditView extends JPanel {
 		stationTable.setFont(new Font("Dialog", 0, 12));
 		stationTable.getTableHeader().setFont(new Font("Dialog", 0, 12));
 
-		stationTableModel = new StationTableModel(stationTable, null);
+		stationTableModel = new StationTableModel(stationTable, this.trainGraph, null);
 		stationTable.setModel(stationTableModel);
 		// stationTable.setPreferredSize(new Dimension(300,
 		// stationTable.getRowHeight() * 20));
@@ -754,6 +752,7 @@ public class RailroadLineEditView extends JPanel {
 	}
 
 	protected void switchRailLine(RailroadLine circuit, int circuitIindex) {
+		
 		selectedCircuitIndex = circuitIindex;
 
 		if (stationTable.getCellEditor() != null)
@@ -763,6 +762,8 @@ public class RailroadLineEditView extends JPanel {
 		cbMultiplicity.setSelectedItem(circuit.multiplicity);
 		tfDispScale.setText("" + circuit.dispScale);
 		stationTableModel.railroadLine = circuit;
+		
+		findCrossoverStations();
 
 		stationTable.revalidate();
 		stationTable.updateUI();
@@ -1087,7 +1088,11 @@ public class RailroadLineEditView extends JPanel {
 				railroadLineTable, true, index, line, 
 				railroadLineTableModel.raillines::add, 
 				railroadLineTableModel.raillines::removeElementAt, 
-				() -> updateRailroadListSelection(index) );
+				() -> {
+					trainGraph.railNetwork.findCrossoverStations();
+					updateRailroadListSelection(index);
+					stationTable.repaint();
+				} );
 	}
 
 	private void doRailNetwork_ImportLine() {
@@ -1108,7 +1113,11 @@ public class RailroadLineEditView extends JPanel {
 				railroadLineTable, true, index, line, 
 				railroadLineTableModel.raillines::add, 
 				railroadLineTableModel.raillines::removeElementAt, 
-				() -> updateRailroadListSelection(index) );
+				() -> {
+					trainGraph.railNetwork.findCrossoverStations();
+					updateRailroadListSelection(index);
+					stationTable.repaint();
+				} );
 	}
 
 	private void doRailNetwork_MoveUpLine() {
@@ -1155,7 +1164,11 @@ public class RailroadLineEditView extends JPanel {
 				railroadLineTableModel.raillines::elementAt,
 				railroadLineTableModel.raillines::add, 
 				railroadLineTableModel.raillines::removeElementAt, 
-				() -> updateRailroadListSelection(index) );
+				() -> {
+					trainGraph.railNetwork.findCrossoverStations();
+					updateRailroadListSelection(index);
+					stationTable.repaint();
+				} );
 	}
 
 	private void doRailNetwork_NewLine() {

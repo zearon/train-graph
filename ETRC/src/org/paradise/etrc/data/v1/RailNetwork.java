@@ -61,6 +61,11 @@ public class RailNetwork extends TrainGraphPart {
 		setName(name);
 	}
 
+	@Override 
+	public void loadComplete() {
+		findCrossoverStations();
+	}
+	
 	public Vector<RailroadLine> getAllRailroadLines() {
 		return railroadLines;
 	}
@@ -162,6 +167,8 @@ public class RailNetwork extends TrainGraphPart {
 	}
 
 	public List<String> findCrossoverStations() {
+		crossoverStations.clear();
+		tempStations.clear();
 		
 		List<String>[] duplicateStationsInLine = new List [railroadLines.size()];
 		
@@ -188,8 +195,16 @@ public class RailNetwork extends TrainGraphPart {
 			}
 		}
 		
+		railroadLines.forEach(line -> line.getAllStations().forEach(station -> {
+			if (crossoverStations.contains(station))
+				station.isCrossover = true;
+			else
+				station.isCrossover = false;
+		}));
+		
 		List<String> errMsg = Stream.of(duplicateStationsInLine)
-				.map((List<String> list)->list.size()<1?null:String.format(__("There are duplicate stations on circuit: %s"), 
+				.map((List<String> list)->list.size()<1?null:String.format(__("There are duplicate stations on railraod Line: %s. "
+						+ "Duplicate stations can only be the first and the last in a railroad line to represent a circle route."), 
 						list.stream().reduce("", (a, b)->a.length() > 0 ? a+", "+b : b)))
 				.collect(Collectors.toList());
 		

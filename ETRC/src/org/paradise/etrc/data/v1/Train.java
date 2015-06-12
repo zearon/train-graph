@@ -43,6 +43,17 @@ public class Train extends TrainGraphPart {
 
 	@TGProperty(name="upName")
 	public String trainNameUp = "";
+
+	@TGProperty
+	public String vehicleName = "";
+	
+	public String getTrainName(boolean downGoing) {
+		String name = downGoing ? trainNameDown : trainNameUp;
+		if (name == null || "".equals(name))
+			name = getName();
+		
+		return name;
+	}
 	
 	/**
 	 * LGuo 20070114 added

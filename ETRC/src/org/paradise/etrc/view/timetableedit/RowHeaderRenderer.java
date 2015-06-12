@@ -16,6 +16,8 @@ import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.table.JTableHeader;
 
+import org.paradise.etrc.util.data.Tuple2;
+
 public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object> {
 	private static final long serialVersionUID = -3720951686492113933L;
 
@@ -61,10 +63,15 @@ public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object
 	public Component getListCellRendererComponent(JList<?> list, Object value,
 			int index, boolean isSelected, boolean cellHasFocus) {
 
-		setText((value == null) ? "" : value.toString());
+    	Tuple2<String, Boolean> rowTuple = (Tuple2<String, Boolean>) value;
+		setText((value == null) ? "" : rowTuple.A.toString());
 		rowIndex = index;
 		
-		if(isSelected) {
+		if (rowTuple.B) {
+			// Is a crossover station
+			setBackground(TimetableEditView.CROSSOVER_STATION_COLOR);
+		}
+		else if(isSelected) {
 			setBackground(TimetableEditView.selectBK);
 		}
 		else {

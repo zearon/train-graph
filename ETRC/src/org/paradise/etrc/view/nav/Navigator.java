@@ -12,6 +12,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Optional;
 import java.util.Vector;
@@ -148,6 +149,28 @@ public class Navigator extends JTree implements TreeSelectionListener {
 		treeModel = new DefaultTreeModel(rootNode);
 		setModel(treeModel);
 	}
+	
+	public void expandAll(boolean expand) {
+		expandAll(this, new TreePath(rootNode), true);
+	}
+	
+	private void expandAll(JTree tree, TreePath parent, boolean expand) {
+
+		TreeNode node = (TreeNode) parent.getLastPathComponent();
+		if (node.getChildCount() > 0) {
+			for (Enumeration e = node.children(); e.hasMoreElements();) {
+				TreeNode n = (TreeNode) e.nextElement();
+				TreePath path = parent.pathByAddingChild(n);
+				expandAll(tree, path, expand);
+			}
+		}
+
+		if (expand) {
+			tree.expandPath(parent);
+		} else {
+			tree.collapsePath(parent);
+		}
+	}  
 	
 	// {{ Train Type 右键菜单
 

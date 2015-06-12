@@ -23,7 +23,7 @@ import org.paradise.etrc.data.v1.ChartSettings;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.databinding.JComboBoxBinding;
-import org.paradise.etrc.util.ui.databinding.JTextFieldBinding;
+import org.paradise.etrc.util.ui.databinding.JTextComponentBinding;
 import org.paradise.etrc.util.ui.databinding.UIBinding;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 
@@ -423,4 +423,6 @@ public class SettingsView extends JPanel {
 		
 		return desc;
 	}
+	
+	// }}
 }

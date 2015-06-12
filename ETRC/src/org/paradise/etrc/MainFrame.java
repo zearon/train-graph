@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.rmi.server.ObjID;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Properties;
 import java.util.StringJoiner;
 import java.util.Vector;
@@ -62,6 +63,8 @@ import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 
 import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.data.ParsingException;
@@ -212,6 +215,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				DEBUG_ACTION( () -> {
 					//setFullScreenModeOnOSX(); 
 					} , "Set full screen mode to false");
+				
+				navigator.expandAll(true);
 			}
 		});
 		

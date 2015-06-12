@@ -1,8 +1,9 @@
 #Common settings
-#Mon May 25 12:23:18 CST 2015
+#Fri Jun 12 15:42:16 CST 2015
 Last_map_path=/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE
-Recent_Open_File_Path=/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/Test2-short.trc;/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/test.trc;/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/Test2.trc;/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/Test2.crs.trc;/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/Test3.trc
-Auto_Load_Last_Edit_File=yes
+Last_railroad_network_path=/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE
 Use_HTTP_Proxy=no
+Auto_Load_Last_Edit_File=yes
+Recent_Open_File_Path=/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/Test2-short.trc;/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/test.trc;/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/Test2.trc;/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/Test2.crs.trc;/Users/zhiyuangong/Hobby/Railroad/\u5217\u8F66\u8FD0\u884C\u56FE/Test3.trc
 HTTP_Proxy_Server=127.0.0.1
-HTTP_Proxy_Port=80
+HTTP_Proxy_Port=801

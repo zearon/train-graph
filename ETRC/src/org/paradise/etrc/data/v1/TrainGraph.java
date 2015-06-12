@@ -159,15 +159,23 @@ public class TrainGraph extends TrainGraphPart {
 		}
 	}
 	
-	public void setTrainTypeByName(Train train) {
-		if (train.getName() == null)
-			return;
+	public TrainType guessTrainTypeByName(String name) {
+		if (name == null)
+			return defaultTrainType;
 
-		String trainName = train.getName().split("/")[0];
+		String trainName = name.split("/")[0];
 		TrainType type = trainTypes.stream()
 			.filter(trainType -> trainType.getNamePattern().matcher(trainName).matches())
 			.findFirst().orElse(defaultTrainType);
-		train.trainType = type;
+		
+		return type;
+	}
+	
+	public void setTrainTypeByName(Train train) {
+		if (train.getName() == null)
+			return;
+		
+		train.trainType = guessTrainTypeByName(train.getName());
 	}
 	
 	public void setTrainTypeByNameForAllTrains() {

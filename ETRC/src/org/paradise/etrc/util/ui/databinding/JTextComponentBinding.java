@@ -11,6 +11,7 @@ import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
 import javax.swing.JTextField;
+import javax.swing.text.JTextComponent;
 
 
 /**
@@ -30,8 +31,8 @@ import javax.swing.JTextField;
  * @author Jeff Gong
  * 
  */
-public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusListener, KeyListener {
-	JTextField textField;
+public class JTextComponentBinding<M> extends UIBinding<M, String> implements FocusListener, KeyListener {
+	JTextComponent textComponent;
 	String oldValue;
 
 	/**
@@ -41,15 +42,15 @@ public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusL
 	 * @param isField True if the property is accessed directly as a field; 
 	 * False if the property is accessed through a getter and a setter.
 	 */
-	JTextFieldBinding(JTextField textField, Object model, String propertyName, 
+	JTextComponentBinding(JTextComponent textComponent, Object model, String propertyName, 
 			String propertyDesc, Consumer<String> callback) {
 		super(model, propertyName, propertyDesc, callback);
-		this.textField = textField;
+		this.textComponent = textComponent;
 	}
 
 	@Override
 	public void focusGained(FocusEvent e) {
-		oldValue = textField.getText();
+		oldValue = textComponent.getText();
 	}
 
 	@Override
@@ -59,8 +60,12 @@ public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusL
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		if (e.getKeyChar() == KeyEvent.VK_ENTER)
-			updateModel();
+		if (oldValue != null && !oldValue.equals(getNewUIValue())) {
+			if (e.getKeyChar() == KeyEvent.VK_ENTER)
+				updateModel();
+			
+			oldValue = getNewUIValue();
+		}
 	}
 
 	@Override
@@ -76,18 +81,19 @@ public class JTextFieldBinding<M> extends UIBinding<M, String> implements FocusL
 	
 	@Override
 	public String getNewUIValue() { 
-		return textField.getText(); 
+		return textComponent.getText(); 
 	}
 
 	@Override
 	public void setUIValue(String uiValue) {
-		textField.setText(uiValue);
+		textComponent.setText(uiValue);
 	}
 
 	@Override
 	public void addEventListenersOnUI() {
-		textField.addFocusListener(this);
-		textField.addKeyListener(this);
+		textComponent.addFocusListener(this);
+//		if (textComponent instanceof JTextField)
+//			textComponent.addKeyListener(this);
 	}
 
 

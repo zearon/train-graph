@@ -14,6 +14,7 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
+import javax.swing.text.JTextComponent;
 
 import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.JColorChooserLabel;
@@ -214,8 +215,8 @@ public class UIBindingManager {
 	private UIBinding<?,?> createUIBindingByComponentType(Component component, Object model, 
 			String propertyName, String propertyDesc, Consumer<String> callback) {
 		
-		if (component instanceof JTextField)
-			return getJTextFieldBinding((JTextField) component, model, 
+		if (component instanceof JTextComponent)
+			return getJTextFieldBinding((JTextComponent) component, model, 
 					propertyName, propertyDesc, callback);
 		else if (component instanceof JComboBox)
 			return getJComboBoxBindingBinding((JComboBox) component, model, 
@@ -231,10 +232,10 @@ public class UIBindingManager {
 				component.getClass().getName() + " yet.");
 	}
 	
-	public JTextFieldBinding<Object> getJTextFieldBinding(JTextField component, Object model, 
+	public JTextComponentBinding<Object> getJTextFieldBinding(JTextComponent component, Object model, 
 			String propertyName, String propertyDesc, Consumer<String> callback) {
 		
-		JTextFieldBinding<Object> binding = new JTextFieldBinding<Object>(component, model, 
+		JTextComponentBinding<Object> binding = new JTextComponentBinding<Object>(component, model, 
 				propertyName, propertyDesc, callback);
 		return binding;
 	}

@@ -9,6 +9,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 
+import javax.swing.BorderFactory;
 import javax.swing.JList;
 import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
@@ -41,6 +42,7 @@ import javax.swing.JButton;
 
 public class TimetableEditView extends JPanel {
 	
+	public static final Color CROSSOVER_STATION_COLOR = Color.YELLOW;
 	public static final Color lineBK1 = Color.white;
 	public static final Color lineBK2 = new Color(224, 255, 255);
 	public static final Color headerBK = new Color(255, 224, 224);
@@ -135,6 +137,7 @@ public class TimetableEditView extends JPanel {
 	
 	private void buildTable() {
 		table = new TimetableEditSheetTable(trainGraph, this);
+		table.getContainerPanel().setBorder(BorderFactory.createEmptyBorder());
 		
 		add(table.getContainerPanel(), BorderLayout.CENTER);
 	}	

@@ -9,6 +9,7 @@ import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
 
 public class StationTableModel extends DefaultJEditTableModel {
@@ -18,14 +19,17 @@ public class StationTableModel extends DefaultJEditTableModel {
 	private static final long serialVersionUID = -6136704973824924463L;
 
 	private JTable table;
+	private TrainGraph trainGraph;
 	public RailroadLine railroadLine;
 
-	public StationTableModel(JTable table, RailroadLine line) {
+	public StationTableModel(JTable table, TrainGraph trainGraph, RailroadLine line) {
 		this.table = table;
-		setRailroadLine(line);
+		setRailroadLine(trainGraph, line);
 	}
 	
-	public void setRailroadLine(RailroadLine line) {
+	public void setRailroadLine(TrainGraph trainGraph, RailroadLine line) {
+		this.trainGraph = trainGraph;
+		
 		if (line != null)
 			railroadLine = line;
 		else
@@ -154,6 +158,10 @@ public class StationTableModel extends DefaultJEditTableModel {
 					.booleanValue();
 			break;
 		default:
+		}
+		
+		if (trainGraph != null) {
+			trainGraph.railNetwork.findCrossoverStations();
 		}
 
 		fireTableCellUpdated(rowIndex, columnIndex);

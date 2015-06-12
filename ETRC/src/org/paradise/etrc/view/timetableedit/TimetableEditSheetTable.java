@@ -30,12 +30,16 @@ import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
+import org.paradise.etrc.dialog.MessageBox;
 //import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.slice.ChartSlice;
 import org.paradise.etrc.util.Config;
+import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.table.JEditTable;
 import org.paradise.etrc.view.traintypes.TrainTypeTableCellRenderer;
 import org.paradise.etrc.view.traintypes.TrainTypeTableModel;
+
+import com.sun.xml.internal.messaging.saaj.packaging.mime.Header;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -49,16 +53,25 @@ public class TimetableEditSheetTable extends JEditTable {
 
 	TimetableEditSheetModel tableModel;
 	RowHeaderModel rowHeaderModel;
+	private SheetHeaderRanderer sheetHeaderRenderer;
 	
 	private TrainGraph trainGraph;
 	
 	private TimetableEditView editView;
+
+	private boolean ui_inited;
+	
+	private int selectedColumnsBeginIndex = -1;
+	private int selectedColumnsEndIndex;
+
 	public TimetableEditSheetTable(TrainGraph trainGraph, TimetableEditView _sheetView) {
 		super(__("Detailed timetable"));
 		setTrainGraph(trainGraph);
 		editView = _sheetView;
 
 		initTable();
+		
+		ui_inited = true;
 	}
 	
 	public void editingStopped(ChangeEvent e) {
@@ -123,11 +136,20 @@ public class TimetableEditSheetTable extends JEditTable {
 		//设置列宽(包括column header table的列宽)
 		setupColumnWidth();
 		
-//		timeTableScrollPane.setColumnHeaderView(view);
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				getTableHeader().repaint();
+			}
+		});
 	}
 	
 	public void setTrainGraph(TrainGraph trainGraph) {
 		this.trainGraph = trainGraph;
+		
+		if (ui_inited) {
+			sheetHeaderRenderer.setTrainGraph(trainGraph);
+		}
 	}
 	
 	public void switchChart(boolean downGoing) {
@@ -178,14 +200,18 @@ public class TimetableEditSheetTable extends JEditTable {
 
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() >= 2 && me.getButton() == MouseEvent.BUTTON1) {
-					String rowHeaderName = (String) ((JList<?>)me.getSource()).getSelectedValue();
-					String staName = rowHeaderName.substring(0, rowHeaderName.length()-3);
-					Station station = trainGraph.currentLineChart.railroadLine.getStation(staName);
-//					new MessageBox(mainFrame, "TODO: 给出 "
-//							   + station.name
-//							   + "站 所有列车停靠、通过（推算）时刻表。 ").showMessage();
+					String rowHeaderName = ((Tuple2<String, Boolean>) ((JList<?>)me.getSource()).getSelectedValue()).A;
 					
-					new ChartSlice(trainGraph.currentLineChart).makeStationSlice(station);
+					String stationRowString = RowHeaderModel.ARRIVE_STR;
+					int beginIndex = stationRowString.indexOf("%s");
+					int endIndex = rowHeaderName.length() - (stationRowString.length() - 1) + 1;
+					if (rowHeaderName.length() < endIndex)
+						return;
+					
+					String staName = rowHeaderName.substring(beginIndex, endIndex);
+					Station station = trainGraph.currentLineChart.railroadLine.getStation(staName);
+					if (station != null)
+						new ChartSlice(trainGraph.currentLineChart).makeStationSlice(station);
 				}
 			}
         });
@@ -227,49 +253,58 @@ public class TimetableEditSheetTable extends JEditTable {
 		//限制重置列宽 
 		header.setResizingAllowed(false);
 		//设置表头渲染
-		header.setDefaultRenderer(new SheetHeaderRanderer());
+		sheetHeaderRenderer = new SheetHeaderRanderer(this.trainGraph);
+		header.setDefaultRenderer(sheetHeaderRenderer);
 		
-//		header.addMouseListener(new MouseAdapter() {
-//			public void mouseClicked(MouseEvent me) {
-//				SheetTable table = SheetTable.this;
-//				int col = header.columnAtPoint(me.getPoint());
-//				int row = table.getSelectedRow();
-//				table.changeSelection(row, col, false, false);
-//				table.editCellAt(row, col);
-//				table.repaint();
-//				header.repaint();
-//				String trainName = SheetTable.this.getColumnName(col);
-//
-//				if(me.getClickCount() >= 2 && me.getButton() == MouseEvent.BUTTON1) {
-////					new MessageBox(sheetView.mainFrame, "TODO: 给出"
-////							   + trainName
-////							   + "次列车在 "
-////							   + sheetView.mainFrame.chart.circuit.name
-////							   + " 所有车站的停靠、通过（推算）时刻表。 ").showMessage();
-//					
-//					Train train = sheetView.activeLineChart.findTrain(trainName);
-//
-//					new ChartSlice(sheetView.activeLineChart).makeTrainSlice(train);
-//				}
-//			}
-//		});
+		header.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				int columnIndex = header.getColumnModel().getColumnIndexAtX(e.getX());
+				selectedColumnsBeginIndex = columnIndex;
+			}
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() != 2)
+					return;
+
+				int columnIndex = header.getColumnModel().getColumnIndexAtX(e.getX());
+				TrainRouteSection section = tableModel.getTrainRouteSection(columnIndex);
+				TrainRouteSectionEditDialiog dialog = new TrainRouteSectionEditDialiog(trainGraph, section);
+				dialog.showDialog();
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				int columnIndex = header.getColumnModel().getColumnIndexAtX(e.getX());
+				selectedColumnsEndIndex = columnIndex;
+
+				setRowSelectionInterval(0, 0);
+				setRowSelectionInterval(0, getRowCount() - 1);
+				setColumnSelectionInterval(selectedColumnsBeginIndex, selectedColumnsEndIndex);
+				
+				repaint();
+				header.repaint();
+			}
+			
+		});
 	}
 
-	int getPreferredWidthForCloumn(JTable table, int icol) {
-		TableColumnModel tcl = table.getColumnModel();
-		TableColumn col = tcl.getColumn(icol);
-		int c = col.getModelIndex(), width = 0, maxw = 0;
-
-		for (int r = 0; r < table.getRowCount(); ++r) {
-
-			TableCellRenderer renderer = table.getCellRenderer(r, c);
-			Component comp = renderer.getTableCellRendererComponent(table,
-					table.getValueAt(r, c), false, false, r, c);
-			width = comp.getPreferredSize().width;
-			maxw = width > maxw ? width : maxw;
-		}
-		return maxw;
-	}
+//	int getPreferredWidthForCloumn(JTable table, int icol) {
+//		TableColumnModel tcl = table.getColumnModel();
+//		TableColumn col = tcl.getColumn(icol);
+//		int c = col.getModelIndex(), width = 0, maxw = 0;
+//
+//		for (int r = 0; r < table.getRowCount(); ++r) {
+//
+//			TableCellRenderer renderer = table.getCellRenderer(r, c);
+//			Component comp = renderer.getTableCellRendererComponent(table,
+//					table.getValueAt(r, c), false, false, r, c);
+//			width = comp.getPreferredSize().width;
+//			maxw = width > maxw ? width : maxw;
+//		}
+//		return maxw;
+//	}
 	
 	public JList<?> getRowHeader() {
 		return rowHeader;

@@ -35,7 +35,7 @@ import org.paradise.etrc.util.data.ValueTypeConverter;
 import org.paradise.etrc.util.ui.FontUtil;
 import org.paradise.etrc.util.ui.JColorChooserLabel;
 import org.paradise.etrc.util.ui.databinding.JComboBoxBinding;
-import org.paradise.etrc.util.ui.databinding.JTextFieldBinding;
+import org.paradise.etrc.util.ui.databinding.JTextComponentBinding;
 import org.paradise.etrc.util.ui.databinding.UIBinding;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 import org.paradise.etrc.util.ui.databinding.converter.FontStyleConverter;

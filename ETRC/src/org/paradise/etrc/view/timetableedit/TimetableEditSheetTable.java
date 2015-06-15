@@ -5,9 +5,12 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -35,7 +38,8 @@ import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.slice.ChartSlice;
 import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.data.Tuple2;
-import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.JEditTable.KeyAction;
 import org.paradise.etrc.view.traintypes.TrainTypeTableCellRenderer;
 import org.paradise.etrc.view.traintypes.TrainTypeTableModel;
 
@@ -53,11 +57,12 @@ public class TimetableEditSheetTable extends JEditTable {
 
 	TimetableEditSheetModel tableModel;
 	RowHeaderModel rowHeaderModel;
-	private SheetHeaderRanderer sheetHeaderRenderer;
+	private SheetHeaderRenderer sheetHeaderRenderer;
 	
 	private TrainGraph trainGraph;
 	
 	private TimetableEditView editView;
+	private StopEditDialog stopEditDialog = new StopEditDialog(this);
 
 	private boolean ui_inited;
 	
@@ -87,7 +92,7 @@ public class TimetableEditSheetTable extends JEditTable {
 		setModel(tableModel);
 
 		//设置渲染器
-		setDefaultRenderer(TrainRouteSection.class, new SheetCellRanderer());
+		setDefaultRenderer(TrainRouteSection.class, new SheetCellRenderer());
 		//设置编辑器
 //		setDefaultEditor(Stop.class, new SheetCellEditor());
 		
@@ -136,10 +141,67 @@ public class TimetableEditSheetTable extends JEditTable {
 		//设置列宽(包括column header table的列宽)
 		setupColumnWidth();
 		
+		// 鼠标双击编辑单元格
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
 				getTableHeader().repaint();
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (!isEditLocked()) {
+					if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
+						int columnIndex = getColumnModel().getColumnIndexAtX(e.getX());
+						int rowIndex = rowAtPoint(e.getPoint());
+						
+						if (tableModel.isRemarksRow(rowIndex)) {
+							TrainRouteSection section = tableModel.getTrainRouteSection(columnIndex);
+							TrainRouteSectionEditDialiog dialog = new TrainRouteSectionEditDialiog(trainGraph, section, columnIndex);
+							dialog.showDialog();
+						} else if (!tableModel.isNewTrainColumn(columnIndex)) {
+							Stop stop = tableModel.getStop(rowIndex, columnIndex);
+							stopEditDialog.setStop(stop, rowIndex, columnIndex);
+							stopEditDialog.showDialog(TimetableEditSheetTable.this, rowIndex % 2 == 0);
+						}
+					}
+				}
+			}
+		});
+		
+		// 键盘按键编辑单元格
+		addKeyListener(new KeyListener() {
+			@Override public void keyTyped(KeyEvent e) {}
+			@Override public void keyReleased(KeyEvent e) {}
+			
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (isEditLocked())
+					return;
+				
+				char keyChar = e.getKeyChar();
+				if ((keyChar >= '0' && keyChar <= '9')
+						|| Config.getInstance().isTimetableEditingKey(keyChar)
+						|| keyChar == ' ' || keyChar == '\n') {
+					
+					int columnIndex = getSelectedColumn();
+					int rowIndex = getSelectedRow();
+
+					if (!tableModel.isNewTrainColumn(columnIndex)) {
+						Stop stop = tableModel.getStop(rowIndex, columnIndex);
+						stopEditDialog.setStop(stop, rowIndex, columnIndex);
+						stopEditDialog.showDialog(TimetableEditSheetTable.this, rowIndex % 2 == 0, keyChar);
+					}
+					
+					if (keyChar == '\n')
+						e.consume();
+				}
+				
+				else if (keyChar == 'c' || keyChar == 'C') {
+					toggleContinuousEditMode();
+				} else if (keyChar == 'f' || keyChar == 'F') {
+					toggleFocusVMove();
+				}
 			}
 		});
 	}
@@ -200,6 +262,7 @@ public class TimetableEditSheetTable extends JEditTable {
 
 			public void mouseClicked(MouseEvent me) {
 				if(me.getClickCount() >= 2 && me.getButton() == MouseEvent.BUTTON1) {
+					@SuppressWarnings("unchecked")
 					String rowHeaderName = ((Tuple2<String, Boolean>) ((JList<?>)me.getSource()).getSelectedValue()).A;
 					
 					String stationRowString = RowHeaderModel.ARRIVE_STR;
@@ -253,7 +316,7 @@ public class TimetableEditSheetTable extends JEditTable {
 		//限制重置列宽 
 		header.setResizingAllowed(false);
 		//设置表头渲染
-		sheetHeaderRenderer = new SheetHeaderRanderer(this.trainGraph);
+		sheetHeaderRenderer = new SheetHeaderRenderer(this.trainGraph);
 		header.setDefaultRenderer(sheetHeaderRenderer);
 		
 		header.addMouseListener(new MouseAdapter() {
@@ -265,13 +328,16 @@ public class TimetableEditSheetTable extends JEditTable {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				if (e.getClickCount() != 2)
-					return;
-
 				int columnIndex = header.getColumnModel().getColumnIndexAtX(e.getX());
 				TrainRouteSection section = tableModel.getTrainRouteSection(columnIndex);
-				TrainRouteSectionEditDialiog dialog = new TrainRouteSectionEditDialiog(trainGraph, section);
-				dialog.showDialog();
+				
+				if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
+					TrainRouteSectionEditDialiog dialog = new TrainRouteSectionEditDialiog(trainGraph, section, columnIndex);
+					dialog.showDialog();
+				}
+				if (e.getButton() == MouseEvent.BUTTON2) {
+					// TODO: 复制粘贴 右键菜单
+				}
 			}
 
 			@Override
@@ -322,5 +388,36 @@ public class TimetableEditSheetTable extends JEditTable {
 	public void updateData() {
 		setupColumnWidth();
 		getTableModel().fireTableStructureChanged();
+	}
+	
+	public void refreshColumn(int column) {
+		getTableHeader().repaint();
+		tableModel.fireTableCellUpdated(getRowCount() - 1, column);
+	}
+	
+	public void refreshStopCell(int row, int column) {
+		int row1 = row;
+		int row2 = row % 2 == 0 ? row + 1 : row - 1;
+		tableModel.fireTableCellUpdated(row1, column);
+		tableModel.fireTableCellUpdated(row2, column);
+	}
+	
+	// Override key event listners in base class.
+	@Override
+	protected void setKeyStrokeAction(JComponent comp, int keycode,
+			int modifier, KeyAction action) {}
+	
+	public void moveToNextCell() {
+		int columnIndex = getSelectedColumn();
+		int rowIndex = getSelectedRow();
+		
+		if (isFocusVMove() && rowIndex < getRowCount() - 3) {
+			rowIndex += 2;
+			setRowSelectionInterval(rowIndex, rowIndex);
+		}
+		else if (!isFocusVMove() && columnIndex < getColumnCount() - 2) {
+			columnIndex += 1;
+			setColumnSelectionInterval(columnIndex, columnIndex);
+		}
 	}
 }

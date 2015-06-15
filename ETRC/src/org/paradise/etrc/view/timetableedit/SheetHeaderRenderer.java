@@ -8,8 +8,6 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BorderFactory;
@@ -18,23 +16,23 @@ import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.ToolTipManager;
-import javax.swing.border.BevelBorder;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
 
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
-import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.util.ui.string.VerticalStringPainter;
 
-public class SheetHeaderRanderer extends JList<TrainRouteSection> implements TableCellRenderer {
+import static org.paradise.etrc.ETRC.__;
+
+public class SheetHeaderRenderer extends JList<TrainRouteSection> implements TableCellRenderer {
 	private static final long serialVersionUID = -3005467491964709634L;
 	TrainGraph trainGraph;
 	TimetableEditSheetTable table;
 	TrainRouteSection trainSection;
 	
-	public SheetHeaderRanderer(TrainGraph trainGraph){
+	public SheetHeaderRenderer(TrainGraph trainGraph){
 		setTrainGraph(trainGraph);
 	}
 	
@@ -53,19 +51,13 @@ public class SheetHeaderRanderer extends JList<TrainRouteSection> implements Tab
 		setModel(listModel);
 		setCellRenderer(new HeaderRenderer(table, column, trainGraph, trainSection));
 		
-		setToolTipText(trainSection.getName());
+		if (column == table.getColumnCount() - 1)
+			setToolTipText(__("Double click to create a new train."));
+		else
+			setToolTipText(trainSection.getName());
 		ToolTipManager.sharedInstance().setDismissDelay(15000);
 		
 		return this;
-	}
-	
-	private void mouseButtonClicked(MouseEvent e) {
-		if (e.getClickCount() == 1) {
-			//
-		} else if (e.getClickCount() == 2) {
-			TrainRouteSectionEditDialiog dialog = new TrainRouteSectionEditDialiog(trainGraph, trainSection);
-			dialog.setVisible(true);
-		}
 	}
 }
 
@@ -95,6 +87,7 @@ class HeaderRenderer extends JLabel implements ListCellRenderer<TrainRouteSectio
 	TimetableEditSheetTable table;
 	int rowIndex;
 	int column;
+	boolean isNewTrainColumn;
 	TrainGraph trainGraph;
 	TrainRouteSection trainSection;
 	
@@ -108,6 +101,7 @@ class HeaderRenderer extends JLabel implements ListCellRenderer<TrainRouteSectio
     	this.column = column;
     	this.trainGraph = trainGraph;
     	this.trainSection = trainSection;
+    	this.isNewTrainColumn = column == table.getColumnCount() - 1;
         JTableHeader header = table.getTableHeader();
         setOpaque(true);
         setBorder(BorderFactory.createEmptyBorder(0, 4, 0, 4));
@@ -121,6 +115,8 @@ class HeaderRenderer extends JLabel implements ListCellRenderer<TrainRouteSectio
 		if (rowIndex == 2) {
 			// vehicle name
 			d.height = table.getVehicleNameRowHeight();
+		} else if (rowIndex == 0) {
+			d.height = table.getRowHeight(0);
 		}
 		return d;
 	}
@@ -167,10 +163,21 @@ class HeaderRenderer extends JLabel implements ListCellRenderer<TrainRouteSectio
 		setBackground(table.getBackground());
 		String text;
 		
+		if (index == 0) {
+			Font tableFont = table.getFont();
+			Font font = new Font(tableFont.getFamily(), tableFont.getStyle(), 10);
+			setFont(font);
+		} else {
+			setFont(table.getFont());
+		}
+		
 		Train train = value.getTrain();
 		if (train == null) {
-			setText("1");
-			setForeground(table.getBackground());
+			setText("*");
+			if (index == 0)
+				setForeground(Color.BLACK);
+			else
+				setForeground(table.getBackground());
 			return this;
 		}
 		

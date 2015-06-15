@@ -56,4 +56,9 @@ public class JColorChooserLabelBinding extends UIBinding<Color, Color> implement
 		label.addPropertyChangeListener("color", this);
 	}
 
+	@Override
+	public void removeEventListenersOnUI() {
+		label.removePropertyChangeListener("color", this);
+	}
+
 }

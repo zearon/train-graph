@@ -2,6 +2,7 @@ package org.paradise.etrc.view.settings;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.util.Vector;
@@ -21,6 +22,7 @@ import javax.swing.border.LineBorder;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.v1.ChartSettings;
 import org.paradise.etrc.data.v1.TrainGraph;
+import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.databinding.JComboBoxBinding;
 import org.paradise.etrc.util.ui.databinding.JTextComponentBinding;
@@ -28,7 +30,12 @@ import org.paradise.etrc.util.ui.databinding.UIBinding;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
+
 import javax.swing.LayoutStyle.ComponentPlacement;
+
+import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 public class SettingsView extends JPanel {
 	private JTextField txtDistscale;
@@ -50,11 +57,19 @@ public class SettingsView extends JPanel {
 	
 	private JTextField txtGlobalhttpproxyserver;
 	private JTextField txtGlobalhttpproxyport;
-	private JComboBox cbUseAntiAliasing;
+	private JComboBox<String> cbUseAntiAliasing;
 	private JTextField txtTimetableEditRowHeaderWidth;
 	private JTextField txtTimetableEditCellWidth;
 	private JTextField timetableEditVehicleNameRowHeight;
 	private JTextField timetableEditRemarksRowHeight;
+	private JPanel panel;
+	private JPanel panelKeySettings;
+	private JTextField txtSE_notgothrough;
+	private JTextField txtSE_stopAtTerminalStation;
+	private JTextField txtSE_stop;
+	private JTextField txtSE_technicalStop;
+	private JTextField txtSE_pass;
+	private JTextField txtSE_stopAtStartStation;
 
 	/**
 	 * Create the panel.
@@ -64,6 +79,9 @@ public class SettingsView extends JPanel {
 		setModel(trainGraph);
 
 		initUI();
+		// set preferred size of panel in order to fit the scroll pane.
+		Rectangle rect = panelKeySettings.getBounds();
+		panel.setPreferredSize(new Dimension(rect.x + rect.width + 10, rect.y + rect.height + 10));
 		
 		setupUIDataBinding();
 		
@@ -77,6 +95,8 @@ public class SettingsView extends JPanel {
 			uiBindingManager.setModel(this::getModelObject, null);
 		}
 	}
+	
+	// {{ init UI
 
 	private synchronized void initUI() {
 		allDataBindingComponent.clear();
@@ -86,32 +106,31 @@ public class SettingsView extends JPanel {
 		JScrollPane scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
 		
-		JPanel panel = new JPanel();
+		panel = new JPanel();
 		scrollPane.setViewportView(panel);
 		
 		JPanel panel_runningChart = new JPanel();
 		panel_runningChart.setBounds(6, 162, 565, 152);
 		panel_runningChart.setBorder(new LineBorder(new Color(192, 192, 192), 1, true));
 		
-		JLabel lblRuningChart = new JLabel(__("Runing Chart"));
+		JLabel lblRuningChart = SettingsView.createJLabel("Runing Chart", true, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblRuningChart.setBounds(19, 154, 85, 15);
-		lblRuningChart.setOpaque(true);
 		lblRuningChart.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRuningChart.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblDistanceUnit = new JLabel(__("Distance Unit"));
+		JLabel lblDistanceUnit = SettingsView.createJLabel("Distance Unit", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblDistanceUnit.setBounds(7, 24, 75, 15);
 		lblDistanceUnit.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblPixelsunit = new JLabel(__("Pixels/Unit"));
+		JLabel lblPixelsunit = SettingsView.createJLabel("Pixels/Unit", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblPixelsunit.setBounds(7, 57, 61, 15);
 		lblPixelsunit.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblDisplaylevel = new JLabel(__("Min Station Display Level"));
+		JLabel lblDisplaylevel = SettingsView.createJLabel("Min Station Display Level", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblDisplaylevel.setBounds(7, 90, 141, 15);
 		lblDisplaylevel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblStationLevelFor = new JLabel(__("Level of Station as Bold Lines"));
+		JLabel lblStationLevelFor = SettingsView.createJLabel("Level of Station as Bold Lines", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblStationLevelFor.setBounds(7, 123, 165, 15);
 		lblStationLevelFor.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
@@ -129,15 +148,15 @@ public class SettingsView extends JPanel {
 		txtBoldlinelevel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		txtBoldlinelevel.setColumns(5);
 		
-		JLabel lblPixelsmin = new JLabel(__("Pixels/minute"));
+		JLabel lblPixelsmin = SettingsView.createJLabel("Pixels/minute", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblPixelsmin.setBounds(355, 57, 78, 15);
 		lblPixelsmin.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblNewLabel = new JLabel(__("Start hour in chart"));
+		JLabel lblNewLabel = SettingsView.createJLabel("Start hour in chart", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblNewLabel.setBounds(355, 90, 103, 15);
 		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblMinsXaxis = new JLabel(__("Minute/x-axis scale"));
+		JLabel lblMinsXaxis = SettingsView.createJLabel("Minute/x-axis scale", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblMinsXaxis.setBounds(355, 123, 114, 15);
 		lblMinsXaxis.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
@@ -157,45 +176,42 @@ public class SettingsView extends JPanel {
 		cbUseAntiAliasing = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "runningChart.useAntiAliasing:YesNo");
 		cbUseAntiAliasing.setBounds(481, 18, 72, 27);
 		
-		JLabel lblUseAntialiasing = new JLabel(__("Use Anti-Aliasing"));
+		JLabel lblUseAntialiasing = SettingsView.createJLabel("Use Anti-Aliasing", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblUseAntialiasing.setBounds(355, 24, 98, 15);
 		lblUseAntialiasing.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblTimetableEdit = new JLabel(__("Timetable Edit Sheet"));
+		JLabel lblTimetableEdit = SettingsView.createJLabel("Timetable Edit Sheet", true, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblTimetableEdit.setBounds(19, 326, 126, 15);
-		lblTimetableEdit.setOpaque(true);
 		lblTimetableEdit.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JPanel panel_timetableEdit = new JPanel();
 		panel_timetableEdit.setBounds(6, 333, 565, 95);
 		panel_timetableEdit.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 		
-		JLabel lblGlobalSettings = new JLabel(__("Global Settings"));
+		JLabel lblGlobalSettings = createJLabel("Global Settings", true, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblGlobalSettings.setBounds(19, 12, 85, 15);
-		lblGlobalSettings.setOpaque(true);
-		lblGlobalSettings.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JPanel panelGlobalSettings = new JPanel();
 		panelGlobalSettings.setBounds(6, 20, 565, 122);
 		panelGlobalSettings.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 		
-		JLabel lblAutoload = new JLabel(__("Auto Load"));
+		JLabel lblAutoload = SettingsView.createJLabel("Auto Load", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblAutoload.setBounds(7, 20, 58, 15);
 		lblAutoload.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblUseHttpProxy = new JLabel(__("Use HTTP Proxy"));
+		JLabel lblUseHttpProxy = SettingsView.createJLabel("Use HTTP Proxy", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblUseHttpProxy.setBounds(7, 54, 93, 15);
 		lblUseHttpProxy.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblHttpProxyServer = new JLabel(__("HTTP Proxy Server:"));
+		JLabel lblHttpProxyServer = SettingsView.createJLabel("HTTP Proxy Server:", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblHttpProxyServer.setBounds(7, 92, 112, 15);
 		lblHttpProxyServer.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JComboBox cbAutoLoadLastFile = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.AutoLoadLastFile:YesNo");
+		JComboBox<String> cbAutoLoadLastFile = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.AutoLoadLastFile:YesNo");
 		cbAutoLoadLastFile.setBounds(112, 15, 93, 27);
 		cbAutoLoadLastFile.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JComboBox cbHttpProxyUse = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.HttpProxyUse:YesNo");
+		JComboBox<String> cbHttpProxyUse = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel<String>(new String[] {"Yes", "No"}), 1, "global.HttpProxyUse:YesNo");
 		cbHttpProxyUse.setBounds(112, 49, 93, 27);
 		
 		txtGlobalhttpproxyserver = SettingsView.createJTextField("global.HttpProxyServer");
@@ -212,6 +228,11 @@ public class SettingsView extends JPanel {
 		txtGlobalhttpproxyport.setBounds(306, 85, 109, 28);
 		txtGlobalhttpproxyport.setColumns(10);
 		panel.setLayout(null);
+		
+		JLabel lblKeySettings = SettingsView.createJLabel("Key Settings", true, new Font("Lucida Grande", Font.PLAIN, 12));
+		lblKeySettings.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		lblKeySettings.setBounds(596, 12, 69, 15);
+		panel.add(lblKeySettings);
 		panel.add(lblGlobalSettings);
 		panel.add(panelGlobalSettings);
 		panelGlobalSettings.setLayout(null);
@@ -265,19 +286,19 @@ public class SettingsView extends JPanel {
 		timetableEditRemarksRowHeight.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		timetableEditRemarksRowHeight.setColumns(5);
 		
-		JLabel lblRowHeaderWidth = new JLabel(__("Row Header Width"));
+		JLabel lblRowHeaderWidth = SettingsView.createJLabel("Row Header Width", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblRowHeaderWidth.setBounds(7, 24, 107, 15);
 		lblRowHeaderWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblCellWidth = new JLabel(__("Cell Width"));
+		JLabel lblCellWidth = SettingsView.createJLabel("Cell Width", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblCellWidth.setBounds(7, 57, 57, 15);
 		lblCellWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblVehicleNameRow = new JLabel(__("Vehicle Name Row Height"));
+		JLabel lblVehicleNameRow = SettingsView.createJLabel("Vehicle Name Row Height", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblVehicleNameRow.setBounds(318, 24, 148, 15);
 		lblVehicleNameRow.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
-		JLabel lblRemarksRowHeight = new JLabel(__("Remarks Row Height"));
+		JLabel lblRemarksRowHeight = SettingsView.createJLabel("Remarks Row Height", false, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblRemarksRowHeight.setBounds(318, 57, 120, 15);
 		lblRemarksRowHeight.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		panel_timetableEdit.setLayout(null);
@@ -290,8 +311,7 @@ public class SettingsView extends JPanel {
 		panel_timetableEdit.add(lblVehicleNameRow);
 		panel_timetableEdit.add(lblRemarksRowHeight);
 		
-		JLabel lblPlanningSchedule = new JLabel("Planning Schedule");
-		lblPlanningSchedule.setOpaque(true);
+		JLabel lblPlanningSchedule = SettingsView.createJLabel("Planning Schedule", true, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblPlanningSchedule.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		lblPlanningSchedule.setBounds(19, 440, 103, 15);
 		panel.add(lblPlanningSchedule);
@@ -301,13 +321,102 @@ public class SettingsView extends JPanel {
 		panel_planningSchedule.setBounds(6, 447, 565, 94);
 		panel.add(panel_planningSchedule);
 		
-		JPanel panel_1 = new JPanel();
-		add(panel_1, BorderLayout.SOUTH);
-		panel_1.setLayout(new GridLayout(0, 1, 0, 0));
+		panelKeySettings = new JPanel();
+		panelKeySettings.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
+		panelKeySettings.setBounds(583, 21, 212, 521);
+		panel.add(panelKeySettings);
+		panelKeySettings.setLayout(null);
 		
-		JLabel lblTip = new JLabel(__("Tip: Move the focus to another control to save the change."));
-		panel_1.add(lblTip);
+		JLabel lblStopEditing = SettingsView.createJLabel("Timetable Editing", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		lblStopEditing.setBounds(6, 5, 105, 15);
+		panelKeySettings.add(lblStopEditing);
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setBounds(6, 26, 200, 172);
+		panelKeySettings.add(panel_1);
+		panel_1.setLayout(null);
+		
+		txtSE_notgothrough = SettingsView.createKeyJTextField("global.KeyTE_NotGoThrough"); 
+		txtSE_notgothrough.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtSE_notgothrough.setBounds(166, 0, 28, 28);
+		panel_1.add(txtSE_notgothrough);
+		txtSE_notgothrough.setColumns(1);
+		
+		txtSE_stopAtTerminalStation = SettingsView.createKeyJTextField("global.KeyTE_StopAtTerminalStation");
+		txtSE_stopAtTerminalStation.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtSE_stopAtTerminalStation.setColumns(10);
+		txtSE_stopAtTerminalStation.setBounds(166, 84, 28, 28);
+		panel_1.add(txtSE_stopAtTerminalStation);
+		
+		txtSE_stop = SettingsView.createKeyJTextField("global.KeyTE_StopForPassenger");
+		txtSE_stop.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtSE_stop.setColumns(10);
+		txtSE_stop.setBounds(166, 112, 28, 28);
+		panel_1.add(txtSE_stop);
+		
+		txtSE_technicalStop = SettingsView.createKeyJTextField("global.KeyTE_StopNoPassenger");
+		txtSE_technicalStop.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtSE_technicalStop.setColumns(10);
+		txtSE_technicalStop.setBounds(166, 140, 28, 28);
+		panel_1.add(txtSE_technicalStop);
+		
+		JLabel lblNotGoThrough = SettingsView.createJLabel("Not Go Through", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		lblNotGoThrough.setBounds(6, 5, 141, 16);
+		panel_1.add(lblNotGoThrough);
+		
+		JLabel lblPass = SettingsView.createJLabel("Pass", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		lblPass.setBounds(6, 33, 101, 16);
+		panel_1.add(lblPass);
+		
+		JLabel lblStopForPassenger = SettingsView.createJLabel("Stop", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		lblStopForPassenger.setBounds(6, 117, 124, 16);
+		panel_1.add(lblStopForPassenger);
+		
+		JLabel lblStopWithoutPassenger = SettingsView.createJLabel("Technical Stop", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		lblStopWithoutPassenger.setBounds(6, 145, 141, 16);
+		panel_1.add(lblStopWithoutPassenger);
+		
+		txtSE_pass = createKeyJTextField("global.KeyTE_PASS");
+		txtSE_pass.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtSE_pass.setColumns(1);
+		txtSE_pass.setBounds(166, 28, 28, 28);
+		panel_1.add(txtSE_pass);
+		
+		txtSE_stopAtStartStation = createKeyJTextField("global.KeyTE_StopAtStartStation");
+		txtSE_stopAtStartStation.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		txtSE_stopAtStartStation.setColumns(1);
+		txtSE_stopAtStartStation.setBounds(166, 56, 28, 28);
+		panel_1.add(txtSE_stopAtStartStation);
+		
+		JLabel label_1 = createJLabel("Stop at Start Station", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		label_1.setBounds(6, 61, 124, 16);
+		panel_1.add(label_1);
+		
+		JLabel label_2 = createJLabel("Stop at Terminal Station", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		label_2.setBounds(6, 89, 148, 16);
+		panel_1.add(label_2);
+		
+		JPanel panelStatusBar = new JPanel();
+		add(panelStatusBar, BorderLayout.SOUTH);
+		panelStatusBar.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		JLabel lblTip = new JLabel("Tip: Move the focus to another control to save the change.");
+		panelStatusBar.add(lblTip);
 		lblTip.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		
+	}
+	
+	/**
+	 * @wbp.factory
+	 * @wbp.factory.parameter.source text ""
+	 * @wbp.factory.parameter.source opaque false
+	 * @wbp.factory.parameter.source font new java.awt.Font("Lucida Grande", java.awt.Font.PLAIN, 12)
+	 */
+	public static JLabel createJLabel(String text, boolean opaque, Font font) {
+		JLabel label = new JLabel(__(text));
+		label.setOpaque(opaque);
+		label.setFont(font);
+		return label;
 	}
 	
 	/**
@@ -315,12 +424,47 @@ public class SettingsView extends JPanel {
 	 * @wbp.factory.parameter.source name ""
 	 */
 	public static JTextField createJTextField(String name) {
-		// Use text value of JTextfield to keep property of data source model
-		
 		JTextField textField = new JTextField();
 		textField.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		textField.setColumns(5);
 		textField.setName(name);
+		
+		allDataBindingComponent.add(textField);
+		
+		return textField;
+	}
+	
+	/**
+	 * @wbp.factory
+	 * @wbp.factory.parameter.source name ""
+	 */
+	public static JTextField createKeyJTextField(String name) {
+		JTextField textField = new JTextField();
+		textField.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		textField.setColumns(1);
+		textField.setName(name);
+		textField.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyTyped(KeyEvent e) {
+				char keyChar = e.getKeyChar();
+				if (keyChar >= 'a' && keyChar <= 'z')
+					keyChar -= 32; // Change to upper case letter
+				
+				e.consume();
+				
+				if (keyChar < 'A' || keyChar > 'Z') {
+					MessageBox mb = new MessageBox(__("Only letters allowed."));
+					mb.showMessage();
+					return;
+				}
+				
+				textField.setText("" + keyChar);
+			}
+			
+			@Override public void keyReleased(KeyEvent e) {}
+			@Override public void keyPressed(KeyEvent e) {}
+		});
 		
 		allDataBindingComponent.add(textField);
 		
@@ -348,6 +492,8 @@ public class SettingsView extends JPanel {
 		return comboBox;
 	}
 	
+	// }}
+	
 	// {{ Data Bindings
 	
 	private void setupUIDataBinding() {
@@ -359,7 +505,7 @@ public class SettingsView extends JPanel {
 		uiBindingManager.updateUI(null);
 	}
 	
-	public Object getModelObject(String propertyGroup) {
+	private Object getModelObject(String propertyGroup) {
 		if ("global".equals(propertyGroup)) {
 			return Config.getInstance();
 		} else if ("runningChart".equals(propertyGroup)) {
@@ -382,7 +528,7 @@ public class SettingsView extends JPanel {
 		}
 	}
 	
-	public String getPropertyDesc(String propertyName) {
+	private String getPropertyDesc(String propertyName) {
 		String desc = "";
 		
 		if ("distScale".equals(propertyName)) {
@@ -421,8 +567,16 @@ public class SettingsView extends JPanel {
 			desc = String.format(__("%s in timetable edit sheet settings"), __("remarks row height"));
 		}
 		
+		else if ("KeyTE_NotGoThrough".equals(propertyName)) {
+			desc = String.format(__("%s in key settings for timetable editing"), __("not go through key"));
+		} else if ("KeyTE_PASS".equals(propertyName)) {
+			desc = String.format(__("%s in key settings for timetable editing"), __("pass key"));
+		} else if ("KeyTE_StopForPassenger".equals(propertyName)) {
+			desc = String.format(__("%s in key settings for timetable editing"), __("stop for passenger key"));
+		} else if ("KeyTE_StopNoPassenger".equals(propertyName)) {
+			desc = String.format(__("%s in key settings for timetable editing"), __("stop without passenger key"));
+		}
+		
 		return desc;
 	}
-	
-	// }}
 }

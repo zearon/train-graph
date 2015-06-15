@@ -47,7 +47,7 @@ public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object
     	
     	g.setColor(Color.gray);
     	//下横线
-    	if (rowIndex % 2 == 1)
+    	if (rowIndex % 2 == 1 || rowIndex == table.getRowCount() - 1)
     		g.drawLine(0, getHeight() - 1, getWidth(), getHeight() - 1);
     	//上横线
 //    	if (rowIndex == 0)
@@ -75,7 +75,8 @@ public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object
 			setBackground(TimetableEditView.selectBK);
 		}
 		else {
-			setBackground(index % 4 < 2 ? TimetableEditView.lineBK1 : TimetableEditView.lineBK2);
+			setBackground(TimetableEditView.lineBK1);
+//			setBackground(index % 4 < 2 ? TimetableEditView.lineBK1 : TimetableEditView.lineBK2);
 		}
 		
 		return this;

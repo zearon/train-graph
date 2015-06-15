@@ -85,4 +85,9 @@ public class JComboBoxBinding<M, U> extends UIBinding<M, U> implements ItemListe
 		comboBox.addItemListener(this);
 	}
 
+	@Override
+	public void removeEventListenersOnUI() {
+		comboBox.removeItemListener(this);
+	}
+
 }

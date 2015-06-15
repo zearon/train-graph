@@ -5,7 +5,7 @@ import java.awt.Dimension;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.TableModelListener;
 
-import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 

@@ -53,7 +53,8 @@ public class RowHeaderModel extends AbstractListModel<Object> {
     	
     	Station station = stations.get(index / 2);
 		String sta = station.getName();
-		String text = index % 2 == 0 ? String.format(ARRIVE_STR, sta) : station.dist + trainGraph.settings.distUnit + DEPARTURE_STR;
+		String text = index % 2 == 0 ? String.format(ARRIVE_STR, sta) : 
+			"<html><span style='color:#C0C0C0'>" + station.dist + trainGraph.settings.distUnit + "</span>" + DEPARTURE_STR + "<html>";
 		return Tuple2.of(text, station.isCrossover);
     }
 }

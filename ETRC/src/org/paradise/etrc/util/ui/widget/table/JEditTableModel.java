@@ -1,4 +1,4 @@
-package org.paradise.etrc.util.ui.table;
+package org.paradise.etrc.util.ui.widget.table;
 
 import javax.swing.table.TableModel;
 

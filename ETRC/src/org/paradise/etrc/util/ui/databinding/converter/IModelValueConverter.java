@@ -6,5 +6,5 @@ import static org.paradise.etrc.ETRCUtil.*;
 public interface IModelValueConverter<M, U> {
 	public String getID();
 	public U modelValueToUI(M modelValue);
-	public M UIvalueToModel(U UIvalue);
+	public M UIvalueToModel(U uiValue);
 }

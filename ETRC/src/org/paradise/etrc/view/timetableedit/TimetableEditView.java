@@ -45,6 +45,8 @@ public class TimetableEditView extends JPanel {
 	public static final Color CROSSOVER_STATION_COLOR = Color.YELLOW;
 	public static final Color lineBK1 = Color.white;
 	public static final Color lineBK2 = new Color(224, 255, 255);
+	public static final Color startStationBK = new Color(224, 255, 255);
+	public static final Color terminalStationBK = Color.decode("#ffeceb");
 	public static final Color headerBK = new Color(255, 224, 224);
 	public static final Color selectBK = new Color(192, 192, 255);
 	
@@ -104,6 +106,14 @@ public class TimetableEditView extends JPanel {
 		uiBindingManager.updateUI(null);
 		table.setupColumnWidth();
 		repaint();
+	}
+	
+	public void refreshColumn(int column) {
+		table.refreshColumn(column);
+	}
+	
+	public void refreshStopCell(int row, int column) {
+		table.refreshStopCell(row, column);
 	}
 
 	private void initUI() {

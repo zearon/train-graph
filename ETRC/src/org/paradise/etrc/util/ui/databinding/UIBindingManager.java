@@ -10,8 +10,10 @@ import java.util.Vector;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JList;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.text.JTextComponent;
@@ -77,6 +79,7 @@ public class UIBindingManager {
 			@Override public Object getNewUIValue() { return ""; }
 			@Override public void setUIValue(Object uiValue) {}
 			@Override public void addEventListenersOnUI() {}
+			@Override public void removeEventListenersOnUI() {}
 		};
 		getBinding(model, propertyName, binding, autoFind, isField);
 		return binding;
@@ -98,6 +101,13 @@ public class UIBindingManager {
 	}
 	
 	private Vector<UIBinding<?, ?>> allBindings = new Vector<> ();
+	
+	public void clearDataBinding() {
+		for (UIBinding<?, ?> binding : allBindings) {
+			binding.removeEventListenersOnUI();
+		}
+		allBindings.clear();
+	}
 	
 	/**
 	 * Read data binding string from <b>name</b> property of UI component, and create a corresponding
@@ -125,7 +135,35 @@ public class UIBindingManager {
 		if (component == null || modelMapper == null)
 			throw new NullPointerException("Component and modelMapper cannot be null.");
 		
-		String dataBindingStr = component.getName();
+		addDataBinding(component, component.getName(), modelMapper, propertyDescMapper, callback);
+	}
+	
+	/**
+	 * Create a data binding for a UI component with a data binding string. <br/>
+	 * As an example, data binding string <b>trainType.lineStyle:LineStyle</b> specifies that the data source model object is 
+	 * identified by trainType, the lineStyle property of the data source object is to be bound 
+	 * to the ui component, and a value type converter identified as LineStyle is used to convert
+	 * value between model value type and UI value type. <br/>
+	 * Note: A value type converter should implements the interface
+	 * org.paradise.etrc.util.ui.databinding.converter.IModelValueConverter. Before being referenced 
+	 * in a data binding string, it should be registered with class
+	 * org.paradise.etrc.util.ui.databinding.converter.ValueConverterManager in advance.
+	 * @param component 	The target UI component to be bound with a model object. Cannot be null.
+	 * @param dataBindingStr The data binding string.
+	 * @param modelMapper 	A function that accepts a string object id and returns the model object. 
+	 * 						Cannot be null.
+	 * @param propertyDescMapper A function that accepts a string property name and returns corresponding
+	 * 						property description. Can be null. If it is null, then use property name as its description.
+	 * @param callback 		A function that will be called after the model value is set. Same with modelMapper,
+	 * 						only objectID matched bindings will take effect. Can be null.
+	 * 						If it is null, no extra actions are taken after the model value is set.
+	 */
+	public void addDataBinding(Object component, String dataBindingStr, Function<String, Object> modelMapper, 
+			Function<String, String> propertyDescMapper, Consumer<String> callback) {
+		
+		if (component == null || modelMapper == null)
+			throw new NullPointerException("Component and modelMapper cannot be null.");
+		
 		if (dataBindingStr == null)
 			throw new NullPointerException("Cannot read data binding string from name property.");
 		
@@ -212,32 +250,30 @@ public class UIBindingManager {
 		return new String[] {modelObj, propertyName, propertyConverterID};
 	}
 	
-	private UIBinding<?,?> createUIBindingByComponentType(Component component, Object model, 
+	private UIBinding<?,?> createUIBindingByComponentType(Object component, Object model, 
 			String propertyName, String propertyDesc, Consumer<String> callback) {
 		
 		if (component instanceof JTextComponent)
-			return getJTextFieldBinding((JTextComponent) component, model, 
+			return new JTextComponentBinding((JTextComponent) component, model, 
 					propertyName, propertyDesc, callback);
 		else if (component instanceof JComboBox)
 			return getJComboBoxBindingBinding((JComboBox) component, model, 
 					propertyName, propertyDesc, callback);
+//		else if (component instanceof JList)
+//			return getJListBindingBinding((JList) component, model, 
+//					propertyName, propertyDesc, callback);
 		else if (component instanceof JColorChooserLabel)
-			return getJColorChooserLabelBinding((JColorChooserLabel) component, model, 
+			return new JColorChooserLabelBinding((JColorChooserLabel) component, model, 
 					propertyName, propertyDesc, callback);
 		else if (component instanceof JToggleButton)
-			return getJToggleButtonBinding((JToggleButton) component, model, 
+			return new JToggleButtonBinding((JToggleButton) component, model, 
+					propertyName, propertyDesc, callback);
+		else if (component instanceof ButtonGroup)
+			return new ButtonGroupBinding((ButtonGroup) component, model, 
 					propertyName, propertyDesc, callback);
 		
 		throw new RuntimeException("There is no ui binding supporting " + 
 				component.getClass().getName() + " yet.");
-	}
-	
-	public JTextComponentBinding<Object> getJTextFieldBinding(JTextComponent component, Object model, 
-			String propertyName, String propertyDesc, Consumer<String> callback) {
-		
-		JTextComponentBinding<Object> binding = new JTextComponentBinding<Object>(component, model, 
-				propertyName, propertyDesc, callback);
-		return binding;
 	}
 	
 	public <T> JComboBoxBinding<Object, T> getJComboBoxBindingBinding(JComboBox<T> component, Object model, 
@@ -249,21 +285,14 @@ public class UIBindingManager {
 		return binding;
 	}
 	
-	public JColorChooserLabelBinding getJColorChooserLabelBinding(JColorChooserLabel component, Object model, 
-			String propertyName, String propertyDesc, Consumer<String> callback) {
-		
-		JColorChooserLabelBinding binding = new JColorChooserLabelBinding(component, model, 
-				propertyName, propertyDesc, callback);
-		return binding;
-	}
-	
-	public JToggleButtonBinding getJToggleButtonBinding(JToggleButton component, Object model, 
-			String propertyName, String propertyDesc, Consumer<String> callback) {
-		
-		JToggleButtonBinding binding = new JToggleButtonBinding(component, model, 
-				propertyName, propertyDesc, callback);
-		return binding;
-	}
+//	public <T> JListBinding<Object, T> getJListBindingBinding(JList<T> component, Object model, 
+//			String propertyName, String propertyDesc, Consumer<String> callback) {
+//		
+//		JListBinding<Object, T> binding = 
+//				new JListBinding<Object, T> (component, model, 
+//						propertyName, propertyDesc, callback);
+//		return binding;
+//	}
 
 
 	private static <M, U> void getBinding(Object model, String propertyName, UIBinding<M, U> binding, 

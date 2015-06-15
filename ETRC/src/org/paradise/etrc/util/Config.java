@@ -27,6 +27,13 @@ public class Config {
 	static String Prop_LAST_TRAIN_PATH = "Last_train_path";
 	static String Prop_LAST_MAP_PATH = "Last_map_path";
 	
+	static String prop_KEYS_TE_NotGoThrough 			= "Keys_TimetableEditing_NotGoThrough";
+	static String prop_KEYS_TE_PASS			 			= "Keys_TimetableEditing_PASS";
+	static String prop_KEYS_TE_StopAtStartStation		= "Keys_TimetableEditing_StopAtStartStation";
+	static String prop_KEYS_TE_StopAtTerminalStation	= "Keys_TimetableEditing_StopAtTerminalStation";
+	static String prop_KEYS_TE_StopForPassenger			= "Keys_TimetableEditing_Stop";
+	static String prop_KEYS_TE_StopNoPassenger 			= "Keys_TimetableEditing_StopTechnical";
+	
 	static String Properties_File = "config.prop";
 	
 	static Properties defaultProp;
@@ -64,6 +71,13 @@ public class Config {
 		defaultProp.setProperty(prop_HTTP_Proxy_Use, "no");
 		defaultProp.setProperty(Prop_HTTP_Proxy_Server, "");
 		defaultProp.setProperty(Prop_HTTP_Proxy_Port, "80");
+		
+		defaultProp.setProperty(prop_KEYS_TE_NotGoThrough, "T");
+		defaultProp.setProperty(prop_KEYS_TE_PASS, "Q");
+		defaultProp.setProperty(prop_KEYS_TE_StopAtStartStation, "W");
+		defaultProp.setProperty(prop_KEYS_TE_StopAtTerminalStation, "E");
+		defaultProp.setProperty(prop_KEYS_TE_StopForPassenger, "R");
+		defaultProp.setProperty(prop_KEYS_TE_StopNoPassenger, "Y");
 	}
 	
 	private Config() {
@@ -235,5 +249,71 @@ public class Config {
 		
 		setValue(Prop_HTTP_Proxy_Port, value + "");
 	}	
+	
+	// {{ Keys settings 
+	
+	/* Timetable editing keys */
+	
+	public boolean isTimetableEditingKey(char key) {
+		String keyString = "" + key;
+		keyString = keyString.toUpperCase();
+		
+		return keyString.equals(getKeyTE_NotGoThrough()) ||
+				keyString.equals(getKeyTE_PASS()) ||
+				keyString.equals(getKeyTE_StopAtStartStation()) ||
+				keyString.equals(getKeyTE_StopAtTerminalStation()) ||
+				keyString.equals(getKeyTE_StopForPassenger()) ||
+				keyString.equals(getKeyTE_StopNoPassenger());
+	}
+	
+	public  String getKeyTE_NotGoThrough() {
+		return getValue(prop_KEYS_TE_NotGoThrough);
+	}
+	
+	public  void setKeyTE_NotGoThrough(String value) {
+		setValue(prop_KEYS_TE_NotGoThrough, value);
+	}
+	
+	public  String getKeyTE_PASS() {
+		return getValue(prop_KEYS_TE_PASS);
+	}
+	
+	public  void setKeyTE_PASS(String value) {
+		setValue(prop_KEYS_TE_PASS, value);
+	}
+	
+	public  String getKeyTE_StopAtStartStation() {
+		return getValue(prop_KEYS_TE_StopAtStartStation);
+	}
+	
+	public  void setKeyTE_StopAtStartStation(String value) {
+		setValue(prop_KEYS_TE_StopAtStartStation, value);
+	}
+	
+	public  String getKeyTE_StopAtTerminalStation() {
+		return getValue(prop_KEYS_TE_StopAtTerminalStation);
+	}
+	
+	public  void setKeyTE_StopAtTerminalStation(String value) {
+		setValue(prop_KEYS_TE_StopAtTerminalStation, value);
+	}
+	
+	public  String getKeyTE_StopForPassenger() {
+		return getValue(prop_KEYS_TE_StopForPassenger);
+	}
+	
+	public  void setKeyTE_StopForPassenger(String value) {
+		setValue(prop_KEYS_TE_StopForPassenger, value);
+	}
+	
+	public  String getKeyTE_StopNoPassenger() {
+		return getValue(prop_KEYS_TE_StopNoPassenger);
+	}
+	
+	public  void setKeyTE_StopNoPassenger(String value) {
+		setValue(prop_KEYS_TE_StopNoPassenger, value);
+	}
+	
+	// }}
 
 }

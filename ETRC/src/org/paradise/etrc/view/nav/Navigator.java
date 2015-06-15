@@ -35,7 +35,7 @@ import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
-import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 import com.sun.org.apache.bcel.internal.generic.RETURN;
 
@@ -63,7 +63,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 	@FunctionalInterface
 	public static interface NavigatorNodeSelectionListener {
 		public void onNavigatorNodeChanged(boolean isTriggerdByMouseLeftButton,
-				NavigatorNodeType nodeType, int index, Object... param);
+				TreePath treePath, NavigatorNodeType nodeType, int index, Object... param);
 	}
 
 	static final String ALL_TRAIN_LABEL = __("All Trains");
@@ -95,6 +95,11 @@ public class Navigator extends JTree implements TreeSelectionListener {
 	private JPopupMenu allTrainTypePopupMenu;
 	private JMenuItem miHideAllTrainTypes;
 	private JMenuItem miShowAllTrainTypes;
+	
+	private JPopupMenu foldingNodesPopupMenu;
+	private JMenuItem miFoldAllNodes;
+	private JMenuItem miExpandAllNodes;
+	private TreePath foldingNodeTreePath;
 	
 	private MouseAdapter contextMenuAdapter;
 	private int popupMenuX, popupMenuY;
@@ -200,6 +205,16 @@ public class Navigator extends JTree implements TreeSelectionListener {
 		miHideAllTrainTypes = createMenuItem(__("Hide All Trains"), e -> toggleAllTrainTypeVisible(false));
 		allTrainTypePopupMenu.add(miHideAllTrainTypes);
 		
+		
+		foldingNodesPopupMenu = new JPopupMenu();
+		foldingNodesPopupMenu.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+		
+		miExpandAllNodes = createMenuItem(__("Expand All Nodes"), e -> toggleTreeNodeExpandingStatus(true));
+		foldingNodesPopupMenu.add(miExpandAllNodes);
+		
+		miFoldAllNodes = createMenuItem(__("Fold All Nodes"), e -> toggleTreeNodeExpandingStatus(false));
+		foldingNodesPopupMenu.add(miFoldAllNodes);
+		
 
 		// Event handler for showing pop up menu
 		contextMenuAdapter = new MouseAdapter() {
@@ -212,7 +227,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 					// 选中鼠标位置处节点
 					Point point = getLocationOnScreen();
 					TreePath path = getPathForLocation(e.getX(), e.getY());
-					TreePath[] paths = getSelectionPaths();
+//					TreePath[] paths = getSelectionPaths();
 					
 					popupMenuX = e.getXOnScreen() - point.x;
 					popupMenuY = e.getYOnScreen() - point.y;
@@ -246,7 +261,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 		return menuItem;
 	}
 	
-	private void onNodeChangedByRightButtonClick(boolean triggeredByLeftButton,
+	private void onNodeChangedByRightButtonClick(boolean triggeredByLeftButton, TreePath treePath,
 			NavigatorNodeType nodeType, int index, Object... params) {
 		
 		if (triggeredByLeftButton)
@@ -263,6 +278,12 @@ public class Navigator extends JTree implements TreeSelectionListener {
 			selectedTrainType = (TrainType) params[0];
 			// 弹出菜单
 			showTrainTypePopupMenu(popupMenuX, popupMenuY);
+			break;
+		default:
+			if (!getModel().isLeaf(treePath.getLastPathComponent())) {
+				foldingNodeTreePath = treePath;
+				showFoldingNodesPopupMenu(popupMenuX, popupMenuY);
+			}
 			break;
 		}
 	}
@@ -302,6 +323,14 @@ public class Navigator extends JTree implements TreeSelectionListener {
 		
 		MainFrame.instance.chartView.updateTrainTypeDisplayOrder();
 		MainFrame.instance.repaint();
+	}
+	
+	private void showFoldingNodesPopupMenu(int x, int y) {
+		foldingNodesPopupMenu.show(Navigator.this, x, y);
+	}
+	
+	private void toggleTreeNodeExpandingStatus(Boolean expanded) {
+		expandAll(this, foldingNodeTreePath, expanded);
 	}
 	
 	// }}
@@ -484,17 +513,17 @@ public class Navigator extends JTree implements TreeSelectionListener {
 			}
 		}
 		
-		fireNodeSelectionChanged(triggedByLeftButton, nodeType, index, params);
+		fireNodeSelectionChanged(triggedByLeftButton, path, nodeType, index, params);
 	}
 	
 	public void addNodeSelectionChangedListener(NavigatorNodeSelectionListener listener) {
 		nodeSelectionListeners.add(listener);
 	}
 
-	private void fireNodeSelectionChanged(Boolean triggedByLeftButton, 
+	private void fireNodeSelectionChanged(Boolean triggedByLeftButton, TreePath treePath,
 			NavigatorNodeType nodeType, int index, Object... params) {
 		
 		nodeSelectionListeners.forEach(listener -> 
-		listener.onNavigatorNodeChanged(triggedByLeftButton, nodeType, index, params));
+		listener.onNavigatorNodeChanged(triggedByLeftButton, treePath, nodeType, index, params));
 	}
 }

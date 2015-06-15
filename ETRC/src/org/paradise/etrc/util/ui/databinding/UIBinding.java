@@ -190,6 +190,8 @@ public abstract class UIBinding<M, U> {
 	
 	public abstract void addEventListenersOnUI();
 	
+	public abstract void removeEventListenersOnUI();
+	
 	@SuppressWarnings("unchecked")
 	protected U convertModelValueToUIValue(M modelValue) {
 		if (converter != null)
@@ -449,17 +451,20 @@ public abstract class UIBinding<M, U> {
 		try {
 			Class<? extends Object> clazz = model.getClass();
 			propertyClassName = null;
-			String getterName = "get" + propertyName.substring(0, 1).toUpperCase() +
+			propertyName = propertyName.substring(0, 1).toUpperCase() +
 					propertyName.substring(1);
-			String setterName = "set" + propertyName.substring(0, 1).toUpperCase() +
-					propertyName.substring(1);
+			String getterName1 = "get" + propertyName;
+			String getterName2 = "is" + propertyName;
+			String setterName = "set" + propertyName;
 			
 			getter = null;
 			setter = null;
 			
 			for (Method method : clazz.getMethods()) {
 				// Getter
-				if (method.getName().equals(getterName) && method.getParameterCount() == 0) {
+				if ((method.getName().equals(getterName1) || method.getName().equals(getterName2))
+						&& method.getParameterCount() == 0) {
+					
 					propertyClassName = method.getReturnType().getName();
 					method.setAccessible(true);
 					
@@ -491,6 +496,7 @@ public abstract class UIBinding<M, U> {
 				// Setter
 				if (method.getName().equals(setterName) && method.getParameterCount() == 1 
 						&& method.getParameters()[0].getType().getName().equals(propertyClassName)) {
+					
 					method.setAccessible(true);
 
 					setter = (obj, value) -> { 

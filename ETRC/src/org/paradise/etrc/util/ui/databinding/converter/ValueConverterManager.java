@@ -5,17 +5,19 @@ import static org.paradise.etrc.ETRCUtil.*;
 
 import java.util.HashMap;
 
+import org.paradise.etrc.view.timetableedit.StopPassingStatusConverter;
 import org.paradise.etrc.view.traintypes.LineStyleConverter;
 
 public class ValueConverterManager {
 	public static HashMap<String, IModelValueConverter<?,?>> converterMap = new HashMap<>();
 	
 	static {
-		registerConvert(new BooleanToYesNoConverter());
-		registerConvert(new FontStyleConverter());
+		registerConverter(new BooleanToYesNoConverter());
+		registerConverter(new FontStyleConverter());
+		registerConverter(new StopPassingStatusConverter());
 	}
 	
-	public static void registerConvert(IModelValueConverter<?, ?> converter) {
+	public static void registerConverter(IModelValueConverter<?, ?> converter) {
 		String id = converter.getID();
 		converterMap.putIfAbsent(id, converter);
 	}

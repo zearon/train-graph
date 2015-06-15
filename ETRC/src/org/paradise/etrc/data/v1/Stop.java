@@ -27,41 +27,56 @@ import static org.paradise.etrc.ETRCUtil.*;
 @TGElementType(name="Stop", printInOneLine=true)
 public class Stop extends TrainGraphPart {
 	
-	public static final int NOT_GO_THROUGH 		= 0;
-	public static final int PASS				= 1;
-	public static final int STOP_PASSENGER		= 2;
-	public static final int STOP_NON_PASSENGER	= 3;
+	public static final int NOT_GO_THROUGH 			= 0;
+	public static final int PASS					= 1;
+	public static final int STOP_START_STATION		= 2;
+	public static final int STOP_TERMINAL_STATION	= 3;
+	public static final int STOP_PASSENGER			= 4;
+	public static final int STOP_NON_PASSENGER		= 5;
 	public static final String[] STOP_STATUS_DESC = {
 		__("Not go through"), __("Pass"), 
-		__("Stop with passenger business"),
-		__("Stop without passenger business") };
+		__("Stop at start station"),
+		__("Stop at terminal station"),
+		__("Stop for business"),
+		__("Stop without business"),
+		};
 	
 	public static int DEFAULT_STOP_TIME = 3;
 	
-//	@TGProperty
+	public int getDEFAULT_STOP_TIME() {
+		return DEFAULT_STOP_TIME;
+	}
+	public void setDEFAULT_STOP_TIME(int defaultStopTime) {
+		DEFAULT_STOP_TIME = defaultStopTime;
+	}
+
+	//	@TGProperty
 	private String trainName;
 	public String getTrainName() { return trainName; }
 	public void setTrainName(String trainName) { this.trainName = trainName; }
 	
 	@TGProperty
-	public int stopStatus;
+	public Integer stopStatus = NOT_GO_THROUGH;
 	//20070224新增，是否图定
-	public boolean isPassenger() { return stopStatus == STOP_PASSENGER; }
+	public boolean isPassenger() { 
+		return stopStatus == STOP_PASSENGER || stopStatus == STOP_START_STATION 
+				|| stopStatus == STOP_TERMINAL_STATION; 
+	}
 	public void setPassenger(boolean isPassenger) {
 		stopStatus = isPassenger ? STOP_PASSENGER : STOP_NON_PASSENGER;
 	}
 	
 	private int stopMinutes;
-	public int getStopTime() { return stopMinutes; }
-	public void setStopTIme(int stopMinutes) {
+	public Integer getStopTime() { return stopMinutes; }
+	public void setStopTIme(Integer stopMinutes) {
 		this.stopMinutes = stopMinutes;
 		leaveTime = addTime(arriveTime, stopMinutes);
 		leaveTimeChanged = true;
 	}
 
 	private int arriveTime = -1;
-	public int getArriveTime() { return arriveTime;}
-	public void setArriveTime(int arriveTime) {
+	public Integer getArriveTime() { return arriveTime;}
+	public void setArriveTime(Integer arriveTime) {
 		this.arriveTime = arriveTime;
 		stopMinutes = getDuration(arriveTime, leaveTime);
 		arriveTimeChanged = true;
@@ -92,16 +107,19 @@ public class Stop extends TrainGraphPart {
 			if (arriveTime == -1)
 				return "||";
 			else
-				makeTimeStr(arriveTime);
+				return makeTimeStr(arriveTime);
 		default:
+			if (arriveTime == -1)
+				return "◯";
+			else
 			return makeTimeStr(arriveTime);
 		}
 	}
 	
 	private int leaveTime = -1;
 	private boolean leaveTimeChanged = true;
-	public int getLeaveTime() { return leaveTime;}
-	public void setLeaveTime(int leaveTime) {
+	public Integer getLeaveTime() { return leaveTime;}
+	public void setLeaveTime(Integer leaveTime) {
 		this.leaveTime = leaveTime;
 		stopMinutes = getDuration(arriveTime, leaveTime);
 		leaveTimeChanged = true;
@@ -114,9 +132,12 @@ public class Stop extends TrainGraphPart {
 			if (leaveTime == -1)
 				return "||";
 			else
-				makeTimeStr(leaveTime);
+				return makeTimeStr(leaveTime);
 		default:
-			return makeTimeStr(leaveTime);
+			if (leaveTime == -1)
+				return "◯";
+			else
+				return makeTimeStr(leaveTime);
 		}
 	}
 	
@@ -149,7 +170,7 @@ public class Stop extends TrainGraphPart {
 	
 	public Stop setProperties(String trainName, String arrive, 
 			String leave, boolean schedular) {
-		this.trainName = trainName;
+		setTrainName(trainName);
 		this.setArrive(arrive);
 		this.setLeave(leave);
 		this.stopStatus = STOP_PASSENGER;
@@ -171,7 +192,7 @@ public class Stop extends TrainGraphPart {
 	}
 
 	public Stop copy() {
-		Stop st = new Stop(this.getName()).setProperties(this.trainName, this.getArrive(), this.getLeave(), this.isPassenger());
+		Stop st = new Stop(this.getName()).setProperties(this.trainName, stopStatus, this.getArriveTime(), this.getLeaveTime());
 		
 		return st;
 	}

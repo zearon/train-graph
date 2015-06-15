@@ -58,6 +58,8 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JTextField txtVehicleName;
 	private final JTextArea txtrRemarks = new JTextArea();
+	private JComboBox<String> cbTrainName;
+	private JLabel lblTrainType;
 	
 	private MainFrame mainFrame;
 	private boolean ui_inited;
@@ -66,17 +68,18 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 	Train train;
 	TrainRouteSection section;
 	boolean downGoing;
-	private JComboBox<String> cbTrainName;
-	private JLabel lblTrainType;
+	int columnIndex;
+	
 
 	/**
 	 * Create the dialog.
 	 */
-	public TrainRouteSectionEditDialiog(TrainGraph trainGraph, TrainRouteSection section) {
+	public TrainRouteSectionEditDialiog(TrainGraph trainGraph, TrainRouteSection section, int columnIndex) {
 		mainFrame = MainFrame.getInstance();
 		this.trainGraph = trainGraph;
 		this.section = section;
 		this.downGoing = section.downGoing;
+		this.columnIndex = columnIndex;
 		
 		allDataBindingComponent.clear();
 		initUI();
@@ -87,7 +90,8 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 	}
 	
 	private void initUI() {
-		setBounds(100, 100, 450, 275);
+		setModal(true);
+		setBounds(100, 100, 419, 275);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -121,6 +125,7 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 		cbTrainName = TrainRouteSectionEditDialiog.createJComboBox(
 				new DefaultComboBoxModel<String>(allTrainNames), 
 				"section.name", new Font("Lucida Grande", Font.PLAIN, 12));
+		cbTrainName.setToolTipText(__("Use odd numbers for down-going trains and even numbers for up-going trains."));
 		cbTrainName.getEditor().getEditorComponent().addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -257,11 +262,11 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 	}
 	
 	private void updateUIforModel(String propertyGroup) {
-			mainFrame.chartView.updateData();
-			mainFrame.sheetView.updateData();
-			mainFrame.runView.repaint();
-			
-			mainFrame.timetableEditView.refreshChart();
+		mainFrame.chartView.updateData();
+		mainFrame.sheetView.updateData();
+		mainFrame.runView.repaint();
+		
+		mainFrame.timetableEditView.refreshColumn(columnIndex);
 	}
 	
 	public String getPropertyDesc(String propertyName) {

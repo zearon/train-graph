@@ -246,11 +246,11 @@ public class TrainListView extends JPanel {
 //		newTrain.getStops()[1] = new Stop(_("Middle"), "00:00", "00:00", false);
 //		newTrain.getStops()[2] = new Stop(_("Terminal"), "00:00", "00:00", false);
 		newTrain.appendStop(TrainGraphFactory.createInstance(Stop.class, __("Departure"))
-				.setProperties(newTrain.getName(), "00:00", "00:00", false));
+				.setProperties(newTrain.getName(), Stop.STOP_START_STATION, 0, 0));
 		newTrain.appendStop(TrainGraphFactory.createInstance(Stop.class, __("Middle"))
-				.setProperties(newTrain.getName(), "00:00", "00:00", false));
+				.setProperties(newTrain.getName(), Stop.STOP_PASSENGER, 0, 0));
 		newTrain.appendStop(TrainGraphFactory.createInstance(Stop.class, __("Terminal"))
-				.setProperties(newTrain.getName(), "00:00", "00:00", false));
+				.setProperties(newTrain.getName(), Stop.STOP_TERMINAL_STATION, 0, 0));
 		
 
 		trainView.setModel(newTrain);

@@ -126,12 +126,17 @@ public class YesNoBox extends JDialog implements ActionListener {
 		super.processWindowEvent(e);
 	}
 
+	public Boolean askForYes() {
+		Boolean yes = askForYesNoOrCancel();
+		return yes != null && yes == true;
+	}
+
 	/**
 	 * 
 	 * @return True if yes button is pressed, false if no button is pressed, 
 	 * and null if cancel button is pressed
 	 */
-	public Boolean askForYes() {
+	public Boolean askForYesNoOrCancel() {
 		Dimension dlgSize = this.getPreferredSize();
 		Dimension frmSize;
 		Point loc;

@@ -4,8 +4,8 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 
-import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
-import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 

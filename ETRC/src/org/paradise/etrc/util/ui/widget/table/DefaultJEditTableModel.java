@@ -1,4 +1,4 @@
-package org.paradise.etrc.util.ui.table;
+package org.paradise.etrc.util.ui.widget.table;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -125,7 +125,7 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 		}
 		
 		boolean isArriveLine = row % 2 == 0;
-		Stop stop = (Stop) getValueAt(row, column);
+		Stop stop = (Stop) getValueAt(row, column); 
 		
 		if (stop == null)
 			return false;
@@ -133,15 +133,20 @@ public abstract class DefaultJEditTableModel extends AbstractTableModel implemen
 		if (isFirstInSeries) {
 			if (isArriveLine) {
 				// Change both arrival and departure time
-				stop.setArrive(increaseTime(stop.getArrive(), increment));
-				stop.setLeave(increaseTime(stop.getLeave(), increment));
+				if (stop.getArriveTime() >= 0)
+					stop.setArriveTime(Stop.addTime(stop.getArriveTime(), increment));
+				if (stop.getLeaveTime() >= 0)
+					stop.setLeaveTime(Stop.addTime(stop.getLeaveTime(), increment));
 			} else {
 				// Only change departure time and remain arrival time unchanged
-				stop.setLeave(increaseTime(stop.getLeave(), increment));
+				if (stop.getLeaveTime() >= 0)
+					stop.setLeaveTime(Stop.addTime(stop.getLeaveTime(), increment));
 			}
 		} else {
-			stop.setArrive(increaseTime(stop.getArrive(), increment));
-			stop.setLeave(increaseTime(stop.getLeave(), increment));
+			if (stop.getArriveTime() >= 0)
+				stop.setArriveTime(Stop.addTime(stop.getArriveTime(), increment));
+			if (stop.getLeaveTime() >= 0)
+				stop.setLeaveTime(Stop.addTime(stop.getLeaveTime(), increment));
 		}
 		
 		/* Do not need to set the value, since the object reference keep 

@@ -131,6 +131,11 @@ public class Train extends TrainGraphPart {
 	}
 	
 	public void setTrainNameForAllStops() {
+		if (stops.size() > 1) {
+			stops.firstElement().stopStatus = Stop.STOP_START_STATION;
+			stops.lastElement().stopStatus = Stop.STOP_TERMINAL_STATION;
+		}
+		
 		stops.forEach(stop -> stop.setTrainName(getName()));
 	}
 

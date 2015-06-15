@@ -34,6 +34,8 @@ public class CornerRenderer extends JLabel implements ListCellRenderer<String> {
 		if (rowIndex == 2) {
 			// vehicle name
 			d.height = table.getVehicleNameRowHeight();
+		} else if (rowIndex == 0) {
+			d.height = table.getRowHeight(0);
 		}
 		return d;
 	}

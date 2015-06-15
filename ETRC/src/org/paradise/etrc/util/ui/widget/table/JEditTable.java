@@ -1,4 +1,4 @@
-package org.paradise.etrc.util.ui.table;
+package org.paradise.etrc.util.ui.widget.table;
 
 import static org.paradise.etrc.ETRC.__;
 import static org.paradise.etrc.ETRCUtil.*;
@@ -226,7 +226,7 @@ public class JEditTable extends JTable {
 		});
 
 		lbLockEdit = new JLabel(__("L.E."));
-		lbLockEdit.setToolTipText(__("<html>Lock Edit<br/>Lock table for editing for data secure<br/>in case that accidental changes are made.</html>"));
+		lbLockEdit.setToolTipText(__("<html><u>L</u>ock Edit<br/>Lock table for editing for data secure<br/>in case that accidental changes are made.</html>"));
 		lbLockEdit.setOpaque(true);
 		lbLockEdit.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.RAISED));
@@ -238,7 +238,7 @@ public class JEditTable extends JTable {
 		});
 
 		lbContinuousEdit = new JLabel(__("C.E."));
-		lbContinuousEdit.setToolTipText(__("<html>Continuous Edit<br/>A change applied to a cell will also <br>apply to all its following cells.</html>"));
+		lbContinuousEdit.setToolTipText(__("<html><u>C</u>ontinuous Edit<br/>A change applied to a cell will also <br>apply to all its following cells.</html>"));
 		lbContinuousEdit.setOpaque(true);
 		lbContinuousEdit.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.RAISED));
@@ -250,7 +250,7 @@ public class JEditTable extends JTable {
 		});
 
 		lbFocusVMove = new JLabel(__("F.M.V."));
-		lbFocusVMove.setToolTipText(__("<html>Focus Move Vertically<br/>When this mode is on, the focus will move to the cell below " + 
+		lbFocusVMove.setToolTipText(__("<html><u>F</u>ocus Move Vertically<br/>When this mode is on, the focus will move to the cell below " + 
 				"<br/>the cell in edit if you press Enter key. <br/>Otherwise, the focus will move to the cell to the right of <br/>" + 
 				"the cell in edit.</html>"));
 		lbFocusVMove.setOpaque(true);
@@ -404,14 +404,14 @@ public class JEditTable extends JTable {
 	 * 设置JEditTable的键盘事件处理程序
 	 */
 	protected void setKeyActonListen() {
-		setKeyStrokeActon(this, KeyEvent.VK_ENTER, 0, KeyAction.ENTER);
-		setKeyStrokeActon(this, KeyEvent.VK_UP, 0, KeyAction.ARROW_UP);
-		setKeyStrokeActon(this, KeyEvent.VK_DOWN, 0, KeyAction.ARROW_DOWN);
-		setKeyStrokeActon(this, KeyEvent.VK_LEFT, 0, KeyAction.ARROW_LEFT);
-		setKeyStrokeActon(this, KeyEvent.VK_RIGHT, 0, KeyAction.ARROW_RIGHT);
+		setKeyStrokeAction(this, KeyEvent.VK_ENTER, 0, KeyAction.ENTER);
+		setKeyStrokeAction(this, KeyEvent.VK_UP, 0, KeyAction.ARROW_UP);
+		setKeyStrokeAction(this, KeyEvent.VK_DOWN, 0, KeyAction.ARROW_DOWN);
+		setKeyStrokeAction(this, KeyEvent.VK_LEFT, 0, KeyAction.ARROW_LEFT);
+		setKeyStrokeAction(this, KeyEvent.VK_RIGHT, 0, KeyAction.ARROW_RIGHT);
 	}
 
-	protected void setKeyStrokeActon(JComponent comp, int keycode,
+	protected void setKeyStrokeAction(JComponent comp, int keycode,
 			int modifier, KeyAction action) {
 		comp.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(
 				KeyStroke.getKeyStroke(keycode, modifier), action.name());
@@ -632,7 +632,7 @@ public class JEditTable extends JTable {
 	 * 
 	 * @return
 	 */
-	public boolean isConinuousEditMode() {
+	public boolean isContinuousEditMode() {
 		return this.isContinuousEditMode;
 	}
 
@@ -888,11 +888,11 @@ public class JEditTable extends JTable {
 		editor.addMouseListener(contextMenuAdapter);
 		editor.addMouseWheelListener(wheelAdapter);
 
-		setKeyStrokeActon(editor, KeyEvent.VK_ENTER, 0, KeyAction.ENTER);
-		setKeyStrokeActon(editor, KeyEvent.VK_UP, 0, KeyAction.ARROW_UP);
-		setKeyStrokeActon(editor, KeyEvent.VK_DOWN, 0, KeyAction.ARROW_DOWN);
-		setKeyStrokeActon(editor, KeyEvent.VK_LEFT, 0, KeyAction.ARROW_LEFT);
-		setKeyStrokeActon(editor, KeyEvent.VK_RIGHT, 0, KeyAction.ARROW_RIGHT);
+		setKeyStrokeAction(editor, KeyEvent.VK_ENTER, 0, KeyAction.ENTER);
+		setKeyStrokeAction(editor, KeyEvent.VK_UP, 0, KeyAction.ARROW_UP);
+		setKeyStrokeAction(editor, KeyEvent.VK_DOWN, 0, KeyAction.ARROW_DOWN);
+		setKeyStrokeAction(editor, KeyEvent.VK_LEFT, 0, KeyAction.ARROW_LEFT);
+		setKeyStrokeAction(editor, KeyEvent.VK_RIGHT, 0, KeyAction.ARROW_RIGHT);
 		//
 		// KeyAdapter keyAdapter = new KeyAdapter() {
 		// @Override

@@ -4,7 +4,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 
-import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 public abstract class TableAction extends UIAction {
 	protected JTable table;

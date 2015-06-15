@@ -221,6 +221,8 @@ public class ETRCSKB {
 				}
 			});
 		});
+		
+		networkChart.trains.forEach(train -> train.setTrainNameForAllStops());
 	}
 	
 	public void findTrains(RailroadLineChart lineChart) {

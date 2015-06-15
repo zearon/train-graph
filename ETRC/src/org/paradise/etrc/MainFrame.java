@@ -981,7 +981,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	 */
 	private Boolean confirmSaveCurrentFile() {
 		return new YesNoBox(this, __("Current train graph has been changed.\n"
-				+ "Do you want to save the changes?")).askForYes();
+				+ "Do you want to save the changes?")).askForYesNoOrCancel();
 		
 	}
 
@@ -1468,7 +1468,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			splitPaneV.setDividerLocation(runView.getPreferredSize().height);
 	}
 	
-	private void onNavigatorNodeChanged(boolean triggeredByLeftButton,
+	private void onNavigatorNodeChanged(boolean triggeredByLeftButton, TreePath treePath,
 			NavigatorNodeType nodeType, int index, Object... params) {
 //		DEBUG_ACTION(() -> {
 //		}, TrainGraphPart.reprJoining(params, "\r\n", true));

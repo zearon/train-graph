@@ -53,8 +53,8 @@ import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.TRFFilter;
 import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
-import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 /**
  * @author lguo@sina.com
@@ -185,6 +185,8 @@ public class TrainView extends JPanel {
 				savingTrain.trainNameDown = tfNameD.getText().trim();
 				savingTrain.trainNameUp = tfNameU.getText().trim();
 				savingTrain.setName(tfName.getText().trim());
+				
+				savingTrain.setTrainNameForAllStops();
 
 				doSaveTrain(savingTrain);
 			}

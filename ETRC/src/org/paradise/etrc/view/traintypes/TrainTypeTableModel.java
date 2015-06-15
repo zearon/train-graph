@@ -8,8 +8,8 @@ import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.util.data.Tuple2;
-import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
-import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 public class TrainTypeTableModel extends DefaultJEditTableModel {
 	public TrainGraph trainGraph;

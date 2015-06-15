@@ -40,7 +40,7 @@ import org.paradise.etrc.util.ui.databinding.UIBinding;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 import org.paradise.etrc.util.ui.databinding.converter.FontStyleConverter;
 import org.paradise.etrc.util.ui.databinding.converter.ValueConverterManager;
-import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -617,7 +617,7 @@ public class TrainTypesView extends JPanel {
 	}
 
 	private void setupUIDataBinding() {
-		ValueConverterManager.registerConvert(new LineStyleConverter());
+		ValueConverterManager.registerConverter(new LineStyleConverter());
 		
 		for (Component component : allDataBindingComponent) {
 			uiBindingManager.addDataBinding(component, this::getModelObject, 

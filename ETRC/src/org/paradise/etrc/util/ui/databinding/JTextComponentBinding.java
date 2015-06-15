@@ -31,7 +31,7 @@ import javax.swing.text.JTextComponent;
  * @author Jeff Gong
  * 
  */
-public class JTextComponentBinding<M> extends UIBinding<M, String> implements FocusListener, KeyListener {
+public class JTextComponentBinding extends UIBinding<String, String> implements FocusListener, KeyListener {
 	JTextComponent textComponent;
 	String oldValue;
 
@@ -51,6 +51,7 @@ public class JTextComponentBinding<M> extends UIBinding<M, String> implements Fo
 	@Override
 	public void focusGained(FocusEvent e) {
 		oldValue = textComponent.getText();
+//		DEBUG_MSG("Focus gained. old value is %s", oldValue);
 	}
 
 	@Override
@@ -94,6 +95,11 @@ public class JTextComponentBinding<M> extends UIBinding<M, String> implements Fo
 		textComponent.addFocusListener(this);
 //		if (textComponent instanceof JTextField)
 //			textComponent.addKeyListener(this);
+	}
+
+	@Override
+	public void removeEventListenersOnUI() {
+		textComponent.removeFocusListener(this);
 	}
 
 

@@ -12,8 +12,8 @@ import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.util.function.MultiConsumer;
 import org.paradise.etrc.util.function.TriConsumer;
-import org.paradise.etrc.util.ui.table.DefaultJEditTableModel;
-import org.paradise.etrc.util.ui.table.JEditTable;
+import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
+import org.paradise.etrc.util.ui.widget.table.JEditTable;
 import org.paradise.etrc.view.lineedit.StationTableModel;
 
 public class ActionFactory {

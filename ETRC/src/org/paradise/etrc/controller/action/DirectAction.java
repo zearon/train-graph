@@ -1,13 +1,11 @@
 package org.paradise.etrc.controller.action;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.paradise.etrc.util.function.MultiConsumer;
 import org.paradise.etrc.util.function.TriConsumer;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * Action with no undo/redo support.

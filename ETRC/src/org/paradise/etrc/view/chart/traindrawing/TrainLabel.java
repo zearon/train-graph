@@ -19,7 +19,6 @@ public class TrainLabel {
 	public static int MARGIN = 10;
 
 	public TrainLabel() {
-		// TODO Auto-generated constructor stub
 	}
 
 }

@@ -1,31 +1,34 @@
 package org.paradise.etrc.data.skb;
 
-import static org.paradise.etrc.ETRCUtil.*;
-
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Vector;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.RailroadLineChart;
-import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
-import org.paradise.etrc.data.TrainGraphFactory;
+
+import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.DEBUG;
+import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
+import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
 
 public class ETRCSKB {
 	private String path;
@@ -53,14 +56,54 @@ public class ETRCSKB {
 		tk = new Vector<String []>();
 		
 		loadcc();
+		DEBUG_MSG("cc count: %d", cc.size());
 		loadzm();
+		DEBUG_MSG("zm count: %d", zm.size());
 		loadtk();
+		DEBUG_MSG("tk count: %d", tk.size());
+	}
+	
+	private void loadcc() throws IOException {
+//		File f = new File(path + "ecc.eda");
+//		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(f)),"UTF-8"));
+		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(
+				getClass().getResourceAsStream("/eda/ecc.eda")),"UTF-8"));
+		
+		String line = in.readLine();
+		while(line != null) {
+			cc.add(line);
+			
+			line = in.readLine();
+//			DEBUG_MSG(line);
+		}
+		
+		in.close();
+	}
+
+	private void loadzm() throws IOException {
+//		File f = new File(path + "ezm.eda");
+//		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(
+//				new FileInputStream(f)),"UTF-8"));
+		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(
+				getClass().getResourceAsStream("/eda/ezm.eda")),"UTF-8"));
+		
+		String line = in.readLine();
+		while(line != null) {
+			zm.add(line);
+			
+			line = in.readLine();
+//			DEBUG_MSG(line);
+		}
+		
+		in.close();
 	}
 	
 	private void loadtk() throws IOException {
-		File f = new File(path + "etrc.eda");
+//		File f = new File(path + "etrc.eda");
+//		DataInputStream in = new DataInputStream(new FileInputStream(f));
 		
-		DataInputStream in = new DataInputStream(new FileInputStream(f));
+		DataInputStream in = new DataInputStream(new BufferedInputStream(
+				getClass().getResourceAsStream("/eda/etrc.eda")));
 		
 		// Skip the BOM of UTF-8 text file
 		boolean firstTime = true;
@@ -83,40 +126,13 @@ public class ETRCSKB {
 			}
 			else
 			{
-				in.read(buffer);
+				int bytesRead = in.read(buffer);
+				if (bytesRead < 8) {
+					System.err.println(new String(buffer));
+				}
 			}
 			
 			tk.add(decodeTK(new String(buffer)));
-		}
-		
-		in.close();
-	}
-
-	private void loadzm() throws IOException {
-		File f = new File(path + "ezm.eda");
-		
-		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(f)),"UTF-8"));
-		
-		String line = in.readLine();
-		while(line != null) {
-			zm.add(line);
-			
-			line = in.readLine();
-		}
-		
-		in.close();
-	}
-	
-	private void loadcc() throws IOException {
-		File f = new File(path + "ecc.eda");
-		
-		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(f)),"UTF-8"));
-		
-		String line = in.readLine();
-		while(line != null) {
-			cc.add(line);
-			
-			line = in.readLine();
 		}
 		
 		in.close();
@@ -125,6 +141,12 @@ public class ETRCSKB {
 	private String[] decodeTK(String tk) {
 		if(tk.length() != 8)
 			return new String[] {"0000", "错误", "00:00", "00:00"};
+		
+		
+		if (IS_DEBUG() && ("".equals(tk))) {
+			// ]dkdn0Vr, trainIndex=6333, stationIndex=1613
+			System.out.println(String.format("%s", tk));
+		}
 		
 		int trainIndex = ETRCData.decode(tk.charAt(0)) * ETRCData.codeTable.length
 		               + ETRCData.decode(tk.charAt(1));
@@ -195,10 +217,23 @@ public class ETRCSKB {
 		return trains;
 	}	
 	
-	public void findTrains(RailNetworkChart networkChart) {
+	public void findTrains(RailNetworkChart networkChart,
+			Consumer<String> statusChangeCallback,
+			Consumer<Integer> progressMaxSetter,
+			Consumer<Integer> progressChangedCallback) {
+		
 		networkChart.clearTrains();
 
 		Vector<String> addedTrainNames = new Vector<> ();
+		int[] counter = new int[] {tk.size(), 0};
+		
+		if (statusChangeCallback != null)
+			statusChangeCallback.accept(__("Searching from built-in timetable..."));
+		if (progressMaxSetter != null)
+			progressMaxSetter.accept(counter[0]);
+		if (progressChangedCallback != null)
+			progressChangedCallback.accept(0);
+		
 		tk.stream().forEach(tkInfo -> {
 			String trainName = tkInfo[0];
 			String tkName = tkInfo[1];
@@ -220,9 +255,27 @@ public class ETRCSKB {
 					lineChart.addTrain(aTrain);
 				}
 			});
+
+			if (progressChangedCallback != null)
+				progressChangedCallback.accept(++ counter[1]);
 		});
+
+		counter[0] = networkChart.trains.size(); 
+		counter[1] = 0;
 		
-		networkChart.trains.forEach(train -> train.setTrainNameForAllStops());
+		if (statusChangeCallback != null)
+			statusChangeCallback.accept(__("Adjusting imported trains..."));
+		if (progressMaxSetter != null)
+			progressMaxSetter.accept(counter[0]);
+		if (progressChangedCallback != null)
+			progressChangedCallback.accept(0);
+		
+		networkChart.trains.forEach(train -> {
+			train.setTrainNameForAllStops();
+
+			if (progressChangedCallback != null)
+				progressChangedCallback.accept(++ counter[1]);
+		});
 	}
 	
 	public void findTrains(RailroadLineChart lineChart) {

@@ -1,6 +1,5 @@
 package org.paradise.etrc.util.data;
 
-import com.sun.accessibility.internal.resources.accessibility;
 
 public class Tuple3 <T1, T2, T3> {
 	

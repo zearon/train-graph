@@ -6,13 +6,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Vector;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
 import org.paradise.etrc.data.TrainGraphPart;
-
-import com.sun.xml.internal.bind.v2.runtime.Name;
 
 import static org.paradise.etrc.ETRC.__;
 

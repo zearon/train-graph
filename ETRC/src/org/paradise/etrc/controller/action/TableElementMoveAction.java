@@ -2,31 +2,24 @@ package org.paradise.etrc.controller.action;
 
 import java.util.Vector;
 
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
-
-import org.paradise.etrc.data.v1.RailroadLine;
-import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRCUtil.*;
-
-public class TableElementMoveAction extends TableAction {
+public class TableElementMoveAction extends UIAction implements TableAction {
+	JTable table;
 	String tableName;
-	Vector list;
+	Vector<Object> list;
 	int oldIndex;
 	int newIndex;
 	boolean vertical;
 	Runnable callback;
 
-	TableElementMoveAction(String tableName, JTable table, Vector list,
+	TableElementMoveAction(String tableName, JTable table, Vector<Object> list,
 			int oldIndex, int newIndex, boolean vertical, Runnable callback) {
 		
-		super(table);
+		this.table = table;
 		this.tableName = tableName;
 		this.list = list;
 		this.oldIndex = oldIndex;
@@ -120,6 +113,11 @@ public class TableElementMoveAction extends TableAction {
 	public String repr() {
 		return String.format(__("Move the element at [%d] to [%d] in %s "),
 				oldIndex, newIndex, tableName);
+	}
+
+	@Override
+	public JTable getTable() {
+		return table;
 	}
 
 }

@@ -10,8 +10,6 @@ import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.util.data.Tuple2;
 
-import sun.security.krb5.Config;
-
 import static org.paradise.etrc.ETRC.__;
 
 public class RowHeaderModel extends AbstractListModel<Object> {

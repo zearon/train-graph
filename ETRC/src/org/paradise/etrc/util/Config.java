@@ -8,15 +8,18 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+import org.paradise.etrc.ETRC;
 import org.paradise.etrc.controller.ActionManager;
 
 import static org.paradise.etrc.ETRC.__;
+import static org.paradise.etrc.ETRCUtil.*;
 
 public class Config {
 	public static final String NEW_FILE_NAME = __("Unnamed Train Graph");
 	static final int Prop_Recent_File_Size = 15;
 	
 	static String Prop_AUTO_LOAD_FILE = "Auto_Load_Last_Edit_File";
+	static String Prop_FULLSCREEN_ON_STARTUP = "FullScreen_On_Startup_MAC";
 	static String prop_HTTP_Proxy_Use = "Use_HTTP_Proxy";
 	static String Prop_HTTP_Proxy_Server = "HTTP_Proxy_Server";
 	static String Prop_HTTP_Proxy_Port = "HTTP_Proxy_Port";
@@ -56,6 +59,16 @@ public class Config {
 //	static String Prop_Show_Run = "Show_Run";
 	
 	static {
+		if (ETRC.isOSX10_7OrAbove()) {
+			String configPath = System.getProperty("user.home") + "/Library/Application Support/" + ETRC.APP_NAME + "/" + Properties_File;
+//			DEBUG_MSG(configPath);
+			
+			if (!IS_DEBUG()) {
+				Properties_File = configPath;
+				new File(Properties_File).getParentFile().mkdirs();
+			}
+			DEBUG_MSG("Use config file %s", Properties_File);
+		}
 		makeDefault();
 	}	
 	
@@ -63,6 +76,7 @@ public class Config {
 		defaultProp = new Properties();
 		
 		defaultProp.setProperty(Prop_AUTO_LOAD_FILE, "no");
+		defaultProp.setProperty(Prop_FULLSCREEN_ON_STARTUP, "yes");
 		defaultProp.setProperty(Prop_Working_Chart, "");
 		defaultProp.setProperty(Prop_Recent_Open_File_Path, "");
 		defaultProp.setProperty(Prop_LAST_RAILNETWORK_PATH, "");
@@ -153,6 +167,14 @@ public class Config {
 	
 	public  void setAutoLoadLastFile(Boolean value) {
 		setValue(Prop_AUTO_LOAD_FILE, value ? "yes" : "no");
+	}
+	
+	public  Boolean getFullScreenOnStartupForOSX() {
+		return getValue(Prop_FULLSCREEN_ON_STARTUP, "false").equalsIgnoreCase("yes");
+	}
+	
+	public  void setFullScreenOnStartupForOSX(Boolean value) {
+		setValue(Prop_FULLSCREEN_ON_STARTUP, value ? "yes" : "no");
 	}
 	
 	public  String[] getRecentOpenedFiles() {

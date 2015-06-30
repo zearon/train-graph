@@ -371,7 +371,7 @@ public class TrainTypesView extends JPanel {
 
 		TrainType trainType = TrainGraphFactory.createInstance(TrainType.class);
 		
-		ActionFactory.createAddTableElementActionAndDoIt(__("train types table"), 
+		ActionFactory.createAddTableElementAction(__("train types table"), 
 				table, true, selectedIndex, trainType, trainGraph::addTrainType,
 				trainGraph::removeTrainTypeAt, 
 				() -> {
@@ -379,7 +379,7 @@ public class TrainTypesView extends JPanel {
 					table.revalidate();
 					
 					_mainFrame.navigator.updateNavigatorByTrainTypes();
-				});
+				}).addToManagerAndDoIt();
 	}
 
 	protected void do_RemoveTrainTeyp() {
@@ -391,7 +391,7 @@ public class TrainTypesView extends JPanel {
 			return;
 		}
 
-		ActionFactory.createRemoveTableElementActionAndDoIt(__("train types table"), 
+		ActionFactory.createRemoveTableElementsAction(__("train types table"), 
 				table, true, new int[] {index}, 
 				trainGraph::getTrainType,
 				trainGraph::addTrainType, 
@@ -401,7 +401,7 @@ public class TrainTypesView extends JPanel {
 					table.revalidate();
 					
 					_mainFrame.navigator.updateNavigatorByTrainTypes();
-				});
+				}).addToManagerAndDoIt();
 	}
 
 	protected void do_MoveDown() {
@@ -416,13 +416,13 @@ public class TrainTypesView extends JPanel {
 			return;
 		}
 		
-		ActionFactory.createTableElementMoveActionAndDoIt(__("train types table"), 
+		ActionFactory.createTableElementMoveAction(__("train types table"), 
 				table, trainGraph.allTrainTypes(), 
 				selectedIndex, selectedIndex + 1, true,
 				() -> {
 					trainGraph.updateTrainTypeDisplayOrder();
 					_mainFrame.navigator.updateNavigatorByTrainTypes();
-				});
+				}).addToManagerAndDoIt();
 	}
 
 	protected void do_MoveUp() {
@@ -437,13 +437,13 @@ public class TrainTypesView extends JPanel {
 			return;
 		}
 		
-		ActionFactory.createTableElementMoveActionAndDoIt(__("train types table"), 
+		ActionFactory.createTableElementMoveAction(__("train types table"), 
 				table, trainGraph.allTrainTypes(), 
 				selectedIndex, selectedIndex - 1, true,
 				() -> {
 					trainGraph.updateTrainTypeDisplayOrder();
 					_mainFrame.navigator.updateNavigatorByTrainTypes();
-				});
+				}).addToManagerAndDoIt();
 	}
 
 	protected void do_UpdateTypeOfTrains() {
@@ -460,7 +460,7 @@ public class TrainTypesView extends JPanel {
 	protected void do_ChangeSelectedTrainType() {
 		int rowIndex = table.getSelectedRow();
 		selectedTrainTypeIndex = rowIndex;
-		DEBUG_MSG("Train type selected row changed to " + rowIndex);
+//		DEBUG_MSG("Train type selected row changed to " + rowIndex);
 		
 		if (rowIndex < 0 || rowIndex >= tableModel.getRowCount() ||
 				(selectedTrainType = tableModel.getTrainTypeAtRow(rowIndex)) == null) {

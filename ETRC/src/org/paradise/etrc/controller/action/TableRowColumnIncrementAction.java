@@ -6,7 +6,7 @@ import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 
-public class TableRowColumnIncrementAction extends TableAction {
+public class TableRowColumnIncrementAction extends UIAction implements TableAction {
 
 	String repr;
 	String tableName;
@@ -21,7 +21,6 @@ public class TableRowColumnIncrementAction extends TableAction {
 			JEditTable table, int increment, int start, int end, int coord,
 			boolean vertical) {
 		
-		super(table);
 		this.repr = repr;
 		this.tableName = tableName;
 		this.table = table;
@@ -57,6 +56,11 @@ public class TableRowColumnIncrementAction extends TableAction {
 			String.format("[%d,%d-%d]", coord, start, end);
 		return repr != null ? repr : String.format(__("Batch change value at %s by %d in %s"), 
 				position, increment, tableName);
+	}
+
+	@Override
+	public JTable getTable() {
+		return table;
 	}
 
 }

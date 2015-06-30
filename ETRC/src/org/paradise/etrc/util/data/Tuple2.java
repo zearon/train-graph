@@ -1,7 +1,5 @@
 package org.paradise.etrc.util.data;
 
-import com.sun.accessibility.internal.resources.accessibility;
-import com.sun.swing.internal.plaf.basic.resources.basic;
 
 public class Tuple2 <T1, T2> {
 	

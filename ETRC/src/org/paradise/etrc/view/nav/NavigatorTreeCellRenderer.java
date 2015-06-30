@@ -19,7 +19,7 @@ public class NavigatorTreeCellRenderer extends DefaultTreeCellRenderer {
 			boolean sel, boolean expanded, boolean leaf, int row,
 			boolean hasFocus) {
 		
-		// TODO:重要!重要! 导航栏节点自定义绘制
+		// TODO: 重要! 导航栏节点自定义绘制(图标)
 		Component component = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf,
 				row, hasFocus);
 		

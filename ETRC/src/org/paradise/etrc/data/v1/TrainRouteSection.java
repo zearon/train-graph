@@ -23,12 +23,19 @@ public class TrainRouteSection extends TrainGraphPart {
 	
 	// Use inherited name attributes as train name
 	public String getTrainName() { return getName(); }
-	public void setTrainName(String name) { setName(name); }
+	public void setTrainName(String name) {
+		if (getRailLineChart().containTrainSectionWithTrainName(downGoing, name)) {
+			throw new IllegalArgumentException("Parent rail line chart has duplicate train with the same name.");
+		}
+		
+		setName(name); 
+	}
 	
 	@TGProperty
 	public boolean downGoing = true;
 	@TGProperty
 	public String remarks = "";
+	// vehicleName value is saved in corresponding train instance.
 	private String vehicleName;
 	public String getVehicleName() {
 		Train train = getTrain();
@@ -90,6 +97,38 @@ public class TrainRouteSection extends TrainGraphPart {
 			// set-up the stop
 			return stop;
 		}).forEach(stops::add);
+	}
+	
+	public TrainRouteSection prepareCloneForPaste(int pasteTimes, int timeOffset) {
+		ChartSettings settings = ((TrainGraph) root).settings;
+		TrainRouteSection obj = TrainGraphFactory.createInstance(TrainRouteSection.class);
+		obj.name = this.name;
+		for (int i = 0; i < pasteTimes; ++ i) {
+			obj.name = Train.createTrainName(obj.name, settings.timetableEditTrainNumberIncrement);
+		}
+		obj.parent = this.parent;
+		obj.root = this.root;
+		obj.downGoing = downGoing;
+		obj.remarks = this.remarks;
+		obj.vehicleName = this.vehicleName;
+		for (Stop stop : this.stops) {
+			Stop stopCopy = stop.copy();
+			stopCopy.applyStopTimeOffset(timeOffset);
+			obj.stops.add(stopCopy);
+		}
+		
+		return obj;
+	}
+	
+	public void applyTimeOffset(Stop startStop, int offset) {
+		boolean apply = false;
+		for (Stop stop : stops) {
+			if (stop.equals(startStop))
+				apply = true;
+			
+			if (apply)
+				stop.applyStopTimeOffset(offset);
+		}
 	}
 	
 	/**

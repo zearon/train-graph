@@ -226,7 +226,7 @@ public class JEditTable extends JTable {
 		});
 
 		lbLockEdit = new JLabel(__("L.E."));
-		lbLockEdit.setToolTipText(__("<html><u>L</u>ock Edit<br/>Lock table for editing for data secure<br/>in case that accidental changes are made.</html>"));
+		lbLockEdit.setToolTipText(__("<html>Lock Edit (<u>L</u>)<br/>Lock table for editing for data secure<br/>in case that accidental changes are made.</html>"));
 		lbLockEdit.setOpaque(true);
 		lbLockEdit.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.RAISED));
@@ -238,7 +238,7 @@ public class JEditTable extends JTable {
 		});
 
 		lbContinuousEdit = new JLabel(__("C.E."));
-		lbContinuousEdit.setToolTipText(__("<html><u>C</u>ontinuous Edit<br/>A change applied to a cell will also <br>apply to all its following cells.</html>"));
+		lbContinuousEdit.setToolTipText(__("<html>Continuous Edit (<u>D</u>)<br/>A change applied to a cell will also <br>apply to all its following cells.</html>"));
 		lbContinuousEdit.setOpaque(true);
 		lbContinuousEdit.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.RAISED));
@@ -250,7 +250,7 @@ public class JEditTable extends JTable {
 		});
 
 		lbFocusVMove = new JLabel(__("F.M.V."));
-		lbFocusVMove.setToolTipText(__("<html><u>F</u>ocus Move Vertically<br/>When this mode is on, the focus will move to the cell below " + 
+		lbFocusVMove.setToolTipText(__("<html>Focus Move Vertically (<u>F</u>)<br/>When this mode is on, the focus will move to the cell below " + 
 				"<br/>the cell in edit if you press Enter key. <br/>Otherwise, the focus will move to the cell to the right of <br/>" + 
 				"the cell in edit.</html>"));
 		lbFocusVMove.setOpaque(true);
@@ -282,9 +282,13 @@ public class JEditTable extends JTable {
 		initUI_buildContainerPanel();
 		initUI_buildStatusBar();
 
-		addContextMenu();
+//		addContextMenu();
 		setSelectionBehavior();
 		setKeyActonListen();
+
+		setEditLocked(editLocked);
+		setContinuousEditMode(isContinuousEditMode);
+		setFocusVMove(isFocusVMove);
 	}
 
 	/**
@@ -299,7 +303,6 @@ public class JEditTable extends JTable {
 
 		miLockEdit = createMenuItem(__("Lock Edit"), e -> toggleEditLocked());
 		popupMenu.add(miLockEdit);
-		setEditLocked(editLocked);
 
 		// continuousInputMenuItem = createMenuItem(
 		// __("Toggle continuous input mode"),
@@ -310,14 +313,12 @@ public class JEditTable extends JTable {
 		miContinuousEdit = createMenuItem(__("Toggle continuous edit mode"),
 				e -> toggleContinuousEditMode());
 		popupMenu.add(miContinuousEdit);
-		setContinuousEditMode(isContinuousEditMode);
 		// popupMenu.add(new JSeparator(JSeparator.HORIZONTAL));
 
 		miFocusVMove = createMenuItem(
 				__("Toggle focus vertical move direction"),
 				e -> toggleFocusVMove());
 		popupMenu.add(miFocusVMove);
-		setFocusVMove(isFocusVMove);
 
 		// Show context menu
 		contextMenuAdapter = new MouseAdapter() {
@@ -553,6 +554,14 @@ public class JEditTable extends JTable {
 		rowNcolumn[1] = nextColumn;
 	}
 
+	public int getIncrement() {
+		try {
+			return Integer.parseInt(tfIncrement.getText());
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+	
 	/**
 	 * 获取编辑是否被锁定
 	 * 
@@ -570,7 +579,7 @@ public class JEditTable extends JTable {
 	public void setEditLocked(boolean locked) {
 		editLocked = locked;
 
-		miLockEdit.setBackground(editLocked ? offColor : onColor);
+//		miLockEdit.setBackground(editLocked ? offColor : onColor);
 		lbLockEdit.setBackground(editLocked ? offColor : onColor);
 
 		if (locked) {
@@ -585,47 +594,6 @@ public class JEditTable extends JTable {
 	public void toggleEditLocked() {
 		setEditLocked(!editLocked);
 	}
-
-	/**
-	 * 获取是否设置为连续输入模式
-	 * 
-	 * @return
-	 */
-	// public boolean isConinuousInputMode() {
-	// return this.isContinuousInputMode;
-	// }
-
-	/**
-	 * 设置连续输入模式
-	 * 
-	 * @param mode
-	 */
-	// public void setContinuousInputMode(boolean mode) {
-	// isContinuousInputMode = mode;
-	// continuousInputMenuItem.setBackground(isContinuousInputMode ? onColor
-	// : offColor);
-	//
-	// if (origGridColor == null)
-	// origGridColor = getGridColor();
-	//
-	// if (isContinuousInputMode) {
-	// setGridColor(continuousInputGridColor);
-	// setColumnSelectionAllowed(true);
-	// } else {
-	// if (origGridColor != null)
-	// setGridColor(origGridColor);
-	// setColumnSelectionAllowed(false);
-	// }
-	//
-	// updateUI();
-	// }
-
-	/**
-	 * 切换连续输入模式
-	 */
-	// public void toggleContinuousInputMode() {
-	// setContinuousInputMode(!isContinuousInputMode);
-	// }
 
 	/**
 	 * 获取是否设置为连续编辑模式
@@ -643,8 +611,8 @@ public class JEditTable extends JTable {
 	 */
 	public void setContinuousEditMode(boolean mode) {
 		isContinuousEditMode = mode;
-		miContinuousEdit.setBackground(isContinuousEditMode ? onColor
-				: offColor);
+//		miContinuousEdit.setBackground(isContinuousEditMode ? onColor
+//				: offColor);
 		lbContinuousEdit.setBackground(isContinuousEditMode ? onColor
 				: offColor);
 	}
@@ -673,7 +641,7 @@ public class JEditTable extends JTable {
 	 */
 	public void setFocusVMove(boolean yesorno) {
 		isFocusVMove = yesorno;
-		miFocusVMove.setBackground(isFocusVMove ? onColor : offColor);
+//		miFocusVMove.setBackground(isFocusVMove ? onColor : offColor);
 		lbFocusVMove.setBackground(isFocusVMove ? onColor : offColor);
 	}
 
@@ -783,9 +751,9 @@ public class JEditTable extends JTable {
 	public void doContinuousIncreaseCell(int startRow, int startColumn,
 			int increment, boolean skipTheFirst, boolean mouseAction) {
 		
-		ActionFactory.createTableCellIncrementActionAndDoIt(tableName, 
+		ActionFactory.createTableCellIncrementAction(tableName, 
 				this, startRow, startColumn, increment, skipTheFirst, 
-				isContinuousEditMode, mouseAction);
+				isContinuousEditMode, mouseAction).addToManagerAndDoIt();
 	}
 	
 	public void _doContinuousIncreaseCell(int startRow, int startColumn,

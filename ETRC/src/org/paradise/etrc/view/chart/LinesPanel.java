@@ -772,7 +772,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 	}
 	
 	//无选中车次的时候弹出菜单
-	//new MessageBox(chartView.mainFrame, "TODO: 弹出菜单“输入新车|选择线路|导入车次|载入运行图|保存运行图|另存运行图”").showMessage();
+	//new MessageBox(chartView.mainFrame, "弹出菜单“输入新车|选择线路|导入车次|载入运行图|保存运行图|另存运行图”").showMessage();
 	private void popupMenuNoTrain(final Point p) {
 //		// 如果没有选中则返回
 //		if (chartView.activeTrain != null) {
@@ -877,7 +877,7 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 		/*		MenuItem miSaveAs = new MenuItem("另存为...");
 		miSaveAs.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//TODO: 另存为
+				//另存为
 			}
 		});
 */		

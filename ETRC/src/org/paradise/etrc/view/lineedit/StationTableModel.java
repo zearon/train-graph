@@ -119,8 +119,8 @@ public class StationTableModel extends DefaultJEditTableModel {
 	}
 
 	protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createTableCellEditActionAndDoIt(__("station table"), 
-				table, this, rowIndex, columnIndex, aValue);
+		return ActionFactory.createTableCellEditAction(__("station table"), 
+				table, this, rowIndex, columnIndex, aValue).addToManagerAndDoIt();
 	}
 
 	/**

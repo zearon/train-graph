@@ -10,6 +10,7 @@ import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileWriter;
 import java.time.Instant;
 import java.util.List;
 import java.util.Vector;
@@ -110,7 +111,7 @@ public class FindTrainsDialog extends JDialog {
 			networkChart.clearTrains();
 			mainFrame.chartView.repaint();
 			
-			msgLabel.setText(__("Please wait while imporing train information..."));
+			msgLabel.setText(__("Loading built-in timetable..."));
 			
 			ETRCSKB skb = mainFrame.getSKB();
 //			
@@ -119,64 +120,37 @@ public class FindTrainsDialog extends JDialog {
 			Instant instant1 = null, instant2 = null;
 			if (IS_DEBUG())
 				instant1= Instant.now();
-
-			skb.findTrains(mainFrame.trainGraph.currentNetworkChart);
-			mainFrame.trainGraph.setTrainTypeByNameForAllTrains();
-			mainFrame.trainGraph.currentNetworkChart.createTrainRouteSectionsForTrainsInAllLines();
 			
-//			// Add to all trains
-//			networkChart.addAllTrains(trains);
-//			
-//			networkChart.parallelTrainStream()
-//				.forEach(train-> {
-//					msgLabel.setText(String.format(__("Importing train information %s"), 
-//							train.getTrainName()));
-//					
-//					networkChart.allRailLineCharts().forEach(lineChart -> {
-//						if (train.isDownTrain(lineChart.railroadLine) > 0) {
-//							lineChart.addTrain(train);
-//						}
-//					});
-//				});
+			progressPanel.autoMakeProgress(false);
+			
+			msgLabel.setText(__("Please wait while imporing train information..."));
+
+			skb.findTrains(mainFrame.trainGraph.currentNetworkChart, 
+					status 	-> msgLabel.setText(status),
+					max 	-> progressPanel.setRange(max), 
+					value 	-> progressPanel.setValue(value));
+			mainFrame.trainGraph.setTrainTypeByNameForAllTrains();
+			
+			msgLabel.setText(__("Creating train route sections..."));
+			mainFrame.trainGraph.currentNetworkChart.createTrainRouteSectionsForTrainsInAllLines();
 			
 			mainFrame.allTrainsView.setModel(mainFrame.trainGraph);
 			
-			// Add train to railroad line charts.
-//			mainFrame.trainGraph.charts.forEach(networkChart -> {
-//				networkChart.get
-//			});
-			
-//			trains.stream().parallel()
-//			.filter(train-> (train.isDownTrain(mainFrame.currentLineChart.railroadLine) > 0))
-//			.forEach(train-> {
-//				mainFrame.currentLineChart.addTrain(train);
-//				msgLabel.setText(String.format(__("Importing train information %s"), train.getTrainName()));
-//			});
+			msgLabel.setText(__("Done."));
+			progressPanel.terminate();
 			
 			if (IS_DEBUG())
 				instant2= Instant.now();
 			
 			DEBUG("Benchmark: [import circuit]: %d", instant2.toEpochMilli() - instant1.toEpochMilli());
 			
-			
-//			for(int i=0; i<trains.size(); i++) {
-//				Train loadingTrain = (Train) (trains.get(i));
-//				
-//				if(loadingTrain.isDownTrain(mainFrame.chart.trunkCircuit, false) > 0) {
-//					mainFrame.chart.addTrain(loadingTrain);
-//					
-//					msgLabel.setText(String.format(__("Importing train information %s"), loadingTrain.getTrainName()));
-//					hold(50);
-//				}
-//			}
-			
 			mainFrame.chartView.repaint();
 			mainFrame.sheetView.updateData();
 	        mainFrame.runView.refresh();
 
-			progressPanel.gotoEnd();
-
 			hold(200);
+
+			setVisible(false);
 			dispose();
 		}
 		
@@ -192,13 +166,14 @@ public class FindTrainsDialog extends JDialog {
     {
 		private static final long serialVersionUID = -2195298227589227704L;
 		private JProgressBar pb;
+		private Timer timer;
 
         public ProgressPanel() {
             pb = new JProgressBar();
             pb.setPreferredSize(new Dimension(200,20));
             
             // 设置定时器，用来控制进度条的处理
-            Timer time = new Timer(1,new ActionListener() { 
+            timer = new Timer(1,new ActionListener() { 
                 int counter = 0;
                 public void actionPerformed(ActionEvent e) {
                     counter++;
@@ -214,7 +189,7 @@ public class FindTrainsDialog extends JDialog {
                     }                    
                 }
             });
-            time.start();
+            timer.start();
             
             //pb.setStringPainted(true);
             pb.setMinimum(0);
@@ -223,6 +198,28 @@ public class FindTrainsDialog extends JDialog {
             pb.setForeground(Color.red);
                         
             this.add(pb);                
+        }
+        
+        public void autoMakeProgress(boolean enabled) {
+            pb.setMinimum(0);
+            pb.setMaximum(300);
+            pb.setValue(0);
+            
+            if (enabled)
+            	timer.start();
+            else
+            	timer.stop();
+        }
+        
+        public void setRange(int maximum) {
+        	timer.stop();
+        	
+        	pb.setMinimum(0);
+        	pb.setMaximum(maximum);
+        }
+        
+        public void setValue(int value) {
+        	pb.setValue(value);
         }
         
         /**
@@ -234,7 +231,13 @@ public class FindTrainsDialog extends JDialog {
         
         public void gotoEnd() {
 			pb.setValue(pb.getMaximum());
-         }
+        }
+        
+        public void terminate() {
+        	timer.stop();
+        	gotoEnd();
+        	repaint();
+        }
     }
 	
 }

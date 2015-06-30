@@ -7,6 +7,42 @@
   <property name="jar.dir"     value="${build.dir}/jar"/>
 
   <property name="main-class"  value="org.paradise.etrc.ETRC"/>
+	
+	<path id="project.classpath">  
+    <pathelement location="/Applications/eclipse/plugins/org.junit_4.11.0.v201303080030/junit.jar"/>  
+		<!--
+    <pathelement path="${java.class.path}"/>  
+    <filelist dir="${basedir}">   
+         <include name="**/*.jar"/>   
+    </filelist>   
+    <dirset dir="${build}">   
+          <include name="**/classes"/>   
+          <exclude name="**/classes"/>   
+    </dirset>   
+    -->
+  </path> 
+	
+	<taskdef name="bundleapp"
+	         classname="com.oracle.appbundler.AppBundlerTask"   
+	         classpath="lib/appbundler-1.0.jar" />
+	
+  <target name="make-osx-bundle" depends="clean,jar">
+  	<!-- 如果要重命名ETRC，应同步更改org.paradise.etrc.ETRC中的APP_NAME字段 -->
+    <bundleapp outputdirectory="release" name="ETRC" displayname="Jeff's Train Graph"
+        identifier="ETRC"  mainclassname="${main-class}" icon="release/ETRC.icns">
+  		<classpath file="${jar.dir}/ETRC.jar" />	
+  		<option value="-Dapple.laf.useScreenMenuBar=true"/>
+  	</bundleapp>
+  </target>
+  
+  <target name="make-osx-bundle-eclipse" depends="jar-eclipse">
+    <!-- 如果要重命名ETRC，应同步更改org.paradise.etrc.ETRC中的APP_NAME字段 -->
+    <bundleapp outputdirectory="release" name="ETRC" displayname="Jeff's Train Graph"
+        identifier="ETRC"  mainclassname="${main-class}" icon="release/ETRC.icns">
+      <classpath file="${jar.dir}/ETRC.jar" />  
+      <option value="-Dapple.laf.useScreenMenuBar=true"/>
+    </bundleapp>
+  </target>
 
   <target name="clean">
 	<delete dir="${build.dir}"/>
@@ -14,8 +50,14 @@
   </target>
 
   <target name="compile">
+    <mkdir dir="${classes.dir}/eda"/>
+    <copy todir="${classes.dir}/eda">
+      <fileset dir="${top.dir}/eda" />
+    </copy>
 	<mkdir dir="${classes.dir}"/>
-	<javac srcdir="${src.dir}" destdir="${classes.dir}" includeAntRuntime="false" />
+	<javac srcdir="${src.dir}" destdir="${classes.dir}" includeAntRuntime="false" >
+		<classpath refid="project.classpath" />
+	</javac>
   </target>
 
   <target name="po-resource">
@@ -30,6 +72,20 @@
 	<copy todir="${classes.dir}/pic">
 	  <fileset dir="${src.dir}/pic" />
 	</copy>
+  </target>
+
+  <target name="jar-eclipse" depends="">
+  <mkdir dir="${jar.dir}"/>
+  <copy file="${top.dir}/sample.trc" todir="${jar.dir}/" />
+  <jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}">
+    <manifest>
+    <attribute name="Main-Class" value="${main-class}"/>
+    </manifest>
+  </jar>
+  <mkdir dir="${jar.dir}/eda"/>
+  <copy todir="${jar.dir}/eda">
+    <fileset dir="${top.dir}/eda" />
+  </copy>
   </target>
 
   <target name="jar" depends="compile,post-compile,po-resource">

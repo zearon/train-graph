@@ -4,25 +4,18 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Vector;
-import java.util.function.Supplier;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.junit.Test;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.TrainGraphPart;
-import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.data.annotation.TGProperty;
-import org.paradise.etrc.util.data.Tuple2;
 
-import java.util.regex.Matcher;
-
-import sun.security.util.Length;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
 
 import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
 
 @TGElementType(name="Stop", printInOneLine=true)
 public class Stop extends TrainGraphPart {
@@ -105,7 +98,7 @@ public class Stop extends TrainGraphPart {
 			return "";
 		case PASS:
 			if (arriveTime == -1)
-				return "||";
+				return "↓";
 			else
 				return makeTimeStr(arriveTime);
 		default:
@@ -130,7 +123,7 @@ public class Stop extends TrainGraphPart {
 			return "";
 		case PASS:
 			if (leaveTime == -1)
-				return "||";
+				return "↓︎";
 			else
 				return makeTimeStr(leaveTime);
 		default:
@@ -192,13 +185,22 @@ public class Stop extends TrainGraphPart {
 	}
 
 	public Stop copy() {
-		Stop st = new Stop(this.getName()).setProperties(this.trainName, stopStatus, this.getArriveTime(), this.getLeaveTime());
+		Stop st = TrainGraphFactory.createInstance(Stop.class, this.getName())
+			.setProperties(this.trainName, stopStatus, arriveTime, leaveTime);
+		st.parent = parent;
+		st.root = root;
 		
 		return st;
 	}
 
 	public void copyTo(Stop stop2) {
 		stop2.setProperties(trainName, stopStatus, arriveTime, leaveTime);
+	}
+	
+	public void applyStopTimeOffset(int offset) {
+		arriveTime += addTime(arriveTime, offset);
+		leaveTime += addTime(leaveTime, offset);
+		leaveTimeChanged = true;
 	}
 
 	public int hashCode() {

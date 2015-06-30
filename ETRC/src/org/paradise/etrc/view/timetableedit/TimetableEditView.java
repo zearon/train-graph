@@ -11,6 +11,7 @@ import java.awt.Component;
 
 import javax.swing.BorderFactory;
 import javax.swing.JList;
+import javax.swing.JMenu;
 import javax.swing.JSplitPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -29,6 +30,7 @@ import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.slice.ChartSlice;
 import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
+import org.paradise.etrc.view.IView;
 import org.paradise.etrc.view.sheet.RowHeaderModel;
 import org.paradise.etrc.view.sheet.RowHeaderRenderer;
 import org.paradise.etrc.view.sheet.SheetTable;
@@ -39,8 +41,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
+import java.awt.Font;
 
-public class TimetableEditView extends JPanel {
+public class TimetableEditView extends JPanel implements IView {
 	
 	public static final Color CROSSOVER_STATION_COLOR = Color.YELLOW;
 	public static final Color lineBK1 = Color.white;
@@ -63,6 +66,7 @@ public class TimetableEditView extends JPanel {
 	private TrainGraph trainGraph;
 	private RailroadLineChart lineChart;
 	private boolean downGoing;
+	private JLabel lblStatusBar;
 	
 	/**
 	 * Create the panel.
@@ -85,6 +89,8 @@ public class TimetableEditView extends JPanel {
 		if (ui_inited) {
 			// update ui
 			uiBindingManager.updateUI(null);
+			
+			table.setTrainGraph(trainGraph);
 		}
 	}
 	
@@ -123,9 +129,10 @@ public class TimetableEditView extends JPanel {
 		add(statusPanel, BorderLayout.SOUTH);
 		statusPanel.setLayout(new BorderLayout(0, 0));
 		
-		JLabel lblNewLabel = new JLabel("New label");
-		lblNewLabel.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		statusPanel.add(lblNewLabel);
+		lblStatusBar = new JLabel("New label");
+		lblStatusBar.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		lblStatusBar.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
+		statusPanel.add(lblStatusBar);
 		
 //		timeTableScrollPane = new JScrollPane();
 //		add(timeTableScrollPane, BorderLayout.CENTER);
@@ -227,6 +234,21 @@ public class TimetableEditView extends JPanel {
 		}
 		
 		return desc;
+	}
+
+	@Override
+	public JMenu getEditMenu() {
+		return table.getEditMenu();
+	}
+
+	@Override
+	public JToolBar getToolBar() {
+		return null;
+	}
+
+	@Override
+	public Component getStatusBar() {
+		return lblStatusBar;
 	}
 	
 	// }}

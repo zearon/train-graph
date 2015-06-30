@@ -103,6 +103,8 @@ public class RailroadLineChart extends TrainGraphPart {
 		super.setName(name);
 	}
 
+
+	public RailNetworkChart getRailNetworkChart() {return (RailNetworkChart) getParent();}
 	// }}
 	
 	// {{ Train 列表操作
@@ -349,6 +351,19 @@ public class RailroadLineChart extends TrainGraphPart {
 
 	// {{ Train Route Section 操作
 	
+	public Vector<TrainRouteSection> getTrainRouteSections(boolean downGoing) {
+		if (downGoing)
+			return downgoings;
+		else
+			return upgoings;
+	}
+	
+	/* public int getTrainSectionCount(boolean downGoing) {
+		if (downGoing)
+			return getDownwardTrainSectionCount();
+		else
+			return getUpwardTrainSectionCount();
+	} */
 	public int getDownwardTrainSectionCount() {
 		return downgoings.size();
 	}
@@ -356,6 +371,12 @@ public class RailroadLineChart extends TrainGraphPart {
 		return upgoings.size();
 	}
 	
+	public TrainRouteSection getDownwardTrainSection(boolean downGoing, int i) {
+		if (downGoing)
+			return getDownwardTrainSection(i);
+		else
+			return getUpwardTrainSection(i);
+	}
 	public TrainRouteSection getDownwardTrainSection(int i) {
 		return downgoings.get(i);
 	}
@@ -363,6 +384,12 @@ public class RailroadLineChart extends TrainGraphPart {
 		return upgoings.get(i);
 	}
 	
+	public void addTrainSection(boolean downGoing, TrainRouteSection obj) {
+		if (downGoing)
+			addDownwardTrainSection(obj);
+		else
+			addUpwardTrainSection(obj);
+	}
 	public void addDownwardTrainSection(TrainRouteSection obj) {
 		downgoings.add(obj);
 		obj.setParent(this);
@@ -372,6 +399,12 @@ public class RailroadLineChart extends TrainGraphPart {
 		obj.setParent(this);
 	}
 	
+	public void insertTrainSectionAt(boolean downGoing, int index, TrainRouteSection obj) {
+		if (downGoing)
+			insertDownwardTrainSectionAt(index, obj);
+		else
+			insertUpwardTrainSectionAt(index, obj);
+	}
 	public void insertDownwardTrainSectionAt(int index, TrainRouteSection obj) {
 		downgoings.add(index, obj);
 		obj.setParent(this);
@@ -380,14 +413,27 @@ public class RailroadLineChart extends TrainGraphPart {
 		upgoings.add(index, obj);
 		obj.setParent(this);
 	}
-	
+
+	public void removeTrainSectionAt(boolean downGoing, int index) {
+		if (downGoing)
+			removeDownwardTrainSectionAt(index);
+		else
+			removeUpwardTrainSectionAt(index);
+	}
 	public void removeDownwardTrainSectionAt(int index) {
 		downgoings.removeElementAt(index);
 	}
 	public void removeUpwardTrainSectionAt(int index) {
 		upgoings.removeElementAt(index);
 	}
-	
+
+	public boolean containTrainSectionWithTrainName(boolean downGoing, String trainName) {
+		if (downGoing)
+			return getDowngoings().anyMatch(trSection -> trSection.getTrainName().equals(trainName));
+		else
+			return getUpgoings().anyMatch(trSection -> trSection.getTrainName().equals(trainName));
+	}
+
 	public void removeTrainRouteSectionForTrain(String trainName) {
 		for (Iterator<TrainRouteSection> iter = downgoings.iterator(); iter.hasNext(); ) {
 			TrainRouteSection section = iter.next();

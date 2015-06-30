@@ -1,24 +1,22 @@
 package org.paradise.etrc.data.v1;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Vector;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.TrainGraphPart;
@@ -26,7 +24,8 @@ import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
-import org.paradise.etrc.util.data.Tuple2;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com
@@ -349,6 +348,31 @@ public class Train extends TrainGraphPart {
 	
 	// }}
 
+	// {{ Others
+	
+	public static int compareTrainName(String name1, String name2) {
+		return getTrainNameComparator().compare(name1, name2);
+	}
+	
+	public static Comparator<String> getTrainNameComparator() {
+		return TrainNameUtil.getInstance();
+	}
+	
+	public static Comparator<Train> getTrainComparatorByTrainName() {
+		return new Comparator<Train>() {
+			@Override
+			public int compare(Train o1, Train o2) {
+				return compareTrainName(o1.getName(), o2.getName());
+			}
+		};
+	}
+	
+	public static String createTrainName(String trainName, int trainNumberIncrement) {
+		return TrainNameUtil.getInstance().createName(trainName, trainNumberIncrement);
+	}
+	
+	// }}
+	
 	// {{ 老式读档
 	public void loadFromFile2(String file) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(file)),"UTF-8"));
@@ -548,39 +572,25 @@ public class Train extends TrainGraphPart {
 		return getTrainName().hashCode();
 	}
 
-	public String toString() {
-		String strRt = getTrainName() + "次从" + getStartStation() + "到"
-				+ getTerminalStation() + "，共经停" + getStopNum() + "个车站\r\n";
-
-		for (int i = 0; i < getStopNum(); i++)
-			strRt += stops.get(i).getName() + "站 "
-					+ stops.get(i).getArrive() + " 到 "
-					+ stops.get(i).getLeave() + " 发\r\n";
-
-		return strRt;
-	}
+//	public String toString() {
+//		String strRt = getTrainName() + "次从" + getStartStation() + "到"
+//				+ getTerminalStation() + "，共经停" + getStopNum() + "个车站\r\n";
+//
+//		for (int i = 0; i < getStopNum(); i++)
+//			strRt += stops.get(i).getName() + "站 "
+//					+ stops.get(i).getArrive() + " 到 "
+//					+ stops.get(i).getLeave() + " 发\r\n";
+//
+//		return strRt;
+//	}
 
 	//测试用
 	public static void main(String argv[]) {
-		Train t = new Train();
-		try {
-			t.loadFromFile2("c:\\N518_519_w.trf");
 
-			System.out.println(t.getTrainName() + "次从" + t.getStartStation() + "到"
-					+ t.getTerminalStation() + "，共经停" + t.getStopNum() + "个车站");
-			for (int i = 0; i < t.getStopNum(); i++)
-				System.out.println(t.stops.get(i).getName() + "站 "
-						+ t.stops.get(i).getArrive() + " 到 "
-						+ t.stops.get(i).getLeave() + " 发");
-
-			File f = new File("c:\\test_w.trf");
-			BufferedWriter out = new BufferedWriter(new FileWriter(f));
-			t.writeTo(out);
-			out.flush();
-			out.close();
-		} catch (IOException ex) {
-			System.out.println("Error:" + ex.getMessage());
-		}
+		TrainNameUtil instance = TrainNameUtil.getInstance();
+		
+		String[] parts = instance.parseName("K1009");
+		System.out.println(String.join(", ", parts));
 	}
 	
 	// }}
@@ -937,4 +947,61 @@ public class Train extends TrainGraphPart {
 	// }}
 	
 
+}
+
+class TrainNameUtil implements Comparator<String> {
+
+	private static TrainNameUtil instance;
+	private static Pattern namePattern = Pattern.compile("^(.*?)(\\d*)(/|$)");				//"(.*?)(\\d*)(/.*)?"
+	
+	public static synchronized TrainNameUtil getInstance() {
+		if (instance == null) {
+			instance = new TrainNameUtil();
+		}
+		
+		return instance;
+	}
+	
+	@Override
+	public int compare(String o1, String o2) {
+		String[] parts1 = parseName(o1);
+		String[] parts2 = parseName(o2);
+		
+		int prefixCompare = parts1[0].compareTo(parts2[0]);
+		int numberCompare = Integer.parseInt(parts1[1]) - Integer.parseInt(parts2[1]);
+		
+		return prefixCompare != 0 ? prefixCompare : numberCompare;
+	}
+	
+	public String[] parseName(String name) {
+		String[] parts = new String[2];
+		Matcher m1 = namePattern.matcher(name);
+		if (m1.find()) {
+			parts[0] = m1.group(1);
+			parts[1] = m1.group(2);
+		} else {
+			parts[0] = name;
+			parts[1] = "";
+		}
+		
+		if (parts[1].length() == 0)
+			parts[1] = "0";
+		
+		return parts;
+	}
+	
+	public String createName(String name, int numberIncrement) {
+		// TODO: 考虑多车次的情况。如K121/K124
+		return createNamePart(name, numberIncrement);
+	}
+	
+	public String createNamePart(String name, int numberIncrement) {
+		String[] parts = parseName(name);
+		
+		String prefix = parts[0];
+		int number = Integer.parseInt(parts[1]);
+		number += numberIncrement;
+		
+		return prefix + number;
+	}
 }

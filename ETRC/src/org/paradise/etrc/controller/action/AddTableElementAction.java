@@ -1,27 +1,15 @@
 package org.paradise.etrc.controller.action;
 
-import java.util.List;
-import java.util.Vector;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellEditor;
-
-import org.paradise.etrc.data.v1.RailroadLine;
-import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
-import org.paradise.etrc.view.lineedit.RailroadLineTableModel;
-import org.paradise.etrc.view.lineedit.StationTableModel;
 
 import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRCUtil.*;
+public class AddTableElementAction<T> extends UIAction implements TableAction {
 
-public class AddTableElementAction<T> extends TableAction {
-
+	JTable table;
 	String tableName;
 	boolean vertical;
 	int index;
@@ -33,7 +21,7 @@ public class AddTableElementAction<T> extends TableAction {
 	AddTableElementAction(String tableName, JTable table, boolean vertical,
 			int index, T element, BiConsumer<Integer, T> adder,
 			Consumer<Integer> remover, Runnable callback) {
-		super(table);
+		this.table = table;
 		this.tableName = tableName;
 		this.vertical = vertical;
 		this.index = index;
@@ -50,7 +38,8 @@ public class AddTableElementAction<T> extends TableAction {
 		selectElement(index, vertical);
 		stopCellEditing(false);
 
-		callback.run();
+		if (callback != null)
+			callback.run();
 	}
 
 	@Override
@@ -60,7 +49,8 @@ public class AddTableElementAction<T> extends TableAction {
 		selectElement(index, vertical);
 		stopCellEditing(false);
 
-		callback.run();
+		if (callback != null)
+			callback.run();
 	}
 
 	@Override
@@ -72,6 +62,11 @@ public class AddTableElementAction<T> extends TableAction {
 	public String repr() {
 		return String.format(__("Add element {%s} into %s at position %d."),
 				element, tableName, index);
+	}
+
+	@Override
+	public JTable getTable() {
+		return table;
 	}
 
 }

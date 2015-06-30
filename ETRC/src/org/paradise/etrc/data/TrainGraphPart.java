@@ -2,7 +2,6 @@ package org.paradise.etrc.data;
 
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -24,7 +23,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -34,19 +32,20 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.paradise.etrc.ETRCUtil;
-import org.paradise.etrc.data.v1.*;
-import org.paradise.etrc.data.annotation.*;
+import org.paradise.etrc.data.annotation.AnnotationException;
+import org.paradise.etrc.data.annotation.TGElement;
+import org.paradise.etrc.data.annotation.TGElementAttr;
+import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.data.annotation.TGProperty;
+import org.paradise.etrc.data.v1.NullPart;
+import org.paradise.etrc.data.v1.RailroadLine;
+import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.data.Tuple3;
 import org.paradise.etrc.util.data.ValueTypeConverter;
 import org.paradise.etrc.util.function.MultiConsumer;
-import org.paradise.etrc.util.function.TriConsumer;
-
-import com.sun.org.apache.xpath.internal.operations.Bool;
 
 import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
 
 
 /**
@@ -1243,7 +1242,6 @@ public abstract class TrainGraphPart {
 //		try {
 //			fw = new FileWriter("/Volumes/MacData/Users/zhiyuangong/Hobby/Railroad/列车运行图/map-base64-load-debug.txt");
 //		} catch (IOException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
 //	}
@@ -1582,20 +1580,22 @@ public abstract class TrainGraphPart {
 		if (obj != null && obj.isBase64Encoded()) {
 			obj.decodeFromBase64End();
 		}
-		obj.loadComplete();
-		if (obj instanceof ListElementAssignment || obj instanceof ObjectPropertyAssignment)
-			return true;
-
-		// Assign object to parent object.
-		TrainGraphPart stackTop = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
-		if (stackTop instanceof ListElementAssignment) {
-			((ListElementAssignment) stackTop).addElement(lineNum, fullLine, obj);
-		} else if (stackTop instanceof ObjectPropertyAssignment) {
-			((ObjectPropertyAssignment) stackTop).assign(obj);
-			
-			// Pop out object assignment node
-			parsingNodeStack.pop();
+		
+		if (obj instanceof ListElementAssignment || obj instanceof ObjectPropertyAssignment) {
+		} else {
+			// Assign object to parent object.
+			TrainGraphPart stackTop = parsingNodeStack.isEmpty() ? null : parsingNodeStack.peek();
+			if (stackTop instanceof ListElementAssignment) {
+				((ListElementAssignment) stackTop).addElement(lineNum, fullLine, obj);
+			} else if (stackTop instanceof ObjectPropertyAssignment) {
+				((ObjectPropertyAssignment) stackTop).assign(obj);
+				
+				// Pop out object assignment node
+				parsingNodeStack.pop();
+			}
 		}
+		
+		obj.loadComplete();
 		
 		return true;
 	}

@@ -4,6 +4,7 @@ import static org.paradise.etrc.ETRC.__;
 
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -45,7 +46,6 @@ public class ActionManager {
 
 	private LinkedList<JMenuItem> actionItemList = new LinkedList<JMenuItem> ();
 	private LinkedList<JMenuItem> undoneActionItemList = new LinkedList<JMenuItem>();
-	private HashMap<Integer, Boolean> actionItemIsUndoMap = new HashMap<Integer, Boolean>();
 
 	private JMenuItem undoMenuItem;
 	private JMenuItem redoMenuItem;
@@ -73,7 +73,7 @@ public class ActionManager {
 		this.undoMenu = undoMenu;
 		this.redoMenu = redoMenu;
 
-		updateUI();
+		updateMenuAndToolbar();
 	}
 
 	/**
@@ -85,7 +85,7 @@ public class ActionManager {
 		this.undoButton = undoButton;
 		this.redoButton = redoButton;
 
-		updateUI();
+		updateMenuAndToolbar();
 	}
 	
 	/**
@@ -102,9 +102,15 @@ public class ActionManager {
 		if (action.shouldSkip())
 			return;
 
+		boolean ok = action.doAction();
+		if (!ok)
+			return;
+
+		addAction(action, true);
+	}
+
+	private void addAction(UIAction action, boolean updateMenuAndToolbar) {
 		action.setID(++ distinctActionID);
-		action.doAction();
-		actionItemIsUndoMap.put(action.getID(), true);
 		if ((actionCount == MAX_ACTION_COUNT && actionCount == actionCountAtMark) ||
 				actionCount < actionCountAtMark)
 			newActionCarriedOn = true;
@@ -135,7 +141,8 @@ public class ActionManager {
 			undoneActionItemList.clear();
 		}
 		
-		updateUI();
+		if (updateMenuAndToolbar)
+			updateMenuAndToolbar();
 	}
 	
 	public void undo() {
@@ -152,7 +159,6 @@ public class ActionManager {
 		undoMenu.remove(menuItem);
 
 		action.undoAction();
-		actionItemIsUndoMap.put(action.getID(), false);
 		actionCount --;
 		
 		undoneActionList.addFirst(action);
@@ -160,7 +166,7 @@ public class ActionManager {
 		redoMenu.add(menuItem, 0);
 
 		if (updateUI)
-			updateUI();
+			updateMenuAndToolbar();
 	}
 	
 	public synchronized void redo() {
@@ -177,7 +183,6 @@ public class ActionManager {
 		redoMenu.remove(menuItem);
 
 		action.redoAction();
-		actionItemIsUndoMap.put(action.getID(), true);
 		actionCount ++;
 
 		actionList.addLast(action);
@@ -185,7 +190,7 @@ public class ActionManager {
 		undoMenu.add(menuItem, 0);
 
 		if (updateUI)
-			updateUI();
+			updateMenuAndToolbar();
 	}
 	
 	private void batchUndo(int id) {
@@ -255,17 +260,17 @@ public class ActionManager {
 	private void batchRedoOrUndo(ActionEvent e) {
 		JMenuItem menu = (JMenuItem) e.getSource();
 		int id = Integer.parseInt(menu.getName());
-		boolean isUndo = actionItemIsUndoMap.get(id);
+		boolean isUndo = findAction(id).isActionDone();
 		if (isUndo) {
 			batchUndo(id);
 		} else {
 			batchRedo(id);
 		}
 		
-		updateUI();
+		updateMenuAndToolbar();
 	}
 
-	private void updateUI() {
+	private void updateMenuAndToolbar() {
 		boolean canUndo = canUndo();
 		boolean canRedo = canRedo();
 
@@ -299,5 +304,51 @@ public class ActionManager {
 		if (updateUIHook != null)
 			updateUIHook.accept(this);
 	}
+	
+	private UIAction findAction(int id) {
+		UIAction action = null;
+		
+		action = actionList.stream().filter(action0 -> id == action0.getID()).findFirst().orElse(null);
+		if (action != null)
+			return action;
+		
+		action = undoneActionList.stream().filter(action0 -> id == action0.getID()).findFirst().orElse(null);
+		return action;
+	}
+	
+	public void replaceActions(List<UIAction> actions, UIAction newAction) {
+		for (UIAction action : actions) {
+			removeAction(action.getID(), action.isActionDone());
+		}
 
+		if (!newAction.shouldSkip())
+			addAction(newAction, false);
+		
+		updateMenuAndToolbar();
+	}
+
+	private void removeAction(int id, boolean done) {
+		List<UIAction> actions = done ? actionList : undoneActionList;
+		List<JMenuItem> actionItems = done ? actionItemList : undoneActionItemList;
+		JMenu menu = done ? undoMenu : redoMenu;
+
+		for (Iterator<UIAction> iter = actions.iterator(); iter.hasNext(); ) {
+			UIAction action = iter.next();
+			if (action.getID() == id) {
+				iter.remove();
+				break;
+			}
+		}
+		
+		for (Iterator<JMenuItem> iter = actionItems.iterator(); iter.hasNext(); ) {
+			JMenuItem actionItem = iter.next();
+			if (actionItem.getName().equals("" + id) ) {
+				iter.remove();
+				menu.remove(actionItem);
+				break;
+			}
+		}
+		
+		-- actionCount;
+	}
 }

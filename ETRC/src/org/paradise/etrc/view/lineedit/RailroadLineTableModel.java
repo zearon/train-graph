@@ -49,7 +49,10 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 	 * @return int
 	 */
 	public int getRowCount() {
-		return raillines.size();
+		if (raillines == null)
+			return 0;
+		else
+			return raillines.size();
 	}
 
 	/**
@@ -109,8 +112,8 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 	}
 
 	protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createTableCellEditActionAndDoIt(__("railroad line table"), 
-				table, this, rowIndex, columnIndex, aValue);
+		return ActionFactory.createTableCellEditAction(__("railroad line table"), 
+				table, this, rowIndex, columnIndex, aValue).addToManagerAndDoIt();
 	}
 	
 	public void _setValueAt(Object aValue, int rowIndex, int columnIndex) {

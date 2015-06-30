@@ -1,20 +1,15 @@
 package org.paradise.etrc;
 
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
-import static org.paradise.etrc.ETRCUtil.DEBUG;
-
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.LayoutManager;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -28,24 +23,17 @@ import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.rmi.server.ObjID;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.StringJoiner;
+import java.util.HashMap;
 import java.util.Vector;
-import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -58,18 +46,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.data.ParsingException;
 import org.paradise.etrc.data.TrainGraphFactory;
-import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.skb.ETRCLCB;
 import org.paradise.etrc.data.skb.ETRCSKB;
 import org.paradise.etrc.data.v1.RailNetworkChart;
@@ -94,8 +77,8 @@ import org.paradise.etrc.filter.TRFFilter;
 import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.databinding.UIBinding;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
+import org.paradise.etrc.view.IView;
 import org.paradise.etrc.view.alltrains.AllTrainsView;
-import org.paradise.etrc.view.alltrains.TrainListView;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.view.dynamic.DynamicView;
 import org.paradise.etrc.view.lineedit.RailroadLineEditView;
@@ -105,11 +88,13 @@ import org.paradise.etrc.view.network.RailNetworkEditorView;
 import org.paradise.etrc.view.settings.SettingsView;
 import org.paradise.etrc.view.sheet.SheetView;
 import org.paradise.etrc.view.timetableedit.TimetableEditView;
-import org.paradise.etrc.view.timetables.TimetableListTableModel;
 import org.paradise.etrc.view.timetables.TimetableListView;
 import org.paradise.etrc.view.traintypes.TrainTypesView;
 
-import com.sun.corba.se.spi.orbutil.fsm.Action;
+import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
+import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
 
 /**
  * @author lguo@sina.com
@@ -132,12 +117,19 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	CardLayout statusbarContentCard;
 	public JSplitPane splitPaneV;
 	public JSplitPane splitPaneH;
+	
+	private JPanel statusPanel;
+	private JMenuBar menuBar;
+	private JToolBar toolBar;
+	private JMenu menuTools; // Anchor of new edit menu of IView
+	private JLabel statusBarEmpty;
 
 	public JPanel raillineChartView;
 	public ChartView chartView;
 	public DynamicView runView;
 	public SheetView sheetView;
 	
+	private HashMap<String, Container> viewMap = new HashMap<> ();
 	public SettingsView settingsView;
 	public RailNetworkEditorView railNetworkEditorView;
 	public RailroadLineEditView railLineEditView;
@@ -146,17 +138,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public TimetableListView timetableListView;
 	public TimetableEditView timetableEditView;
 	
-//	public J
-	
-//	private RailroadLineEditView circuitEditDialog;
-	
 	private boolean isShowRun = true;
 	
 	public JLabel statusBarMain = new JLabel();
 	public JLabel statusBarRight = new JLabel();
-	
-//	public boolean isNewCircuit = false;
-//	private String workingFileName;
 	
 	public TrainGraph trainGraph;
 
@@ -170,12 +155,11 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	public static MainFrame instance;
 	public static MainFrame getInstance() { return instance; }
+	
 	//Construct the frame
 	public MainFrame() {
 		if (instance == null)
 			instance = this;
-		
-		addFullScreenModeSupportOnOSX();
 		
 		trainSelectHistory = new Vector<String>();
 		cbTrainSelectHistory = new JComboBox<String>(new DefaultComboBoxModel<String>(trainSelectHistory));
@@ -199,7 +183,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		ui_inited = true;
 		setModel(trainGraph);
 		
-		// for DEBUG purposes
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowActivated(WindowEvent e) {
@@ -211,10 +194,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				// test circuitEditDialog
 				// DEBUG_ACTION(() -> circuitEditDialog.showDialog());
 				
-				// Set full screen mode
-				DEBUG_ACTION( () -> {
-					//setFullScreenModeOnOSX(); 
-					} , "Set full screen mode to false");
+				if (ETRC.isOSX10_7OrAbove() && Config.getInstance().getFullScreenOnStartupForOSX()) {
+					addFullScreenModeSupportOnOSX();
+					setFullScreenModeOnOSX();
+				}
 				
 				navigator.expandAll(true);
 			}
@@ -252,6 +235,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			sheetView.refresh();
 			
 			runView.refresh();
+			
+			navigator.expandAll(true);
 		}
 	}
 	
@@ -259,36 +244,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 	}
 	
-	static Boolean isOSX = null;
-	public boolean isOSX10_7OrAbove() {
-		if (isOSX != null) {
-			return isOSX;
-		}
-		
-		isOSX = false;
-		if ("Mac OS X".equalsIgnoreCase(System.getProperty("os.name"))) {
-			String osVersionString = System.getProperty("os.version");
-			String[] versionParts = osVersionString.split("\\.");
-			if (versionParts.length >= 2) {
-				try {
-					int versionPart1Val = Integer.parseInt(versionParts[0]);
-					int versionPart2Val = Integer.parseInt(versionParts[1]);
-					if (versionPart1Val >= 10 && versionPart2Val >= 7) {
-						isOSX = true;
-					}
-				} finally {}
-			}
-		}
-		
-		return isOSX;
-	}
-	
 	/**
 	 * If OS is Mac OS X and Version >= 10.7, then add full screen support.
 	 */
 	public void addFullScreenModeSupportOnOSX() {
 		DEBUG_MSG("OS Name=%s, OS Version=%s\n", System.getProperty("os.name"), System.getProperty("os.version"));
-		if (!isOSX10_7OrAbove()) 
+		if (!ETRC.isOSX10_7OrAbove()) 
 			return;
 		
 		// com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(this,true);
@@ -307,7 +268,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 	
 	public void setFullScreenModeOnOSX() {
-		if (!isOSX10_7OrAbove()) 
+		if (!ETRC.isOSX10_7OrAbove()) 
 			return;
 		
 		// com.apple.eawt.Application.getApplication().requestToggleFullScreen(MainFrame.this);	
@@ -342,6 +303,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		System.exit(0);
 	}
+	
+	// {{ init UI
 
 	//Component initialization
 	private void jbInit() throws Exception {
@@ -351,25 +314,24 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		sheetView = new SheetView(trainGraph, this);
 		
 		settingsView = new SettingsView(trainGraph);
+		viewMap.put(NavigatorNodeType.GLOBAL_SETTINGS.name(), settingsView);
 		railNetworkEditorView = new RailNetworkEditorView(trainGraph);
+		viewMap.put(NavigatorNodeType.RAILROAD_NETWORK.name(), railNetworkEditorView);
 		railLineEditView = new RailroadLineEditView(this);
+		viewMap.put(NavigatorNodeType.RAILROAD_LINES.name(), railLineEditView);
 		trainTypesView = new TrainTypesView(trainGraph);
+		viewMap.put(NavigatorNodeType.TRAIN_TYPES.name(), trainTypesView);
 		allTrainsView = new AllTrainsView();
+		viewMap.put(NavigatorNodeType.RAILNETWORK_ALL_TRAINS.name(), allTrainsView);
 		timetableListView = new TimetableListView(trainGraph);
+		viewMap.put(NavigatorNodeType.TIME_TABLES.name(), timetableListView);
 		timetableEditView = new TimetableEditView(trainGraph);
-		
-//		tbPane = new JTabbedPane();
-//		tbPane.setFont(new Font("Dialog", Font.PLAIN, 12));
-//		tbPane.add("点单1", sheetView);
-//		tbPane.add("动态图", runView);
-//		tbPane.setMinimumSize(tbPane.getPreferredSize());
-//		
-//		splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, tbPane, chartView);
-//		splitPane.setDividerLocation(tbPane.getPreferredSize().height);
-//		splitPane.setDividerSize(5);
+		viewMap.put(NavigatorNodeType.TIME_TABLE_LINE_DOWN.name(), timetableEditView);
+		viewMap.put(NavigatorNodeType.TIME_TABLE_LINE_UP.name(), timetableEditView);
 		
 		raillineChartView = new JPanel();
 		raillineChartView.setLayout(new BorderLayout());
+		viewMap.put(NavigatorNodeType.TIME_TABLE_LINE.name(), raillineChartView);
 		
 
 		navigatorContentCard = new CardLayout();
@@ -438,15 +400,18 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 		this.setJMenuBar(loadMenu());
 
-		statusBarMain = loadStatusBar();
-		statusBarRight = loadStatusBar();
-		JPanel statusPanel = new JPanel();
+		statusBarMain = loadStatusBar(__("Status: Normal"));
+		statusBarEmpty = loadStatusBar(null);
+		statusBarRight = loadStatusBar(__("Status: Normal"));
+		
+		statusPanel = new JPanel();
 		statusPanel.setLayout(new BorderLayout());
-		statusPanel.add(statusBarMain, BorderLayout.CENTER);
+		statusPanel.add(statusBarMain, BorderLayout.WEST);
+		statusPanel.add(statusBarEmpty, BorderLayout.CENTER);
 		statusPanel.add(statusBarRight, BorderLayout.EAST);
 
 		contentPane.add(statusPanel, BorderLayout.SOUTH);
-		contentPane.add(loadMainBarTool(), BorderLayout.NORTH);
+		contentPane.add(loadMainToolBar(), BorderLayout.NORTH);
 		contentPane.add(navigatorSplitPane, BorderLayout.CENTER);
 
 		this.setTitle();
@@ -531,13 +496,24 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				(Config.getInstance().isFileModified() ? __("Modified ") : "") + activeTrainName);
 	}
 
-	private JLabel loadStatusBar() {
-		JLabel statusBar = new JLabel();
+	private JLabel loadStatusBar(String text) {
+		@SuppressWarnings("serial")
+		JLabel statusBar = new JLabel() {
+			@Override
+			public Dimension getPreferredSize() {
+				Dimension size = super.getPreferredSize();
+				size.width = navigatorSplitPane.getDividerLocation();
+				return size;
+			}
+		};
 		Border border = BorderFactory.createLoweredBevelBorder();
 
 		statusBar.setBorder(border);
 		statusBar.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
-		statusBar.setText(__("Status: Normal"));
+		
+		if (text != null)
+			statusBar.setText(text);
+		
 		return statusBar;
 	}
 
@@ -547,43 +523,43 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public JToggleButton jtButtonShowWatermark;
 	public JToggleButton jtButtonAntiAliasing;
 
-	private JToolBar loadMainBarTool() {
-		JToolBar jToolBar = new JToolBar();
+	private JToolBar loadMainToolBar() {
+		toolBar = new JToolBar();
 		
 		//文件操作
 		JButton jbOpenFile = createTBButton("openFile", __("Open a Chart"), File_Load_Chart);
 		JButton jbSaveFile = createTBButton("saveFile", __("Save Chart"), File_Save_Chart);
 		JButton jbSaveAs   = createTBButton("saveAs", __("Save Chart As"), File_Save_Chart_As);
-		jToolBar.add(jbOpenFile);
-		jToolBar.add(jbSaveFile);
-		jToolBar.add(jbSaveAs);
+		toolBar.add(jbOpenFile);
+		toolBar.add(jbSaveFile);
+		toolBar.add(jbSaveAs);
 		
 		//撤销,重做
 		JButton jbUndo = createTBButton("undo", __("Undo"), Edit_Undo);
 		JButton jbRedo  = createTBButton("redo", __("Redo"), Edit_Redo);
 		ActionManager.getInstance().setToolbarButton(jbUndo, jbRedo);
-		jToolBar.addSeparator();
-		jToolBar.add(jbUndo);
-		jToolBar.add(jbRedo);
+		toolBar.addSeparator();
+		toolBar.add(jbUndo);
+		toolBar.add(jbRedo);
 		
 		//车次、线路编辑
 		JButton jbCircuitEdit = createTBButton("circuit", __("Edit Circuit"), Edit_Circuit);
 		JButton jbTrainsEdit  = createTBButton("trains", __("Edit Train Information"), Edit_Trains);
-		jToolBar.addSeparator();
-		jToolBar.add(jbCircuitEdit);
-		jToolBar.add(jbTrainsEdit);
+		toolBar.addSeparator();
+		toolBar.add(jbCircuitEdit);
+		toolBar.add(jbTrainsEdit);
 		
 		//查找车次
 		JButton jbFindTrain = createTBButton("findTrain", __("Find a Train"), Edit_FindTrain);
-		jToolBar.addSeparator();
-		jToolBar.add(jbFindTrain);
+		toolBar.addSeparator();
+		toolBar.add(jbFindTrain);
 
 		//坐标设置
 		JButton jbSetupH = createTBButton("setupH", __("Timeline Settings"), Setup_Time);
 		JButton jbSetupV = createTBButton("setupV", __("Distance Bar Settings"), Setup_Dist);
-		jToolBar.addSeparator();
-		jToolBar.add(jbSetupH);
-		jToolBar.add(jbSetupV);
+		toolBar.addSeparator();
+		toolBar.add(jbSetupH);
+		toolBar.add(jbSetupV);
 		
 		//动态图是否开启
 		ImageIcon imageRun = new ImageIcon(this.getClass().getResource("/pic/show_run.png"));
@@ -604,8 +580,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //		}
 		updateShowRunState();
 		
-		jToolBar.addSeparator();
-		jToolBar.add(jtButtonShowRun);
+		toolBar.addSeparator();
+		toolBar.add(jtButtonShowRun);
 		
 		//上下行显示选择
 		ImageIcon imageDown = new ImageIcon(this.getClass().getResource("/pic/down.png"));
@@ -670,11 +646,11 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		//让ChartView右下角的上下行状态显示图标显示正确的内容
 		chartView.updateUpDownDisplay();
 
-		jToolBar.addSeparator();
-		jToolBar.add(jtButtonDown);
-		jToolBar.add(jtButtonUp);
-		jToolBar.add(jtButtonShowWatermark);
-		jToolBar.add(jtButtonAntiAliasing);
+		toolBar.addSeparator();
+		toolBar.add(jtButtonDown);
+		toolBar.add(jtButtonUp);
+		toolBar.add(jtButtonShowWatermark);
+		toolBar.add(jtButtonAntiAliasing);
 		
 		//历史记录
 		cbTrainSelectHistory.setFont(new Font("Dialog", Font.PLAIN, 12));
@@ -701,10 +677,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 					new MessageBox(MainFrame.this, String.format(__("Cannot find train information: %s"), trainToFind)).showMessage();
 			}
 		});
-		jToolBar.addSeparator();
-		jToolBar.add(cbTrainSelectHistory);
+		toolBar.addSeparator();
+		toolBar.add(cbTrainSelectHistory);
 
-		return jToolBar;
+		return toolBar;
 	}
 	
 	private JButton createTBButton(String imgName, String toolTipText, String Command) {
@@ -754,6 +730,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private final String Edit_Undo = "Edit_Undo";
 	private final String Edit_Redo = "Edit_Redo";
 	private final String Edit_Action_History = "Edit_Action_History";
+	private final String Edit_Cut = "Edit_Cut";
+	private final String Edit_Copy = "Edit_Copy";
+	private final String Edit_Paste = "Edit_Paste";
 	private final String Edit_FindTrain = "Edit_FindTrain";
 	private final String Edit_Circuit = "Edit_Circuit";
 	private final String Edit_Trains = "Edit_Trains";
@@ -768,7 +747,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private final String Help_About = "Help_About";
 
 	private JMenuBar loadMenu() {
-		JMenuBar jMenuBar = new JMenuBar();
+		menuBar = new JMenuBar();
 
 		JMenu menuFile = createMenu(__("File"));
 		menuFile.setMnemonic(KeyEvent.VK_F);
@@ -788,14 +767,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		menuFile.addSeparator();
 		menuFile.add(createMenuItem(__("Exit"), File_Exit)).setMnemonic(KeyEvent.VK_X);
 
-		JMenu menuSetup = createMenu(__("Settings"));
-		menuSetup.setMnemonic(KeyEvent.VK_S);
-		menuSetup.add(createMenuItem(__("Margin..."), Setup_Margin)).setMnemonic(KeyEvent.VK_M);
-		menuSetup.addSeparator();
-		menuSetup.add(createMenuItem(__("Timeline..."), Setup_Time)).setMnemonic(KeyEvent.VK_T);
-		menuSetup.add(createMenuItem(__("Distance Bar..."), Setup_Dist)).setMnemonic(KeyEvent.VK_D);
+//		JMenu menuSetup = createMenu(__("Settings"));
+//		menuSetup.setMnemonic(KeyEvent.VK_S);
+//		menuSetup.add(createMenuItem(__("Margin..."), Setup_Margin)).setMnemonic(KeyEvent.VK_M);
+//		menuSetup.addSeparator();
+//		menuSetup.add(createMenuItem(__("Timeline..."), Setup_Time)).setMnemonic(KeyEvent.VK_T);
+//		menuSetup.add(createMenuItem(__("Distance Bar..."), Setup_Dist)).setMnemonic(KeyEvent.VK_D);
 
-        JMenu menuEdit = createMenu(__("EditMenu"));
+        JMenu menuEdit = createMenu(__("Edit"));
 		menuEdit.setMnemonic(KeyEvent.VK_E);
 		JMenuItem undoMenuItem = menuEdit.add(createMenuItem(__("Undo"), Edit_Undo, KeyEvent.VK_Z));
 		JMenuItem redoMenuItem = menuEdit.add(createMenuItem(__("Redo"), Edit_Redo, KeyEvent.VK_Z, InputEvent.SHIFT_DOWN_MASK));
@@ -803,6 +782,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		JMenu redoMenu = createMenu(__("Redo..."));
 		menuEdit.add(undoMenu);
 		menuEdit.add(redoMenu);
+//		menuFile.addSeparator();
+//		menuEdit.add(createMenuItem(__("Cut"), Edit_Cut, KeyEvent.VK_X));
+//		menuEdit.add(createMenuItem(__("Copy"), Edit_Copy, KeyEvent.VK_C));
+//		menuEdit.add(createMenuItem(__("Paste"), Edit_Paste, KeyEvent.VK_V));
 		ActionManager.getInstance().setMenuItem(undoMenuItem, redoMenuItem, undoMenu, redoMenu);
 		
 		menuEdit.addSeparator();
@@ -814,7 +797,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //		menuEdit.addSeparator();
 //		menuEdit.add(createMenuItem("颜色设定...", Edit_Color));
 		
-        JMenu menuTools = createMenu(__("Tool"));
+        menuTools = createMenu(__("Tool"));
 		menuTools.setMnemonic(KeyEvent.VK_T);
         menuTools.add(createMenuItem(__("Import Circuit..."), Tools_Circuit)).setMnemonic(KeyEvent.VK_C);
         menuTools.add(createMenuItem(__("Import Train..."), Tools_Train)).setMnemonic(KeyEvent.VK_R);
@@ -823,13 +806,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		menuHelp.setMnemonic(KeyEvent.VK_H);
         menuHelp.add(createMenuItem(__("About..."), Help_About)).setMnemonic(KeyEvent.VK_A);
 
-		jMenuBar.add(menuFile);
-		jMenuBar.add(menuEdit);
-		jMenuBar.add(menuSetup);
-		jMenuBar.add(menuTools);
-		jMenuBar.add(menuHelp);
+		menuBar.add(menuFile);
+		menuBar.add(menuEdit);
+//		menuBar.add(menuSetup);
+		menuBar.add(menuTools);
+		menuBar.add(menuHelp);
 
-		return jMenuBar;
+		return menuBar;
 	}
 
 	private JMenu createMenu(String name) {
@@ -855,7 +838,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		menuItem.addActionListener(this);
 		
 		if (shortcutKey >= 0) {
-			if (isOSX10_7OrAbove()) {
+			if (ETRC.isOSX10_7OrAbove()) {
 				menuItem.setAccelerator(
 						KeyStroke.getKeyStroke(shortcutKey, extraModifier | InputEvent.META_DOWN_MASK));
 			} else {
@@ -865,6 +848,16 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		}
 
 		return menuItem;
+	}
+	
+	// }}
+	
+	private void setStatusMain(String status) {
+		//
+	}
+	
+	private void setStatusRight(String status) {
+		
 	}
 
 	private void initChart() {
@@ -951,6 +944,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		for (String filePath : Config.getInstance().getRecentOpenedFiles()) {
 			JMenuItem item = new JMenuItem(filePath);
+			item.setFont(new Font(__("FONTNAME"), 0, 12));
 			item.setName(filePath);
 			item.addActionListener(this::menuItem_OpenRecentFile);
 			recentFileMenuItems.add(item);
@@ -1004,6 +998,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			ActionManager.getInstance().undo();
 		} else if (command.equalsIgnoreCase(Edit_Redo)) {
 			ActionManager.getInstance().redo();
+		} else if (command.equalsIgnoreCase(Edit_Cut)) {
+			this.doCut();
+		} else if (command.equalsIgnoreCase(Edit_Copy)) {
+			this.doCopy();
+		} else if (command.equalsIgnoreCase(Edit_Paste)) {
+			this.doPaste();
 		} else if (command.equalsIgnoreCase(Edit_Circuit)) {
 			this.doEditCircuit();
 		} else if (command.equalsIgnoreCase(Edit_Trains)) {
@@ -1052,7 +1052,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		if(circuit == null)
 			return;
 		
-		// TODO: 菜单中的导入线路工具. 因为线路编辑对话框改线路编辑视图, 因此拿掉
+		// 菜单中的导入线路工具. 因为线路编辑对话框改线路编辑视图, 因此拿掉
 		DEBUG_ACTION(() -> {
 			new MessageBox(this, "待完成工作:需要把新创建的线路加入路网.待完成工作:")
 				.showMessage();
@@ -1087,6 +1087,18 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 //		this.setTitle();
 //		chartView.repaint();
 //		runView.refresh();
+	}
+	
+	private void doCut() {
+		DEBUG_MSG("Do clipboard cut");
+	}
+	
+	public void doCopy() {
+		DEBUG_MSG("Do clipboard copy");
+	}
+	
+	public void doPaste() {
+		DEBUG_MSG("Do clipboard paste");
 	}
 
 	/**
@@ -1443,6 +1455,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 	
 	private ETRCLCB lcb = null;
+
 	public ETRCLCB getLCB() {
 		if(lcb == null)
 			try {
@@ -1477,40 +1490,35 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		switch (nodeType) {
 		case GLOBAL_SETTINGS:
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.GLOBAL_SETTINGS.name());
+			switchView(NavigatorNodeType.GLOBAL_SETTINGS.name());
 			break;
 		case RAILROAD_NETWORK:
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.RAILROAD_NETWORK.name());
+			switchView(NavigatorNodeType.RAILROAD_NETWORK.name());
 			break;
 		case RAILROAD_LINE_SPECIFIC:
 			railLineEditView.switchRailLine((RailroadLine) params[0]); 
 		case RAILROAD_LINES:
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.RAILROAD_LINES.name());
+			switchView(NavigatorNodeType.RAILROAD_LINES.name());
 			break;
 		case TRAIN_TYPES:
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.TRAIN_TYPES.name());
+			switchView(NavigatorNodeType.TRAIN_TYPES.name());
 			break;
 		case TRAIN_TYPE_SPECIFIC:
 			/**********************************************/
 //			trainGraph.currentLineChart = (TrainType) params[0];
-//			navigatorContentCard.show(navigatorContentPanel, 
+//			switchView(navigatorContentPanel, 
 //					NavigatorNodeType.TRAIN_TYPES.name());
 			break;
 		case TIME_TABLES:
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.TIME_TABLES.name());
+			switchView(NavigatorNodeType.TIME_TABLES.name());
 			break;
 		case RAILNETWORK_ALL_TRAINS:
 			trainGraph.currentNetworkChart = (RailNetworkChart) params[1];
 
 			switchLineChart();
+			allTrainsView.refresh();
 			
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.RAILNETWORK_ALL_TRAINS.name());
+			switchView(NavigatorNodeType.RAILNETWORK_ALL_TRAINS.name());
 			break;
 		case TIME_TABLE_LINE:
 			trainGraph.currentLineChart = (RailroadLineChart) params[0];
@@ -1518,8 +1526,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 			switchLineChart();
 
-			navigatorContentCard.show(navigatorContentPanel, 
-					NavigatorNodeType.TIME_TABLE_LINE.name());
+			switchView(NavigatorNodeType.TIME_TABLE_LINE.name());
 			break;
 		case TIME_TABLE_LINE_DOWN:
 			trainGraph.currentLineChart = (RailroadLineChart) params[0];
@@ -1527,8 +1534,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			
 			timetableEditView.switchChart(true);
 			
-			navigatorContentCard.show(navigatorContentPanel,
-					NavigatorNodeType.TIME_TABLE_LINE_UP.name());
+			switchView(NavigatorNodeType.TIME_TABLE_LINE_UP.name());
 			break;
 
 		case TIME_TABLE_LINE_UP:
@@ -1537,14 +1543,49 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			
 			timetableEditView.switchChart(false);
 			
-			navigatorContentCard.show(navigatorContentPanel,
-					NavigatorNodeType.TIME_TABLE_LINE_UP.name());
+			switchView(NavigatorNodeType.TIME_TABLE_LINE_UP.name());
 			break;
 		default:
 			break;
 		}
 		navigatorContentPanel.revalidate();
 		
+	}
+	
+	private void switchView(String cardName) {
+		navigatorContentCard.show(navigatorContentPanel, cardName);
+		Container view = viewMap.get(cardName);
+		
+		int menuAnchor = 2;
+		JMenu editMenu = null, origEditMenu = menuBar.getMenu(menuAnchor);
+		JToolBar toolBar = null;
+		Component statusBar = null;
+		
+		origEditMenu = origEditMenu == menuTools ? null : origEditMenu;
+		if (view instanceof IView) {
+			IView view0 =(IView) view;
+			editMenu = view0.getEditMenu();
+			toolBar = view0.getToolBar();
+			statusBar = view0.getStatusBar();
+		}
+
+		if (origEditMenu != null)
+			menuBar.remove(menuAnchor);
+		if (editMenu != null) 
+			menuBar.add(editMenu, menuAnchor);
+		menuBar.revalidate();
+		
+		if (statusBar != null) {
+			statusPanel.removeAll();
+			statusPanel.add(statusBarMain, BorderLayout.WEST);
+			statusPanel.add(statusBar, BorderLayout.CENTER);
+			statusPanel.add(statusBarRight, BorderLayout.EAST);
+		} else {
+			statusPanel.removeAll();
+			statusPanel.add(statusBarMain, BorderLayout.WEST);
+			statusPanel.add(statusBarEmpty, BorderLayout.CENTER);
+			statusPanel.add(statusBarRight, BorderLayout.EAST);
+		}
 	}
 	
 	private void switchLineChart() {

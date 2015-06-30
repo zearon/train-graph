@@ -97,12 +97,10 @@ public class RunningPanel extends JPanel {
 	}
 
 	private Object doPopupMenu_AddToProjection() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	private Object doPopupMenu_RemoveFromProjection() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

@@ -70,6 +70,11 @@ import org.paradise.etrc.filter.CIRFilter;
 import org.paradise.etrc.filter.CRSFilter;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.util.Config;
+import javax.swing.JSeparator;
+import javax.swing.SwingConstants;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
 public class RailroadLineEditView extends JPanel {
 	private static final long serialVersionUID = 8501387955756137148L;
@@ -450,6 +455,10 @@ public class RailroadLineEditView extends JPanel {
 //		JPanel rootPanel = new JPanel();
 		setLayout(new BorderLayout());
 		add(buildCircuitListPanel(), BorderLayout.WEST);
+		
+		JPanel panel = new JPanel();
+		add(panel, BorderLayout.EAST);
+		panel.setLayout(null);
 		add(buildCircuitPanel(), BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.NORTH);
 
@@ -584,80 +593,8 @@ public class RailroadLineEditView extends JPanel {
 			}
 		});
 
-		JLabel lbName = new JLabel(__("Circuit Name:"));
-		lbName.setFont(new Font("dialog", 0, 12));
-
-		tfName = new JTextField(12);
-		tfName.setFont(new Font("dialog", 0, 12));
-		tfName.setText(stationTableModel.railroadLine.getName());
-		tfName.addFocusListener(new FocusListener() {
-			String oldValue;
-			
-			@Override
-			public void focusLost(FocusEvent e) {
-				doRailline_UpdateName(oldValue);
-			}
-			
-			@Override
-			public void focusGained(FocusEvent e) {
-				oldValue = ((JTextField) e.getSource()).getText();
-			}
-		});
-
 		JLabel lbLengthLabel = new JLabel(__("Total Length:"));
 		lbLength = new JLabel("0 " + __("km"));
-
-		JLabel lbMultiplicity = new JLabel(__("Track Count:"));
-		lbName.setFont(new Font("dialog", 0, 12));
-
-		cbMultiplicity = new JComboBox<String>();
-		cbMultiplicity.setFont(new Font("dialog", 0, 12));
-		cbMultiplicity.setEditable(true);
-		cbMultiplicity.addItem("1");
-		cbMultiplicity.addItem("2");
-		cbMultiplicity.addItem("4");
-		cbMultiplicity.setSelectedItem(stationTableModel.railroadLine.multiplicity);
-		cbMultiplicity.addItemListener(new ItemListener() {
-			String oldValue;
-			
-			@Override
-			public void itemStateChanged(ItemEvent e) {
-				if (e.getStateChange() == ItemEvent.DESELECTED) {
-					oldValue = e.getItem().toString();
-				} else if (e.getStateChange() == ItemEvent.SELECTED) {
-					doRailline_UpdateMultiplicity(oldValue);
-				}
-			}
-		});
-
-		JLabel lbDispScale = new JLabel(__("Display Scale:"));
-		lbName.setFont(new Font("dialog", 0, 12));
-
-		tfDispScale = new JTextField(2);
-		tfDispScale.setFont(new Font("dialog", 0, 12));
-		tfDispScale.setText("" + stationTableModel.railroadLine.dispScale);
-		tfDispScale.addFocusListener(new FocusListener() {
-			String oldValue;
-			
-			@Override
-			public void focusLost(FocusEvent e) {
-				doRailline_UpdateDisplayScale(oldValue);
-			}
-			
-			@Override
-			public void focusGained(FocusEvent e) {
-				oldValue = ((JTextField) e.getSource()).getText();
-			}
-		});
-
-		JPanel namePanel = new JPanel();
-		namePanel.add(lbName);
-		namePanel.add(tfName);
-		namePanel.add(lbMultiplicity);
-		namePanel.add(cbMultiplicity);
-		namePanel.add(lbDispScale);
-		namePanel.add(tfDispScale);
-		namePanel.setBorder(new EmptyBorder(1, 1, 1, 1));
 
 //		JPanel tipPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		JLabel lbTip = new JLabel(
@@ -680,11 +617,108 @@ public class RailroadLineEditView extends JPanel {
 
 		JPanel contentPanel = new JPanel(new BorderLayout());
 		contentPanel.add(stationTable.getContainerPanel(), BorderLayout.CENTER);
-//		contentPanel.add(tipPanel, BorderLayout.SOUTH);
-		contentPanel.add(namePanel, BorderLayout.NORTH);
 
 		JPanel circuitPanel = new JPanel();
 		circuitPanel.setLayout(new BorderLayout());
+		
+		JLabel lbName = new JLabel(__("Circuit Name:"));
+		lbName.setFont(new Font("dialog", 0, 12));
+		
+		tfName = new JTextField(12);
+		tfName.setFont(new Font("dialog", 0, 12));
+		tfName.setText(stationTableModel.railroadLine.getName());
+		tfName.addFocusListener(new FocusListener() {
+			String oldValue;
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				doRailline_UpdateName(oldValue);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				oldValue = ((JTextField) e.getSource()).getText();
+			}
+		});
+		
+		JLabel lbMultiplicity = new JLabel(__("Track Count:"));
+		lbName.setFont(new Font("dialog", 0, 12));
+		
+		cbMultiplicity = new JComboBox<String>();
+		cbMultiplicity.setFont(new Font("dialog", 0, 12));
+		cbMultiplicity.setEditable(true);
+		cbMultiplicity.addItem("1");
+		cbMultiplicity.addItem("2");
+		cbMultiplicity.addItem("4");
+		cbMultiplicity.setSelectedItem(stationTableModel.railroadLine.multiplicity);
+		cbMultiplicity.addItemListener(new ItemListener() {
+			String oldValue;
+			
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.DESELECTED) {
+					oldValue = e.getItem().toString();
+				} else if (e.getStateChange() == ItemEvent.SELECTED) {
+					doRailline_UpdateMultiplicity(oldValue);
+				}
+			}
+		});
+		
+		JLabel lbDispScale = new JLabel(__("Display Scale:"));
+		lbName.setFont(new Font("dialog", 0, 12));
+		
+		tfDispScale = new JTextField(2);
+		tfDispScale.setFont(new Font("dialog", 0, 12));
+		tfDispScale.setText("" + stationTableModel.railroadLine.dispScale);
+		tfDispScale.addFocusListener(new FocusListener() {
+			String oldValue;
+			
+			@Override
+			public void focusLost(FocusEvent e) {
+				doRailline_UpdateDisplayScale(oldValue);
+			}
+			
+			@Override
+			public void focusGained(FocusEvent e) {
+				oldValue = ((JTextField) e.getSource()).getText();
+			}
+		});
+		
+		JPanel namePanel = new JPanel();
+		circuitPanel.add(namePanel, BorderLayout.NORTH);
+		namePanel.setBorder(new EmptyBorder(1, 1, 1, 1));
+		GroupLayout gl_namePanel = new GroupLayout(namePanel);
+		gl_namePanel.setHorizontalGroup(
+			gl_namePanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_namePanel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(lbName)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addGap(18)
+					.addComponent(lbMultiplicity, GroupLayout.PREFERRED_SIZE, 87, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(cbMultiplicity, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addComponent(lbDispScale)
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addComponent(tfDispScale, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+					.addContainerGap(26, Short.MAX_VALUE))
+		);
+		gl_namePanel.setVerticalGroup(
+			gl_namePanel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_namePanel.createSequentialGroup()
+					.addGap(5)
+					.addGroup(gl_namePanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lbName)
+						.addComponent(tfName, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbMultiplicity)
+						.addComponent(cbMultiplicity, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(lbDispScale)
+						.addComponent(tfDispScale, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		namePanel.setLayout(gl_namePanel);
 		circuitPanel.add(buttonPanel1, BorderLayout.WEST);
 		circuitPanel.add(contentPanel, BorderLayout.CENTER);
 		// circuitPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -851,19 +885,19 @@ public class RailroadLineEditView extends JPanel {
 		RailroadLine line = ((StationTableModel) stationTable.getModel()).railroadLine;
 		String newValue = tfName.getText();
 		
-		ActionFactory.createSetValueActionAndDoIt(__("railroad line name"), 
+		ActionFactory.createSetValueAction(__("railroad line name"), 
 				oldValue, newValue, value -> {
 					
 			line.setName((String) value);
 			tfName.setText((String) value);
-		}, null);
+		}, null).addToManagerAndDoIt();
 	}
 	
 	private void doRailline_UpdateDisplayScale(String oldValue) {
 		RailroadLine line = ((StationTableModel) stationTable.getModel()).railroadLine;
 		String newValue = tfDispScale.getText();
 		
-		ActionFactory.createSetValueActionAndDoIt(__("display scale of railroad line"), 
+		ActionFactory.createSetValueAction(__("display scale of railroad line"), 
 				oldValue, newValue, value -> {
 					
 			try {
@@ -875,14 +909,14 @@ public class RailroadLineEditView extends JPanel {
 				new MessageBox(__("Display scale should be a decimal."))
 						.showMessage();
 			}	
-		}, mainFrame.raillineChartView::updateUI);
+		}, mainFrame.raillineChartView::updateUI).addToManagerAndDoIt();
 	}
 	
 	private void doRailline_UpdateMultiplicity(String oldValue) {
 		RailroadLine line = ((StationTableModel) stationTable.getModel()).railroadLine;
 		String newValue = cbMultiplicity.getSelectedItem().toString();
 		
-		ActionFactory.createSetValueActionAndDoIt(__("track count of railroad line"), 
+		ActionFactory.createSetValueAction(__("track count of railroad line"), 
 				oldValue, newValue, value -> {
 					
 			try {
@@ -893,7 +927,7 @@ public class RailroadLineEditView extends JPanel {
 				new MessageBox(__("Rail count should be an integer."))
 						.showMessage();
 			}
-		}, mainFrame.raillineChartView::updateUI);
+		}, mainFrame.raillineChartView::updateUI).addToManagerAndDoIt();
 	}
 
 	private void doRailline_OK() {
@@ -954,9 +988,9 @@ public class RailroadLineEditView extends JPanel {
 		int[] selectedRows = stationTable.getSelectedRows();
 		RailroadLine line = ((StationTableModel) stationTable.getModel()).railroadLine;
 		
-		ActionFactory.createRemoveTableElementActionAndDoIt(__("station table"), 
+		ActionFactory.createRemoveTableElementsAction(__("station table"), 
 				stationTable, true, selectedRows, line::getStation, 
-				line::insertStation, line::delStation, stationTable::revalidate);
+				line::insertStation, line::delStation, stationTable::revalidate).addToManagerAndDoIt();
 	}
 
 	private void doRailline_MoveUpStation() {
@@ -969,9 +1003,9 @@ public class RailroadLineEditView extends JPanel {
 			return;
 		}
 		
-		ActionFactory.createTableElementMoveActionAndDoIt(__("station table"), 
+		ActionFactory.createTableElementMoveAction(__("station table"), 
 				stationTable, stationTableModel.railroadLine.getAllStations(), 
-				selectedStatonIndex, selectedStatonIndex - 1, true);
+				selectedStatonIndex, selectedStatonIndex - 1, true).addToManagerAndDoIt();
 	}
 
 	private void doRailline_MoveDownStation() {
@@ -985,45 +1019,21 @@ public class RailroadLineEditView extends JPanel {
 			return;
 		}
 		
-		ActionFactory.createTableElementMoveActionAndDoIt(__("station table"), 
+		ActionFactory.createTableElementMoveAction(__("station table"), 
 				stationTable, stationTableModel.railroadLine.getAllStations(), 
-				selectedStatonIndex, selectedStatonIndex + 1, true);
+				selectedStatonIndex, selectedStatonIndex + 1, true).addToManagerAndDoIt();
 	}
 
 	protected void doRailline_RevertStation() {
-		ActionFactory.createRevertRaillineActionAndDoIt(stationTable, stationTableModel);
-		
-//		// TODO: Revert station
-//		RailroadLine circuit = stationTableModel.railroadLine;
-//		int stationCount = circuit.getStationNum();
-//
-//		for (int i = 0, j = stationCount - 1; i < j; ++i, --j) {
-//			Station station1 = circuit.getStation(i);
-//			Station station2 = circuit.getStation(j);
-//			int tempDist = station2.dist;
-//			station2.dist = station1.dist;
-//			station1.dist = tempDist;
-//
-//			circuit.delStation(j);
-//			circuit.delStation(i);
-//			circuit.insertStation(station2, i);
-//			circuit.insertStation(station1, j);
-//		}
-//
-//		int rowSelection = stationTable.getSelectedRow();
-//		if (rowSelection >= 0) {
-//			rowSelection = stationCount - 1 - rowSelection;
-//			stationTable.setRowSelectionInterval(rowSelection, rowSelection);
-//		}
-//		stationTable.updateUI();
+		ActionFactory.createRevertRaillineAction(stationTable, stationTableModel).addToManagerAndDoIt();
 	}
 
 	protected void doRailline_NormalizeDistance() {
 		RailroadLine c = stationTableModel.railroadLine;
 		int offset = c.getStation(0).dist * -1;
 		
-		ActionFactory.createTableRowColumnIncrementActionAndDoIt(__("Normalize railroad line"), null, 
-				stationTable, offset, 0, stationTable.getRowCount() - 1, 1, true);
+		ActionFactory.createTableRowColumnIncrementAction(__("Normalize railroad line"), null, 
+				stationTable, offset, 0, stationTable.getRowCount() - 1, 1, true).addToManagerAndDoIt();
 		
 		
 //		if (offset != 0) {
@@ -1053,9 +1063,9 @@ public class RailroadLineEditView extends JPanel {
 		Station station = TrainGraphFactory.createInstance(Station.class)
 				.setProperties(dist, level, false);
 		
-		ActionFactory.createAddTableElementActionAndDoIt(__("station table"), 
+		ActionFactory.createAddTableElementAction(__("station table"), 
 				stationTable, true, selectedIndex, station, line::insertStation, 
-				line::delStation, stationTable::revalidate);
+				line::delStation, stationTable::revalidate).addToManagerAndDoIt();
 	}
 
 	private void doRailline_AddStation() {
@@ -1072,9 +1082,9 @@ public class RailroadLineEditView extends JPanel {
 		Station station = TrainGraphFactory.createInstance(Station.class)
 				.setProperties(dist, level, false);
 		
-		ActionFactory.createAddTableElementActionAndDoIt(__("station table"), 
+		ActionFactory.createAddTableElementAction(__("station table"), 
 				stationTable, true, selectedIndex + 1, station, line::insertStation, 
-				line::delStation, stationTable::revalidate);
+				line::delStation, stationTable::revalidate).addToManagerAndDoIt();
 	}
 
 	private void doRailNetwork_AddLine() {
@@ -1084,7 +1094,7 @@ public class RailroadLineEditView extends JPanel {
 		int index = railroadLineTableModel.raillines.size();
 
 		
-		ActionFactory.createAddTableElementActionAndDoIt(__("railroad network table"), 
+		ActionFactory.createAddTableElementAction(__("railroad network table"), 
 				railroadLineTable, true, index, line, 
 				railroadLineTableModel.raillines::add, 
 				railroadLineTableModel.raillines::removeElementAt, 
@@ -1092,7 +1102,7 @@ public class RailroadLineEditView extends JPanel {
 					trainGraph.railNetwork.findCrossoverStations();
 					updateRailroadListSelection(index);
 					stationTable.repaint();
-				} );
+				} ).addToManagerAndDoIt();
 	}
 
 	private void doRailNetwork_ImportLine() {
@@ -1109,7 +1119,7 @@ public class RailroadLineEditView extends JPanel {
 
 		int index = railroadLineTableModel.raillines.size();
 		
-		ActionFactory.createAddTableElementActionAndDoIt(__("railroad network table"), 
+		ActionFactory.createAddTableElementAction(__("railroad network table"), 
 				railroadLineTable, true, index, line, 
 				railroadLineTableModel.raillines::add, 
 				railroadLineTableModel.raillines::removeElementAt, 
@@ -1117,7 +1127,7 @@ public class RailroadLineEditView extends JPanel {
 					trainGraph.railNetwork.findCrossoverStations();
 					updateRailroadListSelection(index);
 					stationTable.repaint();
-				} );
+				} ).addToManagerAndDoIt();
 	}
 
 	private void doRailNetwork_MoveUpLine() {
@@ -1131,9 +1141,9 @@ public class RailroadLineEditView extends JPanel {
 			return;
 		}
 		
-		ActionFactory.createTableElementMoveActionAndDoIt(__("railroad line table"), 
+		ActionFactory.createTableElementMoveAction(__("railroad line table"), 
 				railroadLineTable, railroadLineTableModel.raillines, 
-				selectedCircuitIndex, selectedCircuitIndex - 1, true);
+				selectedCircuitIndex, selectedCircuitIndex - 1, true).addToManagerAndDoIt();
 	}
 
 	private void doRailNetwork_MoveDownLine() {
@@ -1146,9 +1156,9 @@ public class RailroadLineEditView extends JPanel {
 			return;
 		}
 		
-		ActionFactory.createTableElementMoveActionAndDoIt(__("railroad line table"), 
+		ActionFactory.createTableElementMoveAction(__("railroad line table"), 
 				railroadLineTable, railroadLineTableModel.raillines, 
-				selectedCircuitIndex, selectedCircuitIndex + 1, true);
+				selectedCircuitIndex, selectedCircuitIndex + 1, true).addToManagerAndDoIt();
 	}
 
 	private void doRailNetwork_RemoveLine() {
@@ -1159,7 +1169,7 @@ public class RailroadLineEditView extends JPanel {
 			return;
 		}
 
-		ActionFactory.createRemoveTableElementActionAndDoIt(__("railroad network table"), 
+		ActionFactory.createRemoveTableElementsAction(__("railroad network table"), 
 				railroadLineTable, true, new int[] {index}, 
 				railroadLineTableModel.raillines::elementAt,
 				railroadLineTableModel.raillines::add, 
@@ -1168,7 +1178,7 @@ public class RailroadLineEditView extends JPanel {
 					trainGraph.railNetwork.findCrossoverStations();
 					updateRailroadListSelection(index);
 					stationTable.repaint();
-				} );
+				} ).addToManagerAndDoIt();
 	}
 
 	private void doRailNetwork_NewLine() {
@@ -1177,11 +1187,11 @@ public class RailroadLineEditView extends JPanel {
 
 		int index = railroadLineTableModel.raillines.size();
 		
-		ActionFactory.createAddTableElementActionAndDoIt(__("railroad network table"), 
+		ActionFactory.createAddTableElementAction(__("railroad network table"), 
 				railroadLineTable, true, index, line, 
 				railroadLineTableModel.raillines::add, 
 				railroadLineTableModel.raillines::removeElementAt, 
-				() -> updateRailroadListSelection(index) );
+				() -> updateRailroadListSelection(index) ).addToManagerAndDoIt();
 	}
 
 	private void doRailNetwork_SaveNetwork() {
@@ -1218,7 +1228,7 @@ public class RailroadLineEditView extends JPanel {
 	}
 
 	protected void doRailNetwork_Calculate() {
-		// TODO: ERROR
+		// TODO: temp_ERROR
 		StringBuilder sb = new StringBuilder();
 		int index = -1;
 		for (RailroadLine circuit : railroadLineTableModel.raillines) {

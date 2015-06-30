@@ -100,9 +100,11 @@ public class ETRCLCB {
 
 	private void loadlc() throws IOException {
 		lc = new Vector<LCBStation>();
-		File f = new File(path + "elc.eda");
+//		File f = new File(path + "elc.eda");
+//		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(f)),"UTF-8"));
 		
-		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(f)),"UTF-8"));
+		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(
+				getClass().getResourceAsStream("/eda/elc.eda")),"UTF-8"));
 		
 		String line = in.readLine();
 		while(line != null) {
@@ -116,9 +118,11 @@ public class ETRCLCB {
 
 	private void loadxl() throws IOException {
 		xl = new Vector<String>();
-		File f = new File(path + "exl.eda");
+//		File f = new File(path + "exl.eda");
+//		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(f)),"UTF-8"));
 		
-		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(new FileInputStream(f)),"UTF-8"));
+		BufferedReader in = new BufferedReader(new InputStreamReader(new BOMStripperInputStream(
+				getClass().getResourceAsStream("/eda/exl.eda")),"UTF-8"));
 		
 		String line = in.readLine();
 		while(line != null) {

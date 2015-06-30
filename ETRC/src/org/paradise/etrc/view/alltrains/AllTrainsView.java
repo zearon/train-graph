@@ -52,5 +52,9 @@ public class AllTrainsView extends JPanel {
 		this.trainGraph = trainGraph;
 		trainListView.setModel(trainGraph);
 	}
+	
+	public void refresh() {
+		trainListView.refresh();
+	}
 
 }

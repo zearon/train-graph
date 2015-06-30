@@ -3,6 +3,8 @@ package org.paradise.etrc.view.timetableedit;
 import static org.paradise.etrc.ETRC.__;
 
 import java.awt.EventQueue;
+import java.util.Arrays;
+import java.util.Vector;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -18,11 +20,13 @@ import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
+import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
 
 public class TimetableEditSheetModel extends DefaultJEditTableModel {
 	private static final long serialVersionUID = 6767541225039467460L;
 	protected JTable table;
+	protected String tableName;
 	protected TrainGraph trainGraph;
 	protected RailroadLineChart chart;
 	protected boolean downGoing;
@@ -33,10 +37,32 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 	Consumer<Integer> sectionRemover;
 	
 	TrainRouteSection newSection;
+	private static int newTrainCounter = 0;
+
+	protected TrainRouteSection[] trainsInClipboard = null;
+	protected Stop[] stopsInClipboard;
+	PasteParameters pasteParams = new PasteParameters();
+	
+	
+	public static class PasteParameters implements Cloneable {
+		public int times = -1;
+		public int offset = 0;
+		public PasteParameters copy() {
+			try {
+				return (PasteParameters) clone();
+			} catch (CloneNotSupportedException e) {
+				return null;
+			}
+		}
+	}
 	
 	
 	public TimetableEditSheetModel(JTable table, TrainGraph trainGraph) {
 		this.table = table;
+		setModel(trainGraph);
+	}
+	
+	public void setModel(TrainGraph trainGraph) {
 		this.trainGraph = trainGraph;
 		
 		switchChart(true);
@@ -64,14 +90,16 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 			newSection.allStops().clear();
 		}
 		
-		newSection = TrainGraphFactory.createInstance(TrainRouteSection.class);
-		newSection.downGoing = downGoing;
-		newSection.setRailLineChart(chart);
+		tableName = String.format(__("%s timetable on %s"), downGoing ? __("down-going") : __("up-going"),
+				chart.railroadLine.getName());
+		
+		newSection = _createNewTrainRouteSection();
 		
 		fireTableStructureChanged();
-		EventQueue.invokeLater(() -> {
-			table.setRowHeight(getRowCount() - 1, ((TimetableEditSheetTable) table).getRemarksRowHeight());
-		});
+	}
+	
+	public TrainGraph getTrainGraph() {
+		return trainGraph;
 	}
 	
 	public int getColumnCount() {
@@ -104,7 +132,7 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 		TrainRouteSection trainSection = sectionGetter.apply(columnIndex);
 		return trainSection;
 	}
-	
+		
 	public boolean isNewTrainColumn(int column) {
 		return column == sectionCounter.getAsInt();
 	}
@@ -142,8 +170,8 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 	}
 
 	protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createTableCellEditActionAndDoIt(__("timetable"), 
-				table, this, rowIndex, columnIndex, aValue);
+		return ActionFactory.createTableCellEditAction(__("timetable"), 
+				table, this, rowIndex, columnIndex, aValue).addToManagerAndDoIt();
 	}
 	
 	//修改到发点时间不需要特殊处理，在CellEditor里面就处理好了
@@ -191,5 +219,102 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 
 		return true;
 	}
+	
+	// {{ Train route section operations
+	
+	public TrainRouteSection createNewTrainRouteSection(int index) {
+		TrainRouteSection createdSection = newSection;
+		TrainRouteSection oldValue = newSection;
+		TrainRouteSection newValue = _createNewTrainRouteSection();
+		
+		ActionFactory.createCreateNewTrainRouteSectionAction(
+				String.format(__("create a new train in %s"), tableName),
+				table, index, createdSection, sectionInserter,
+				sectionRemover, oldValue, newValue, 
+				value -> this.newSection = value, 
+				this::fireTableStructureChanged)
+				.addToManagerAndDoIt();
+		
+		return createdSection;
+	}
+	
+	private TrainRouteSection _createNewTrainRouteSection() {
+		TrainRouteSection newSection = TrainGraphFactory.createInstance(TrainRouteSection.class, 
+				String.format(__("NewTrain%d"), ++ newTrainCounter));
+		newSection.setParent(chart);
+		newSection.setRoot(trainGraph);
+		newSection.downGoing = downGoing;
+		newSection.setRailLineChart(chart);
+		
+		return newSection;
+	}
+	
+	public void copyStopTime(int[] rows, int column) {
+		
+	}
+	
+	public void pasteStopTimeWithOffset(int row, int column, int offset) {
+		//
+		
+		if (offset != 0) {
+			
+		}
+	}
+	
+	public void removeTrainRouteSection(int[] columns) {
+		if (columns.length < 1)
+			return;
+		
+		int count = sectionCounter.getAsInt();
+		columns = Arrays.stream(columns)
+				.filter(columnIndex -> (columnIndex >=0 && columnIndex < count))
+				.toArray();
+		
+		ActionFactory.createRemoveTableElementsAction(tableName, table, false, 
+				columns, sectionGetter, sectionInserter, sectionRemover, 
+				this::fireTableStructureChanged).addToManagerAndDoIt();
+	}
+	
+	public void cutTrainRouteSection(int[] columns) {
+		copyTrainRouteSection(columns);
+		removeTrainRouteSection(columns);
+	}
+	
+	public void copyTrainRouteSection(int[] columns) {
+		if (columns.length < 1) {
+			trainsInClipboard = new TrainRouteSection[0];
+			return;
+		}
+		
+		int count = sectionCounter.getAsInt();
+		trainsInClipboard = Arrays.stream(columns)
+				.filter(columnIndex -> (columnIndex >=0 && columnIndex < count))
+				.mapToObj(this::getTrainRouteSection)
+				.toArray(TrainRouteSection[]::new);
+		
+		pasteParams.offset = 0;
+		pasteParams.times = 0;
+	}
+	
+	public void pasteTrainRouteSectionWithOffset(int column, int offset) {
+		if (trainsInClipboard == null || trainsInClipboard.length < 1)
+			return;
+		
+		PasteParameters origPasteParams = pasteParams.copy();
+		pasteParams.times += 1;
+		pasteParams.offset += offset;
+		int count = trainsInClipboard.length;
+		
+		ActionFactory.createPasteTrainRouteSectionAction(
+				String.format(__("Copy %d %s with %d minutes time offset."), count, count > 1 ? __("trains") : __("train"), pasteParams.offset),
+				table, column, trainsInClipboard, sectionInserter, sectionRemover, 
+				origPasteParams, pasteParams, value -> {
+					pasteParams.times = value.times;
+					pasteParams.offset = value.offset;
+				}, 
+				this::fireTableStructureChanged).addToManagerAndDoIt();
+	}
+	
+	// }}
 
 }

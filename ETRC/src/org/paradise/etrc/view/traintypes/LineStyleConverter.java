@@ -1,12 +1,7 @@
 package org.paradise.etrc.view.traintypes;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
-import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.util.ui.databinding.converter.IModelValueConverter;
 
-import sun.net.ftp.FtpClient.TransferType;
+import static org.paradise.etrc.ETRC.__;
 
 public class LineStyleConverter implements IModelValueConverter<Integer, String> {
 

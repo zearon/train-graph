@@ -1,29 +1,15 @@
 package org.paradise.etrc.util.ui.string;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
-import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-
-import org.junit.Test;
 import org.paradise.etrc.util.data.Tuple2;
-
-import sun.font.FontManager;
-
-import com.sun.org.glassfish.gmbal.GmbalException;
 
 public class VerticalStringPainter {
 	private boolean textFromLeftToRight = true;
-	private int hCharMargin = 2;
+	private int hCharMargin = 1;
 	private int vCharMargin = 1;
 	private int alignment = 1;
 	
@@ -83,10 +69,13 @@ public class VerticalStringPainter {
 	}
 	
 	private void prepareString(String str) {
+		words.clear();
+		if (str == null)
+			return;
+		
 		str = str.replace("\r\n", "\n").replace("\n\r", "\n").replace("\r", "\n");
 		int strLen = str.length();
 		StringBuilder sb = new StringBuilder();
-		words.clear();
 		
 		for (int i = 0; i < strLen; ++ i) {
 			char ch = str.charAt(i);
@@ -117,7 +106,7 @@ public class VerticalStringPainter {
 	}
 	 
 	private void startPainting(Graphics2D g) {
-		FontMetrics fm = g.getFontMetrics();
+//		FontMetrics fm = g.getFontMetrics();
 		top = vCharMargin;
 		standardCharWidth = g.getFontMetrics().charWidth('你');
 		
@@ -138,7 +127,7 @@ public class VerticalStringPainter {
 		int doubleMargin = bounds.width - left - standardCharWidth - 2 * hCharMargin;
 		int margin = doubleMargin / 2;
 		
-		top = 0;
+		top = vCharMargin;
 		if (textFromLeftToRight) {
 			if (margin > 0 && alignment == 1) {
 				// center-alignment
@@ -206,7 +195,7 @@ public class VerticalStringPainter {
 			g.translate(baselineX, baselineY);
 		}
 
-//		DEBUG("%d (%b)\t%s", top, shouldRotate, word);
+//		DEBUG("%d (%b)\t%s", baselineY, shouldRotate, word);
 		g.drawString(word, 0, 0);
 		top += deltaY;
 

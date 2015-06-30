@@ -221,7 +221,7 @@ public class WZOutPointSet extends WizardDialog {
 		if(time.equalsIgnoreCase(""))
 			return;
 		else {
-			//TODO: train.xstop.setTime;
+			//TODO: temp_train.xstop.setTime;
 			Stop stop = TrainGraphFactory.createInstance(Stop.class, curStation.getName())
 					.setProperties(null, time, time, false);
 			chart.insertNewStopToTrain(train, stop);

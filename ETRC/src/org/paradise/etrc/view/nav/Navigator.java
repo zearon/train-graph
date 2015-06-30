@@ -1,20 +1,12 @@
 package org.paradise.etrc.view.nav;
 
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Optional;
 import java.util.Vector;
 
 import javax.swing.JMenuItem;
@@ -24,20 +16,18 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.data.event.RailroadLineChangeType;
-import org.paradise.etrc.data.v1.RailNetwork;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
-import com.sun.org.apache.bcel.internal.generic.RETURN;
+import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
 
 /**
  * 主界面导航栏
@@ -69,6 +59,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 	static final String ALL_TRAIN_LABEL = __("All Trains");
 	static final String DOWNWARD_LABEL = __("Down-going Trains");
 	static final String UPWARD_LABEL = __("Up-going Trains");
+	public static Navigator instance;
 	
 	
 	protected DefaultTreeModel treeModel;
@@ -117,6 +108,8 @@ public class Navigator extends JTree implements TreeSelectionListener {
 		nodeSelectionListeners = new Vector<> ();
 		
 		buildUI();	
+		
+		instance = this;
 	}
 	
 	private void buildUI() {
@@ -373,7 +366,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 			});
 		});
 		
-		updateUI();
+		refresh();
 	}
 	
 	public void updateNavigatorByRailNetwork() {
@@ -408,7 +401,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 		// Sync Railroad network chart
 		updateNavigatorByTimetables();
 		
-		updateUI();
+		refresh();
 	}
 
 	public void updateNavigatorByTrainTypes() {
@@ -421,6 +414,11 @@ public class Navigator extends JTree implements TreeSelectionListener {
 			trainTypesNode.add(node);
 		});
 		
+		refresh();
+	}
+	
+	public void refresh() {
+		expandAll(true);
 		updateUI();
 	}
 	
@@ -512,6 +510,9 @@ public class Navigator extends JTree implements TreeSelectionListener {
 				}
 			}
 		}
+//		NavigatorNodeType nodeType0 = nodeType;
+//		Object[] params0 = params;
+//		Runnable switchTask = () -> fireNodeSelectionChanged(triggedByLeftButton, path, nodeType0, index, params0);
 		
 		fireNodeSelectionChanged(triggedByLeftButton, path, nodeType, index, params);
 	}

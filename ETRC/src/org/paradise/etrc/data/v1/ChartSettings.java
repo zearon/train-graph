@@ -37,6 +37,10 @@ public class ChartSettings extends TrainGraphPart {
 	public int timetableEditVehicleNameRowHeight;
 	@TGProperty
 	public int timetableEditRemarksRowHeight;
+	@TGProperty
+	public int timetableEditTrainNumberIncrement;
+	@TGProperty
+	public boolean timetableEditUseTrainTypeFontColor;
 
 	ChartSettings() {
 		setToDefault();
@@ -45,7 +49,8 @@ public class ChartSettings extends TrainGraphPart {
 	public void setProperties(float distScale, int displayLevel, int boldLevel, 
 			int startHour, float minuteScale, int timeInterval, String distUnit, boolean useAntiAliasing,
 			int timetableEditRowHeaderWidth, int timetableEditCellWidth,
-			int timetableEditVehicleNameRowHeight, int timetableEditRemarksRowHeight) {
+			int timetableEditVehicleNameRowHeight, int timetableEditRemarksRowHeight,
+			int timetableEditTrainNumberIncrement, boolean timetableEditUseTrainTypeFontColor) {
 		this.setName("");
 		this.distScale = distScale;
 		this.displayLevel = displayLevel;
@@ -59,11 +64,13 @@ public class ChartSettings extends TrainGraphPart {
 		this.timetableEditCellWidth = timetableEditCellWidth;
 		this.timetableEditVehicleNameRowHeight = timetableEditVehicleNameRowHeight;
 		this.timetableEditRemarksRowHeight = timetableEditRemarksRowHeight;
+		this.timetableEditTrainNumberIncrement = timetableEditTrainNumberIncrement;
+		this.timetableEditUseTrainTypeFontColor = timetableEditUseTrainTypeFontColor;
 	}
 	
 	@Override
 	public void setToDefault() {
-		setProperties(3.0f, 4, 2, 18, 2.0f, 10, "km", false, 80, 40, 60, 250);
+		setProperties(3.0f, 4, 2, 18, 2.0f, 10, "km", false, 80, 40, 60, 250, 2, false);
 	}
 	
 	public int getDisplayLevel() {

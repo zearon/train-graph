@@ -70,7 +70,7 @@ public class AddTrainWizard extends Wizard {
 							}
 						}
 						
-						//找到了几条数据，TODO 如果是多条的话应当选择。
+						//找到了几条数据，如果是多条的话应当选择。
 						if(trains.size() == 0) {
 							new MessageBox(chartView.mainFrame, String.format(__("Unable to find information for the train %s, please input manually."), fullName)).showMessage();
 							train = TrainGraphFactory.createInstance(Train.class);

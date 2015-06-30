@@ -1,6 +1,7 @@
 /bin/
 /htrc.prop
 /build/
+/release/
 /.settings/
 *.class
 *.log

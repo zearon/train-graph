@@ -1,34 +1,16 @@
 package org.paradise.etrc.controller.action;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Vector;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
-import javax.swing.JSplitPane;
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellEditor;
-
-import org.paradise.etrc.data.v1.RailroadLine;
-import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
-import org.paradise.etrc.view.lineedit.RailroadLineTableModel;
-import org.paradise.etrc.view.lineedit.StationTableModel;
-
-import apple.laf.JRSUIConstants.Size;
 
 import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRCUtil.*;
-
-public class RemoveTableElementAction<T> extends TableAction {
-
+public class RemoveTableElementsAction<T> extends UIAction implements TableAction {
+	JTable table;
 	String tableName;
 	boolean vertical;
 	int[] indeces;
@@ -38,11 +20,11 @@ public class RemoveTableElementAction<T> extends TableAction {
 	Consumer<Integer> remover;
 	Runnable callback;
 
-	RemoveTableElementAction(String tableName, JTable table, boolean vertical,
+	RemoveTableElementsAction(String tableName, JTable table, boolean vertical,
 			int[] indeces, IntFunction<T> getter, BiConsumer<Integer, T> adder,
 			Consumer<Integer> remover, Runnable callback) {
 		
-		super(table);
+		this.table = table;
 		this.tableName = tableName;
 		this.vertical = vertical;
 		this.indeces = Arrays.stream(indeces).sorted().toArray();
@@ -71,6 +53,7 @@ public class RemoveTableElementAction<T> extends TableAction {
 		stopCellEditing(false);
 		for (int i = 0; i < indeces.length; ++ i) {
 			int index = indeces[i];
+			@SuppressWarnings("unchecked")
 			T e = (T) elements[i];
 			adder.accept(index, e);
 		}
@@ -89,6 +72,11 @@ public class RemoveTableElementAction<T> extends TableAction {
 	public String repr() {
 		return String.format(__("Remove element at position [%d-%d] from %s."),
 				indeces[0], indeces[indeces.length - 1], tableName);
+	}
+
+	@Override
+	public JTable getTable() {
+		return table;
 	}
 
 }

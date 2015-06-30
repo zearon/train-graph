@@ -136,7 +136,7 @@ public class SheetView extends JPanel {
 					String rowHeaderName = (String) ((JList<?>)me.getSource()).getSelectedValue();
 					String staName = rowHeaderName.substring(0, rowHeaderName.length()-3);
 					Station station = trainGraph.currentLineChart.railroadLine.getStation(staName);
-//					new MessageBox(mainFrame, "TODO: 给出 "
+//					new MessageBox(mainFrame, "给出 "
 //							   + station.name
 //							   + "站 所有列车停靠、通过（推算）时刻表。 ").showMessage();
 					

@@ -117,7 +117,7 @@ public class SheetTable extends JEditTable {
 				String trainName = SheetTable.this.getColumnName(col);
 
 				if(me.getClickCount() >= 2 && me.getButton() == MouseEvent.BUTTON1) {
-//					new MessageBox(sheetView.mainFrame, "TODO: 给出"
+//					new MessageBox(sheetView.mainFrame, "给出"
 //							   + trainName
 //							   + "次列车在 "
 //							   + sheetView.mainFrame.chart.circuit.name

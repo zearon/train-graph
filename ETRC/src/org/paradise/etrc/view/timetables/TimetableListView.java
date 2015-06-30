@@ -173,10 +173,10 @@ public class TimetableListView extends JPanel {
 			return;
 		}
 		
-		ActionFactory.createTableElementMoveActionAndDoIt(__("timetable list"), 
+		ActionFactory.createTableElementMoveAction(__("timetable list"), 
 				table, trainGraph.allCharts(), 
 				selectedIndex, selectedIndex + 1, true,
-				_mainFrame.navigator::updateNavigatorByTimetables);
+				_mainFrame.navigator::updateNavigatorByTimetables).addToManagerAndDoIt();
 	}
 
 	protected void do_MoveUp() {
@@ -191,10 +191,10 @@ public class TimetableListView extends JPanel {
 			return;
 		}
 		
-		ActionFactory.createTableElementMoveActionAndDoIt(__("timetable list"), 
+		ActionFactory.createTableElementMoveAction(__("timetable list"), 
 				table, trainGraph.allCharts(), 
 				selectedIndex, selectedIndex - 1, true,
-				_mainFrame.navigator::updateNavigatorByTimetables);
+				_mainFrame.navigator::updateNavigatorByTimetables).addToManagerAndDoIt();
 	}
 
 	protected void do_CreateTimetable() {
@@ -202,14 +202,14 @@ public class TimetableListView extends JPanel {
 
 		RailNetworkChart chart = TrainGraphFactory.createInstance(RailNetworkChart.class);
 		
-		ActionFactory.createAddTableElementActionAndDoIt(__("timetable list"), 
+		ActionFactory.createAddTableElementAction(__("timetable list"), 
 				table, true, selectedIndex, chart, trainGraph.allCharts()::add,
 				trainGraph.allCharts()::removeElementAt, 
 				() -> {
 					table.revalidate();
 					
 					_mainFrame.navigator.updateNavigatorByTimetables();
-				});
+				}).addToManagerAndDoIt();
 	}
 
 	protected void do_RemoveTimetable() {
@@ -221,7 +221,7 @@ public class TimetableListView extends JPanel {
 			return;
 		}
 
-		ActionFactory.createRemoveTableElementActionAndDoIt(__("timetable list"), 
+		ActionFactory.createRemoveTableElementsAction(__("timetable list"), 
 				table, true, new int[] {index}, 
 				trainGraph.allCharts()::elementAt,
 				trainGraph.allCharts()::add, 
@@ -230,7 +230,7 @@ public class TimetableListView extends JPanel {
 					table.revalidate();
 					
 					_mainFrame.navigator.updateNavigatorByTimetables();
-				});
+				}).addToManagerAndDoIt();
 	}
 
 	/**

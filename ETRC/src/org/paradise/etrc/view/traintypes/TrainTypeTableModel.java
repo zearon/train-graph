@@ -117,7 +117,10 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 
 	@Override
 	public void _setValueAt(Object aValue, int rowIndex, int columnIndex) {
-		TrainType trainType = trainGraph.getTrainType(rowIndex);
+		TrainType trainType = trainGraph.getDefaultTrainType();
+		if (rowIndex >=0 && rowIndex < trainGraph.trainTypeCount())
+			trainType = trainGraph.getTrainType(rowIndex);
+		
 		switch (columnIndex) {
 		case 1:
 			trainType.setName((String) aValue);
@@ -147,8 +150,8 @@ public class TrainTypeTableModel extends DefaultJEditTableModel {
 	@Override
 	protected UIAction getActionAndDoIt(Object aValue, int rowIndex,
 			int columnIndex) {
-		return ActionFactory.createTableCellEditActionAndDoIt(__("train types table"), 
-				table, this, rowIndex, columnIndex, aValue);
+		return ActionFactory.createTableCellEditAction(__("train types table"), 
+				table, this, rowIndex, columnIndex, aValue).addToManagerAndDoIt();
 	}
 
 	@Override

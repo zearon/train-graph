@@ -258,7 +258,7 @@ public class StopEditDialog extends JDialog implements KeyListener {
 			contentPanel.add(separator_2);
 		}
 		
-		chckbxChangeFollowingTimes = new JCheckBox("<html><u>C</u>hange following times accordingly</html>");
+		chckbxChangeFollowingTimes = new JCheckBox("<html>E<u>d</u>it following times accordingly</html>");
 		chckbxChangeFollowingTimes.setName("table.continuousEditMode");
 		chckbxChangeFollowingTimes.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		chckbxChangeFollowingTimes.setBounds(202, 127, 233, 23);
@@ -288,6 +288,8 @@ public class StopEditDialog extends JDialog implements KeyListener {
 				buttonPane.add(cancelButton);
 			}
 		}
+		
+		setTitle(__("Edit Stop"));
 	}
 	
 	/**
@@ -427,7 +429,7 @@ public class StopEditDialog extends JDialog implements KeyListener {
 		if ((keyChar >= 'A' && keyChar <= 'Z') || (keyChar >= 'a' && keyChar <= 'z'))
 			e.consume();
 
-		if (keyChar == 'c' || keyChar == 'C') {
+		if (keyChar == 'd' || keyChar == 'E') {
 			chckbxChangeFollowingTimes.setSelected(!chckbxChangeFollowingTimes.isSelected());
 			return;
 		}
@@ -449,7 +451,7 @@ public class StopEditDialog extends JDialog implements KeyListener {
 		uiBindingManager.clearDataBinding();
 		for (Tuple2<Object, String> componentTuple : allDataBindingComponent) {
 			uiBindingManager.addDataBinding(componentTuple.A, componentTuple.B, 
-					this::getModelObject, this::getPropertyDesc, this::updateUIforModel);
+					this::getModelObject, this::getPropertyDesc, null, this::updateUIforModel);
 		}
 	}
 	

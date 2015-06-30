@@ -70,6 +70,7 @@ public class SettingsView extends JPanel {
 	private JTextField txtSE_technicalStop;
 	private JTextField txtSE_pass;
 	private JTextField txtSE_stopAtStartStation;
+	private JTextField textField_1;
 
 	/**
 	 * Create the panel.
@@ -83,7 +84,7 @@ public class SettingsView extends JPanel {
 		Rectangle rect = panelKeySettings.getBounds();
 		panel.setPreferredSize(new Dimension(rect.x + rect.width + 10, rect.y + rect.height + 10));
 		
-		setupUIDataBinding();
+		UIDB_setupUIDataBinding();
 		
 		ui_inited = true;
 	}
@@ -92,7 +93,7 @@ public class SettingsView extends JPanel {
 		settings = trainGraph.settings;
 		
 		if(ui_inited) {
-			uiBindingManager.setModel(this::getModelObject, null);
+			uiBindingManager.setModel(this::UIDB_getModelObject, null);
 		}
 	}
 	
@@ -110,7 +111,7 @@ public class SettingsView extends JPanel {
 		scrollPane.setViewportView(panel);
 		
 		JPanel panel_runningChart = new JPanel();
-		panel_runningChart.setBounds(6, 162, 565, 152);
+		panel_runningChart.setBounds(6, 162, 565, 150);
 		panel_runningChart.setBorder(new LineBorder(new Color(192, 192, 192), 1, true));
 		
 		JLabel lblRuningChart = SettingsView.createJLabel("Runing Chart", true, new Font("Lucida Grande", Font.PLAIN, 12));
@@ -119,15 +120,15 @@ public class SettingsView extends JPanel {
 		lblRuningChart.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblDistanceUnit = SettingsView.createJLabel("Distance Unit", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblDistanceUnit.setBounds(7, 24, 75, 15);
+		lblDistanceUnit.setBounds(7, 24, 165, 15);
 		lblDistanceUnit.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblPixelsunit = SettingsView.createJLabel("Pixels/Unit", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblPixelsunit.setBounds(7, 57, 61, 15);
+		lblPixelsunit.setBounds(7, 57, 165, 15);
 		lblPixelsunit.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblDisplaylevel = SettingsView.createJLabel("Min Station Display Level", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblDisplaylevel.setBounds(7, 90, 141, 15);
+		lblDisplaylevel.setBounds(7, 90, 165, 15);
 		lblDisplaylevel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblStationLevelFor = SettingsView.createJLabel("Level of Station as Bold Lines", false, new Font("Lucida Grande", Font.PLAIN, 12));
@@ -149,11 +150,11 @@ public class SettingsView extends JPanel {
 		txtBoldlinelevel.setColumns(5);
 		
 		JLabel lblPixelsmin = SettingsView.createJLabel("Pixels/minute", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblPixelsmin.setBounds(355, 57, 78, 15);
+		lblPixelsmin.setBounds(355, 57, 114, 15);
 		lblPixelsmin.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblNewLabel = SettingsView.createJLabel("Start hour in chart", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblNewLabel.setBounds(355, 90, 103, 15);
+		lblNewLabel.setBounds(355, 90, 114, 15);
 		lblNewLabel.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblMinsXaxis = SettingsView.createJLabel("Minute/x-axis scale", false, new Font("Lucida Grande", Font.PLAIN, 12));
@@ -177,15 +178,15 @@ public class SettingsView extends JPanel {
 		cbUseAntiAliasing.setBounds(481, 18, 72, 27);
 		
 		JLabel lblUseAntialiasing = SettingsView.createJLabel("Use Anti-Aliasing", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblUseAntialiasing.setBounds(355, 24, 98, 15);
+		lblUseAntialiasing.setBounds(355, 24, 114, 15);
 		lblUseAntialiasing.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblTimetableEdit = SettingsView.createJLabel("Timetable Edit Sheet", true, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblTimetableEdit.setBounds(19, 326, 126, 15);
+		lblTimetableEdit.setBounds(19, 324, 126, 15);
 		lblTimetableEdit.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JPanel panel_timetableEdit = new JPanel();
-		panel_timetableEdit.setBounds(6, 333, 565, 95);
+		panel_timetableEdit.setBounds(6, 331, 565, 116);
 		panel_timetableEdit.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 		
 		JLabel lblGlobalSettings = createJLabel("Global Settings", true, new Font("Lucida Grande", Font.PLAIN, 12));
@@ -196,11 +197,11 @@ public class SettingsView extends JPanel {
 		panelGlobalSettings.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
 		
 		JLabel lblAutoload = SettingsView.createJLabel("Auto Load", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblAutoload.setBounds(7, 20, 58, 15);
+		lblAutoload.setBounds(7, 20, 93, 15);
 		lblAutoload.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblUseHttpProxy = SettingsView.createJLabel("Use HTTP Proxy", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblUseHttpProxy.setBounds(7, 54, 93, 15);
+		lblUseHttpProxy.setBounds(7, 54, 109, 15);
 		lblUseHttpProxy.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblHttpProxyServer = SettingsView.createJLabel("HTTP Proxy Server:", false, new Font("Lucida Grande", Font.PLAIN, 12));
@@ -244,6 +245,14 @@ public class SettingsView extends JPanel {
 		panelGlobalSettings.add(lblAutoload);
 		panelGlobalSettings.add(lblUseHttpProxy);
 		panelGlobalSettings.add(lblHttpProxyServer);
+		
+		JLabel lblFullScreenOn = SettingsView.createJLabel("Full Screen On Startup for OS X", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		lblFullScreenOn.setBounds(281, 19, 188, 16);
+		panelGlobalSettings.add(lblFullScreenOn);
+		
+		JComboBox cbFullScreenOnStartup = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel(new String[] {"Yes", "No"}), 1, "global.FullScreenOnStartupForOSX:YesNo");
+		cbFullScreenOnStartup.setBounds(481, 15, 72, 27);
+		panelGlobalSettings.add(cbFullScreenOnStartup);
 		panel.add(lblRuningChart);
 		panel.add(panel_runningChart);
 		panel_runningChart.setLayout(null);
@@ -287,19 +296,19 @@ public class SettingsView extends JPanel {
 		timetableEditRemarksRowHeight.setColumns(5);
 		
 		JLabel lblRowHeaderWidth = SettingsView.createJLabel("Row Header Width", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblRowHeaderWidth.setBounds(7, 24, 107, 15);
+		lblRowHeaderWidth.setBounds(7, 24, 159, 15);
 		lblRowHeaderWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblCellWidth = SettingsView.createJLabel("Cell Width", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblCellWidth.setBounds(7, 57, 57, 15);
+		lblCellWidth.setBounds(7, 57, 159, 15);
 		lblCellWidth.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblVehicleNameRow = SettingsView.createJLabel("Vehicle Name Row Height", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblVehicleNameRow.setBounds(318, 24, 148, 15);
+		lblVehicleNameRow.setBounds(318, 24, 159, 15);
 		lblVehicleNameRow.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		
 		JLabel lblRemarksRowHeight = SettingsView.createJLabel("Remarks Row Height", false, new Font("Lucida Grande", Font.PLAIN, 12));
-		lblRemarksRowHeight.setBounds(318, 57, 120, 15);
+		lblRemarksRowHeight.setBounds(318, 57, 159, 15);
 		lblRemarksRowHeight.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
 		panel_timetableEdit.setLayout(null);
 		panel_timetableEdit.add(txtTimetableEditRowHeaderWidth);
@@ -311,19 +320,39 @@ public class SettingsView extends JPanel {
 		panel_timetableEdit.add(lblVehicleNameRow);
 		panel_timetableEdit.add(lblRemarksRowHeight);
 		
+		textField_1 = createJTextField("timetableEdit.timetableEditTrainNumberIncrement");
+		textField_1.setBounds(178, 84, 69, 27);
+		panel_timetableEdit.add(textField_1);
+		textField_1.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		textField_1.setColumns(5);
+		
+		JLabel lblUseTrainTypeColor = createJLabel("Use train type font color", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		lblUseTrainTypeColor.setBounds(318, 90, 138, 15);
+		panel_timetableEdit.add(lblUseTrainTypeColor);
+		
+		JComboBox comboBox_1 = SettingsView.createJComboBox(new Font("Lucida Grande", Font.PLAIN, 12), new DefaultComboBoxModel(new String[] {"Yes", "No"}), 1, "timetableEdit.timetableEditUseTrainTypeFontColor:YesNo");
+		comboBox_1.setBounds(481, 85, 72, 27);
+		panel_timetableEdit.add(comboBox_1);
+		comboBox_1.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		comboBox_1.setModel(new DefaultComboBoxModel(new String[] {"Yes", "No"}));
+		
+		JLabel lblTrainNumberIncrement = createJLabel("Train Number Increment", false, new Font("Lucida Grande", Font.PLAIN, 12));
+		lblTrainNumberIncrement.setBounds(7, 90, 165, 15);
+		panel_timetableEdit.add(lblTrainNumberIncrement);
+		
 		JLabel lblPlanningSchedule = SettingsView.createJLabel("Planning Schedule", true, new Font("Lucida Grande", Font.PLAIN, 12));
 		lblPlanningSchedule.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		lblPlanningSchedule.setBounds(19, 440, 103, 15);
+		lblPlanningSchedule.setBounds(19, 459, 103, 15);
 		panel.add(lblPlanningSchedule);
 		
 		JPanel panel_planningSchedule = new JPanel();
 		panel_planningSchedule.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
-		panel_planningSchedule.setBounds(6, 447, 565, 94);
+		panel_planningSchedule.setBounds(6, 466, 565, 94);
 		panel.add(panel_planningSchedule);
 		
 		panelKeySettings = new JPanel();
 		panelKeySettings.setBorder(new LineBorder(Color.LIGHT_GRAY, 1, true));
-		panelKeySettings.setBounds(583, 21, 212, 521);
+		panelKeySettings.setBounds(583, 21, 212, 539);
 		panel.add(panelKeySettings);
 		panelKeySettings.setLayout(null);
 		
@@ -496,16 +525,16 @@ public class SettingsView extends JPanel {
 	
 	// {{ Data Bindings
 	
-	private void setupUIDataBinding() {
+	private void UIDB_setupUIDataBinding() {
 		for (Component component : allDataBindingComponent) {
-			uiBindingManager.addDataBinding(component, this::getModelObject, 
-					this::getPropertyDesc, this::updateUIforModel);
+			uiBindingManager.addDataBinding(component, this::UIDB_getModelObject, 
+					this::UIDB_getPropertyDesc, this::UIDB_updateUIforModel);
 		}
 		
 		uiBindingManager.updateUI(null);
 	}
 	
-	private Object getModelObject(String propertyGroup) {
+	private Object UIDB_getModelObject(String propertyGroup) {
 		if ("global".equals(propertyGroup)) {
 			return Config.getInstance();
 		} else if ("runningChart".equals(propertyGroup)) {
@@ -517,7 +546,7 @@ public class SettingsView extends JPanel {
 		return null;
 	}
 	
-	private void updateUIforModel(String propertyGroup) {
+	private void UIDB_updateUIforModel(String propertyGroup) {
 		if ("runningChart".equals(propertyGroup)) {
 //			mainFrame.chartView.setModel(mainFrame.trainGraph, mainFrame.currentLineChart);
 //			mainFrame.runView.setModel(mainFrame.trainGraph, mainFrame.currentLineChart);
@@ -528,7 +557,7 @@ public class SettingsView extends JPanel {
 		}
 	}
 	
-	private String getPropertyDesc(String propertyName) {
+	private String UIDB_getPropertyDesc(String propertyName) {
 		String desc = "";
 		
 		if ("distScale".equals(propertyName)) {
@@ -565,6 +594,10 @@ public class SettingsView extends JPanel {
 			desc = String.format(__("%s in timetable edit sheet settings"), __("vehicle name row height"));
 		} else if ("timetableEditRemarksRowHeight".equals(propertyName)) {
 			desc = String.format(__("%s in timetable edit sheet settings"), __("remarks row height"));
+		} else if ("timetableEditTrainNumberIncrement".equals(propertyName)) {
+			desc = String.format(__("%s in timetable edit sheet settings"), __("train number incrememt"));
+		} else if ("timetableEditUseTrainTypeFontColor".equals(propertyName)) {
+			desc = String.format(__("%s in timetable edit sheet settings"), __("use train type font color"));
 		}
 		
 		else if ("KeyTE_NotGoThrough".equals(propertyName)) {

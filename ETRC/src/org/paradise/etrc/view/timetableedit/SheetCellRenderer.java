@@ -2,36 +2,27 @@ package org.paradise.etrc.view.timetableedit;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
-import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
-import org.paradise.etrc.slice.ChartSlice;
-import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.string.VerticalStringPainter;
-import org.paradise.etrc.view.timetableedit.TimetableEditSheetModel;
 
 public class SheetCellRenderer extends JLabel implements TableCellRenderer {
 
 	private static final long serialVersionUID = -3005467491964709634L;
 	private JTable table;
+	private TimetableEditSheetModel model;
 	private int rowIndex;
-	private int columnIndex;
+//	private int columnIndex;
 	private boolean verticalText = false;
 	private VerticalStringPainter stringPainter = new VerticalStringPainter();
 	
@@ -44,9 +35,15 @@ public class SheetCellRenderer extends JLabel implements TableCellRenderer {
 	public void paint(Graphics g) {
     	if (verticalText) {
 			g.setColor(getBackground());
-			Rectangle rect = g.getClipBounds();
+			Rectangle rect = getBounds();
 			g.fillRect(0, 0, rect.width, rect.height);
-    	} 
+			
+			if (getBounds().width >= 45) {
+				stringPainter.setProperties(2, 1, true);
+			} else {
+				stringPainter.setProperties(1, 1, true);
+			}
+    	}
     	else {
     		super.paint(g);
 		}
@@ -78,15 +75,18 @@ public class SheetCellRenderer extends JLabel implements TableCellRenderer {
 			boolean isSelected, boolean hasFocus, int row, int column) {
 		
     	this.table = table;
+		this.model = (TimetableEditSheetModel) table.getModel();
     	rowIndex = row;
-    	columnIndex = column;
+//    	columnIndex = column;
 		boolean isArriveLine = row % 2 == 0;
-		TimetableEditSheetModel model = (TimetableEditSheetModel) table.getModel();
 		if (model.isRemarksRow(row)) {
 			setText(((TrainRouteSection) value).remarks);
 			setBackground(table.getBackground());
 			setForeground(Color.BLACK);
-			verticalText = true;
+			verticalText = true;			
+			
+			if (isSelected)
+				setBackground(TimetableEditView.selectBK);
 		} else {
 			Stop stop = model.getStop(row, column);
 				
@@ -94,7 +94,7 @@ public class SheetCellRenderer extends JLabel implements TableCellRenderer {
 			setText((stop == null) ? "" : 
 				    (isArriveLine ? stop.getArriveTimeStr() : stop.getLeaveTimeStr()));
 			
-			int stationLine = row % 4;
+//			int stationLine = row % 4;
 			//设置背景色
 			if (isSelected)//if(table.getSelectedColumn() == column || table.getSelectedRow() == row)
 				setBackground(TimetableEditView.selectBK);
@@ -110,8 +110,15 @@ public class SheetCellRenderer extends JLabel implements TableCellRenderer {
 			//设置文字颜色
 			if(stop!=null && !stop.isPassenger())
 					setForeground(Color.GRAY);
-			else
-				setForeground(Color.BLACK);
+			else {
+				Color color = Color.BLACK;
+				TrainGraph trainGraph = model.getTrainGraph();
+				if (trainGraph.settings.timetableEditUseTrainTypeFontColor) {
+					String trainName = model.getTrainRouteSection(column).getName();
+					color = trainGraph.guessTrainTypeByName(trainName).getFontColor();
+				}
+				setForeground(color);
+			}
 			
 			verticalText = false;
 		}

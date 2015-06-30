@@ -27,8 +27,6 @@ import org.paradise.etrc.data.event.RailroadLineChangeType;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.util.data.Tuple2;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 /**
  * 由多条铁路线路组成的铁路网。
  * 
@@ -151,19 +149,19 @@ public class RailNetwork extends TrainGraphPart {
 	}
 
 	public void addProjectionNode() {
-		throw new NotImplementedException();
+		throw new RuntimeException("NotImplementedException");
 	}
 
 	public void removeProjectionNode() {
-		throw new NotImplementedException();
+		throw new RuntimeException("NotImplementedException");
 	}
 
 	public RailroadLine getProjectionCircuit() {
-		throw new NotImplementedException();
+		throw new RuntimeException("NotImplementedException");
 	}
 
 	public RailroadLine getVirtualRailroadLine() {
-		throw new NotImplementedException();
+		throw new RuntimeException("NotImplementedException");
 	}
 
 	public List<String> findCrossoverStations() {

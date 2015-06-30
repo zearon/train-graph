@@ -1,17 +1,15 @@
 package org.paradise.etrc.controller.action;
 
 import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellEditor;
 
 import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRCUtil.*;
+import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
 
-public class TableCellEditAction extends TableAction {
+public class TableCellEditAction extends UIAction implements TableAction {
+	JTable table;
 	String tableName;
 	DefaultJEditTableModel tableModel;
 	int row;
@@ -23,7 +21,7 @@ public class TableCellEditAction extends TableAction {
 			DefaultJEditTableModel tableModel, int row, int column,
 			Object newValue) {
 
-		super(table);
+		this.table = table;
 		this.tableName = tableName;
 		this.tableModel = tableModel;
 		this.row = row;
@@ -76,6 +74,11 @@ public class TableCellEditAction extends TableAction {
 			return String.format(__("Set %s cell value [%d,%d]=%s"), tableName,
 					row, column, newValue);
 		}
+	}
+
+	@Override
+	public JTable getTable() {
+		return table;
 	}
 
 }

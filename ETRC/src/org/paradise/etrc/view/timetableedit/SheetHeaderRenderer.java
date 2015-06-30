@@ -22,6 +22,7 @@ import javax.swing.table.TableCellRenderer;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
+import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.util.ui.string.VerticalStringPainter;
 
 import static org.paradise.etrc.ETRC.__;
@@ -171,36 +172,50 @@ class HeaderRenderer extends JLabel implements ListCellRenderer<TrainRouteSectio
 			setFont(table.getFont());
 		}
 		
-		Train train = value.getTrain();
-		if (train == null) {
-			setText("*");
-			if (index == 0)
+		if (isNewTrainColumn) {
+			if (index == 0) {
+				setText(__("(NEW)"));
 				setForeground(Color.BLACK);
-			else
-				setForeground(table.getBackground());
+				verticalText = false;
+			} else if (index == 1) {
+				setText(__("*"));
+				setForeground(Color.BLACK);
+//				setForeground(table.getBackground());
+				verticalText = false;
+			} else if (index == 2) {
+				setText(__("*"));
+				setForeground(Color.BLACK);
+//				setForeground(table.getBackground());
+			}
 			return this;
 		}
 		
 		if (index == 0) {
 			// Train name (up-going / down-going)
-			text = value.downGoing ? train.trainNameDown : train.trainNameUp;
-			if (text == null || "".equals(text)) {
-				text = train.getName();
-				setForeground(Color.RED);
+			Train train = value.getTrain();
+			if (train != null) {
+				text = value.downGoing ? train.trainNameDown : train.trainNameUp;
+				if (text == null || "".equals(text)) {
+					text = train.getName();
+					setForeground(Color.RED);
+				} else {
+					setForeground(table.getForeground());
+				}
 			} else {
-				setForeground(table.getForeground());
+				text = value.getName();
 			}
 			setText(text);
 			verticalText = false;	
 		} else if (index == 1) {
 			// Train type
-			text = train.trainType.abbriveation;
+			TrainType trainType = trainGraph.guessTrainTypeByName(value.getName());
+			text = trainType.abbriveation;
 			setText(text);
-			setForeground(train.trainType.getLineColor());	
+			setForeground(trainType.getLineColor());	
 			verticalText = false;	
 		} else {
 			// Vehicle Name
-			text = "";
+			text = value.getVehicleName();
 			setText(text);
 			setForeground(table.getForeground());
 			verticalText = true;

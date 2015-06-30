@@ -8,14 +8,18 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Arrays;
+import java.util.Comparator;
 
 import javax.swing.AbstractCellEditor;
-import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -37,11 +41,9 @@ import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.dialog.YesNoBox;
+import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
-
-import javax.swing.JComboBox;
-import javax.swing.ComboBoxModel;
 
 /**
  * @author lguo@sina.com
@@ -56,9 +58,12 @@ public class TrainListView extends JPanel {
 	MainFrame mainFrame = MainFrame.getInstance();
 
 	TrainsTable table;
+	TableRowSorter<TrainsTableModel> tableRowSorter;
+	TrainsTableModel tableModel;
 
 //	JCheckBox cbUnderColor;
 	TrainView trainView;
+	private JComboBox<TrainFilter> cbRaillineFilter;
 	
 	public TrainListView() {
 		table = new TrainsTable();
@@ -66,6 +71,7 @@ public class TrainListView extends JPanel {
 		try {
 			jbInit();
 //			pack();
+			doUpdateFilters();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -77,14 +83,34 @@ public class TrainListView extends JPanel {
 	
 	public void setModel(TrainGraph trainGraph) {
 		this.trainGraph = trainGraph;
-		table.setRowSorter(new TableRowSorter<TrainsTableModel> ((TrainsTableModel)table.getModel()));
+		tableRowSorter = new TableRowSorter<TrainsTableModel> ((TrainsTableModel)table.getModel()) {
+
+			@Override
+			public Comparator<?> getComparator(int column) {
+				if (column == 0)
+					return Train.getTrainNameComparator();
+				else
+					return super.getComparator(column);
+			}
+			
+		};
+		table.setRowSorter(tableRowSorter);
+		
+		refresh();
+	}
+	
+	public void refresh() {
+
+		doUpdateFilters();
 		
 		updateUI();
 	}
 
 	private void jbInit() throws Exception {
-		table.setModel(new TrainsTableModel());
-		table.setDefaultRenderer(TrainType.class, new TrainTypeRenderer());
+		tableModel = new TrainsTableModel();
+		table.setModel(tableModel);
+		table.setDefaultRenderer(String.class, new TrainCellRenderer());
+		table.setDefaultRenderer(TrainType.class, new TrainTypeCellRenderer());
 //		table.setDefaultEditor(Color.class, new ColorCellEditor());
 
 		table.setFont(new Font("Dialog", 0, 12));
@@ -197,6 +223,33 @@ public class TrainListView extends JPanel {
 
 //		JPanel rootPanel = new JPanel();
 		setLayout(new BorderLayout());
+		
+		JPanel panel = new JPanel();
+		add(panel, BorderLayout.NORTH);
+		
+		JLabel lblFilter = new JLabel("Railline Filter");
+		lblFilter.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		panel.add(lblFilter);
+		
+		cbRaillineFilter = new JComboBox<>();
+		cbRaillineFilter.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					doUpdateTrains();
+				}
+			}
+		});
+		cbRaillineFilter.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		panel.add(cbRaillineFilter);
+		
+		JButton btnUpdateFilters = new JButton("Update Filters");
+		btnUpdateFilters.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				doUpdateFilters();
+			}
+		});
+		btnUpdateFilters.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
+		panel.add(btnUpdateFilters);
 		add(colorPanel, BorderLayout.CENTER);
 		add(buttonPanel, BorderLayout.SOUTH);
 
@@ -279,6 +332,23 @@ public class TrainListView extends JPanel {
 //			
 //			table.revalidate();
 //		}
+	}
+	
+	public void doUpdateFilters() {
+		cbRaillineFilter.setModel(new DefaultComboBoxModel<>(
+				TrainFilter.createFiltersForAllRaillines(trainGraph)));
+		cbRaillineFilter.repaint();
+		
+		cbRaillineFilter.setSelectedIndex(0);
+		doUpdateTrains();
+	}
+	
+	public void doUpdateTrains() {
+		if (tableRowSorter == null)
+			return;
+		
+		TrainFilter trainFilter = (TrainFilter) cbRaillineFilter.getSelectedItem();
+		tableRowSorter.setRowFilter(trainFilter);
 	}
 
 	public class ColorCellEditor extends AbstractCellEditor implements
@@ -431,7 +501,8 @@ public class TrainListView extends JPanel {
 
 	}
 
-	public class TrainTypeRenderer extends DefaultTableCellRenderer {
+	@SuppressWarnings("serial")
+	public class TrainCellRenderer extends DefaultTableCellRenderer {
 
 		@Override
 		public Component getTableCellRendererComponent(JTable table,
@@ -440,7 +511,30 @@ public class TrainListView extends JPanel {
 			Component component = super.getTableCellRendererComponent(table, value, 
 					isSelected, hasFocus, row, column);
 			
-			((JLabel) component).setText(((TrainType) value).abbriveation);
+			if (column != 0) {
+				component.setForeground(table.getForeground());
+				return component;
+			}
+			
+			Color color = tableModel.getTrain(row).trainType.getFontColor();
+//			((JLabel) component).setText((String) value);
+			component.setForeground(color);
+			
+			return component;
+		}
+	}
+
+	@SuppressWarnings("serial")
+	public class TrainTypeCellRenderer extends DefaultTableCellRenderer {
+
+		@Override
+		public Component getTableCellRendererComponent(JTable table,
+				Object value, boolean isSelected, boolean hasFocus, int row,
+				int column) {
+			Component component = super.getTableCellRendererComponent(table, value, 
+					isSelected, hasFocus, row, column);
+			
+			((JLabel) component).setText(((TrainType) value).getName());
 			component.setForeground(((TrainType) value).getFontColor());
 			
 			return component;
@@ -482,7 +576,7 @@ public class TrainListView extends JPanel {
 		 * @return boolean
 		 */
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == 3;
+			return false;
 		}
 
 		/**
@@ -512,18 +606,23 @@ public class TrainListView extends JPanel {
 		 * @return Object
 		 */
 		public Object getValueAt(int rowIndex, int columnIndex) {
+			Train train = getTrain(rowIndex);
 			switch (columnIndex) {
 			case 0:
-				return trainGraph.currentNetworkChart.getTrain(rowIndex).getTrainName();
+				return train.getTrainName();
 			case 1:
-				return trainGraph.currentNetworkChart.getTrain(rowIndex).getStartStation();
+				return train.getStartStation();
 			case 2:
-				return trainGraph.currentNetworkChart.getTrain(rowIndex).getTerminalStation();
+				return train.getTerminalStation();
 			case 3:
-				return trainGraph.currentNetworkChart.getTrain(rowIndex).trainType;
+				return train.trainType;
 			default:
 				return null;
 			}
+		}
+
+		public Train getTrain(int rowIndex) {
+			return trainGraph.currentNetworkChart.getTrain(rowIndex);
 		}
 
 		/**
@@ -535,7 +634,7 @@ public class TrainListView extends JPanel {
 		 */
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			if (columnIndex == 3) {
-				trainGraph.currentNetworkChart.getTrain(rowIndex).trainType = (TrainType) aValue;
+				getTrain(rowIndex).trainType = (TrainType) aValue;
 				fireTableCellUpdated(rowIndex, columnIndex);
 			}
 		}
@@ -555,7 +654,7 @@ public class TrainListView extends JPanel {
 			case 2:
 				return __("Terminal");
 			case 3:
-				return __("Color");
+				return __("Train Type");
 			default:
 				return null;
 			}

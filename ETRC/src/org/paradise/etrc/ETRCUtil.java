@@ -26,11 +26,6 @@ public class ETRCUtil {
 		return str1 + "," + str2; 
 	}
 	
-	@FunctionalInterface
-	public static interface DebugAction {		
-		void doAction();
-	}
-	
 	static {
 		isDebug = "true".equalsIgnoreCase(System.getenv("DEBUG"));
 		dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -61,7 +56,6 @@ public class ETRCUtil {
 	   * if it is running in debug mode.
 	   * @param tgp
 	   */
-	  @SuppressWarnings("rawtypes")
 	  public static void DEBUG_PRINT_TGP(TrainGraphPart tgp) {
 		  if (IS_DEBUG()) {
 			  System.err.println(tgp.toDebugString());
@@ -87,10 +81,19 @@ public class ETRCUtil {
 	   * @return true if in debug mode and false if else.
 	   */
 	  public static boolean DEBUG(String msgFormat, Object... msgArgs) {
-		  if (isDebug)
-			  _printMsg("DEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
+		  DEBUG_MSG(msgFormat, msgArgs);
 		  
 		  return isDebug;
+	  }
+	  
+	  /**
+	   * Print a message if it is running in debug mode.
+	   * @param msg
+	   */
+	  public static void DEBUG_MSG(String msgFormat, Object... msgArgs) {
+		  
+		  if (IS_DEBUG())
+			  _printMsg("DEBUG_MSG: ", formatMessage(msgFormat, msgArgs), false, false, false, true, false, 0);
 	  }
 	  
 	  /**
@@ -98,10 +101,10 @@ public class ETRCUtil {
 	   * @param action The action to be done if in debug mode.
 	   * @return true if in debug mode and false if else.
 	   */
-	  public static boolean DEBUG_ACTION(DebugAction action) {
+	  public static boolean DEBUG_ACTION(Runnable action) {
 		  if (isDebug) {
 			  _printMsg("\r\nDEBUG ACTION:", "", true, true, false, true, true, 0);
-			  action.doAction();
+			  action.run();
 		  }
 		  
 		  return isDebug;
@@ -116,10 +119,10 @@ public class ETRCUtil {
 	   * @param msgArgs	 The arguments of the message format.
 	   * @return true if in debug mode and false if else.
 	   */
-	  public static boolean DEBUG_ACTION(DebugAction action, String msgFormat, Object... msgArgs) {
+	  public static boolean DEBUG_ACTION(Runnable action, String msgFormat, Object... msgArgs) {
 		  if (isDebug) {
-			  _printMsg("\r\nDEBUG ACTION:", String.format(msgFormat, msgArgs), true, true, true, true, true, 0);
-			  action.doAction();
+			  _printMsg("\r\nDEBUG ACTION:", formatMessage(msgFormat, msgArgs), true, true, true, true, true, 0);
+			  action.run();
 		  }
 		  
 		  return isDebug;
@@ -129,18 +132,9 @@ public class ETRCUtil {
 	   * Print a message if it is running in debug mode.
 	   * @param msg
 	   */
-	  public static void DEBUG_MSG(String msgFormat, Object... msgArgs) {
-		  if (IS_DEBUG())
-			  _printMsg("DEBUG_MSG: ", String.format(msgFormat, msgArgs), false, false, false, true, false, 0);
-	  }
-	  
-	  /**
-	   * Print a message if it is running in debug mode.
-	   * @param msg
-	   */
 	  public static void DEBUG_STACKTRACE(int level, String msgFormat, Object... msgArgs) {
 		  if (IS_DEBUG())
-			  _printMsg("\r\nDEBUG: ", String.format(msgFormat, msgArgs), true, true, true, true, false, level);
+			  _printMsg("\r\nDEBUG: ", formatMessage(msgFormat, msgArgs), true, true, true, true, false, level);
 	  }
 	  
 	  private static void _printMsg(String prefix, String msg, boolean printTime, boolean printInvoker, 
@@ -197,5 +191,15 @@ public class ETRCUtil {
 		  
 		  if (newLineAfterMsg)
 			  System.err.println();
+	  }
+	  
+	  private static String formatMessage(String msgFormat, Object... args) {
+		  if (msgFormat == null)
+			  return "(NULL MESSAGE)";
+		  
+		  if (args.length > 0)
+			  return String.format(msgFormat, args);
+		  else
+			  return msgFormat;
 	  }
 }

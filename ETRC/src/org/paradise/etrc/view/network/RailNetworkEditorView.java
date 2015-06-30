@@ -115,7 +115,7 @@ public class RailNetworkEditorView extends JPanel {
 			System.out.println(f);
 			
 
-			ActionFactory.createDirectActionAndDoIt(__("Load a map as the backgroup picture"), 
+			ActionFactory.createDirectAction(__("Load a map as the backgroup picture"), 
 					() -> {
 				try {
 					trainGraph.map.loadFromFile(f);
@@ -131,7 +131,7 @@ public class RailNetworkEditorView extends JPanel {
 							+ "\nReason:%s\nDetail:%s"), chooser.getSelectedFile(), ioe.getMessage(), 
 							ioe.getCause() )).showMessage();
 				}
-			});
+			}).addToManagerAndDoIt();;
 		}
 	}
 

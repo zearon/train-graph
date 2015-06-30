@@ -1,15 +1,8 @@
 package org.paradise.etrc.controller.action;
 
-import javax.swing.JTable;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.TableCellEditor;
-
-import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
 import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
 
 public class TableCellIncrementAction extends UIAction {
 	String tableName;

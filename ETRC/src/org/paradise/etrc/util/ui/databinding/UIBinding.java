@@ -7,12 +7,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.paradise.etrc.controller.action.ActionFactory;
+import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.databinding.converter.IModelValueConverter;
 import org.paradise.etrc.util.ui.databinding.converter.IValueTypeConverter;
 import org.paradise.etrc.util.ui.databinding.converter.ValueConverterManager;
 
 import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.*;
 
 /**
  * UIBinding is used to bing a UI control and a data model.
@@ -69,6 +72,9 @@ public abstract class UIBinding<M, U> {
 	protected String uiValueClassName = null;
 	
 	protected Consumer<String> callback;
+	protected Function<M, Boolean> valueValidator;
+	
+	protected UIBindingManager bindingManager;
 	
 	protected static Consumer<Exception> exceptionHandler;	
 	public static void setExceptionHandler(Consumer<Exception> exceptionHandler) {
@@ -109,6 +115,20 @@ public abstract class UIBinding<M, U> {
 	public void setConverter(String convertID) {
 		this.converter = (IModelValueConverter<M, U>) ValueConverterManager.getConverter(convertID);
 	}
+	
+	// return UIBinding for convenience of chain invocation
+	public UIBinding<M, U> setValueValidator(Function<M, Boolean> modelValueValidator) {
+		this.valueValidator = modelValueValidator;
+		return this;
+	}
+	@SuppressWarnings("unchecked")
+	UIBinding<M, U> _setValueValidator(Function<?, Boolean> modelValueValidator) {
+		return setValueValidator((Function<M, Boolean>) modelValueValidator);
+	}
+	
+	void setUIBindingManager(UIBindingManager bindingManager) {
+		this.bindingManager = bindingManager;
+	}
 
 	public void updateModel() {
 		U oldUIValue = getOldUIValue();
@@ -134,8 +154,25 @@ public abstract class UIBinding<M, U> {
 			return;
 		}
 		
-		ActionFactory.createSetValueActionAndDoIt(propertyDesc, oldModelValue, newModelValue, 
-				this::setModelAndUIValue, this::callbackAfterModelUpdated);
+		if (!validateUiValue(newModelValue)) {
+			DEBUG_MSG("Invalid new ui value.");
+			setUIValue(oldUIValue);
+			return;
+		}
+		
+		UIAction action = ActionFactory.createSetValueAction(
+				propertyDesc, oldModelValue, newModelValue,
+				this::setModelAndUIValue, this::callbackAfterModelUpdated).addToManagerAndDoIt();
+		
+		if (bindingManager != null)
+			bindingManager.addUIAction(action);
+	}
+	
+	protected boolean validateUiValue(M modelValue) {
+		if (valueValidator == null)
+			return true;
+		else
+			return valueValidator.apply(modelValue);
 	}
 	
 	private void handleException(Exception e) {

@@ -84,8 +84,8 @@ public class SheetModel extends DefaultJEditTableModel {
 	}
 
 	protected UIAction getActionAndDoIt(Object aValue, int rowIndex, int columnIndex) {
-		return ActionFactory.createTableCellEditActionAndDoIt(__("stop table"), 
-				table, this, rowIndex, columnIndex, aValue);
+		return ActionFactory.createTableCellEditAction(__("stop table"), 
+				table, this, rowIndex, columnIndex, aValue).addToManagerAndDoIt();
 	}
 	
 	//修改到发点时间不需要特殊处理，在CellEditor里面就处理好了

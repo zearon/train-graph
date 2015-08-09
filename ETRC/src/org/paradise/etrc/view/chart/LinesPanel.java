@@ -1,9 +1,5 @@
 package org.paradise.etrc.view.chart;
 
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -30,8 +26,6 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
-import javax.swing.JColorChooser;
-import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.JToolTip;
 import javax.swing.ToolTipManager;
@@ -47,12 +41,15 @@ import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.slice.ChartSlice;
-import org.paradise.etrc.view.alltrains.TrainView;
 import org.paradise.etrc.view.chart.traindrawing.TrainDrawing;
 import org.paradise.etrc.view.chart.traindrawing.TrainLine;
 import org.paradise.etrc.view.sheet.SheetTable;
 import org.paradise.etrc.wizard.Wizard;
 import org.paradise.etrc.wizard.addtrain.AddTrainWizard;
+
+import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
 
 /**
  * @author lguo@sina.com

@@ -5,15 +5,12 @@ import java.awt.Font;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.function.Supplier;
 
 import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
-import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 

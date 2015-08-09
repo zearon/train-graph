@@ -1,16 +1,10 @@
 package org.paradise.etrc.util.ui.databinding;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
-import javax.swing.JTextField;
 import javax.swing.text.JTextComponent;
 
 

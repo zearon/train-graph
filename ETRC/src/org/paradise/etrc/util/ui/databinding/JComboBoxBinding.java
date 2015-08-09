@@ -1,18 +1,9 @@
 package org.paradise.etrc.util.ui.databinding;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
-import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.util.function.Consumer;
 
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 /**
  * A data binding model to binding a JComboBox to a data source model. <br/>

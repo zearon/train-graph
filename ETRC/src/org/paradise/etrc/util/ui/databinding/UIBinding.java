@@ -15,7 +15,7 @@ import org.paradise.etrc.util.ui.databinding.converter.ValueConverterManager;
 
 import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRCUtil.*;
+import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
 
 /**
  * UIBinding is used to bing a UI control and a data model.

@@ -1,10 +1,7 @@
 package org.paradise.etrc.wizard.addtrain;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.util.Vector;
 
-import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.dialog.MessageBox;
@@ -14,6 +11,8 @@ import org.paradise.etrc.view.alltrains.TrainView;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.wizard.Wizard;
 import org.paradise.etrc.wizard.WizardDialog;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class AddTrainWizard extends Wizard {
 	private Train train;

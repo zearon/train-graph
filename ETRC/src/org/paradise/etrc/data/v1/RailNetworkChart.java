@@ -1,21 +1,15 @@
 package org.paradise.etrc.data.v1;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
-
-import javafx.scene.chart.LineChart;
 
 import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementType;
-import org.paradise.etrc.util.data.Tuple2;
 
 @TGElementType(name="RailNetwork Chart")
 public class RailNetworkChart extends TrainGraphPart {
@@ -39,13 +33,13 @@ public class RailNetworkChart extends TrainGraphPart {
 	}
 
 	public void addTrain(Train element) {
-		trainDict.put(element.getName(), element);
+		addToTrainDict(element);
 		
 		trains.add(element);
 	}
 
 	public void addTrain(int index, Train element) {
-		trainDict.put(element.getName(), element);
+		addToTrainDict(element);
 		
 		trains.add(index, element);
 	}
@@ -71,14 +65,14 @@ public class RailNetworkChart extends TrainGraphPart {
 
 	public void removeTrainAt(int index) {
 		Train obj = getTrain(index);
-		trainDict.remove(obj.getName());
+		removeFromTrainDict(obj);
 		removeTrainInLineCharts(obj);
 		
 		trains.removeElementAt(index);
 	}
 
 	public boolean removeTrain(Train obj) {
-		trainDict.remove(obj.getName());
+		removeFromTrainDict(obj);
 		removeTrainInLineCharts(obj);
 		
 		return trains.removeElement(obj);
@@ -105,9 +99,25 @@ public class RailNetworkChart extends TrainGraphPart {
 		}
 	}
 	
+	private void addToTrainDict(Train train) {
+		String[] trainNames = train.getName() != null ? 
+				train.getName().split("/") : new String[0];
+				
+		for (String trainName : trainNames)
+			trainDict.put(trainName, train);
+	}
+	
+	private void removeFromTrainDict(Train train) {
+		String[] trainNames = train.getName() != null ? 
+				train.getName().split("/") : new String[0];
+				
+		for (String trainName : trainNames)
+			trainDict.remove(trainName);
+	}
+	
 	public void updateTrainDict() {
 		trainDict.clear();
-		trains.forEach(train -> trainDict.put(train.getName(), train));
+		trains.forEach(this::addToTrainDict);
 	}
 
 	public void updateTrain(Train newTrain) {
@@ -120,7 +130,7 @@ public class RailNetworkChart extends TrainGraphPart {
 		}
 	}
 	
-	public void removeTrainInLineCharts(Train train) {
+	private void removeTrainInLineCharts(Train train) {
 		for (RailroadLineChart lineChart : allRailLineCharts()) {
 			for (Iterator<Train> iter = lineChart.trains.iterator(); iter.hasNext(); ) {
 				Train train0 = iter.next();

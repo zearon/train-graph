@@ -1,7 +1,4 @@
 package org.paradise.etrc.util.ui.databinding.converter;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
 
 public class BooleanToYesNoConverter implements IModelValueConverter<Boolean, String> {
 

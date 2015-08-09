@@ -1,10 +1,4 @@
 package org.paradise.etrc.test.data;
-import static org.junit.Assert.*;
-
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;

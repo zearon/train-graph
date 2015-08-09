@@ -4,8 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -15,12 +13,9 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import javax.swing.AbstractCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -29,11 +24,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
-import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Stop;
@@ -41,7 +34,6 @@ import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.dialog.YesNoBox;
-import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -349,96 +341,6 @@ public class TrainListView extends JPanel {
 		
 		TrainFilter trainFilter = (TrainFilter) cbRaillineFilter.getSelectedItem();
 		tableRowSorter.setRowFilter(trainFilter);
-	}
-
-	public class ColorCellEditor extends AbstractCellEditor implements
-			TableCellEditor, ActionListener {
-		private static final long serialVersionUID = -5449669328932839469L;
-
-		Color currentColor;
-
-		JButton colorButton = new JButton();
-
-		JColorChooser colorChooser;
-
-		JDialog dialog;
-
-		protected static final String EDIT = "edit";
-
-		public ColorCellEditor() {
-			//Set up the editor (from the table's point of view),
-			//which is a button.
-			//This button brings up the color chooser dialog,
-			//which is the editor from the user's point of view.
-
-			//Set up the dialog that the button brings up.
-			colorChooser = new JColorChooser();
-			dialog = JColorChooser.createDialog(TrainListView.this, "Select the color for the line",
-					true, //modal
-					colorChooser, this, //OK button handler
-					null); //no CANCEL button handler
-		}
-
-		/**
-		 * Handles events from the editor button and from
-		 * the dialog's OK button.
-		 */
-		public void actionPerformed(ActionEvent e) {
-			if (EDIT.equals(e.getActionCommand())) {
-				//The user has clicked the cell, so
-				//bring up the dialog.
-				colorButton.setForeground(currentColor);
-				colorChooser.setColor(currentColor);
-				ETRC.setFont(dialog);
-				dialog.setVisible(true);
-
-				//Make the renderer reappear.
-				fireEditingStopped();
-
-			} else { //User pressed dialog's "OK" button.
-				currentColor = colorChooser.getColor();
-			}
-		}
-
-		//Implement the one CellEditor method that AbstractCellEditor doesn't.
-		public Object getCellEditorValue() {
-			return currentColor;
-		}
-
-		//Implement the one method defined by TableCellEditor.
-		public Component getTableCellEditorComponent(JTable table,
-				Object value, boolean isSelected, int row, int column) {
-			currentColor = (Color) value;
-
-			colorButton = new JButton() {
-				/**
-				 * 
-				 */
-				private static final long serialVersionUID = 1L;
-
-				public void paint(Graphics g) {
-					Rectangle clip = g.getClipBounds();
-					g.setColor(currentColor);
-					g.drawLine(clip.x, clip.y + clip.height - 3, clip.x
-							+ clip.width, clip.y + clip.height - 3);
-					super.paint(g);
-				}
-			};
-			colorButton.setText(trainGraph.currentNetworkChart.getTrain(
-					table.convertRowIndexToModel(row))
-					.getTrainName());
-			colorButton.setForeground(currentColor);
-			colorButton.setBackground(Color.white);
-
-			colorButton.setHorizontalAlignment(SwingConstants.CENTER);
-			colorButton.setVerticalAlignment(SwingConstants.CENTER);
-
-			colorButton.setActionCommand(EDIT);
-			colorButton.addActionListener(this);
-			colorButton.setBorderPainted(false);
-
-			return colorButton;
-		}
 	}
 
 	public class ColorCellRenderer implements TableCellRenderer {

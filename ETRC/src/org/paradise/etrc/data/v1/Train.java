@@ -124,6 +124,10 @@ public class Train extends TrainGraphPart {
 	
 	public TrainType trainType = TrainType.defaultTrainType;
 	
+	public boolean isBlank() {
+		return name == null || name.length() < 1;
+	}
+	
 	@Override
 	public void loadComplete() {
 		setTrainNameForAllStops();

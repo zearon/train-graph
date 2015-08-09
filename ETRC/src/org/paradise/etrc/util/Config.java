@@ -12,7 +12,9 @@ import org.paradise.etrc.ETRC;
 import org.paradise.etrc.controller.ActionManager;
 
 import static org.paradise.etrc.ETRC.__;
-import static org.paradise.etrc.ETRCUtil.*;
+
+import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
 
 public class Config {
 	public static final String NEW_FILE_NAME = __("Unnamed Train Graph");

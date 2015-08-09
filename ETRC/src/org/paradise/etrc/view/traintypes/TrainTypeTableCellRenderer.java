@@ -1,23 +1,15 @@
 package org.paradise.etrc.view.traintypes;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
-import java.awt.Stroke;
 
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
 
 public class TrainTypeTableCellRenderer extends DefaultTableCellRenderer {
@@ -39,6 +31,7 @@ public class TrainTypeTableCellRenderer extends DefaultTableCellRenderer {
 		
 		if (trainType != null && column == effectiveColumnIndex) {
 			if (column == 4) {
+				// Line Style
 				component = new JLabel("") {
 
 					@Override

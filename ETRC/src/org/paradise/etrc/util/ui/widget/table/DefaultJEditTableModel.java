@@ -7,8 +7,6 @@ import java.util.Optional;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.paradise.etrc.controller.ActionManager;
-import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.v1.Stop;
 

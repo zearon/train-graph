@@ -3,7 +3,6 @@ package org.paradise.etrc.view.lineedit;
 import java.awt.Dimension;
 
 import javax.swing.ListSelectionModel;
-import javax.swing.event.TableModelListener;
 
 import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
@@ -25,7 +24,7 @@ public class RailroadLineTable extends JEditTable {
 			int r = this.getRowCount();
 			int h = this.getRowHeight() * Math.min(r, 15);
 //			int w = super.getPreferredScrollableViewportSize().width;
-			int w = 200;
+			int w = 250;
 			return new Dimension(w, h);
 		}
 	}

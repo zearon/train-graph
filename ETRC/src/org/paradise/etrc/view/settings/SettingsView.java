@@ -5,12 +5,13 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.util.Vector;
 
 import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -24,18 +25,9 @@ import org.paradise.etrc.data.v1.ChartSettings;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.ui.databinding.JComboBoxBinding;
-import org.paradise.etrc.util.ui.databinding.JTextComponentBinding;
-import org.paradise.etrc.util.ui.databinding.UIBinding;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
-
-import javax.swing.LayoutStyle.ComponentPlacement;
-
-import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class SettingsView extends JPanel {
 	private JTextField txtDistscale;

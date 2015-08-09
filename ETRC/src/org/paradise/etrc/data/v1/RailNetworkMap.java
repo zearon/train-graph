@@ -1,26 +1,14 @@
 package org.paradise.etrc.data.v1;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.Vector;
-import java.util.function.Supplier;
 
 import javax.imageio.ImageIO;
 
 import org.paradise.etrc.data.Base64EncodingBinaryPart;
-import org.paradise.etrc.data.TrainGraphPart;
-import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementType;
-import org.paradise.etrc.util.data.Tuple2;
-
-import sun.misc.BASE64Decoder;
 
 @TGElementType(name="RailNetwork Map")
 public class RailNetworkMap extends Base64EncodingBinaryPart {

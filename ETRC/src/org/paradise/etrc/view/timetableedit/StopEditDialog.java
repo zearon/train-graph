@@ -1,63 +1,43 @@
 package org.paradise.etrc.view.timetableedit;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.SystemColor;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Vector;
 
-import javax.swing.DefaultListModel;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSeparator;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-
-import java.awt.Color;
-
-import javax.swing.JList;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-
-import java.awt.Font;
-
-import javax.swing.UIManager;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
-import org.paradise.etrc.util.ui.wb.swing.FocusTraversalOnArray;
 
-import java.awt.Component;
-import java.util.Vector;
-import java.util.function.Consumer;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-
-import javax.swing.AbstractListModel;
-import javax.swing.ListSelectionModel;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import javax.swing.JRadioButton;
-import javax.swing.ButtonGroup;
-
-import java.awt.SystemColor;
-
-import javax.swing.JCheckBox;
-
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import static org.paradise.etrc.ETRC.__;
 
 public class StopEditDialog extends JDialog implements KeyListener {
 	/**

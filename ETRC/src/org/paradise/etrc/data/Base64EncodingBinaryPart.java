@@ -1,15 +1,10 @@
 package org.paradise.etrc.data;
 
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
 import sun.misc.BASE64Decoder;
-import sun.misc.BASE64Encoder;
 
 public abstract class Base64EncodingBinaryPart extends
 		TrainGraphPart {

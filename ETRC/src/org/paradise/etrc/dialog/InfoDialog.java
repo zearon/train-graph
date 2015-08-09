@@ -1,10 +1,10 @@
 package org.paradise.etrc.dialog;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.Component;
 
 import javax.swing.JOptionPane;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com

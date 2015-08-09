@@ -8,7 +8,7 @@
  * Contributors:
  *    Google, Inc. - initial API and implementation
  *******************************************************************************/
-package org.paradise.etrc.util.ui.wb.swing;
+package org.eclipse.wb.swing;
 
 import java.awt.Component;
 import java.awt.Container;

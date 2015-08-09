@@ -1,7 +1,5 @@
 package org.paradise.etrc.dialog;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -27,9 +25,9 @@ import javax.swing.event.ChangeListener;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.v1.ChartSettings;
-import org.paradise.etrc.data.v1.RailroadLineChart;
-import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.view.chart.ChartView;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class ChartSetDialog extends JDialog {
 	private static final long serialVersionUID = 1L;

@@ -1,10 +1,6 @@
 package org.paradise.etrc.view.timetableedit;
 
-import static org.paradise.etrc.ETRC.__;
-
-import java.awt.EventQueue;
 import java.util.Arrays;
-import java.util.Vector;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntFunction;
@@ -17,11 +13,11 @@ import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Stop;
-import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
-import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class TimetableEditSheetModel extends DefaultJEditTableModel {
 	private static final long serialVersionUID = 6767541225039467460L;
@@ -239,12 +235,9 @@ public class TimetableEditSheetModel extends DefaultJEditTableModel {
 	}
 	
 	private TrainRouteSection _createNewTrainRouteSection() {
-		TrainRouteSection newSection = TrainGraphFactory.createInstance(TrainRouteSection.class, 
-				String.format(__("NewTrain%d"), ++ newTrainCounter));
-		newSection.setParent(chart);
-		newSection.setRoot(trainGraph);
-		newSection.downGoing = downGoing;
-		newSection.setRailLineChart(chart);
+		TrainRouteSection newSection = TrainRouteSection
+				.createEmptyTrainRouteSection(chart, downGoing,
+						String.format(__("NewTrain%d"), ++newTrainCounter));
 		
 		return newSection;
 	}

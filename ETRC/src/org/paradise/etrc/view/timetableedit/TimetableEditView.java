@@ -1,47 +1,24 @@
 package org.paradise.etrc.view.timetableedit;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
-import javax.swing.JPanel;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
-import javax.swing.JList;
-import javax.swing.JMenu;
-import javax.swing.JSplitPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JToolBar;
+import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.GroupLayout;
-import javax.swing.ListSelectionModel;
-import javax.swing.GroupLayout.Alignment;
+import javax.swing.JMenu;
+import javax.swing.JPanel;
+import javax.swing.JToolBar;
 import javax.swing.border.BevelBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 import org.paradise.etrc.data.v1.RailroadLineChart;
-import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.TrainGraph;
-import org.paradise.etrc.slice.ChartSlice;
-import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 import org.paradise.etrc.view.IView;
-import org.paradise.etrc.view.sheet.RowHeaderModel;
-import org.paradise.etrc.view.sheet.RowHeaderRenderer;
-import org.paradise.etrc.view.sheet.SheetTable;
 
-import java.awt.FlowLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-
-import javax.swing.JButton;
-import java.awt.Font;
+import static org.paradise.etrc.ETRC.__;
 
 public class TimetableEditView extends JPanel implements IView {
 	
@@ -110,7 +87,7 @@ public class TimetableEditView extends JPanel implements IView {
 		
 		// update ui:
 		uiBindingManager.updateUI(null);
-		table.setupColumnWidth();
+		table.updateData();
 		repaint();
 	}
 	

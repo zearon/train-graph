@@ -1,8 +1,4 @@
 package org.paradise.etrc.view.alltrains;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.util.Vector;
 
 import javax.swing.RowFilter;
@@ -11,6 +7,8 @@ import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.view.alltrains.TrainListView.TrainsTableModel;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class TrainFilter extends RowFilter<TrainsTableModel, Integer> {
 	RailroadLineChart lineChart;

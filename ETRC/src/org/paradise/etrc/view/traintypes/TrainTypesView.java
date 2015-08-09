@@ -1,64 +1,45 @@
 package org.paradise.etrc.view.traintypes;
-import static org.paradise.etrc.ETRC.__;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+import java.util.Vector;
 
-import static org.paradise.etrc.ETRCUtil.*;
-
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JScrollPane;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.SwingConstants;
-
-import java.awt.Component;
-
+import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 
-import java.awt.Color;
-import java.awt.Font;
-
-import javax.swing.JButton;
-
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.data.v1.RailNetworkChart;
-import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.TrainGraphFactory;
+import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.dialog.MessageBox;
-import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.data.ValueTypeConverter;
 import org.paradise.etrc.util.ui.FontUtil;
 import org.paradise.etrc.util.ui.JColorChooserLabel;
-import org.paradise.etrc.util.ui.databinding.JComboBoxBinding;
-import org.paradise.etrc.util.ui.databinding.JTextComponentBinding;
-import org.paradise.etrc.util.ui.databinding.UIBinding;
 import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 import org.paradise.etrc.util.ui.databinding.converter.FontStyleConverter;
 import org.paradise.etrc.util.ui.databinding.converter.ValueConverterManager;
 import org.paradise.etrc.util.ui.widget.table.JEditTable;
 
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.util.Vector;
-
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.ComboBoxModel;
-
-import org.paradise.etrc.view.alltrains.TrainListView;
-
-import javax.swing.border.Border;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.ItemEvent;
+import static org.paradise.etrc.ETRC.__;
 
 public class TrainTypesView extends JPanel {
 

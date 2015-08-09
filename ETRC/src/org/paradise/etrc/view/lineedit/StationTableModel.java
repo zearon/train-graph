@@ -1,9 +1,6 @@
 package org.paradise.etrc.view.lineedit;
 
-import static org.paradise.etrc.ETRC.__;
-
 import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
 
 import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
@@ -11,6 +8,8 @@ import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class StationTableModel extends DefaultJEditTableModel {
 	/**

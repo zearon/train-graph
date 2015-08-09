@@ -1,24 +1,13 @@
 package org.paradise.etrc.data;
 
-import static org.junit.Assert.*;
-
-import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.net.URISyntaxException;
 import java.util.Random;
-import java.util.Vector;
-import java.util.function.IntConsumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import org.junit.After;
 import org.junit.Before;
@@ -31,6 +20,11 @@ import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 
 public class TrainGraphTest {
 	

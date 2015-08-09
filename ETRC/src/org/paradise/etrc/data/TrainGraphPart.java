@@ -1822,6 +1822,10 @@ public abstract class TrainGraphPart {
 				getElementName(), 3), false, false);
 	}
 	
+	public String toFullString() {
+		return repr(100, true, true);
+	}
+	
 	public String repr(int elementDepth, boolean showType, boolean showProperties) {
 
 		StringWriter writer = new StringWriter();

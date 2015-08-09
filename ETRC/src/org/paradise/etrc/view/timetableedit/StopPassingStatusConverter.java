@@ -1,8 +1,4 @@
 package org.paradise.etrc.view.timetableedit;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.util.ui.databinding.converter.IModelValueConverter;
 

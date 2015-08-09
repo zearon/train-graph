@@ -1,7 +1,5 @@
 package org.paradise.etrc.dialog;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -20,6 +18,8 @@ import javax.swing.SwingConstants;
 
 //import com.borland.jbcl.layout.*;
 import org.paradise.etrc.MainFrame;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com

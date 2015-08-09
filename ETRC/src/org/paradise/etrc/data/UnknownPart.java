@@ -1,9 +1,5 @@
 package org.paradise.etrc.data;
 
-import java.util.Vector;
-import java.util.function.Supplier;
-
-import org.paradise.etrc.util.data.Tuple2;
 
 /**
  * Used as unknown element in train graph model when loading from file.

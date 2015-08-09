@@ -11,15 +11,10 @@ import java.awt.SystemColor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.Comparator;
 import java.util.Vector;
 import java.util.function.Function;
 
@@ -30,8 +25,11 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
@@ -45,7 +43,6 @@ import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Station;
-import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
@@ -56,10 +53,6 @@ import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 import static org.paradise.etrc.ETRC.__;
 
 import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
-
-import javax.swing.JSplitPane;
-import javax.swing.JToggleButton;
-import javax.swing.JSeparator;
 
 public class TrainRouteSectionEditDialiog extends JDialog {
 
@@ -376,10 +369,12 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 		}
 		
 		txtFulltrainname = new JTextField();
+		txtFulltrainname.setName("section.trainName");
+		txtFulltrainname.setEnabled(false);
 		txtFulltrainname.setText("fullTrainName");
 		txtFulltrainname.setBounds(110, 6, 186, 28);
+		allDataBindingComponent.add(txtFulltrainname);
 		contentPanel.add(txtFulltrainname);
-		txtFulltrainname.setColumns(10);
 		
 		JLabel lblFullTrainName = createJLabel("Full Train Name", new Font("Lucida Grande", Font.PLAIN, 12));
 		lblFullTrainName.setBounds(6, 12, 92, 16);
@@ -446,6 +441,8 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 		trainNameInEditor = origTrainName;
 		do_updateTrainNameTip();
 		do_updateTrainNameTip();
+		
+		cbTrainName.requestFocus();
 	}
 	
 	private void do_toggleLinkTrainPanel(boolean panelExpanded) {
@@ -495,10 +492,14 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 	private Boolean validateTrainName(String trainName) {
 		boolean duplicateName = !trainName.equals(origTrainName) && 
 				section.getRailLineChart().containTrainSectionWithTrainName(downGoing, trainName);
+		boolean valid = true;
 		
-		if (duplicateName) {
+		if (trainName.length() < 1) {
+			updateTrainNameTip(TrainNameStatus.BlankTrain);
+		} else if (duplicateName) {
 			updateTrainNameTip(TrainNameStatus.DuplicateTrain);
 			new MessageBox(__("Cannot use duplicate train name. \nPlease use another train name.")).showMessage();
+			valid = false;
 		} else {
 			RailNetworkChart chart = section.getRailLineChart().getRailNetworkChart();
 			Train train = chart.findTrain(trainName);
@@ -509,7 +510,7 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 			}
 		}
 		
-		return !duplicateName;
+		return valid;
 	}
 	
 	private void updateTrainNameTip(TrainNameStatus status) {
@@ -517,6 +518,11 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 		Color fgColor = getForeground();
 		Color bgColor = getBackground();
 		switch (status) {
+		case BlankTrain:
+			text = __("This is a blank train");
+			fgColor = Color.GRAY;
+			bgColor = Color.decode("#99FF99");
+			break;
 		case NewTrain:
 			text = __("This is a new train");
 			fgColor = Color.BLACK;
@@ -625,5 +631,5 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 }
 
 enum TrainNameStatus {
-	NewTrain, ExistingTrain, DuplicateTrain
+	BlankTrain, NewTrain, ExistingTrain, DuplicateTrain
 }

@@ -1,7 +1,4 @@
 package org.paradise.etrc.data.v1;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
 
 import java.util.Comparator;
 import java.util.Vector;
@@ -22,13 +19,20 @@ import org.paradise.etrc.data.annotation.TGProperty;
 public class TrainRouteSection extends TrainGraphPart {
 	
 	// Use inherited name attributes as train name
-	public String getTrainName() { return getName(); }
+	public String getTrainName() { 
+		Train train = getTrain();
+		return train == null ? null : train.getName(); 
+	}
 	public void setTrainName(String name) {
-		if (getRailLineChart().containTrainSectionWithTrainName(downGoing, name)) {
-			throw new IllegalArgumentException("Parent rail line chart has duplicate train with the same name.");
-		}
+		Train train = getTrain();
+		if (train != null)
+			train.setName(name);
 		
-		setName(name); 
+//		if (name != null && name.length() > 0 && getRailLineChart().containTrainSectionWithTrainName(downGoing, name)) {
+//			throw new IllegalArgumentException("Parent rail line chart has duplicate train with the same name.");
+//		}
+		
+		stops.forEach(stop -> stop.setTrainName(name));
 	}
 	
 	@TGProperty
@@ -66,6 +70,10 @@ public class TrainRouteSection extends TrainGraphPart {
 	private Vector<Stop> stops = new Vector<> ();
 	public Vector<Stop> allStops() { return stops; }
 	
+	public boolean isBlank() {
+		return name == null || name.length() < 1;
+	}
+	
 	public Train getTrain() {
 		RailroadLineChart lineChart = (RailroadLineChart) getParent();
 		if (lineChart == null)
@@ -82,7 +90,7 @@ public class TrainRouteSection extends TrainGraphPart {
 		stops.forEach(stop -> stop.setTrainName(getTrainName()));
 	}
 	
-	public void createEmptySection() {
+	public void initAsEmptySection() {
 		RailroadLine railLine = getRailLine();
 		if (railLine == null)
 			return;
@@ -131,6 +139,36 @@ public class TrainRouteSection extends TrainGraphPart {
 		}
 	}
 	
+	public static TrainRouteSection createEmptyTrainRouteSection(
+			RailroadLineChart lineChart, boolean downGoing, String name) {
+
+		TrainRouteSection newSection = TrainGraphFactory.createInstance(TrainRouteSection.class);
+		if (name != null)
+			newSection.setName(name);
+		
+		newSection.setParent(lineChart);
+		newSection.setRoot(lineChart.getRoot());
+		newSection.downGoing = downGoing;
+		newSection.setRailLineChart(lineChart);
+		
+		lineChart.railroadLine.getAllStations().stream()
+			.map(station -> Stop.createStopFromStation(station, name))
+			.forEachOrdered(newSection.stops::add);
+		
+//		createTrainForTrainRouteSection(newSection);
+		
+		return newSection;
+	}
+	
+//	public static Train createTrainForTrainRouteSection(TrainRouteSection section) {
+//		RailNetworkChart chart = section.getRailLineChart().getRailNetworkChart();
+//		Train train = chart.findTrain(section.getName());
+//		if (train != null)
+//			return train;
+//		
+//		train = TrainGraphFactory.createInstance(Train.class, section.getName());
+//	}
+	
 	/**
 	 * Should only be used in parsing imported trains.
 	 * @param train
@@ -145,10 +183,9 @@ public class TrainRouteSection extends TrainGraphPart {
 		section.setRailLineChart(railLineChart);
 		section.downGoing = downGoing;
 		
-		section.createEmptySection();
+		section.initAsEmptySection();
 		
-		int stopIndex = 0, firstStopIndex = -1, lastStopIndex = -1, stopCount = 0;
-		for (Stop stop : section.stops) {
+		int stopIndex = 0, firstStopIndex = -1, lastStopIndex = -1, stopCount = 0;		for (Stop stop : section.stops) {
 			stop.setTrainName(train.getName());
 			Stop stopInTrain = train.findStop(stop.getName());
 			if (stopInTrain != null) {

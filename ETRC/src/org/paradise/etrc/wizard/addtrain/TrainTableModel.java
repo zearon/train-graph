@@ -1,11 +1,11 @@
 package org.paradise.etrc.wizard.addtrain;
 
-import static org.paradise.etrc.ETRC.__;
-
 import javax.swing.table.AbstractTableModel;
 
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class TrainTableModel extends AbstractTableModel {
 	private static final long serialVersionUID = 1014817974495127589L;

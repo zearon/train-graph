@@ -1,7 +1,5 @@
 package org.paradise.etrc.dialog;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -22,6 +20,8 @@ import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.util.ui.widget.table.JEditTable;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com

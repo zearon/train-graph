@@ -1,39 +1,31 @@
 package org.paradise.etrc.view.network;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-
-import org.paradise.etrc.ETRC;
-import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.data.TrainGraphFactory;
-import org.paradise.etrc.data.v1.TrainGraph;
-import org.paradise.etrc.dialog.MessageBox;
-import org.paradise.etrc.filter.ImageFilter;
-import org.paradise.etrc.filter.TRCFilter;
-import org.paradise.etrc.util.Config;
-
-import javax.swing.BoxLayout;
-
 import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import org.paradise.etrc.ETRC;
+import org.paradise.etrc.MainFrame;
+import org.paradise.etrc.controller.action.ActionFactory;
+import org.paradise.etrc.data.v1.TrainGraph;
+import org.paradise.etrc.dialog.MessageBox;
+import org.paradise.etrc.filter.ImageFilter;
+import org.paradise.etrc.util.Config;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class RailNetworkEditorView extends JPanel {
 
 	TrainGraph trainGraph;
 	private boolean ui_inited;
+	JScrollPane scrollPane;
 	private MapPanel mapPanel;
 	MainFrame mainFrame;
 	
@@ -47,7 +39,7 @@ public class RailNetworkEditorView extends JPanel {
 		
 		setLayout(new BorderLayout(0, 0));
 		
-		JScrollPane scrollPane = new JScrollPane();
+		scrollPane = new JScrollPane();
 		add(scrollPane, BorderLayout.CENTER);
 		
 		mapPanel = new MapPanel(trainGraph);
@@ -65,14 +57,16 @@ public class RailNetworkEditorView extends JPanel {
 		add(topPanel, BorderLayout.NORTH);
 		
 		JSlider slider = new JSlider();
+		slider.setMaximum(255);
+		slider.setBounds(130, 6, 150, 29);
+		mapPanel.add(slider);
 		slider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				mapPanel.alpha_value = 255 - slider.getValue();
 				mapPanel.repaint();
 			}
 		});
-		slider.setMaximum(255);
-		topPanel.add(slider);
+//		topPanel.add(slider);
 		
 		JPanel leftPanel = new JPanel();
 		add(leftPanel, BorderLayout.WEST);
@@ -86,6 +80,7 @@ public class RailNetworkEditorView extends JPanel {
 		
 		if (ui_inited) {
 			mapPanel.setModel(trainGraph);
+			scrollPane.setPreferredSize(mapPanel.getPreferredSize());
 		}
 	}
 

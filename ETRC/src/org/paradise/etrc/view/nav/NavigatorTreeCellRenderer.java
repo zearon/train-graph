@@ -1,8 +1,4 @@
 package org.paradise.etrc.view.nav;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.Color;
 import java.awt.Component;
 

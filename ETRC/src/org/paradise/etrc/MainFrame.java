@@ -47,6 +47,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.tree.TreePath;
 
@@ -142,6 +143,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	public JLabel statusBarMain = new JLabel();
 	public JLabel statusBarRight = new JLabel();
+	private Timer statusBarTimerMain = null;
+	private Timer statusBarTimerRight = null;
 	
 	public TrainGraph trainGraph;
 
@@ -400,9 +403,11 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 		this.setJMenuBar(loadMenu());
 
-		statusBarMain = loadStatusBar(__("Status: Normal"));
+		statusBarMain = loadStatusBar(null);
+		setStatusMain(__("Status: Normal"), false);
 		statusBarEmpty = loadStatusBar(null);
-		statusBarRight = loadStatusBar(__("Status: Normal"));
+		statusBarRight = loadStatusBar(null);
+		setStatusRight(__("Status: Normal"), false);
 		
 		statusPanel = new JPanel();
 		statusPanel.setLayout(new BorderLayout());
@@ -852,12 +857,31 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	// }}
 	
-	private void setStatusMain(String status) {
-		//
+	private void setStatusMain(String status, boolean isTempStatus) {
+		if (statusBarTimerMain == null)
+			statusBarTimerMain = new Timer(3000, e -> statusBarMain.setText(__("Status: Normal")));
+		
+		setStatus(statusBarMain, statusBarTimerMain, status, isTempStatus);
 	}
 	
-	private void setStatusRight(String status) {
+	private void setStatusRight(String status, boolean isTempStatus) {
+		if (statusBarTimerRight == null)
+			statusBarTimerRight = new Timer(3000, e -> statusBarRight.setText(__("Status: Normal")));
 		
+		setStatus(statusBarRight, statusBarTimerRight, status, isTempStatus);
+	}
+	
+	private void setStatus(JLabel statusBar, Timer statusBarTimer, String status,
+			boolean isTempStatus) {
+		
+		if (statusBarTimer.isRunning())
+			statusBarTimer.stop();
+		
+		statusBar.setText(status);
+		
+		if (isTempStatus) {
+			statusBarTimer.start();
+		}
 	}
 
 	private void initChart() {
@@ -928,10 +952,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			ActionManager.getInstance().markModelSaved();
 			
 			do_UpdateRecentFilesMenu();
-			this.statusBarMain.setText(__("File Saved."));
+			setStatusMain(__("File Saved."), true);
 		} catch (IOException ex) {
 			System.err.println("Err:" + ex.getMessage());
-			this.statusBarMain.setText(__("Unable to save the graph."));
+			new MessageBox(__("Unable to save the graph.")).showMessage();
 		}
 	}
 	
@@ -944,7 +968,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		for (String filePath : Config.getInstance().getRecentOpenedFiles()) {
 			JMenuItem item = new JMenuItem(filePath);
-			item.setFont(new Font(__("FONTNAME"), 0, 12));
+			item.setFont(new Font(__("FONT_NAME"), 0, 12));
 			item.setName(filePath);
 			item.addActionListener(this::menuItem_OpenRecentFile);
 			recentFileMenuItems.add(item);

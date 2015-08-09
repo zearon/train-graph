@@ -1,8 +1,4 @@
 package org.paradise.etrc.view;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.Container;
 
 import javax.swing.tree.TreePath;

@@ -1,23 +1,14 @@
 package org.paradise.etrc.data.v1;
 
-import static org.paradise.etrc.ETRC.__;
-
-import java.awt.Color;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Vector;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,7 +17,8 @@ import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
-import org.paradise.etrc.util.data.Tuple2;
+
+import static org.paradise.etrc.ETRC.__;
 
 @TGElementType(name="RailLine Chart")
 public class RailroadLineChart extends TrainGraphPart {
@@ -117,20 +109,14 @@ public class RailroadLineChart extends TrainGraphPart {
 	}
 
 	public void addTrain(Train loadingTrain) {
-//		if (getTrainNum() >= MAX_TRAIN_NUM)
-//			return;
-
 		if (isLoaded(loadingTrain)) {
 			updateTrain(loadingTrain);
 			return;
 		}
-
-//		if (loadingTrain.color == null)
-//			loadingTrain.color = loadingTrain.getDefaultColor();
-//			loadingTrain.color = getNextTrainColor();
-
-//		this._trains[getTrainNum()] = loadingTrain;
 		trains.add(loadingTrain);
+		RailNetworkChart networkChart = getRailNetworkChart();
+		if (networkChart != null)
+			networkChart.addTrain(loadingTrain);
 
 		switch (loadingTrain.isDownTrain(railroadLine)) {
 		case Train.DOWN_TRAIN:
@@ -140,20 +126,6 @@ public class RailroadLineChart extends TrainGraphPart {
 			uNum++;
 			break;
 		}
-//		setTrainNum(getTrainNum() + 1);
-
-//	    String direction="";
-//	    switch(loadingTrain.isDownTrain(circuit)){
-//	      case Train.DOWN_TRAIN:
-//	        direction = "下行";
-//	        break;
-//	      case Train.UP_TRAIN:
-//	        direction = "上行";
-//	        break;
-//	      default:
-//	        direction = "未知";
-//	    }
-//	    System.out.println(loadingTrain.getTrainName(circuit) + "次" + direction);
 		
 		loadingTrain.addTrainChangedListener(this::onTrainChanged);
 		fireChartChangedEvent();
@@ -196,6 +168,8 @@ public class RailroadLineChart extends TrainGraphPart {
 		Train train = trains.remove(index);
 		removeTrainRouteSectionForTrain(train.getName());
 		trains.remove(index).removeTrainChangedListener(this::onTrainChanged);
+		
+		// TODO: 删除LineChart中的Train的时候，考虑删除NetworkChart中的孤儿Train
 
 		fireChartChangedEvent();
 	}
@@ -206,6 +180,8 @@ public class RailroadLineChart extends TrainGraphPart {
 		
 		trains.remove(theTrain);
 		removeTrainRouteSectionForTrain(theTrain.getName());
+		
+		// TODO: 删除LineChart中的Train的时候，考虑删除NetworkChart中的孤儿Train
 		
 		theTrain.removeTrainChangedListener(this::onTrainChanged);
 		fireChartChangedEvent();

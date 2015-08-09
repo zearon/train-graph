@@ -2,14 +2,9 @@ package org.paradise.etrc;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
-import java.util.StringJoiner;
-import java.util.stream.Stream;
 
 import org.paradise.etrc.data.TrainGraphPart;
-import org.paradise.etrc.data.v1.TrainGraph;
 
 /**
  * Utility class

@@ -3,7 +3,6 @@ package org.paradise.etrc.data.skb;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.Instant;
@@ -27,7 +26,6 @@ import static org.paradise.etrc.ETRC.__;
 
 import static org.paradise.etrc.ETRCUtil.DEBUG;
 import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
-import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
 import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
 
 public class ETRCSKB {

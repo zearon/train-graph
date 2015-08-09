@@ -1,7 +1,5 @@
 package org.paradise.etrc.view.chart.traindrawing;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -10,6 +8,8 @@ import java.awt.Rectangle;
 
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.view.chart.ChartView;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class TrainNameRect {
     private ChartPoint anchor;

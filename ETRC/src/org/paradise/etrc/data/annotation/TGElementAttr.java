@@ -1,8 +1,4 @@
 package org.paradise.etrc.data.annotation;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import org.paradise.etrc.data.TrainGraphPart;
 
 public class TGElementAttr {

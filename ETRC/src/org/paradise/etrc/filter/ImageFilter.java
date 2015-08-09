@@ -1,14 +1,11 @@
 package org.paradise.etrc.filter;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.swing.filechooser.FileFilter;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class ImageFilter extends FileFilter {
 	static String[] suffixStream = {".gif", ".jpg", ".jpeg", ".png"};

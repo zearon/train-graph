@@ -1,7 +1,5 @@
 package org.paradise.etrc.wizard;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -25,6 +23,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
+
+import static org.paradise.etrc.ETRC.__;
 
 public abstract class WizardDialog extends JDialog {
 	private static final long serialVersionUID = -5409636948664788767L;

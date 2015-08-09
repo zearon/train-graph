@@ -3,9 +3,6 @@ import java.awt.Component;
 
 import javax.swing.JMenu;
 import javax.swing.JToolBar;
-import javax.swing.tree.TreePath;
-
-import org.paradise.etrc.view.nav.Navigator;
 
 public interface IView {
 	

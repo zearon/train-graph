@@ -1,7 +1,5 @@
 package org.paradise.etrc.wizard.addtrain;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -21,6 +19,8 @@ import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.wizard.WizardDialog;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class WZTimeEdit extends WizardDialog {
 	private static final long serialVersionUID = -1097100938159035740L;

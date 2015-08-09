@@ -1,7 +1,5 @@
 package org.paradise.etrc.dialog;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -19,6 +17,8 @@ import javax.swing.border.EmptyBorder;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.skb.ETRCLCB;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class XianluSelectDialog extends JDialog {
 	private static final long serialVersionUID = 1389706992939223725L;

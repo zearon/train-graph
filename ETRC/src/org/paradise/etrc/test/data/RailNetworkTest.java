@@ -1,15 +1,10 @@
 package org.paradise.etrc.test.data;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.junit.After;
@@ -20,8 +15,10 @@ import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.data.v1.RailNetwork;
 import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.RailroadLineChart;
-import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.TrainGraph;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class RailNetworkTest {
 	

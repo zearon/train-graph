@@ -1,10 +1,10 @@
 package org.paradise.etrc.controller.action;
 
+import org.paradise.etrc.controller.ActionManager;
+
 import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRCUtil.*;
-
-import org.paradise.etrc.controller.ActionManager;
+import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
 
 public abstract class UIAction {
 	protected static int idCounter = 0;

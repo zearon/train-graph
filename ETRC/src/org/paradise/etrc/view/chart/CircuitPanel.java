@@ -1,7 +1,5 @@
 package org.paradise.etrc.view.chart;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -19,6 +17,8 @@ import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.slice.ChartSlice;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com

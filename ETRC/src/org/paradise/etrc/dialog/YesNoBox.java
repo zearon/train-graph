@@ -1,7 +1,5 @@
 package org.paradise.etrc.dialog;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -20,6 +18,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.paradise.etrc.ETRC;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com

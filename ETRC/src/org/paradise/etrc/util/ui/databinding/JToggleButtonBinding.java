@@ -1,16 +1,8 @@
 package org.paradise.etrc.util.ui.databinding;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.Enumeration;
 import java.util.function.Consumer;
 
-import javax.swing.AbstractButton;
 import javax.swing.JToggleButton;
 
 /**

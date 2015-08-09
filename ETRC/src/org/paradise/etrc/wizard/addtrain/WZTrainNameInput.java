@@ -1,7 +1,5 @@
 package org.paradise.etrc.wizard.addtrain;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -24,6 +22,8 @@ import javax.swing.text.DefaultCaret;
 
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.wizard.WizardDialog;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class WZTrainNameInput extends WizardDialog {
 	private static final long serialVersionUID = -874417475779045052L;

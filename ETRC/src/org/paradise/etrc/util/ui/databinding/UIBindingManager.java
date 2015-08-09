@@ -1,10 +1,5 @@
 package org.paradise.etrc.util.ui.databinding;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.Component;
-import java.awt.Container;
 import java.util.HashMap;
 import java.util.Stack;
 import java.util.Vector;
@@ -13,16 +8,12 @@ import java.util.function.Function;
 
 import javax.swing.ButtonGroup;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JList;
-import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import javax.swing.text.JTextComponent;
 
 import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.util.data.Tuple2;
 import org.paradise.etrc.util.ui.JColorChooserLabel;
-import org.paradise.etrc.util.ui.databinding.converter.IValueTypeConverter;
 
 
 public class UIBindingManager {

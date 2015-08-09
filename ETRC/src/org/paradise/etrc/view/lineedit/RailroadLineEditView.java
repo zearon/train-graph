@@ -1,14 +1,9 @@
 package org.paradise.etrc.view.lineedit;
 
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Point;
@@ -18,50 +13,41 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedHashSet;
 import java.util.Vector;
 import java.util.stream.Stream;
 
-import javafx.scene.shape.Line;
-
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellEditor;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.data.util.BOMStripperInputStream;
+import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.RailNetwork;
 import org.paradise.etrc.data.v1.RailroadLine;
-import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.TrainGraph;
-import org.paradise.etrc.data.TrainGraphFactory;
-import org.paradise.etrc.data.TrainGraphPart;
 import org.paradise.etrc.dialog.CircuitMakeDialog;
 import org.paradise.etrc.dialog.InfoDialog;
 import org.paradise.etrc.dialog.MessageBox;
@@ -70,11 +56,13 @@ import org.paradise.etrc.filter.CIRFilter;
 import org.paradise.etrc.filter.CRSFilter;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.util.Config;
-import javax.swing.JSeparator;
-import javax.swing.SwingConstants;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
+import org.paradise.etrc.util.ui.widget.table.ColorTableCellEditor;
+import org.paradise.etrc.util.ui.widget.table.ColorTableCellRender;
+
+import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.DEBUG;
+import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
 
 public class RailroadLineEditView extends JPanel {
 	private static final long serialVersionUID = 8501387955756137148L;
@@ -487,9 +475,10 @@ public class RailroadLineEditView extends JPanel {
 
 		railroadLineTableModel = new RailroadLineTableModel(railroadLineTable, null);
 		railroadLineTable.setModel(railroadLineTableModel);
-		railroadLineTable.getColumnModel().getColumn(0).setPreferredWidth(30);
+		railroadLineTable.getColumnModel().getColumn(0).setPreferredWidth(10);
 		railroadLineTable.getColumnModel().getColumn(1).setPreferredWidth(160);
-		railroadLineTable.getColumnModel().getColumn(2).setPreferredWidth(60);
+		railroadLineTable.getColumnModel().getColumn(2).setPreferredWidth(20);
+		railroadLineTable.getColumnModel().getColumn(3).setPreferredWidth(20);
 
 		railroadLineTable.getSelectionModel().addListSelectionListener(
 				new ListSelectionListener() {
@@ -527,6 +516,13 @@ public class RailroadLineEditView extends JPanel {
 //		for (int i = 0; i < circuitTable.getColumnCount(); i++) {
 			railroadLineTable.getColumn(railroadLineTable.getColumnName(1))
 					.setCellRenderer(renderer);
+			
+			// 颜色栏的渲染器及编辑器
+			ColorTableCellRender colorRenderer = new ColorTableCellRender();
+			railroadLineTable.setDefaultRenderer(Color.class, colorRenderer);
+
+			ColorTableCellEditor colorEditor = new ColorTableCellEditor();
+			railroadLineTable.setDefaultEditor(Color.class, colorEditor);
 //		}
 	}
 

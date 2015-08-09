@@ -1,10 +1,5 @@
 package org.paradise.etrc.util.ui;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -13,9 +8,6 @@ import java.awt.event.MouseListener;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-
-import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.util.data.ValueTypeConverter;
 
 public class JColorChooserLabel extends JLabel implements MouseListener, ActionListener {
 	private static JColorChooser colorChooser = new JColorChooser();
@@ -29,6 +21,10 @@ public class JColorChooserLabel extends JLabel implements MouseListener, ActionL
 	
 	public JColorChooserLabel(String text) {
 		super(text);
+		init();
+	}
+	
+	public JColorChooserLabel(Color color) {
 		init();
 	}
 	

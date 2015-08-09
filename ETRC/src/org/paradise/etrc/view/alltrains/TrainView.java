@@ -1,14 +1,9 @@
 package org.paradise.etrc.view.alltrains;
 
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.DEBUG;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedReader;
@@ -29,18 +24,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.TableModelListener;
-import javax.swing.table.AbstractTableModel;
 
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
@@ -55,6 +44,10 @@ import org.paradise.etrc.filter.TRFFilter;
 import org.paradise.etrc.util.Config;
 import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
 import org.paradise.etrc.util.ui.widget.table.JEditTable;
+
+import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.DEBUG;
 
 /**
  * @author lguo@sina.com

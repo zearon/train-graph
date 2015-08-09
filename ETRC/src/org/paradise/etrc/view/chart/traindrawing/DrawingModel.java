@@ -1,8 +1,6 @@
 package org.paradise.etrc.view.chart.traindrawing;
 
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Vector;
 
 import org.paradise.etrc.data.v1.ChartSettings;

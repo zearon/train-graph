@@ -1,9 +1,5 @@
 package org.paradise.etrc.data.v1;
 
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -15,8 +11,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Vector;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -26,6 +20,11 @@ import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.data.event.RailroadLineChangeType;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.util.data.Tuple2;
+
+import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.DEBUG;
+import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
 
 /**
  * 由多条铁路线路组成的铁路网。

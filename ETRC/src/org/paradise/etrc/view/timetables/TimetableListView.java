@@ -1,30 +1,23 @@
 package org.paradise.etrc.view.timetables;
 
-import javax.swing.JPanel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.JScrollPane;
-import javax.swing.JButton;
-import javax.swing.LayoutStyle.ComponentPlacement;
-
-import java.awt.Font;
-
-import javax.swing.SwingConstants;
-
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.AbstractAction;
-import javax.swing.Action;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.RailNetworkChart;
-import org.paradise.etrc.data.v1.RailroadLine;
-import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.util.ui.widget.table.JEditTable;

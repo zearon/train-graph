@@ -1,20 +1,12 @@
 package org.paradise.etrc.dialog;
 
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileWriter;
 import java.time.Instant;
-import java.util.List;
-import java.util.Vector;
-import java.util.stream.Collectors;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoundedRangeModel;
@@ -29,8 +21,11 @@ import javax.swing.border.EmptyBorder;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.skb.ETRCSKB;
 import org.paradise.etrc.data.v1.RailNetworkChart;
-import org.paradise.etrc.data.v1.Train;
-import org.paradise.etrc.data.v1.TrainGraph;
+
+import static org.paradise.etrc.ETRC.__;
+
+import static org.paradise.etrc.ETRCUtil.DEBUG;
+import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
 
 /**
  * @author lguo@sina.com

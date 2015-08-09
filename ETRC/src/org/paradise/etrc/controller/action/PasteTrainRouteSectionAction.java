@@ -9,6 +9,8 @@ import javax.swing.JTable;
 import org.paradise.etrc.data.v1.TrainRouteSection;
 import org.paradise.etrc.view.timetableedit.TimetableEditSheetModel.PasteParameters;
 
+import com.sun.accessibility.internal.resources.accessibility;
+
 public class PasteTrainRouteSectionAction extends CompoundAction {
 	private Runnable callback;
 	private ChangeTableSelectionAction selectionAction;
@@ -54,6 +56,7 @@ public class PasteTrainRouteSectionAction extends CompoundAction {
 			callback.run();
 		
 		selectionAction._doAction();
+		accessibility.getBundle("test").getKeys();
 	}
 
 	@Override

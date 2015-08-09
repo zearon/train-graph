@@ -15,7 +15,6 @@ import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.v1.ChartSettings;
-import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.TrainGraph;
 
 /**

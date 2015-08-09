@@ -1,12 +1,9 @@
 package org.paradise.etrc.data;
 
 import java.util.List;
-import java.util.Vector;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import org.paradise.etrc.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 

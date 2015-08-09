@@ -1,7 +1,5 @@
 package org.paradise.etrc.view.dynamic;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -28,6 +26,8 @@ import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
+
+import static org.paradise.etrc.ETRC.__;
 
 
 public class RunningPanel extends JPanel {

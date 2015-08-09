@@ -1,22 +1,18 @@
 package org.paradise.etrc.controller;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.event.ActionEvent;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Vector;
 import java.util.function.Consumer;
 
 import javax.swing.JButton;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JTable;
-import javax.swing.table.TableModel;
 
-import org.paradise.etrc.controller.action.*;
+import org.paradise.etrc.controller.action.UIAction;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * Keep in track of all actions that may modify the underlying model,

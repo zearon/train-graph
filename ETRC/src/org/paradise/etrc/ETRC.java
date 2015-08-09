@@ -5,7 +5,6 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Toolkit;
-import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -65,13 +64,13 @@ public class ETRC {
   
   //Construct the application
   public ETRC() {
-	instance = this;
-	try	{
-		res = ResourceBundle.getBundle("resources.Messages");
-	}
-	catch (MissingResourceException ex)	{
-		res = null;
-	}
+		instance = this;
+		try	{
+			res = ResourceBundle.getBundle("resources.Messages");
+		}
+		catch (MissingResourceException ex)	{
+			res = null;
+		}
 
     frame = new MainFrame();
     //Validate frames that have preset sizes

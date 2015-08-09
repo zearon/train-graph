@@ -190,7 +190,7 @@ msgstr "退出(X)"
 
 #: src/org/paradise/etrc/MainFrame.java:451
 msgid "Settings"
-msgstr "设置(S)"
+msgstr "设置"
 
 #: src/org/paradise/etrc/MainFrame.java:453
 msgid "Margin..."

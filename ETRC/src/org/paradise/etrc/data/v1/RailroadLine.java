@@ -1,19 +1,15 @@
 package org.paradise.etrc.data.v1;
 
-import static org.paradise.etrc.ETRC.__;
-
-import java.awt.Event;
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.List;
 import java.util.Vector;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.paradise.etrc.data.TrainGraphFactory;
@@ -23,6 +19,8 @@ import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
 import org.paradise.etrc.util.data.Tuple2;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * 运行图的区间，可以是一整条线路，也可以是某条干线的一段
@@ -50,6 +48,8 @@ public class RailroadLine extends TrainGraphPart {
 	public boolean visible = true;
 	@TGProperty
 	public boolean isProjection = false;
+	@TGProperty
+	public Color lineColor = Color.BLACK;
 	
 	public transient String dinfo = "";
 	private transient int id;
@@ -78,6 +78,7 @@ public class RailroadLine extends TrainGraphPart {
 		this.multiplicity = 2;
 		this.zindex = 1;
 		this.dispScale = 1.0f;
+		lineColor = Color.BLACK;
 		
 		appendStation(TrainGraphFactory.createInstance(Station.class)
 				.setProperties(0, 1, false));

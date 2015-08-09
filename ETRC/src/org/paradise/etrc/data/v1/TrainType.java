@@ -1,26 +1,15 @@
 package org.paradise.etrc.data.v1;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Stroke;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.Vector;
-import java.util.function.Supplier;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.paradise.etrc.data.TrainGraphPart;
-import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.data.annotation.TGProperty;
-import org.paradise.etrc.util.data.Tuple2;
+
+import static org.paradise.etrc.ETRC.__;
 
 @TGElementType(name="Train Type", printInOneLine=true)
 public class TrainType extends TrainGraphPart {

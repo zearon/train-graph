@@ -1,18 +1,17 @@
 package org.paradise.etrc.view.lineedit;
 
-import static org.paradise.etrc.ETRC.__;
-
+import java.awt.Color;
 import java.util.Vector;
 
 import javax.swing.JTable;
-import javax.swing.event.TableModelListener;
 
-import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.v1.RailNetwork;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class RailroadLineTableModel extends DefaultJEditTableModel {
 
@@ -40,7 +39,7 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 	 * @return int
 	 */
 	public int getColumnCount() {
-		return 3;
+		return 4;
 	}
 
 	/**
@@ -81,6 +80,8 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 			return String.class;
 		case 2:
 			return Integer.class;
+		case 3:
+			return Color.class;
 		case 0:
 			return Boolean.class;
 		default:
@@ -104,6 +105,8 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 			return raillines.get(rowIndex).getName();
 		case 2:
 			return new Integer(raillines.get(rowIndex).zindex);
+		case 3:
+			return raillines.get(rowIndex).lineColor;
 		case 0:
 			return new Boolean(raillines.get(rowIndex).visible);
 		default:
@@ -122,6 +125,9 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 			break;
 		case 2:
 			raillines.get(rowIndex).zindex = ((Number) aValue).intValue();
+			break;
+		case 3:
+			raillines.get(rowIndex).lineColor = (Color) aValue;
 			break;
 		case 0:
 			raillines.get(rowIndex).visible = ((Boolean) aValue).booleanValue();
@@ -145,6 +151,8 @@ public class RailroadLineTableModel extends DefaultJEditTableModel {
 			return __("Circuit");
 		case 2:
 			return __("zIndex");
+		case 3:
+			return __("Color");
 		case 0:
 			return __("Visible");
 		default:

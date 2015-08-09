@@ -8,9 +8,7 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Vector;
 
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;

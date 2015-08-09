@@ -3,16 +3,11 @@ package org.paradise.etrc.view.timetableedit;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.ListCellRenderer;
 import javax.swing.table.JTableHeader;
 

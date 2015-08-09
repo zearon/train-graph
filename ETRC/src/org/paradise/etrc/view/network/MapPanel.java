@@ -1,23 +1,12 @@
 package org.paradise.etrc.view.network;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import org.paradise.etrc.data.v1.TrainGraph;
-
-import com.sun.javafx.collections.MappingChange.Map;
 
 public class MapPanel extends JPanel {
 
@@ -84,7 +73,7 @@ public class MapPanel extends JPanel {
 		super.paintComponent(g);
 		
 		// TODO: 绘图Optimize
-//		g.getClipBounds();
+		g.setClip(0, 0, width, height);
 		
 		if (bgImage != null) {
 			g.drawImage(bgImage, 0, 0, null);

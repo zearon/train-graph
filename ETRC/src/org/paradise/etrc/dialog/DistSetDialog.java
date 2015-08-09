@@ -1,7 +1,5 @@
 package org.paradise.etrc.dialog;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
@@ -22,8 +20,9 @@ import javax.swing.border.TitledBorder;
 import org.paradise.etrc.MainFrame;
 //import com.borland.jbcl.layout.*;
 import org.paradise.etrc.data.v1.ChartSettings;
-import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.TrainGraph;
+
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com

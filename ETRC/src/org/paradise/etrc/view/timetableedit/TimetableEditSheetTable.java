@@ -46,6 +46,7 @@ public class TimetableEditSheetTable extends JEditTable {
 
 	JList<?> rowHeader;
 	JTable columnHeader;
+	JList<String> corner;
 
 	TimetableEditSheetModel tableModel;
 	RowHeaderModel rowHeaderModel;
@@ -226,14 +227,22 @@ public class TimetableEditSheetTable extends JEditTable {
 					// 这几个按键虽然在菜单中通过setAccelerator注册过，但是实际使用的时候没有反应。因此再次通过keyListener注册。
 					int modifiers = ETRC.isOSX10_7OrAbove() ? 
 							KeyEvent.META_DOWN_MASK : KeyEvent.CTRL_DOWN_MASK;
-					if ((e.getModifiersEx() & modifiers) != 0) {
+					boolean ctrlDown = (e.getModifiersEx() & modifiers) != 0;
+					boolean shiftDown = (e.getModifiersEx() & KeyEvent.SHIFT_DOWN_MASK) != 0;
+					if (ctrlDown) {
 						if (keyChar == 'c' || keyChar == 'C') {
-							copyColumns();
+							if (shiftDown)
+								copyCells();
+							else
+								copyColumns();
 						} else if (keyChar == 'x' || keyChar == 'X') {
 							cutColumns();
 						} else if (keyChar == 'v' || keyChar == 'V') {
 							boolean altDown = (e.getModifiersEx() & KeyEvent.ALT_DOWN_MASK) != 0;
-							pasteColumns(altDown);
+							if (shiftDown)
+								pasteCells(altDown);
+							else
+								pasteColumns(altDown);
 						}
 					}
 				}
@@ -251,7 +260,7 @@ public class TimetableEditSheetTable extends JEditTable {
 	}
 	
 	private void buildCorner() {
-		JList<String> corner = new JList<>(new String[] {__("车次"), __("类型"), __("车辆名")});
+		corner = new JList<>(new String[] {__("车次"), __("类型"), __("车辆名")});
 		corner.setCellRenderer(new CornerRenderer(this));
 		
 		JScrollPane timeTableScrollPane = getScrollPane();
@@ -677,9 +686,9 @@ public class TimetableEditSheetTable extends JEditTable {
 	
 	public void pasteColumns(boolean withOffset) {
 		DEBUG_MSG("paste columns");
-		int targetColumn = getSelectedColumn() + 1;
+		int targetColumn = getLastSelectedColumnIndex() + 1;
 		if (targetColumn >= getColumnCount())
-			targetColumn = getColumnCount();
+			targetColumn = getColumnCount() - 1;
 		tableModel.pasteTrainRouteSectionWithOffset(targetColumn, getIncrement());
 	}
 	
@@ -687,9 +696,7 @@ public class TimetableEditSheetTable extends JEditTable {
 		DEBUG_MSG("insert new train");
 		int columnIndex = getSelectedColumn();
 		if (!insertBeforeSelected) {
-			int[] selection = getSelectedColumns();
-			int count = selection.length;
-			columnIndex = count > 0 ? selection[count - 1] + 1 : -1;
+			columnIndex = getLastSelectedColumnIndex() + 1;
 		}
 		if (columnIndex < 0)
 			return;
@@ -703,6 +710,12 @@ public class TimetableEditSheetTable extends JEditTable {
 		// Show edit dialog
 		TrainRouteSectionEditDialiog dialog = new TrainRouteSectionEditDialiog(trainGraph, section, columnIndex);
 		dialog.showDialog();
+	}
+	
+	private int getLastSelectedColumnIndex() {
+			int[] selection = getSelectedColumns();
+			int count = selection.length;
+			return count > 0 ? selection[count - 1] : -1;
 	}
 	
 	// }}

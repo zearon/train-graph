@@ -1,13 +1,13 @@
 package org.paradise.etrc.view.timetables;
 
-import static org.paradise.etrc.ETRC.__;
-
 import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
 import org.paradise.etrc.util.ui.widget.table.JEditTable;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class TimetableListTableModel extends DefaultJEditTableModel {
 	public TrainGraph trainGraph;

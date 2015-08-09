@@ -1,7 +1,5 @@
 package org.paradise.etrc.dialog;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -21,9 +19,10 @@ import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.skb.ETRCLCB;
 import org.paradise.etrc.data.skb.LCBStation;
-import org.paradise.etrc.data.v1.RailNetwork;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.Station;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class CircuitMakeDialog extends JDialog {
 	private static final long serialVersionUID = -5891299808461231142L;

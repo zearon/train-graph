@@ -1,14 +1,8 @@
 package org.paradise.etrc.data.annotation;
-import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.*;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import org.paradise.etrc.data.TrainGraphPart;
 
 /**
  * 支持序列化及反序列化的标记, 用于标记继承自TrainGraphPart的TrainGraph元素.<br/>

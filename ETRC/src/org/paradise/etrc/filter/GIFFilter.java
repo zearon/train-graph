@@ -1,10 +1,10 @@
 package org.paradise.etrc.filter;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.io.File;
 
 import javax.swing.filechooser.FileFilter;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class GIFFilter extends FileFilter {
 

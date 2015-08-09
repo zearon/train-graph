@@ -74,13 +74,22 @@ public class SheetCellRenderer extends JLabel implements TableCellRenderer {
 	public Component getTableCellRendererComponent(JTable table, Object value, 
 			boolean isSelected, boolean hasFocus, int row, int column) {
 		
-    	this.table = table;
+		this.table = table;
 		this.model = (TimetableEditSheetModel) table.getModel();
-    	rowIndex = row;
-//    	columnIndex = column;
+		rowIndex = row;
+		//    	columnIndex = column;
+		TrainRouteSection section = (TrainRouteSection) value;
 		boolean isArriveLine = row % 2 == 0;
-		if (model.isRemarksRow(row)) {
-			setText(((TrainRouteSection) value).remarks);
+		if (section.isBlank()) {
+			setText("");
+			setBackground(table.getBackground());
+			setForeground(table.getBackground());
+			verticalText = false;			
+			
+			if (isSelected)
+				setBackground(TimetableEditView.selectBK);
+		} else if (model.isRemarksRow(row)) {
+			setText(section.remarks);
 			setBackground(table.getBackground());
 			setForeground(Color.BLACK);
 			verticalText = true;			

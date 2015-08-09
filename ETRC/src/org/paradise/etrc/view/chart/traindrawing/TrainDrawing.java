@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Stroke;
-import java.security.cert.PKIXRevocationChecker.Option;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;

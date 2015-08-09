@@ -1,6 +1,5 @@
 package org.paradise.etrc.controller.action;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Vector;
 import java.util.function.BiConsumer;
@@ -9,7 +8,6 @@ import java.util.function.IntFunction;
 
 import javax.swing.JTable;
 
-import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.data.v1.TrainRouteSection;
 import org.paradise.etrc.util.function.MultiConsumer;
 import org.paradise.etrc.util.function.TriConsumer;

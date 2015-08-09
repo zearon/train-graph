@@ -1,7 +1,5 @@
 package org.paradise.etrc.wizard.addtrain;
 
-import static org.paradise.etrc.ETRC.__;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -30,6 +28,8 @@ import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.wizard.WizardDialog;
+
+import static org.paradise.etrc.ETRC.__;
 
 public class WZOutPointSet extends WizardDialog {
 	private static final long serialVersionUID = 1558550027322954767L;

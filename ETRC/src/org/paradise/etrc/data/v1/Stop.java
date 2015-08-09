@@ -20,13 +20,13 @@ import static org.paradise.etrc.ETRC.__;
 @TGElementType(name="Stop", printInOneLine=true)
 public class Stop extends TrainGraphPart {
 	
-	public static final int NOT_GO_THROUGH 			= 0;
-	public static final int PASS					= 1;
-	public static final int STOP_START_STATION		= 2;
-	public static final int STOP_TERMINAL_STATION	= 3;
-	public static final int STOP_PASSENGER			= 4;
-	public static final int STOP_NON_PASSENGER		= 5;
-	public static final String[] STOP_STATUS_DESC = {
+	public static final int				NOT_GO_THROUGH				= 0;
+	public static final int				PASS									= 1;
+	public static final int				STOP_START_STATION		= 2;
+	public static final int				STOP_TERMINAL_STATION	= 3;
+	public static final int				STOP_PASSENGER				= 4;
+	public static final int				STOP_NON_PASSENGER		= 5;
+	public static final String[]	STOP_STATUS_DESC			= {
 		__("Not go through"), __("Pass"), 
 		__("Stop at start station"),
 		__("Stop at terminal station"),
@@ -60,10 +60,13 @@ public class Stop extends TrainGraphPart {
 	}
 	
 	private int stopMinutes;
-	public Integer getStopTime() { return stopMinutes; }
+	public Integer getStopTime() { 
+		return leaveTime >= 0 && arriveTime >= 0 ? 
+				(stopMinutes = getDuration(arriveTime, leaveTime)) : 0; 
+	}
 	public void setStopTIme(Integer stopMinutes) {
 		this.stopMinutes = stopMinutes;
-		leaveTime = addTime(arriveTime, stopMinutes);
+//		leaveTime = addTime(arriveTime, stopMinutes);
 		leaveTimeChanged = true;
 	}
 
@@ -71,7 +74,7 @@ public class Stop extends TrainGraphPart {
 	public Integer getArriveTime() { return arriveTime;}
 	public void setArriveTime(Integer arriveTime) {
 		this.arriveTime = arriveTime;
-		stopMinutes = getDuration(arriveTime, leaveTime);
+//		stopMinutes = getDuration(arriveTime, leaveTime);
 		arriveTimeChanged = true;
 	}
 
@@ -89,7 +92,7 @@ public class Stop extends TrainGraphPart {
 	@TGProperty
 	public void setArrive(String arrive) {
 		arriveTime = makeTimeFromStr(arrive, true);
-		stopMinutes = getDuration(arriveTime, leaveTime);
+//		stopMinutes = getDuration(arriveTime, leaveTime);
 		this.arrive = arrive;
 	}
 	public String getArriveTimeStr() {
@@ -97,12 +100,12 @@ public class Stop extends TrainGraphPart {
 		case NOT_GO_THROUGH:
 			return "";
 		case PASS:
-			if (arriveTime == -1)
+			if (arriveTime < 0)
 				return "↓";
 			else
 				return makeTimeStr(arriveTime);
 		default:
-			if (arriveTime == -1)
+			if (arriveTime < 0)
 				return "◯";
 			else
 			return makeTimeStr(arriveTime);
@@ -114,7 +117,7 @@ public class Stop extends TrainGraphPart {
 	public Integer getLeaveTime() { return leaveTime;}
 	public void setLeaveTime(Integer leaveTime) {
 		this.leaveTime = leaveTime;
-		stopMinutes = getDuration(arriveTime, leaveTime);
+//		stopMinutes = getDuration(arriveTime, leaveTime);
 		leaveTimeChanged = true;
 	}
 	public String getLeaveTimeStr() {
@@ -122,12 +125,12 @@ public class Stop extends TrainGraphPart {
 		case NOT_GO_THROUGH:
 			return "";
 		case PASS:
-			if (leaveTime == -1)
+			if (leaveTime < 0)
 				return "↓︎";
 			else
 				return makeTimeStr(leaveTime);
 		default:
-			if (leaveTime == -1)
+			if (leaveTime < 0)
 				return "◯";
 			else
 				return makeTimeStr(leaveTime);
@@ -147,7 +150,7 @@ public class Stop extends TrainGraphPart {
 	@TGProperty
 	public void setLeave(String leave) {
 		leaveTime = makeTimeFromStr(leave, true);
-		stopMinutes = getDuration(arriveTime, leaveTime);
+//		stopMinutes = getDuration(arriveTime, leaveTime);
 		this.leave = leave;
 	}
 	
@@ -197,9 +200,16 @@ public class Stop extends TrainGraphPart {
 		stop2.setProperties(trainName, stopStatus, arriveTime, leaveTime);
 	}
 	
+	public static Stop createStopFromStation(Station station, String trainName) {
+		Stop st = TrainGraphFactory.createInstance(Stop.class, station.getName())
+			.setProperties(trainName, NOT_GO_THROUGH, -1, -1);
+		
+		return st;
+	}
+	
 	public void applyStopTimeOffset(int offset) {
-		arriveTime += addTime(arriveTime, offset);
-		leaveTime += addTime(leaveTime, offset);
+		arriveTime = addTime(arriveTime, offset);
+		leaveTime = addTime(leaveTime, offset);
 		leaveTimeChanged = true;
 	}
 
@@ -324,6 +334,8 @@ public class Stop extends TrainGraphPart {
 	}
 	
 	public static int addTime(int time, int deltaInMinutes) {
+		if (time < 0)
+			return time;
 
 //		DEBUG_MSG("-------test addTime(%d, %d)", time, deltaInMinutes);
 //		DEBUG_MSG("hour:minute is %d:%d", hour, minute);

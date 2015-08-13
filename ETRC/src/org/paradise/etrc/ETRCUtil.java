@@ -139,13 +139,18 @@ public class ETRCUtil {
 		  boolean notSameInvoker = true;
 		  if (printInvoker) {
 			  int startLevel = 2;
+			  if (stackLevel >= Integer.MAX_VALUE - 2)
+			  	stackLevel = Integer.MAX_VALUE;
+			  else
+				  stackLevel += 2;
+			  
 			  StackTraceElement[] stackElements = new Throwable().getStackTrace();
 			  // System.err.println(stackElements[0]);	 		_printMsg
 			  // System.err.println(stackElements[1]);	  		DEBUG/DEBUG_MSG
 			  // System.err.println(stackElements[2]);	 		caller of DEBUG/DEBUG_MSG
 			  invoker.append( stackElements[startLevel].toString() );
-			  for (int level = 0; level < stackLevel && level < stackElements.length - 2; ++ level) {
-				  invoker.append( "\r\n" + stackElements[startLevel + level + 1] );
+			  for (int level = startLevel; (level < stackLevel) && (level < stackElements.length); ++ level) {
+				  invoker.append( "\r\n" + stackElements[level] );
 			  }
 			  
 			  if (lastInvoker == null || !lastInvoker.equals(invoker.toString())) {

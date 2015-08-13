@@ -1,6 +1,7 @@
 <project name="ETRC" basedir="." default="main">
   <property name="top.dir"     value="." />
   <property name="src.dir"     value="src"/>
+  <property name="lib.dir"     value="lib"/>
 
   <property name="build.dir"   value="build"/>
   <property name="classes.dir" value="${build.dir}/classes"/>
@@ -10,11 +11,12 @@
 	
 	<path id="project.classpath">  
     <pathelement location="/Applications/eclipse/plugins/org.junit_4.11.0.v201303080030/junit.jar"/>  
-		<!--
     <pathelement path="${java.class.path}"/>  
-    <filelist dir="${basedir}">   
+	  <fileset dir="${lib.dir}" includes="*.jar" />
+		<!--
+    <filelist dir="${basedir}" >   
          <include name="**/*.jar"/>   
-    </filelist>   
+    </filelist> 
     <dirset dir="${build}">   
           <include name="**/classes"/>   
           <exclude name="**/classes"/>   
@@ -31,6 +33,7 @@
     <bundleapp outputdirectory="release" name="ETRC" displayname="Jeff's Train Graph"
         identifier="ETRC"  mainclassname="${main-class}" icon="release/ETRC.icns">
   		<classpath file="${jar.dir}/ETRC.jar" />	
+  		<classpath file="${lib.dir}/*.jar" />	
   		<option value="-Dapple.laf.useScreenMenuBar=true"/>
   	</bundleapp>
   </target>

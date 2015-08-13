@@ -16,7 +16,7 @@ import javax.swing.SwingConstants;
 import javax.swing.table.TableCellEditor;
 
 import org.paradise.etrc.ETRC;
-import org.paradise.etrc.util.ui.JColorChooserLabel;
+import org.paradise.etrc.util.ui.widget.JColorChooserLabel;
 import org.paradise.etrc.view.alltrains.TrainListView;
 
 public class ColorTableCellEditor extends AbstractCellEditor implements

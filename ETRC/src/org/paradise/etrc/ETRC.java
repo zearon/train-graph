@@ -13,6 +13,14 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLProfile;
+
+import de.lessvoid.nifty.Nifty;
+import de.lessvoid.nifty.render.batch.BatchRenderDevice;
+import de.lessvoid.nifty.renderer.jogl.render.JoglBatchRenderBackendCoreProfileFactory;
+import de.lessvoid.nifty.spi.render.RenderDevice;
+
 
 /**
  * @author lguo@sina.com
@@ -22,10 +30,16 @@ import javax.swing.border.TitledBorder;
 public class ETRC {
   public static final String APP_NAME = "ETRC";
   
+  
   boolean packFrame = false;
   
   private static ETRC instance = null;
   private MainFrame frame;
+
+
+	private GLProfile	glp;
+	public GLCapabilities	glcaps;
+	public Nifty nifty;
   
   public static ResourceBundle res;
 
@@ -64,6 +78,8 @@ public class ETRC {
   
   //Construct the application
   public ETRC() {
+  	initOpenGL();
+  	
 		instance = this;
 		try	{
 			res = ResourceBundle.getBundle("resources.Messages");
@@ -138,6 +154,18 @@ public class ETRC {
 		}
 		
 		return isOSX;
+	}
+
+	public void initOpenGL() {
+		glp = GLProfile.getDefault();
+		glcaps = new GLCapabilities(glp);
+		glcaps.setDoubleBuffered(true);
+		
+		// init Nifty GUI Lib
+		initNiftyGUILib();
+	}
+	
+	private void initNiftyGUILib() {
 	}
 	
   //Main method

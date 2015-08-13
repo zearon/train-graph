@@ -28,6 +28,7 @@ import org.paradise.etrc.data.v1.TrainType;
 import static org.paradise.etrc.ETRC.__;
 
 import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import static org.paradise.etrc.ETRCUtil.DEBUG_STACKTRACE;
 
 /**
  * 主界面导航栏
@@ -333,13 +334,14 @@ public class Navigator extends JTree implements TreeSelectionListener {
 	public void setTrainGraph(TrainGraph trainGraph) {
 		this.trainGraph = trainGraph;
 		
-		updateNavigatorByTimetables();
+		// invoked by updateNavigatorByRailNetwork()
+//		updateNavigatorByTimetables();
 		
 		updateNavigatorByRailNetwork();
 		
 		updateNavigatorByTrainTypes();
 	}
-	
+
 	public void updateNavigatorByTimetables() {
 		DEBUG_MSG("可以优化, 参照updateNavigatorByRailNetwork");
 		

@@ -9,10 +9,11 @@ import javax.imageio.ImageIO;
 
 import org.paradise.etrc.data.Base64EncodingBinaryPart;
 import org.paradise.etrc.data.annotation.TGElementType;
+import org.paradise.etrc.util.image.ImageUtil;
 
 @TGElementType(name="RailNetwork Map")
 public class RailNetworkMap extends Base64EncodingBinaryPart {
-	BufferedImage image;
+	BufferedImage image, rgbPixelImage;
 	int height;
 	int width;
 	
@@ -52,18 +53,30 @@ public class RailNetworkMap extends Base64EncodingBinaryPart {
 	
 	public void loadFromFile(File imageFile) throws IOException {
 		image = null;
+		rgbPixelImage = null;
 		System.gc();
 		
 		image = ImageIO.read(imageFile);
 		height = image.getHeight();
 		width = image.getWidth();
-
 	}
 	
-	
-	
 	public BufferedImage getImage() {
-		return image;
+		if (rgbPixelImage == null) {
+			rgbPixelImage = ImageUtil.toRrbPixelImage(image);
+			
+			image.flush();
+			image = rgbPixelImage;
+			System.gc();
+		}
+		
+		return rgbPixelImage;
+	}
+
+	@Override
+	protected void loadComplete() {
+		// TODO Auto-generated method stub
+		super.loadComplete();
 	}
 
 	public int getHeight() {

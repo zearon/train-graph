@@ -4,7 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.function.Consumer;
 
-import org.paradise.etrc.util.ui.JColorChooserLabel;
+import org.paradise.etrc.util.ui.widget.JColorChooserLabel;
 
 public class JColorChooserLabelBinding extends UIBinding<Color, Color> implements PropertyChangeListener {
 	private JColorChooserLabel label;

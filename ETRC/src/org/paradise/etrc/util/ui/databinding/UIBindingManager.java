@@ -13,7 +13,7 @@ import javax.swing.text.JTextComponent;
 
 import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.util.data.Tuple2;
-import org.paradise.etrc.util.ui.JColorChooserLabel;
+import org.paradise.etrc.util.ui.widget.JColorChooserLabel;
 
 
 public class UIBindingManager {

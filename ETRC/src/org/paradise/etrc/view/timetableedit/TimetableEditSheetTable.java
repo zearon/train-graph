@@ -33,9 +33,10 @@ import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
 //import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.slice.ChartSlice;
-import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.data.Tuple2;
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
+import org.paradise.etrc.util.config.Config;
+
+import com.zearon.util.data.Tuple2;
+import com.zearon.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 

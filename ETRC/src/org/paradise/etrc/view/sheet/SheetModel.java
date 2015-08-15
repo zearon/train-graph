@@ -7,7 +7,8 @@ import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
-import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
+
+import com.zearon.util.ui.widget.table.DefaultJEditTableModel;
 
 import static org.paradise.etrc.ETRC.__;
 

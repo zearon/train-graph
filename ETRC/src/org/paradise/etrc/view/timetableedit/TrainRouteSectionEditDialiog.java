@@ -48,7 +48,8 @@ import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
 import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.dialog.MessageBox;
-import org.paradise.etrc.util.ui.databinding.UIBindingManager;
+
+import com.zearon.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
 

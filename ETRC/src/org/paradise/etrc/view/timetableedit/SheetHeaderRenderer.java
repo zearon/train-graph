@@ -23,7 +23,8 @@ import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
 import org.paradise.etrc.data.v1.TrainType;
-import org.paradise.etrc.util.ui.string.VerticalStringPainter;
+
+import com.zearon.util.ui.string.VerticalStringPainter;
 
 import static org.paradise.etrc.ETRC.__;
 

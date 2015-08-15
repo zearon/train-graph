@@ -32,12 +32,13 @@ import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
 import org.paradise.etrc.dialog.MessageBox;
-import org.paradise.etrc.util.ui.FontUtil;
-import org.paradise.etrc.util.ui.databinding.UIBindingManager;
-import org.paradise.etrc.util.ui.databinding.converter.FontStyleConverter;
-import org.paradise.etrc.util.ui.databinding.converter.ValueConverterManager;
-import org.paradise.etrc.util.ui.widget.JColorChooserLabel;
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
+
+import com.zearon.util.ui.FontUtil;
+import com.zearon.util.ui.databinding.UIBindingManager;
+import com.zearon.util.ui.databinding.converter.FontStyleConverter;
+import com.zearon.util.ui.databinding.converter.ValueConverterManager;
+import com.zearon.util.ui.widget.JColorChooserLabel;
+import com.zearon.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 

@@ -6,7 +6,7 @@ import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.YesNoBox;
-import org.paradise.etrc.util.Config;
+import org.paradise.etrc.util.config.Config;
 import org.paradise.etrc.view.alltrains.TrainView;
 import org.paradise.etrc.view.chart.ChartView;
 import org.paradise.etrc.wizard.Wizard;

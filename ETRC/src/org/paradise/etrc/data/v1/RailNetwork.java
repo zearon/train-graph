@@ -19,7 +19,8 @@ import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementType;
 import org.paradise.etrc.data.event.RailroadLineChangeType;
 import org.paradise.etrc.data.util.BOMStripperInputStream;
-import org.paradise.etrc.util.data.Tuple2;
+
+import com.zearon.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 

@@ -17,8 +17,9 @@ import org.paradise.etrc.controller.action.ActionFactory;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.filter.ImageFilter;
-import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.ui.map.MapPane;
+import org.paradise.etrc.util.config.Config;
+
+import com.zearon.util.ui.map.MapPane;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -68,14 +69,16 @@ public class RailNetworkEditorView extends JPanel {
 		comboBox.setMaximumSize(new Dimension(150, 32767));
 		toolBar.add(comboBox);
 		
-		JButton btnDebugFunc = new JButton("Debug Func Button");
-		btnDebugFunc.addActionListener(new ActionListener() {
+		JButton btnOpenGLWindow = new JButton("OpenGLWindow");
+		btnOpenGLWindow.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				mapPane.createGLWindow();
+				
 				System.out.println(mapPane.getBounds());
 				System.gc();
 			}
 		});
-		toolBar.add(btnDebugFunc);
+		toolBar.add(btnOpenGLWindow);
 		btnLoadBackgroundMap.addActionListener((e) -> {
 			do_LoadMap();
 		});

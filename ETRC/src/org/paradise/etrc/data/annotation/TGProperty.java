@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
  * <code>name</code> 	序列化时的元素名称.每一个TrainGraph元素的对象属性及列表属性在该元素的范围内
  * 						必须有唯一的名称.<br/>
  * 
- * @see org.paradise.etrc.util.data.ValueTypeConverter
+ * @see com.zearon.util.data.ValueTypeConverter
  * @author Jeff Gong
  *
  */

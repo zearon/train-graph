@@ -8,7 +8,8 @@ import javax.swing.AbstractListModel;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Station;
 import org.paradise.etrc.data.v1.TrainGraph;
-import org.paradise.etrc.util.data.Tuple2;
+
+import com.zearon.util.data.Tuple2;
 
 import static org.paradise.etrc.ETRC.__;
 

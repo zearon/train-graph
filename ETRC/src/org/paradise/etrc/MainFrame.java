@@ -75,9 +75,7 @@ import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.GIFFilter;
 import org.paradise.etrc.filter.TRCFilter;
 import org.paradise.etrc.filter.TRFFilter;
-import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.ui.databinding.UIBinding;
-import org.paradise.etrc.util.ui.databinding.UIBindingManager;
+import org.paradise.etrc.util.config.Config;
 import org.paradise.etrc.view.IView;
 import org.paradise.etrc.view.alltrains.AllTrainsView;
 import org.paradise.etrc.view.chart.ChartView;
@@ -91,6 +89,11 @@ import org.paradise.etrc.view.sheet.SheetView;
 import org.paradise.etrc.view.timetableedit.TimetableEditView;
 import org.paradise.etrc.view.timetables.TimetableListView;
 import org.paradise.etrc.view.traintypes.TrainTypesView;
+
+import com.zearon.util.ui.databinding.UIBinding;
+import com.zearon.util.ui.databinding.UIBindingManager;
+import com.zearon.util.ui.map.MapPane;
+import com.zearon.util.ui.map.MapPaneContainer;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -1579,6 +1582,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private void switchView(String cardName) {
 		navigatorContentCard.show(navigatorContentPanel, cardName);
 		Container view = viewMap.get(cardName);
+		if (view instanceof MapPaneContainer) {
+			
+		}
 		
 		int menuAnchor = 2;
 		JMenu editMenu = null, origEditMenu = menuBar.getMenu(menuAnchor);

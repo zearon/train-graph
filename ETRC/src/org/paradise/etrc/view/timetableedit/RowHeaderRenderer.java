@@ -11,7 +11,7 @@ import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 import javax.swing.table.JTableHeader;
 
-import org.paradise.etrc.util.data.Tuple2;
+import com.zearon.util.data.Tuple2;
 
 public class RowHeaderRenderer extends JLabel implements ListCellRenderer<Object> {
 	private static final long serialVersionUID = -3720951686492113933L;

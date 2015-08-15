@@ -4,7 +4,7 @@ import java.awt.Dimension;
 
 import javax.swing.ListSelectionModel;
 
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
+import com.zearon.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 

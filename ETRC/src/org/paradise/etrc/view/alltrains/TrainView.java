@@ -41,9 +41,10 @@ import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.TRFFilter;
-import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
+import org.paradise.etrc.util.config.Config;
+
+import com.zearon.util.ui.widget.table.DefaultJEditTableModel;
+import com.zearon.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 

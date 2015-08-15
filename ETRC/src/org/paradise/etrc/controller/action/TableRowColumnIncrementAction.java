@@ -2,7 +2,7 @@ package org.paradise.etrc.controller.action;
 
 import javax.swing.JTable;
 
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
+import com.zearon.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 

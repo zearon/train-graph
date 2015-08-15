@@ -40,10 +40,11 @@ import org.paradise.etrc.data.annotation.TGProperty;
 import org.paradise.etrc.data.v1.NullPart;
 import org.paradise.etrc.data.v1.RailroadLine;
 import org.paradise.etrc.data.v1.RailroadLineChart;
-import org.paradise.etrc.util.data.Tuple2;
-import org.paradise.etrc.util.data.Tuple3;
-import org.paradise.etrc.util.data.ValueTypeConverter;
-import org.paradise.etrc.util.function.MultiConsumer;
+
+import com.zearon.util.data.Tuple2;
+import com.zearon.util.data.Tuple3;
+import com.zearon.util.data.ValueTypeConverter;
+import com.zearon.util.function.MultiConsumer;
 
 import static org.paradise.etrc.ETRC.__;
 

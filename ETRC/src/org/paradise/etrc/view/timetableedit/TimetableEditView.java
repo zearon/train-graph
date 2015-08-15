@@ -15,8 +15,9 @@ import javax.swing.border.BevelBorder;
 
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.TrainGraph;
-import org.paradise.etrc.util.ui.databinding.UIBindingManager;
 import org.paradise.etrc.view.IView;
+
+import com.zearon.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
 

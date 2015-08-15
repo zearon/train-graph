@@ -55,9 +55,10 @@ import org.paradise.etrc.dialog.XianluSelectDialog;
 import org.paradise.etrc.filter.CIRFilter;
 import org.paradise.etrc.filter.CRSFilter;
 import org.paradise.etrc.filter.CSVFilter;
-import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.ui.widget.table.ColorTableCellEditor;
-import org.paradise.etrc.util.ui.widget.table.ColorTableCellRender;
+import org.paradise.etrc.util.config.Config;
+
+import com.zearon.util.ui.widget.table.ColorTableCellEditor;
+import com.zearon.util.ui.widget.table.ColorTableCellRender;
 
 import static org.paradise.etrc.ETRC.__;
 

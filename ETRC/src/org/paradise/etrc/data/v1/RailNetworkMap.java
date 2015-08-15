@@ -9,7 +9,8 @@ import javax.imageio.ImageIO;
 
 import org.paradise.etrc.data.Base64EncodingBinaryPart;
 import org.paradise.etrc.data.annotation.TGElementType;
-import org.paradise.etrc.util.image.ImageUtil;
+
+import com.zearon.util.image.ImageUtil;
 
 @TGElementType(name="RailNetwork Map")
 public class RailNetworkMap extends Base64EncodingBinaryPart {

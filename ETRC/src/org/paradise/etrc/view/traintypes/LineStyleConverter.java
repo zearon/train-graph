@@ -1,5 +1,5 @@
 package org.paradise.etrc.view.traintypes;
-import org.paradise.etrc.util.ui.databinding.converter.IModelValueConverter;
+import com.zearon.util.ui.databinding.converter.IModelValueConverter;
 
 import static org.paradise.etrc.ETRC.__;
 

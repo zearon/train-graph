@@ -24,8 +24,9 @@ import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.v1.ChartSettings;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.MessageBox;
-import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.ui.databinding.UIBindingManager;
+import org.paradise.etrc.util.config.Config;
+
+import com.zearon.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
 

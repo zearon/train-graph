@@ -15,6 +15,7 @@ import javax.swing.border.TitledBorder;
 
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
+import com.zearon.util.ui.map.GLWindowManager;
 
 import de.lessvoid.nifty.Nifty;
 import de.lessvoid.nifty.render.batch.BatchRenderDevice;
@@ -157,20 +158,13 @@ public class ETRC {
 	}
 
 	public void initOpenGL() {
-		glp = GLProfile.getDefault();
-		glcaps = new GLCapabilities(glp);
-		glcaps.setDoubleBuffered(true);
-		
-		// init Nifty GUI Lib
-		initNiftyGUILib();
-	}
-	
-	private void initNiftyGUILib() {
+		GLWindowManager.initOpenGL();
 	}
 	
   //Main method
   public static void main(String[] args) {
-	isOSX10_7OrAbove();
+  	System.out.println(String.join(" ", args));
+  	isOSX10_7OrAbove();
 	
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

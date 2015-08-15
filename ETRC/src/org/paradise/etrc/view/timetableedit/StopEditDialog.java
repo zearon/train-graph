@@ -33,9 +33,10 @@ import javax.swing.border.LineBorder;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.v1.Stop;
-import org.paradise.etrc.util.Config;
-import org.paradise.etrc.util.data.Tuple2;
-import org.paradise.etrc.util.ui.databinding.UIBindingManager;
+import org.paradise.etrc.util.config.Config;
+
+import com.zearon.util.data.Tuple2;
+import com.zearon.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
 

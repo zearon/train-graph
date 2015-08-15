@@ -19,7 +19,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.util.ui.widget.table.JEditTable;
+
+import com.zearon.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;
 

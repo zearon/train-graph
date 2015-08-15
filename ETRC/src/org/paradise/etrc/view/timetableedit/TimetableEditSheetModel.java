@@ -15,7 +15,8 @@ import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
-import org.paradise.etrc.util.ui.widget.table.DefaultJEditTableModel;
+
+import com.zearon.util.ui.widget.table.DefaultJEditTableModel;
 
 import static org.paradise.etrc.ETRC.__;
 

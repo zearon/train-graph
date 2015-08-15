@@ -1,6 +1,7 @@
 package org.paradise.etrc.view.timetableedit;
 import org.paradise.etrc.data.v1.Stop;
-import org.paradise.etrc.util.ui.databinding.converter.IModelValueConverter;
+
+import com.zearon.util.ui.databinding.converter.IModelValueConverter;
 
 public class StopPassingStatusConverter implements IModelValueConverter<Integer, String> {
 

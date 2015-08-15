@@ -19,13 +19,11 @@ public class $className extends $baseClassName {
 	 * Static property fields declaration
 	 */
 #foreach ( $item in $properties )
-	static final String prop_${item.propertyKeyName} 			= "${item.propertyName}"; 
+	static final String prop_${item.propertyKeyName} = "${item.propertyName}"; 
 #end
 
 	${className}() {
 		super();
-		
-		Properties_File = "${configFileName}";
 	}
 
 	/**
@@ -38,6 +36,16 @@ public class $className extends $baseClassName {
 #foreach ( $item in $properties )
 		defaultProp.setProperty(prop_${item.propertyKeyName}, "${item.defaultValue}");
 #end
+	}
+	
+	@Override
+	protected String getAppName() {
+		return "${appName}";
+	}
+	
+	@Override
+	protected String getConfigFileName() { 
+		return "${configFileName}"; 
 	}
 	
 	/**
@@ -79,7 +87,7 @@ public String get${item.propertyKeyName}() {
 protected ${item.valueType.getSimpleName()} afterGet${item.propertyKeyName}(${item.valueType.getSimpleName()} value) {
 		return value;
 	}
-	public ${item.valueType.getSimpleName()} beforeSet${item.propertyKeyName}(${item.valueType.getSimpleName()} value) {
+	protected ${item.valueType.getSimpleName()} beforeSet${item.propertyKeyName}(${item.valueType.getSimpleName()} value) {
 		return value;
 	}
 	

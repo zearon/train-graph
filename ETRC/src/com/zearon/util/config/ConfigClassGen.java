@@ -13,6 +13,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+import org.paradise.etrc.ETRC;
 
 
 /**
@@ -34,8 +35,8 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
  *			  new ConfigItem (String.class, "AutoLoadFilePath", "Auto_Load_File_Path", "/sdfsdfsdfd"),
  *			  new ConfigItem (int.class, "HttpProxyPort", "Http_Proxy_Port", "80"),
  *			};
- *			System.out.println(args[0]);
- *			new ConfigClassGen().generateConfigClass(args[0] + "/src", 
+ *			
+ *			new ConfigClassGen().generateConfigClass(ETRC.APP_NAME, args[0] + "/src", 
  *				ConfigGenerated.class.getCanonicalName(), "config.prop", properties);
  *		}
  * 		</code></pre>
@@ -47,12 +48,16 @@ public class ConfigClassGen {
 	private String baseClassName = ConfigBase.class.getSimpleName();
 	
 	/**
-	 * 
-	 * @param configClassSourceFilePath
-	 * @param configFileName
-	 * @param properties
+	 * Generate a java source code for a config class.
+	 * @param appName 	The name of the app which determines the saving path of config file according to OS specification.
+	 * 									For example, "ETRC" will make the config file stored at ${user.home}/Library/Application Support/ETRC/
+	 * @param configClassSourceFilePath 	The source file path of the project
+	 * @param destClassName								The full class name of the class to be generated
+	 * @param configFileName							The short file name (without path) of the app's config file to be saved on file system.
+	 * @param properties									a ConfigItem array describing all config items in config file.
 	 */
-	public void generateConfigClass(String sourceFilePath, String destClassName, String configFileName, ConfigItem[] properties) {
+	public void generateConfigClass(String appName, String sourceFilePath, 
+			String destClassName, String configFileName, ConfigItem[] properties) {
 		
 		String packageName, className;
 		
@@ -76,7 +81,8 @@ public class ConfigClassGen {
 		
 		Template template = ve.getTemplate("/com/zearon/util/config/ConfigTemplate");
 		VelocityContext ctx = new VelocityContext();
-		
+
+		ctx.put("appName", appName);
 		ctx.put("packageName", packageName);
 		ctx.put("className", className);
 		ctx.put("baseClassName", baseClassName);

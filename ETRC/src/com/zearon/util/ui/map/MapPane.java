@@ -240,7 +240,7 @@ public class MapPane extends JDesktopPane implements ComponentListener, Runnable
 	}
 	
 	private void createMapCanvas() {
-		mapCanvas = GLWindow.create(ETRC.getInstance().glcaps);
+		mapCanvas = GLWindowManager.createGLWindow();
 		mapCanvas.setUndecorated(true);
 		mapCanvas.setAlwaysOnTop(true);
 		mapCanvas.setVisible(true);

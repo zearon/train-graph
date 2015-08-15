@@ -13,8 +13,11 @@ import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
+import org.paradise.etrc.util.config.Config;
+
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
+import com.zearon.util.os.OSVersionUtil;
 import com.zearon.util.ui.map.GLWindowManager;
 
 import de.lessvoid.nifty.Nifty;
@@ -79,7 +82,7 @@ public class ETRC {
   
   //Construct the application
   public ETRC() {
-  	initOpenGL();
+  	init();
   	
 		instance = this;
 		try	{
@@ -133,30 +136,16 @@ public class ETRC {
   }
 
 	
-	static Boolean isOSX = null;
 	public static boolean isOSX10_7OrAbove() {
-		if (isOSX != null) {
-			return isOSX;
-		}
-		
-		isOSX = false;
-		if ("Mac OS X".equalsIgnoreCase(System.getProperty("os.name"))) {
-			String osVersionString = System.getProperty("os.version");
-			String[] versionParts = osVersionString.split("\\.");
-			if (versionParts.length >= 2) {
-				try {
-					int versionPart1Val = Integer.parseInt(versionParts[0]);
-					int versionPart2Val = Integer.parseInt(versionParts[1]);
-					if (versionPart1Val >= 10 && versionPart2Val >= 7) {
-						isOSX = true;
-					}
-				} finally {}
-			}
-		}
-		
-		return isOSX;
+		return OSVersionUtil.isOSX10_7OrAbove();
 	}
 
+	public void init() {
+  	initOpenGL();
+		
+  	Config.getInstance();
+	}
+	
 	public void initOpenGL() {
 		GLWindowManager.initOpenGL();
 	}

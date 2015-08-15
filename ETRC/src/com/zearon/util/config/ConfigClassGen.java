@@ -15,6 +15,34 @@ import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 
 
+/**
+ * Config class generator. <br/>
+ * Typical use can be achieved by following the the steps below: <br/>
+ * 1.	Create a intermediate <b>ConfigGenerated</b> class and leave it unchanged (which is 
+ * 		the destination of code generation). <br/>
+ * 2.	Create a <b>Config</b> class extending ConfigGenerated, which is the final
+ * 		config class.
+ * 3.	Add a main method in Config class, which utilize ConfigClassGen to generate 
+ * 		the source code for the intermediate class ConfigGenerated. <br/>
+ * 		The class hierarchy is Config -> ConfigGenerated -> com.zearon.util.ConfigBase. <br/>
+ * 		A sample main method is given as the following: <br/> <pre><code>
+ * 		public static void main(String... args) {
+ *			// set args[0] to ${project_loc:ETRC} in eclipse run configuration where ETRC is the project name
+ *			
+ *			ConfigItem[] properties = {
+ *			  new ConfigItem (Boolean.class, "AutoLoadFile", "Auto_Load_Last_Edit_File", "no"),
+ *			  new ConfigItem (String.class, "AutoLoadFilePath", "Auto_Load_File_Path", "/sdfsdfsdfd"),
+ *			  new ConfigItem (int.class, "HttpProxyPort", "Http_Proxy_Port", "80"),
+ *			};
+ *			System.out.println(args[0]);
+ *			new ConfigClassGen().generateConfigClass(args[0] + "/src", 
+ *				ConfigGenerated.class.getCanonicalName(), "config.prop", properties);
+ *		}
+ * 		</code></pre>
+ *
+ * @author Jeff Gong
+ *
+ */
 public class ConfigClassGen {
 	private String baseClassName = ConfigBase.class.getSimpleName();
 	

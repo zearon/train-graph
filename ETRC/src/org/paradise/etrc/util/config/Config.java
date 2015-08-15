@@ -20,7 +20,6 @@ import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
 import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
 
 public class Config extends ConfigGenerated {
-	public static final String NEW_FILE_NAME = __("Unnamed Train Graph");
 	static final int Prop_Recent_File_Size = 15;
 	
 	static String Prop_AUTO_LOAD_FILE = "Auto_Load_Last_Edit_File";
@@ -114,6 +113,9 @@ public class Config extends ConfigGenerated {
 	/*****************************************************************/
 	/* This part are in memory and has no need to be write to disks. */
 	/*****************************************************************/
+
+	public static final String NEW_FILE_NAME = __("Unnamed Train Graph");
+	
 	public  String getCurrentFile() {
 		return currentFile;
 	}
@@ -354,7 +356,5 @@ public class Config extends ConfigGenerated {
 		};
 		System.out.println(args[0]);
 		new ConfigClassGen().generateConfigClass(args[0] + "/src", ConfigGenerated.class.getCanonicalName(), "config.prop", properties);
-		
-		System.out.println(Integer.class.getSimpleName());
 	}
 }

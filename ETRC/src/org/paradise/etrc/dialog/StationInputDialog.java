@@ -29,7 +29,7 @@ import static org.paradise.etrc.ETRC.__;
  * @version 1.0
  */
 
-public class StationInputDialog extends JDialog implements ActionListener {
+public class StationInputDialog extends DialogBase implements ActionListener {
 	private static final long serialVersionUID = 9065758632068382095L;
 	JPanel panel = new JPanel();
 	JTable jTable1 = new JEditTable(__("station table"));

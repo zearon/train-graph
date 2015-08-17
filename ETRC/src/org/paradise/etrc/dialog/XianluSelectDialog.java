@@ -20,7 +20,7 @@ import org.paradise.etrc.data.skb.ETRCLCB;
 
 import static org.paradise.etrc.ETRC.__;
 
-public class XianluSelectDialog extends JDialog {
+public class XianluSelectDialog extends DialogBase {
 	private static final long serialVersionUID = 1389706992939223725L;
 	
 	private ETRCLCB lcb;

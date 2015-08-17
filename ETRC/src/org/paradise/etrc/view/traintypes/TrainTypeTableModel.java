@@ -1,9 +1,9 @@
 package org.paradise.etrc.view.traintypes;
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
 
+import com.zearon.util.ui.controller.action.UIAction;
 import com.zearon.util.ui.widget.table.DefaultJEditTableModel;
 import com.zearon.util.ui.widget.table.JEditTable;
 

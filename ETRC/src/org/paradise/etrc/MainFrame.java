@@ -6,6 +6,7 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Graphics;
@@ -31,6 +32,7 @@ import java.util.Vector;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -51,7 +53,6 @@ import javax.swing.Timer;
 import javax.swing.border.Border;
 import javax.swing.tree.TreePath;
 
-import org.paradise.etrc.controller.ActionManager;
 import org.paradise.etrc.data.ParsingException;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.skb.ETRCLCB;
@@ -78,27 +79,30 @@ import org.paradise.etrc.filter.TRFFilter;
 import org.paradise.etrc.util.config.Config;
 import org.paradise.etrc.view.IView;
 import org.paradise.etrc.view.alltrains.AllTrainsView;
-import org.paradise.etrc.view.chart.ChartView;
-import org.paradise.etrc.view.dynamic.DynamicView;
 import org.paradise.etrc.view.lineedit.RailroadLineEditView;
 import org.paradise.etrc.view.nav.Navigator;
 import org.paradise.etrc.view.nav.Navigator.NavigatorNodeType;
 import org.paradise.etrc.view.network.RailNetworkEditorView;
+import org.paradise.etrc.view.runningchart.RunningChartView;
+import org.paradise.etrc.view.runningchart.chart.ChartView;
+import org.paradise.etrc.view.runningchart.dynamic.DynamicView;
+import org.paradise.etrc.view.runningchart.sheet.SheetView;
 import org.paradise.etrc.view.settings.SettingsView;
-import org.paradise.etrc.view.sheet.SheetView;
 import org.paradise.etrc.view.timetableedit.TimetableEditView;
 import org.paradise.etrc.view.timetables.TimetableListView;
 import org.paradise.etrc.view.traintypes.TrainTypesView;
 
+import com.zearon.util.os.OSXUtil;
+import com.zearon.util.ui.controller.ActionManager;
 import com.zearon.util.ui.databinding.UIBinding;
 import com.zearon.util.ui.databinding.UIBindingManager;
-import com.zearon.util.ui.map.MapPane;
-import com.zearon.util.ui.map.MapPaneContainer;
+import com.zearon.util.ui.map.GLWindowManager;
+import com.zearon.util.ui.widget.StatusBar;
 
 import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG_ACTION;
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import static com.zearon.util.debug.DebugUtil.DEBUG_ACTION;
+import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
 
 /**
  * @author lguo@sina.com
@@ -107,6 +111,8 @@ import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
 
 public class MainFrame extends JFrame implements ActionListener, Printable {
 	private static final long serialVersionUID = 1L;
+	
+	public static final int	initialDividerLocation	= 200;
 	
 	private UIBindingManager uiBindingManager = UIBindingManager.getInstance(this);
 	
@@ -119,19 +125,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	CardLayout navigatorContentCard;
 	CardLayout toolbarContentCard;
 	CardLayout statusbarContentCard;
-	public JSplitPane splitPaneV;
-	public JSplitPane splitPaneH;
 	
 	private JPanel statusPanel;
 	private JMenuBar menuBar;
-	private JToolBar toolBar;
+	private JToolBar mainToolBar;
+	private JPanel toolBarContainer;
 	private JMenu menuTools; // Anchor of new edit menu of IView
 	private JLabel statusBarEmpty;
-
-	public JPanel raillineChartView;
-	public ChartView chartView;
-	public DynamicView runView;
-	public SheetView sheetView;
 	
 	private HashMap<String, Container> viewMap = new HashMap<> ();
 	public SettingsView settingsView;
@@ -140,20 +140,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public TrainTypesView trainTypesView;
 	public AllTrainsView allTrainsView;
 	public TimetableListView timetableListView;
+	public RunningChartView runningChartView;
 	public TimetableEditView timetableEditView;
 	
-	private boolean isShowRun = true;
-	
-	public JLabel statusBarMain = new JLabel();
-	public JLabel statusBarRight = new JLabel();
-	private Timer statusBarTimerMain = null;
-	private Timer statusBarTimerRight = null;
+	public StatusBar statusBarMain;
+	public StatusBar statusBarRight;
 	
 	public TrainGraph trainGraph;
 
-	private static final int MAX_TRAIN_SELECT_HISTORY_RECORD = 12;
-	public Vector<String> trainSelectHistory;
-	public JComboBox<String> cbTrainSelectHistory;
 	
 	private boolean firstTimeLoading = true;
 
@@ -166,9 +160,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	public MainFrame() {
 		if (instance == null)
 			instance = this;
-		
-		trainSelectHistory = new Vector<String>();
-		cbTrainSelectHistory = new JComboBox<String>(new DefaultComboBoxModel<String>(trainSelectHistory));
 				
 		initChart();
 		enableEvents(AWTEvent.WINDOW_EVENT_MASK);
@@ -199,10 +190,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				
 				// test circuitEditDialog
 				// DEBUG_ACTION(() -> circuitEditDialog.showDialog());
-				
-				if (ETRC.isOSX10_7OrAbove() && Config.getInstance().getFullScreenOnStartupForOSX()) {
-					addFullScreenModeSupportOnOSX();
-					setFullScreenModeOnOSX();
+
+				OSXUtil.addFullScreenModeSupportOnOSX(MainFrame.this);
+				if (Config.getInstance().getFullScreenOnStartupForOSX()) {
+					OSXUtil.setFullScreenModeOnOSX(MainFrame.this);
 				}
 				
 				navigator.expandAll(true);
@@ -227,20 +218,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			railLineEditView.setModel(trainGraph);
 			trainTypesView.setModel(trainGraph);
 			allTrainsView.setModel(trainGraph);
+			runningChartView.setModel(trainGraph);
 			timetableListView.setModel(trainGraph);
 			timetableEditView.setModel(trainGraph);
-			
-			chartView.setModel(trainGraph);
-			sheetView.setModel(trainGraph);
-			runView.setModel(trainGraph);
-	
-			chartView.updateData();
-			chartView.resetSize();
-	
-			sheetView.updateData();
-			sheetView.refresh();
-			
-			runView.refresh();
 			
 			navigator.expandAll(true);
 		}
@@ -248,53 +228,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	public void validateModel() {
 		
-	}
-	
-	/**
-	 * If OS is Mac OS X and Version >= 10.7, then add full screen support.
-	 */
-	public void addFullScreenModeSupportOnOSX() {
-		DEBUG_MSG("OS Name=%s, OS Version=%s\n", System.getProperty("os.name"), System.getProperty("os.version"));
-		if (!ETRC.isOSX10_7OrAbove()) 
-			return;
-		
-		// com.apple.eawt.FullScreenUtilities.setWindowCanFullScreen(this,true);
-		
-		// In case of the need to compile and run on other platforms,
-		// replace the method invocation with reflection style to avoid
-		// ClassNotFound Exceptions.
-		try {
-			Class<?> clz = Class.forName("com.apple.eawt.FullScreenUtilities");
-			java.lang.reflect.Method method = clz.getMethod("setWindowCanFullScreen", java.awt.Window.class, boolean.class);
-			method.invoke(null, this, true);
-		} catch (Exception e) {
-			System.err.println("Cannot add full screen support.");
-			System.err.println(e);
-		}
-	}
-	
-	public void setFullScreenModeOnOSX() {
-		if (!ETRC.isOSX10_7OrAbove()) 
-			return;
-		
-		// com.apple.eawt.Application.getApplication().requestToggleFullScreen(MainFrame.this);	
-		
-		// In case of the need to compile and run on other platforms,
-		// replace the method invocation with reflection style to avoid
-		// ClassNotFound Exceptions.
-		try {
-			Class applicationClz = Class.forName("com.apple.eawt.Application");
-			java.lang.reflect.Method getApplicationMethod = 
-					applicationClz.getMethod("getApplication");
-			Object app = getApplicationMethod.invoke(null);
-			
-			java.lang.reflect.Method requestToggleFullScreenMethod = 
-					applicationClz.getMethod("requestToggleFullScreen",java.awt.Window.class);
-			requestToggleFullScreenMethod.invoke(app, MainFrame.this);
-		} catch (Exception e) {
-			System.err.println("Cannot add full screen support.");
-			System.err.println(e);
-		}
 	}
 
 	public void doExit() {
@@ -315,10 +248,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	//Component initialization
 	private void jbInit() throws Exception {
 		
-		chartView = new ChartView(trainGraph, this);
-		runView = new DynamicView(trainGraph, this);
-		sheetView = new SheetView(trainGraph, this);
-		
 		settingsView = new SettingsView(trainGraph);
 		viewMap.put(NavigatorNodeType.GLOBAL_SETTINGS.name(), settingsView);
 		railNetworkEditorView = new RailNetworkEditorView(trainGraph);
@@ -329,16 +258,13 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		viewMap.put(NavigatorNodeType.TRAIN_TYPES.name(), trainTypesView);
 		allTrainsView = new AllTrainsView();
 		viewMap.put(NavigatorNodeType.RAILNETWORK_ALL_TRAINS.name(), allTrainsView);
+		runningChartView = new RunningChartView(trainGraph);
+		viewMap.put(NavigatorNodeType.TIME_TABLE_LINE.name(), runningChartView);
 		timetableListView = new TimetableListView(trainGraph);
 		viewMap.put(NavigatorNodeType.TIME_TABLES.name(), timetableListView);
 		timetableEditView = new TimetableEditView(trainGraph);
 		viewMap.put(NavigatorNodeType.TIME_TABLE_LINE_DOWN.name(), timetableEditView);
 		viewMap.put(NavigatorNodeType.TIME_TABLE_LINE_UP.name(), timetableEditView);
-		
-		raillineChartView = new JPanel();
-		raillineChartView.setLayout(new BorderLayout());
-		viewMap.put(NavigatorNodeType.TIME_TABLE_LINE.name(), raillineChartView);
-		
 
 		navigatorContentCard = new CardLayout();
 		navigatorContentPanel = new JPanel(navigatorContentCard);
@@ -355,7 +281,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLES.name(),
 				timetableListView);
 		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLE_LINE.name(), 
-				raillineChartView);
+				runningChartView);
 		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLE_LINE_DOWN.name(),
 				timetableEditView);
 		navigatorContentPanel.add(NavigatorNodeType.TIME_TABLE_LINE_UP.name(),
@@ -367,28 +293,12 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		navigatorSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, 
 				new JScrollPane(navigator), navigatorContentPanel);
-		int dividerPosH0 = 200;
-		navigatorSplitPane.setDividerLocation(dividerPosH0);
+		navigatorSplitPane.setDividerLocation(initialDividerLocation);
 		navigatorSplitPane.setDividerSize(6);
 		navigatorSplitPane.setOneTouchExpandable(true);
 		
 		
 		//mainPanel.add(runView, BorderLayout.NORTH);
-		
-		splitPaneH = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, false, chartView, sheetView);
-	    int dividerPosH = Toolkit.getDefaultToolkit().getScreenSize().width
-	    		- dividerPosH0 - 253;
-		splitPaneH.setDividerLocation(dividerPosH);
-		splitPaneH.setDividerSize(6);
-		splitPaneH.setOneTouchExpandable(true);
-		
-		splitPaneV = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, runView, splitPaneH);
-	    int dividerPosV = runView.getPreferredSize().height;
-		splitPaneV.setDividerLocation(dividerPosV);
-		splitPaneV.setDividerSize(6);
-		splitPaneV.setOneTouchExpandable(true);
-		
-		raillineChartView.add(splitPaneV, BorderLayout.CENTER);
 
 		this.setDefaultCloseOperation(HIDE_ON_CLOSE);
 		this.setFont(new java.awt.Font(__("FONT_NAME"), 0, 10));
@@ -406,107 +316,67 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 		this.setJMenuBar(loadMenu());
 
-		statusBarMain = loadStatusBar(null);
-		setStatusMain(__("Status: Normal"), false);
-		statusBarEmpty = loadStatusBar(null);
-		statusBarRight = loadStatusBar(null);
-		setStatusRight(__("Status: Normal"), false);
+		statusBarMain = loadStatusBar(__("Status: Normal"));
+		statusBarEmpty = loadStatusBar("");
+		statusBarRight = loadStatusBar(__("Status: Normal"));
 		
 		statusPanel = new JPanel();
 		statusPanel.setLayout(new BorderLayout());
 		statusPanel.add(statusBarMain, BorderLayout.WEST);
 		statusPanel.add(statusBarEmpty, BorderLayout.CENTER);
 		statusPanel.add(statusBarRight, BorderLayout.EAST);
+		
+		loadMainToolBar();
+		toolBarContainer = new JPanel();
+		toolBarContainer.setLayout(new BoxLayout(toolBarContainer, BoxLayout.X_AXIS));
+		toolBarContainer.setPreferredSize(new Dimension(200, mainToolBar.getPreferredSize().height + 2));
+//		toolBarContainer.setAlignmentY(CENTER_ALIGNMENT);
+		toolBarContainer.add(mainToolBar);
 
 		contentPane.add(statusPanel, BorderLayout.SOUTH);
-		contentPane.add(loadMainToolBar(), BorderLayout.NORTH);
+		contentPane.add(toolBarContainer, BorderLayout.NORTH);
 		contentPane.add(navigatorSplitPane, BorderLayout.CENTER);
 
 		this.setTitle();
 	}
-/*
-	private void jbInit() throws Exception {
-		chartView = new ChartView(this);
-		runView = new DynamicView(this);
-		sheetView = new SheetView(this);
-		
-		JTabbedPane tbPane = new JTabbedPane();
-		tbPane.setFont(new Font("Dialog", Font.PLAIN, 12));
-		tbPane.add("点单", sheetView);
-		tbPane.add("运行图", chartView);
-		
-		splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, false, runView, tbPane);
-		splitPane.setDividerLocation(runView.getPreferredSize().height);
-		splitPane.setDividerSize(3);
-		runView.setMinimumSize(runView.getPreferredSize());
+	
+	private static final String titlePrefix = __("Jeff's Electronic Train Graph");
 
-		this.setDefaultCloseOperation(HIDE_ON_CLOSE);
-		this.setFont(new java.awt.Font(_("FONT_NAME"), 0, 10));
-		this.setLocale(java.util.Locale.getDefault());
-		this.setResizable(true);
-		this.setState(Frame.NORMAL);
-		this.setIconImage(new ImageIcon(org.paradise.etrc.MainFrame.class
-				.getResource("/pic/icon.gif")).getImage());
-		
-		JPanel contentPane;
-		contentPane = (JPanel) this.getContentPane();
-		contentPane.setLayout(new BorderLayout());
-		contentPane.setBorder(null);
-		contentPane.setDebugGraphicsOptions(0);
-
-		this.setJMenuBar(loadMenu());
-
-		statusBarMain = loadStatusBar();
-		statusBarRight = loadStatusBar();
-		JPanel statusPanel = new JPanel();
-		statusPanel.setLayout(new BorderLayout());
-		statusPanel.add(statusBarMain, BorderLayout.CENTER);
-		statusPanel.add(statusBarRight, BorderLayout.EAST);
-
-		contentPane.add(statusPanel, BorderLayout.SOUTH);
-		contentPane.add(loadToolBar(), BorderLayout.NORTH);
-		contentPane.add(splitPane, BorderLayout.CENTER);
-
-		this.setTitle();
-	}
-*/
-    private static final String titlePrefix = __("Jeff's Electronic Train Graph");
-
-	private String activeTrainName = "";
-
-	public void setActiceTrainName(String _name) {
-		if (_name.equalsIgnoreCase(""))
-			activeTrainName = "";
-		else
-			activeTrainName = " (" + _name + ") ";
-		
-		//_name不为空的时候，加入hitory
-		if (!_name.equalsIgnoreCase("")) {
-			//如果已经存在于history中则删除之，以保证新加入的位于第一个
-			if(trainSelectHistory.contains(_name))
-				trainSelectHistory.remove(_name);
-			
-			trainSelectHistory.add(0, _name);
-			
-			//超过最大历史记录数，则删除最老的
-			if(trainSelectHistory.size() > MAX_TRAIN_SELECT_HISTORY_RECORD)
-				for(int i=12; i<trainSelectHistory.size(); i++)
-					trainSelectHistory.remove(i);
-			
-			cbTrainSelectHistory.setModel(new DefaultComboBoxModel<String>(trainSelectHistory));
-		}
-
-		setTitle();
-	}
+//	private String activeTrainName = "";
+//
+//	public void setActiceTrainName(String _name) {
+//		if (_name.equalsIgnoreCase(""))
+//			activeTrainName = "";
+//		else
+//			activeTrainName = " (" + _name + ") ";
+//		
+//		//_name不为空的时候，加入hitory
+//		if (!_name.equalsIgnoreCase("")) {
+//			//如果已经存在于history中则删除之，以保证新加入的位于第一个
+//			if(trainSelectHistory.contains(_name))
+//				trainSelectHistory.remove(_name);
+//			
+//			trainSelectHistory.add(0, _name);
+//			
+//			//超过最大历史记录数，则删除最老的
+//			if(trainSelectHistory.size() > MAX_TRAIN_SELECT_HISTORY_RECORD)
+//				for(int i=12; i<trainSelectHistory.size(); i++)
+//					trainSelectHistory.remove(i);
+//			
+//			cbTrainSelectHistory.setModel(new DefaultComboBoxModel<String>(trainSelectHistory));
+//		}
+//
+//		setTitle();
+//	}
 
 	public void setTitle() {
-		setTitle(titlePrefix + " -- [" + Config.getInstance().getCurrentFile()+ "] " + 
-				(Config.getInstance().isFileModified() ? __("Modified ") : "") + activeTrainName);
+		setTitle(String.format("%s -- [%s] %s", titlePrefix, Config.getInstance().getCurrentFile(),
+				(Config.getInstance().isFileModified() ? __("Modified ") : "")));
 	}
 
-	private JLabel loadStatusBar(String text) {
+	private StatusBar loadStatusBar(String text) {
 		@SuppressWarnings("serial")
-		JLabel statusBar = new JLabel() {
+		StatusBar statusBar = new StatusBar(text) {
 			@Override
 			public Dimension getPreferredSize() {
 				Dimension size = super.getPreferredSize();
@@ -514,181 +384,31 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				return size;
 			}
 		};
-		Border border = BorderFactory.createLoweredBevelBorder();
-
-		statusBar.setBorder(border);
-		statusBar.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
-		
-		if (text != null)
-			statusBar.setText(text);
 		
 		return statusBar;
 	}
 
-	public JToggleButton jtButtonDown;
-	public JToggleButton jtButtonShowRun;
-	public JToggleButton jtButtonUp;
-	public JToggleButton jtButtonShowWatermark;
-	public JToggleButton jtButtonAntiAliasing;
-
 	private JToolBar loadMainToolBar() {
-		toolBar = new JToolBar();
+		mainToolBar = new JToolBar();
+		mainToolBar.setFloatable(false);
 		
 		//文件操作
 		JButton jbOpenFile = createTBButton("openFile", __("Open a Chart"), File_Load_Chart);
 		JButton jbSaveFile = createTBButton("saveFile", __("Save Chart"), File_Save_Chart);
 		JButton jbSaveAs   = createTBButton("saveAs", __("Save Chart As"), File_Save_Chart_As);
-		toolBar.add(jbOpenFile);
-		toolBar.add(jbSaveFile);
-		toolBar.add(jbSaveAs);
+		mainToolBar.add(jbOpenFile);
+		mainToolBar.add(jbSaveFile);
+		mainToolBar.add(jbSaveAs);
 		
 		//撤销,重做
 		JButton jbUndo = createTBButton("undo", __("Undo"), Edit_Undo);
 		JButton jbRedo  = createTBButton("redo", __("Redo"), Edit_Redo);
 		ActionManager.getInstance().setToolbarButton(jbUndo, jbRedo);
-		toolBar.addSeparator();
-		toolBar.add(jbUndo);
-		toolBar.add(jbRedo);
-		
-		//车次、线路编辑
-		JButton jbCircuitEdit = createTBButton("circuit", __("Edit Circuit"), Edit_Circuit);
-		JButton jbTrainsEdit  = createTBButton("trains", __("Edit Train Information"), Edit_Trains);
-		toolBar.addSeparator();
-		toolBar.add(jbCircuitEdit);
-		toolBar.add(jbTrainsEdit);
-		
-		//查找车次
-		JButton jbFindTrain = createTBButton("findTrain", __("Find a Train"), Edit_FindTrain);
-		toolBar.addSeparator();
-		toolBar.add(jbFindTrain);
+		mainToolBar.addSeparator();
+		mainToolBar.add(jbUndo);
+		mainToolBar.add(jbRedo);
 
-		//坐标设置
-		JButton jbSetupH = createTBButton("setupH", __("Timeline Settings"), Setup_Time);
-		JButton jbSetupV = createTBButton("setupV", __("Distance Bar Settings"), Setup_Dist);
-		toolBar.addSeparator();
-		toolBar.add(jbSetupH);
-		toolBar.add(jbSetupV);
-		
-		//动态图是否开启
-		ImageIcon imageRun = new ImageIcon(this.getClass().getResource("/pic/show_run.png"));
-		jtButtonShowRun = new JToggleButton(imageRun);
-		jtButtonShowRun.setToolTipText(__("Show Dynamic Chart"));
-		jtButtonShowRun.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				MainFrame.this.changeShowRunState();
-			}
-		});
-		
-		//读配置文件设定是否显示动态图
-//		if(prop.getProperty(Prop_Show_Run).equalsIgnoreCase("Y")) {
-//			isShowRun = true;
-//		}
-//		else {
-//			isShowRun = false;
-//		}
-		updateShowRunState();
-		
-		toolBar.addSeparator();
-		toolBar.add(jtButtonShowRun);
-		
-		//上下行显示选择
-		ImageIcon imageDown = new ImageIcon(this.getClass().getResource("/pic/down.png"));
-		ImageIcon imageUp = new ImageIcon(this.getClass().getResource("/pic/up.png"));
-		ImageIcon imageWatermark = new ImageIcon(this.getClass().getResource("/pic/showAsWatermark.png"));
-		jtButtonDown = new JToggleButton(imageDown);
-		jtButtonUp = new JToggleButton(imageUp);
-		jtButtonShowWatermark = new JToggleButton(imageWatermark);
-		jtButtonUp.setToolTipText(__("Display Up-going Trains"));
-		jtButtonDown.setToolTipText(__("Display Down-going Trains"));
-		jtButtonShowWatermark.setToolTipText(__("Show undisplayed trains as watermarks"));
-		jtButtonDown.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				chartView.changeShowDown();
-			}
-		});
-		jtButtonUp.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				chartView.changShownUp();
-			}
-		});
-		jtButtonShowWatermark.addActionListener(e->{
-			if (jtButtonShowWatermark.isSelected())
-				chartView.underDrawingColor = ChartView.DEFAULT_UNDER_COLOR;
-			else
-				chartView.underDrawingColor = null;
-			
-			chartView.repaint();
-		});
-		
-		//抗锯齿
-		jtButtonAntiAliasing = createTBToggleButton("/pic/AA.png", 
-				__("Use anti-aliasing drawing"), "chartSettings.useAntiAliasing");
-//		ImageIcon imageAA = new ImageIcon(this.getClass().getResource("/pic/AA.png"));
-//		jtButtonAntiAliasing = new JToggleButton(imageAA);
-//		jtButtonAntiAliasing.setToolTipText(__("Use anti-aliasing drawing"));
-//		jtButtonAntiAliasing.setName("chartSettings.useAntiAliasing");
-//		uiBindingManager.addDataBinding(jtButtonAntiAliasing, objID -> trainGraph.settings, 
-//				propName -> __("Use anti-aliasing drawing"), null);
-		
-		//读配置文件设置上下行状态按钮
-		chartView.showUpDownState = ChartView.SHOW_ALL;
-		jtButtonDown.setSelected(true);
-		jtButtonUp.setSelected(true);
-		jtButtonShowWatermark.setSelected(true);
-		
-//		chartView.showUpDownState = ChartView.SHOW_NONE;
-//		if(prop.getProperty(Prop_Show_Down).equalsIgnoreCase("Y")) {
-//			jtButtonDown.setSelected(true);
-//			chartView.showUpDownState ^= ChartView.SHOW_DOWN;
-//		}
-//		else
-//			jtButtonDown.setSelected(false);
-//		
-//		if(prop.getProperty(Prop_Show_UP).equalsIgnoreCase("Y")) {
-//			jtButtonUp.setSelected(true);
-//			chartView.showUpDownState ^= ChartView.SHOW_UP;
-//		}
-//		else
-//			jtButtonUp.setSelected(false);
-		
-		//让ChartView右下角的上下行状态显示图标显示正确的内容
-		chartView.updateUpDownDisplay();
-
-		toolBar.addSeparator();
-		toolBar.add(jtButtonDown);
-		toolBar.add(jtButtonUp);
-		toolBar.add(jtButtonShowWatermark);
-		toolBar.add(jtButtonAntiAliasing);
-		
-		//历史记录
-		cbTrainSelectHistory.setFont(new Font("Dialog", Font.PLAIN, 12));
-		cbTrainSelectHistory.setMinimumSize(new Dimension(64, 20));
-		cbTrainSelectHistory.setMaximumSize(new Dimension(64, 20));
-		cbTrainSelectHistory.setEditable(true);
-		cbTrainSelectHistory.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent ae) {
-				//当用键盘输入的时候会触发两次Action
-				//一次是comboBoxChanged，另一次是comboBoxEdited
-				//我们只处理与下拉选择一样的那一次：comboBoxChanged
-				if(!ae.getActionCommand().equalsIgnoreCase("comboBoxChanged"))
-					return;
-				
-				String trainToFind = (String) cbTrainSelectHistory.getSelectedItem();
-
-				if(trainToFind == null)
-					return;
-
-				if(trainToFind.trim().equalsIgnoreCase(""))
-					return;
-				
-				if(!chartView.findAndMoveToTrain(trainToFind))
-					new MessageBox(MainFrame.this, String.format(__("Cannot find train information: %s"), trainToFind)).showMessage();
-			}
-		});
-		toolBar.addSeparator();
-		toolBar.add(cbTrainSelectHistory);
-
-		return toolBar;
+		return mainToolBar;
 	}
 	
 	private JButton createTBButton(String imgName, String toolTipText, String Command) {
@@ -704,40 +424,21 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		
 		return jbOnToolBar;
 	}
-	
-	private JToggleButton createTBToggleButton(String imgName, String toolTipText, 
-			String dataBindingStr) {
-
-		ImageIcon image = new ImageIcon(this.getClass().getResource(imgName));
-		JToggleButton button = new JToggleButton(image);
-		button.setToolTipText(toolTipText);
-		button.setName(dataBindingStr);
-		uiBindingManager.addDataBinding(button, objID -> trainGraph.settings, 
-				propName -> toolTipText, (objID) -> navigatorContentPanel.repaint());
-		
-		return button;
-	}
-	
-	private Object getModelObjectByID(String objID) {
-		if ("chartSettings".equals(objID))
-			return trainGraph.settings;
-		
-		return null;
-	}
 
 	private final String File_Load_Chart = "File_Load_Chart";
 	private final String File_Save_Chart = "File_Save_Chart";
 	private final String File_Save_Chart_As = "File_Save_Chart_As";
 	private final String File_New_Chart = "File_Clear_Chart";
 //	private final String File_Circuit = "File_Circuit";
-	private final String File_Load_Map = "File_Load_Map";
+//	private final String File_Load_Map = "File_Load_Map";
 	private final String File_Train = "File_Train";
 	private final String File_Export = "File_Export";
+	private final String File_FullScreen = "File_FullScreen";
 	private final String File_Exit = "File_Exit";
 
 	private final String Edit_Undo = "Edit_Undo";
 	private final String Edit_Redo = "Edit_Redo";
-	private final String Edit_Action_History = "Edit_Action_History";
+//	private final String Edit_Action_History = "Edit_Action_History";
 	private final String Edit_Cut = "Edit_Cut";
 	private final String Edit_Copy = "Edit_Copy";
 	private final String Edit_Paste = "Edit_Paste";
@@ -746,8 +447,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private final String Edit_Trains = "Edit_Trains";
 
 	private final String Setup_Margin = "Setup_MarginSet";
-	private final String Setup_Time = "Setup_TimeSet";
-	private final String Setup_Dist = "Setup_DistSet";
+//	private final String Setup_Time = "Setup_TimeSet";
+//	private final String Setup_Dist = "Setup_DistSet";
 
 	private final String Tools_Circuit = "Tools_Circuit";
 	private final String Tools_Train = "Tools_Train";
@@ -772,6 +473,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		menuFile.add(createMenuItem(__("Load Train..."), File_Train)).setMnemonic(KeyEvent.VK_L);
 		menuFile.addSeparator();
 		menuFile.add(createMenuItem(__("Export..."), File_Export)).setMnemonic(KeyEvent.VK_P);
+		menuFile.addSeparator();
+		menuFile.add(createMenuItem(__("Toggle Full Screen Mode"), File_FullScreen, KeyEvent.VK_F, InputEvent.SHIFT_DOWN_MASK)).setMnemonic(KeyEvent.VK_X);
 		menuFile.addSeparator();
 		menuFile.add(createMenuItem(__("Exit"), File_Exit)).setMnemonic(KeyEvent.VK_X);
 
@@ -859,33 +562,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	}
 	
 	// }}
-	
-	private void setStatusMain(String status, boolean isTempStatus) {
-		if (statusBarTimerMain == null)
-			statusBarTimerMain = new Timer(3000, e -> statusBarMain.setText(__("Status: Normal")));
-		
-		setStatus(statusBarMain, statusBarTimerMain, status, isTempStatus);
-	}
-	
-	private void setStatusRight(String status, boolean isTempStatus) {
-		if (statusBarTimerRight == null)
-			statusBarTimerRight = new Timer(3000, e -> statusBarRight.setText(__("Status: Normal")));
-		
-		setStatus(statusBarRight, statusBarTimerRight, status, isTempStatus);
-	}
-	
-	private void setStatus(JLabel statusBar, Timer statusBarTimer, String status,
-			boolean isTempStatus) {
-		
-		if (statusBarTimer.isRunning())
-			statusBarTimer.stop();
-		
-		statusBar.setText(status);
-		
-		if (isTempStatus) {
-			statusBarTimer.start();
-		}
-	}
 
 	private void initChart() {
 		if (Config.getInstance().getAutoLoadLastFile()) {
@@ -935,11 +611,11 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			setModel(trainGraph);
 			
 		} catch (Exception ioe) {
-			String msg = "Loading graph failed.";
-			ioe.printStackTrace();
-			new MessageBox(String.format(__("Load train graph failed. Please check the %s file."
+			String msg = String.format(__("Load train graph failed. Please check the %s file."
 					+ "\nReason:%s\nDetail:%s"), filePath, ioe.getMessage(), 
-					ioe.getCause() )).showMessage();
+					ioe.getCause() );
+			ioe.printStackTrace();
+			new MessageBox(msg).showMessage();
 			
 			if (throwExceptions)
 				throw new RuntimeException();
@@ -955,7 +631,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			ActionManager.getInstance().markModelSaved();
 			
 			do_UpdateRecentFilesMenu();
-			setStatusMain(__("File Saved."), true);
+			statusBarMain.setTempStatus(__("File Saved."));
 		} catch (IOException ex) {
 			System.err.println("Err:" + ex.getMessage());
 			new MessageBox(__("Unable to save the graph.")).showMessage();
@@ -1011,16 +687,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 
 		if (command.equalsIgnoreCase(File_Exit)) {
 			this.doExit();
-		} else if (command.equalsIgnoreCase(Tools_Circuit)) {
-			this.doCircuitTools();
-		} else if (command.equalsIgnoreCase(Tools_Train)) {
-			this.doImportTrains();
-		} else if (command.equalsIgnoreCase(Setup_Margin)) {
+		} else if (command.equalsIgnoreCase(File_FullScreen)) {
+			OSXUtil.setFullScreenModeOnOSX(this);
+		} 
+//		else if (command.equalsIgnoreCase(Tools_Circuit)) {
+//			this.doCircuitTools();
+//		} 
+		else if (command.equalsIgnoreCase(Setup_Margin)) {
 			this.doMarginSet();
-		} else if (command.equalsIgnoreCase(Setup_Time)) {
-			this.doTimeSet();
-		} else if (command.equalsIgnoreCase(Setup_Dist)) {
-			this.doDistSet();
 		} else if (command.equalsIgnoreCase(Edit_Undo)) {
 			ActionManager.getInstance().undo();
 		} else if (command.equalsIgnoreCase(Edit_Redo)) {
@@ -1037,13 +711,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			this.doEditTrains();
 //		} else if (command.equalsIgnoreCase(Edit_NewTrain)) {
 //			this.doNewTrain();
-		} else if (command.equalsIgnoreCase(Edit_FindTrain)) {
-			this.doFindTrain();
-//		} else if (command.equalsIgnoreCase(Edit_Color)) {
+//		}
+//		else if (command.equalsIgnoreCase(Edit_Color)) {
 //			this.doColorSet();
-		} else if (command.equalsIgnoreCase(File_Train)) {
-			this.doLoadTrain();
-//		} else if (command.equalsIgnoreCase(File_Circuit)) {
+//		} 
+//		else if (command.equalsIgnoreCase(File_Train)) {
+//			this.doLoadTrain();
+//		} 
+//		else if (command.equalsIgnoreCase(File_Circuit)) {
 //			this.doLoadCircuit();
 		} else if (command.equalsIgnoreCase(File_New_Chart)) {
 			this.doNewChart();
@@ -1059,38 +734,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			this.doHelpAbout();
 		}
 	}
-	
-	public void doImportTrains() {
-		//new MessageBox(this, "todo：从网络获取数据生成车次描述文件(.trf文件)。").showMessage();
-		if(new YesNoBox(this, __("This operation will delete all the train information on the current railnetwork chart, then import the train information from the default time table for this circuit. Continue?")).askForYes()) {
-			FindTrainsDialog waitingBox = new FindTrainsDialog(this);
-			waitingBox.findTrains();
-		}
-	}
 
-	private void doCircuitTools() {
-		//new MessageBox(this, "todo：从里程表获取数据生成线路描述文件(.cir文件)。").showMessage();
-		
-		String xianlu = new XianluSelectDialog(this).getXianlu();
-		if(xianlu == null)
-			return;
-		
-		RailroadLine circuit = new CircuitMakeDialog(this, xianlu).getCircuit();
-		if(circuit == null)
-			return;
-		
-		// 菜单中的导入线路工具. 因为线路编辑对话框改线路编辑视图, 因此拿掉
-		DEBUG_ACTION(() -> {
-			new MessageBox(this, "待完成工作:需要把新创建的线路加入路网.待完成工作:")
-				.showMessage();
-		});
-		System.out.println(circuit);
-//		circuitEditDialog.showDialogForCircuit(circuit);
-		
-		this.setTitle();
-		chartView.repaint();
-		runView.refresh();
-	}
 
 	private void doEditTrains() {
 //		TrainListView dlg = new TrainListView(this);
@@ -1126,21 +770,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	
 	public void doPaste() {
 		DEBUG_MSG("Do clipboard paste");
-	}
-
-	/**
-	 * doFindTrain
-	 */
-	private void doFindTrain() {
-		FindTrainDialog dlg = new FindTrainDialog(this);
-		Dimension dlgSize = dlg.getPreferredSize();
-		Dimension frmSize = getSize();
-		Point loc = getLocation();
-		dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
-				(frmSize.height - dlgSize.height) / 2 + loc.y);
-		dlg.setModal(false);
-		dlg.pack();
-		dlg.setVisible(true);
 	}
 
 	/**
@@ -1190,13 +819,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		String fileName = trainGraph.currentLineChart.railroadLine.getName() + df.format(new Date());
 		chooser.setSelectedFile(new File(fileName));
 
-		int returnVal = chooser.showSaveDialog(this); 
+		int returnVal = GLWindowManager.showDialogOnFloatingGLWindow(
+				() -> chooser.showSaveDialog(this)); 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
 			if (!f.getAbsolutePath().endsWith(".gif"))
 				f = new File(f.getAbsolutePath() + ".gif");
 			try {
-				BufferedImage image = chartView.getBufferedImage();
+				BufferedImage image = runningChartView.getChartView().getBufferedImage();
 				ImageIO.write(image, "gif", f);
 			}
 			catch(Exception ioe) {
@@ -1307,10 +937,11 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		} catch (Exception e) {}
 		
 		// SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd");
-		String fileName = Config.getInstance().isNewFile() ? Config.getInstance().NEW_FILE_NAME : Config.getInstance().getCurrentFileName();
+		String fileName = Config.getInstance().isNewFile() ? Config.NEW_FILE_NAME : Config.getInstance().getCurrentFileName();
 		chooser.setSelectedFile(new File(fileName));
 
-		int returnVal = chooser.showSaveDialog(this); 
+		int returnVal = GLWindowManager.showDialogOnFloatingGLWindow(
+				() -> chooser.showSaveDialog(this)); 
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
 			String suffix = TRCFilter.suffix;
@@ -1351,109 +982,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 				chooser.setCurrentDirectory(recentPath);
 		} catch (Exception e) {}
 
-		int returnVal = chooser.showOpenDialog(this);
+		int returnVal = GLWindowManager.showDialogOnFloatingGLWindow(
+				() -> chooser.showOpenDialog(this));
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			File f = chooser.getSelectedFile();
 			System.out.println(f);
 			
 			do_OpenFile(f.getAbsolutePath(), false);
 		}
-	}
-
-	/**
-	 * doLoadTrain
-	 */
-	public void doLoadTrain() {
-		if(!(new YesNoBox(this, __("Load train information file and overwrite the existing information. Continue?")).askForYes()))
-			return;
-
-		JFileChooser chooser = new JFileChooser();
-		ETRC.setFont(chooser);
-
-		chooser.setDialogTitle(__("Load Train Information"));
-		chooser.setDialogType(JFileChooser.OPEN_DIALOG);
-		chooser.setMultiSelectionEnabled(true);
-		chooser.addChoosableFileFilter(new CSVFilter());
-		chooser.addChoosableFileFilter(new TRFFilter());
-		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
-		try {
-			File recentPath = new File(Config.getInstance().getLastFilePath(""));
-			if (recentPath.exists() && recentPath.isDirectory())
-				chooser.setCurrentDirectory(recentPath);
-		} catch (Exception e) {}
-		
-		int returnVal = chooser.showOpenDialog(this);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File f[] = chooser.getSelectedFiles();
-			if (f.length > 0)
-				System.out.println(f[0]);
-			else
-				System.out.println("No File selected!");
-
-			Train loadingTrain = null;
-			for (int j = 0; j < f.length; j++) {
-				loadingTrain = TrainGraphFactory.createInstance(Train.class);
-				try {
-					loadingTrain.loadFromFile2(f[j].getAbsolutePath());
-//					prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
-				} catch (IOException ex) {
-					System.err.println("Error: " + ex.getMessage());
-				}
-
-//				System.out.println(loadingTrain.getTrainName() + "次列车从"
-//						+ loadingTrain.startStation + "到"
-//						+ loadingTrain.terminalStation + "，共经停"
-//						+ loadingTrain.stopNum + "个车站");
-//				for (int i = 0; i < loadingTrain.stopNum; i++)
-//					System.out.println(loadingTrain.stops[i].stationName + "站 "
-//							+ Train.toTrainFormat(loadingTrain.stops[i].arrive)
-//							+ " 到 "
-//							+ Train.toTrainFormat(loadingTrain.stops[i].leave)
-//							+ " 发");
-
-				if(loadingTrain.isDownTrain(trainGraph.currentLineChart.railroadLine, false) > 0)
-					trainGraph.currentLineChart.addTrain(loadingTrain);
-			}
-
-			//System.out.println("1.Move to: "+loadingTrain.getTrainName());
-			//mainView.buildTrainDrawings();
-			chartView.repaint();
-			sheetView.updateData();
-			chartView.findAndMoveToTrain(loadingTrain.getTrainName(trainGraph.currentLineChart.railroadLine));
-			runView.refresh();
-			//panelChart.panelLines.repaint();
-		}
-
-	}
-
-	/**
-	 * doDistSet
-	 */
-	private void doDistSet() {
-		DistSetDialog dlg = new DistSetDialog(this, trainGraph);
-		Dimension dlgSize = dlg.getPreferredSize();
-		Dimension frmSize = getSize();
-		Point loc = getLocation();
-		dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
-				(frmSize.height - dlgSize.height) / 2 + loc.y);
-		dlg.setModal(false);
-		dlg.pack();
-		dlg.setVisible(true);
-	}
-
-	/**
-	 * doTimeSet
-	 */
-	private void doTimeSet() {
-		TimeSetDialog dlg = new TimeSetDialog(trainGraph.settings, this);
-		Dimension dlgSize = dlg.getPreferredSize();
-		Dimension frmSize = getSize();
-		Point loc = getLocation();
-		dlg.setLocation((frmSize.width - dlgSize.width) / 2 + loc.x,
-				(frmSize.height - dlgSize.height) / 2 + loc.y);
-		dlg.setModal(false);
-		dlg.pack();
-		dlg.setVisible(true);
 	}
 
 	private void doMarginSet() {
@@ -1466,46 +1002,6 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		dlg.setModal(false);
 		dlg.pack();
 		dlg.setVisible(true);
-	}
-	
-	private ETRCSKB skb = null;
-	public ETRCSKB getSKB() {
-		if(skb == null)
-			try {
-				skb = new ETRCSKB("eda/");
-			} catch (IOException e) {
-				new MessageBox(this, __("Unable to open time table.")).showMessage();
-				e.printStackTrace();
-			}
-			
-		return skb;
-	}
-	
-	private ETRCLCB lcb = null;
-
-	public ETRCLCB getLCB() {
-		if(lcb == null)
-			try {
-				lcb = new ETRCLCB("eda/");
-			} catch (IOException e) {
-				new MessageBox(this, __("Unable to open circuit table.")).showMessage();
-				e.printStackTrace();
-			}
-		
-		return lcb;
-	}
-	
-	private void changeShowRunState() {
-		isShowRun = isShowRun ? false : true;
-		updateShowRunState();
-	}
-
-	private void updateShowRunState() {
-		jtButtonShowRun.setSelected(isShowRun);
-		runView.setRunState(isShowRun);
-		runView.setVisible(isShowRun);
-		if (isShowRun)
-			splitPaneV.setDividerLocation(runView.getPreferredSize().height);
 	}
 	
 	private void onNavigatorNodeChanged(boolean triggeredByLeftButton, TreePath treePath,
@@ -1542,7 +1038,7 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		case RAILNETWORK_ALL_TRAINS:
 			trainGraph.currentNetworkChart = (RailNetworkChart) params[1];
 
-			switchLineChart();
+			runningChartView.switchLineChart();
 			allTrainsView.refresh();
 			
 			switchView(NavigatorNodeType.RAILNETWORK_ALL_TRAINS.name());
@@ -1551,8 +1047,8 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			trainGraph.currentLineChart = (RailroadLineChart) params[0];
 			trainGraph.currentNetworkChart = (RailNetworkChart) params[1];
 
-			switchLineChart();
-
+			runningChartView.switchLineChart();
+			
 			switchView(NavigatorNodeType.TIME_TABLE_LINE.name());
 			break;
 		case TIME_TABLE_LINE_DOWN:
@@ -1582,12 +1078,10 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 	private void switchView(String cardName) {
 		navigatorContentCard.show(navigatorContentPanel, cardName);
 		Container view = viewMap.get(cardName);
-		if (view instanceof MapPaneContainer) {
-			
-		}
+		GLWindowManager.switchTopContainer(view);
 		
-		int menuAnchor = 2;
-		JMenu editMenu = null, origEditMenu = menuBar.getMenu(menuAnchor);
+		int anchorMenuIndex = 2;
+		JMenu editMenu = null, origEditMenu = menuBar.getMenu(anchorMenuIndex);
 		JToolBar toolBar = null;
 		Component statusBar = null;
 		
@@ -1600,9 +1094,9 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 		}
 
 		if (origEditMenu != null)
-			menuBar.remove(menuAnchor);
-		if (editMenu != null) 
-			menuBar.add(editMenu, menuAnchor);
+			menuBar.remove(anchorMenuIndex);
+		if (editMenu != null && editMenu.getPopupMenu().getComponentCount() > 0) 
+			menuBar.add(editMenu, anchorMenuIndex);
 		menuBar.revalidate();
 		
 		if (statusBar != null) {
@@ -1616,12 +1110,14 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			statusPanel.add(statusBarEmpty, BorderLayout.CENTER);
 			statusPanel.add(statusBarRight, BorderLayout.EAST);
 		}
-	}
-	
-	private void switchLineChart() {
-		chartView.switchLineChart();
-		runView.setModel(trainGraph);
-		sheetView.setModel(trainGraph);
+
+		while (toolBarContainer.getComponentCount() > 1) {
+			toolBarContainer.remove(1);
+		}
+		if (toolBar != null && toolBar.getComponentCount() > 0) {
+			toolBarContainer.add(toolBar);
+		}
+		toolBarContainer.repaint();
 	}
 	
 	//Overridden so we can exit when window is closed
@@ -1631,7 +1127,50 @@ public class MainFrame extends JFrame implements ActionListener, Printable {
 			super.processWindowEvent(e);
 		} else if (e.getID() == WindowEvent.WINDOW_ACTIVATED) {
 			super.processWindowEvent(e);
-			chartView.requestFocus();
 		}
 	}
+	
+	// {{ 遗留代码中对话框部分的依赖
+	
+	private ETRCSKB skb = null;
+	public ETRCSKB getSKB() {
+		if(skb == null)
+			try {
+				skb = new ETRCSKB("eda/");
+			} catch (IOException e) {
+				new MessageBox(this, __("Unable to open time table.")).showMessage();
+				e.printStackTrace();
+			}
+			
+		return skb;
+	}
+	
+	private ETRCLCB lcb = null;
+
+	public ETRCLCB getLCB() {
+		if(lcb == null)
+			try {
+				lcb = new ETRCLCB("eda/");
+			} catch (IOException e) {
+				new MessageBox(this, __("Unable to open circuit table.")).showMessage();
+				e.printStackTrace();
+			}
+		
+		return lcb;
+	}
+
+	public ChartView getChartView() {
+			return runningChartView.getChartView();
+		}
+	
+	public DynamicView getRunView() {
+		return runningChartView.getRunView();
+	}
+
+	public SheetView getSheetView() {
+		return runningChartView.getSheetView();
+	}
+	
+	// }}
+	
 }

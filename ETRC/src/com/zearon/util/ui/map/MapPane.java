@@ -47,11 +47,12 @@ import com.zearon.util.ui.widget.TransparentLabel;
 import com.zearon.util.ui.widget.ZoomSlider;
 
 import de.lessvoid.nifty.Nifty;
+import static com.zearon.util.debug.DebugUtil.DEBUG;
+import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
 
 import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.DEBUG;
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 
 public class MapPane extends JDesktopPane implements ComponentListener, Runnable {
 
@@ -70,7 +71,6 @@ public class MapPane extends JDesktopPane implements ComponentListener, Runnable
 	
 	private JPanel panelViewOptions;
 	private JSlider sliderBGMapTransparency;
-	private JScrollPane bgScrollPane;
 	private JToggleButton tglbtnNightMode;
 	private JToggleButton tglbtnGrayMode;
 	private JToggleButton tglbtnAnnimation;
@@ -118,11 +118,6 @@ public class MapPane extends JDesktopPane implements ComponentListener, Runnable
 		setDoubleBuffered(true);
 		setLayout(null);
 		addComponentListener(this);
-		
-		bgScrollPane = new JScrollPane();
-		setLayer(bgScrollPane, -5);
-		bgScrollPane.setBounds(400, 200, 275, 129);
-		add(bgScrollPane);
 		
 //		mapPanel = new MapPanel(trainGraph, bgScrollPane);
 //		bgScrollPane.setViewportView(mapPanel);
@@ -234,77 +229,28 @@ public class MapPane extends JDesktopPane implements ComponentListener, Runnable
 		setLayer(sliderZoom, -1);
 		transparentComponents.add(sliderZoom);
 		
+		JPanel panel = new JPanel();
+		panel.setBounds(140, 191, 396, 206);
+		add(panel);
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		
+		JButton btnNewButton = new JButton("New button");
+		panel.add(btnNewButton);
+		
+		JButton btnNewButton_1 = new JButton("New button");
+		panel.add(btnNewButton_1);
+		
 		if (trainGraph != null) {
-			createMapCanvas();
+			createMapCanvas(false);
 		}
 	}
 	
-	private void createMapCanvas() {
-		mapCanvas = GLWindowManager.createGLWindow();
-		mapCanvas.setUndecorated(true);
-		mapCanvas.setAlwaysOnTop(true);
-		mapCanvas.setVisible(true);
-		
+	private void createMapCanvas(boolean initialVisibility) {
+		mapCanvas = GLWindowManager.createFloatingGLWindow(MainFrame.getInstance(), this, 2);
 		mapCanvas.addGLEventListener(new MapEditScene(mapCanvas, animator));
 		animator.add(mapCanvas);
 		
-		MainFrame.getInstance().addWindowListener(new java.awt.event.WindowAdapter() {
-			
-			@Override
-			public void windowIconified(java.awt.event.WindowEvent e) {
-				if (mapCanvas != null) {
-					mapCanvas.setAlwaysOnTop(false);
-					mapCanvas.setVisible(false);
-				}
-			}
-			
-			@Override
-			public void windowDeiconified(java.awt.event.WindowEvent e) {
-				if (mapCanvas != null) {
-					mapCanvas.setAlwaysOnTop(true);
-					mapCanvas.setVisible(true);
-				}
-			}
-			
-			@Override
-			public void windowDeactivated(java.awt.event.WindowEvent e) {
-				if (mapCanvas != null) {
-					mapCanvas.setAlwaysOnTop(false);
-				}
-			}
-			
-			@Override
-			public void windowActivated(java.awt.event.WindowEvent e) {
-				if (mapCanvas != null) {
-					mapCanvas.setAlwaysOnTop(true);
-				}
-			}
-		});
-		
-		MainFrame.getInstance().addComponentListener(new ComponentListener() {
-			@Override public void componentShown(ComponentEvent e) {}
-			@Override public void componentResized(ComponentEvent e) {}
-			@Override public void componentHidden(ComponentEvent e) {}
-			
-			@Override
-			public void componentMoved(ComponentEvent e) {
-				syncMapCanvasPisitionWithWindow();
-			}
-		});
-		
-//	mapArea = new NewtCanvasAWT(mapCanvas);
-//	mapArea.setBounds(50, 50, 100, 60);
-//	setLayer(mapArea, -3);
-//	add(mapArea);
-	
-//	mapCanvas = new GLJPanel(ETRC.getInstance().glcaps);
-//	mapCanvas = new NewtCanvasAWT();
-//	mapCanvas.addGLEventListener(MapScene.getInstance());
-//	mapCanvas.setBounds(50, 50, 100, 60);
-//	Button btn = new Button("Click me");
-//	setLayer(mapCanvas, -3);
-//	internalFrame.getContentPane().add(mapCanvas);
-//	add(mapCanvas);
+		mapCanvas.setVisible(initialVisibility);
 	}
 
 	private FPSAnimator animator = new FPSAnimator(60);
@@ -371,14 +317,6 @@ public class MapPane extends JDesktopPane implements ComponentListener, Runnable
 	@Override public void componentHidden(ComponentEvent e) {}
 
 	private void syncMapCanvasPisitionWithWindow() {
-		try {
-			Rectangle bounds = getBounds();
-			Point location = getLocationOnScreen();
-			mapCanvas.setTopLevelPosition(location.x + 2, location.y + 2);
-			mapCanvas.setTopLevelSize(bounds.width - 4, bounds.height - 4);
-		} catch (Exception ex) {
-			System.err.println(ex);
-		}
 	}
 	
 	public void setBGMapTransparency(int alpha) {
@@ -442,12 +380,10 @@ public class MapPane extends JDesktopPane implements ComponentListener, Runnable
 
 	
 	public void createGLWindow() {
-		GLWindow window = GLWindow.create(ETRC.getInstance().glcaps);
-		
-		window.setUndecorated(true);
+		GLWindow window = GLWindowManager.createGLWindow();
 		window.setSize(300, 300);
 		window.setVisible(true);
-		window.setTitle("Second JOGL Application - NEWT Window Test");
+		window.setTitle("Map Edit");
 		window.addGLEventListener(new MapEditScene(window, animator));
 
 		window.addWindowListener(new WindowAdapter() {

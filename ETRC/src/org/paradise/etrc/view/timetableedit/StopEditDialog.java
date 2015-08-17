@@ -21,7 +21,6 @@ import java.util.Vector;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -33,6 +32,7 @@ import javax.swing.border.LineBorder;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.v1.Stop;
+import org.paradise.etrc.dialog.DialogBase;
 import org.paradise.etrc.util.config.Config;
 
 import com.zearon.util.data.Tuple2;
@@ -40,7 +40,7 @@ import com.zearon.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
 
-public class StopEditDialog extends JDialog implements KeyListener {
+public class StopEditDialog extends DialogBase implements KeyListener {
 	/**
 	 * 
 	 */
@@ -447,9 +447,7 @@ public class StopEditDialog extends JDialog implements KeyListener {
 	}
 	
 	private void updateUIforModel(String propertyGroup) {
-			mainFrame.chartView.updateData();
-			mainFrame.sheetView.updateData();
-			mainFrame.runView.repaint();
+			mainFrame.runningChartView.refresh();
 			
 			mainFrame.timetableEditView.refreshStopCell(row, column);
 	}

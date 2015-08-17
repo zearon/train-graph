@@ -34,7 +34,6 @@ import javax.swing.border.EmptyBorder;
 import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
@@ -43,12 +42,13 @@ import org.paradise.etrc.filter.CSVFilter;
 import org.paradise.etrc.filter.TRFFilter;
 import org.paradise.etrc.util.config.Config;
 
+import com.zearon.util.ui.controller.action.UIAction;
 import com.zearon.util.ui.widget.table.DefaultJEditTableModel;
 import com.zearon.util.ui.widget.table.JEditTable;
 
-import static org.paradise.etrc.ETRC.__;
+import static com.zearon.util.debug.DebugUtil.DEBUG;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG;
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com

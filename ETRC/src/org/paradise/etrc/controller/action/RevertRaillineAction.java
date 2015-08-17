@@ -4,6 +4,8 @@ import javax.swing.JTable;
 
 import org.paradise.etrc.view.lineedit.StationTableModel;
 
+import com.zearon.util.ui.controller.action.UIAction;
+
 import static org.paradise.etrc.ETRC.__;
 
 public class RevertRaillineAction extends UIAction {

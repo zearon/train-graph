@@ -22,17 +22,17 @@ import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.skb.ETRCSKB;
 import org.paradise.etrc.data.v1.RailNetworkChart;
 
-import static org.paradise.etrc.ETRC.__;
+import static com.zearon.util.debug.DebugUtil.DEBUG;
+import static com.zearon.util.debug.DebugUtil.IS_DEBUG;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG;
-import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * @author lguo@sina.com
  * @version 1.0
  */
 
-public class FindTrainsDialog extends JDialog {
+public class FindTrainsDialog extends DialogBase {
 	private static final long serialVersionUID = -609136239072858202L;
 
 	private ProgressPanel progressPanel = new ProgressPanel();
@@ -104,7 +104,7 @@ public class FindTrainsDialog extends JDialog {
 			hold(500);
 			RailNetworkChart networkChart = mainFrame.trainGraph.currentNetworkChart;
 			networkChart.clearTrains();
-			mainFrame.chartView.repaint();
+			mainFrame.getChartView().repaint();
 			
 			msgLabel.setText(__("Loading built-in timetable..."));
 			
@@ -139,9 +139,9 @@ public class FindTrainsDialog extends JDialog {
 			
 			DEBUG("Benchmark: [import circuit]: %d", instant2.toEpochMilli() - instant1.toEpochMilli());
 			
-			mainFrame.chartView.repaint();
-			mainFrame.sheetView.updateData();
-	        mainFrame.runView.refresh();
+			mainFrame.getChartView().repaint();
+			mainFrame.getSheetView().updateData();
+	        mainFrame.getRunView().refresh();
 
 			hold(200);
 

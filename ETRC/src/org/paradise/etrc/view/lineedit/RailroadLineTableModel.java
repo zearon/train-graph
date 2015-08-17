@@ -6,10 +6,10 @@ import java.util.Vector;
 import javax.swing.JTable;
 
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.v1.RailNetwork;
 import org.paradise.etrc.data.v1.RailroadLine;
 
+import com.zearon.util.ui.controller.action.UIAction;
 import com.zearon.util.ui.widget.table.DefaultJEditTableModel;
 
 import static org.paradise.etrc.ETRC.__;

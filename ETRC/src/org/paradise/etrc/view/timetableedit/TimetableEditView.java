@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
@@ -17,10 +16,13 @@ import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.view.IView;
 
+import com.zearon.util.interface_.IMultiInheritance;
 import com.zearon.util.ui.databinding.UIBindingManager;
+import com.zearon.util.ui.widget.StatusBar;
 
 import static org.paradise.etrc.ETRC.__;
 
+@SuppressWarnings("serial")
 public class TimetableEditView extends JPanel implements IView {
 	
 	public static final Color CROSSOVER_STATION_COLOR = Color.YELLOW;
@@ -34,7 +36,6 @@ public class TimetableEditView extends JPanel implements IView {
 	
 	private JToolBar toolBar;
 	
-	private UIBindingManager uiBindingManager;
 	private boolean ui_inited;
 	private JButton btnNewButton;
 	private JButton btnNewButton_1;
@@ -44,7 +45,6 @@ public class TimetableEditView extends JPanel implements IView {
 	private TrainGraph trainGraph;
 	private RailroadLineChart lineChart;
 	private boolean downGoing;
-	private JLabel lblStatusBar;
 	
 	/**
 	 * Create the panel.
@@ -52,10 +52,8 @@ public class TimetableEditView extends JPanel implements IView {
 	public TimetableEditView(TrainGraph trainGraph) {
 		setModel(trainGraph);
 		
-		uiBindingManager = new UIBindingManager();
-		
 		initUI();
-		uiBindingManager.updateUI(null);
+		UIDB_updateUI(null);
 		
 		ui_inited = true;
 	}
@@ -66,7 +64,7 @@ public class TimetableEditView extends JPanel implements IView {
 		
 		if (ui_inited) {
 			// update ui
-			uiBindingManager.updateUI(null);
+			UIDB_updateUI(null);
 			
 			table.setTrainGraph(trainGraph);
 		}
@@ -78,7 +76,7 @@ public class TimetableEditView extends JPanel implements IView {
 		table.switchChart(downGoing);
 		
 		// update ui:
-		uiBindingManager.updateUI(null);
+		UIDB_updateUI(null);
 		table.setupColumnWidth();
 		repaint();
 	}
@@ -87,7 +85,7 @@ public class TimetableEditView extends JPanel implements IView {
 		table.switchChart(downGoing);
 		
 		// update ui:
-		uiBindingManager.updateUI(null);
+		UIDB_updateUI(null);
 		table.updateData();
 		repaint();
 	}
@@ -107,23 +105,19 @@ public class TimetableEditView extends JPanel implements IView {
 		add(statusPanel, BorderLayout.SOUTH);
 		statusPanel.setLayout(new BorderLayout(0, 0));
 		
-		lblStatusBar = new JLabel("New label");
-		lblStatusBar.setFont(new Font("Lucida Grande", Font.PLAIN, 12));
-		lblStatusBar.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		statusPanel.add(lblStatusBar);
+		statusPanel.add(getStatusBar());
 		
 //		timeTableScrollPane = new JScrollPane();
 //		add(timeTableScrollPane, BorderLayout.CENTER);
 		
-		toolBar = new JToolBar();
+		toolBar = getToolBar();
 		add(toolBar, BorderLayout.NORTH);
 		
-		btnNewButton = createToolbarButton("Create data for imported trains", null, 
-				(e) -> do_CreateDataForImportedTrains());
+		btnNewButton = createToolBarButton(JButton.class, __("Create data for imported trains"), 
+				__("Create data for imported trains"), this::do_CreateDataForImportedTrains);
 		toolBar.add(btnNewButton);
 		
-		btnNewButton_1 = createToolbarButton("New button 2", null, null);
-		btnNewButton_1.setToolTipText("hello");
+		btnNewButton_1 = createToolBarButton(JButton.class, "New button 2", "New button 2", ()->{});
 		toolBar.add(btnNewButton_1);
 //		toolBar.add(btnNewButton_1);
 		
@@ -135,16 +129,6 @@ public class TimetableEditView extends JPanel implements IView {
 		table.getContainerPanel().setBorder(BorderFactory.createEmptyBorder());
 		
 		add(table.getContainerPanel(), BorderLayout.CENTER);
-	}	
-	
-	private JButton createToolbarButton(String text, String name, ActionListener listener) {
-		JButton button = new JButton(text);
-		if (listener != null)
-			button.addActionListener(listener);
-		
-		setupUIDataBinding(btnNewButton, name);
-		
-		return button;
 	}
 	
 	private void do_CreateDataForImportedTrains() {
@@ -154,35 +138,27 @@ public class TimetableEditView extends JPanel implements IView {
 	
 	
 	// {{ Data Bindings
-	
-	private void setupUIDataBinding(Component component, String name) {
-		if (name == null)
-			return;
-		
-		component.setName(name);
-		uiBindingManager.addDataBinding(component, this::getModelObject, 
-				this::getPropertyDesc, this::updateUIforModel);
+	{
+		IMI_initInterface();
+	}
+	@Override
+	public IMultiInheritance IMI_getThisObject() {
+		return this;
 	}
 	
-	public Object getModelObject(String propertyGroup) {
-		if ("chartSettings".equals(propertyGroup)) {
+	@Override
+	public Object UIDB_getModelObject(String objectID) {
+		if ("chartSettings".equals(objectID)) {
 			return trainGraph.settings;
-		} else if ("chart".equals(propertyGroup)) {
+		} else if ("chart".equals(objectID)) {
 			return trainGraph.currentLineChart;
 		}
 		
 		return null;
 	}
-	
-	private void updateUIforModel(String propertyGroup) {
-		if ("chartSettings".equals(propertyGroup)) {
-//			mainFrame.chartView.updateData();
-//			mainFrame.runView.updateUI();
-		} else if ("chart".equals(propertyGroup)) {
-		}
-	}
-	
-	public String getPropertyDesc(String propertyName) {
+
+	@Override
+	public String UIDB_getPropertyDesc(String propertyName) {
 		String desc = "";
 		
 		if ("distScale".equals(propertyName)) {
@@ -215,18 +191,17 @@ public class TimetableEditView extends JPanel implements IView {
 	}
 
 	@Override
+	public void UIDB_updateUIforModel(String objectID) {
+		if ("chartSettings".equals(objectID)) {
+			// mainFrame.chartView.updateData();
+			// mainFrame.runView.updateUI();
+		} else if ("chart".equals(objectID)) {
+		}
+	}
+
+	@Override
 	public JMenu getEditMenu() {
 		return table.getEditMenu();
-	}
-
-	@Override
-	public JToolBar getToolBar() {
-		return null;
-	}
-
-	@Override
-	public Component getStatusBar() {
-		return lblStatusBar;
 	}
 	
 	// }}

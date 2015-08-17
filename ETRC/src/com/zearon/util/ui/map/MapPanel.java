@@ -24,9 +24,9 @@ import com.zearon.util.image.GrayFilterColorModel;
 import com.zearon.util.image.ImageUtil;
 import com.zearon.util.image.ReverseColorFilterColorModel;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG;
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
-import static org.paradise.etrc.ETRCUtil.DEBUG_STACKTRACE;
+import static com.zearon.util.debug.DebugUtil.DEBUG;
+import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
+import static com.zearon.util.debug.DebugUtil.DEBUG_STACKTRACE;
 
 @SuppressWarnings("serial")
 public class MapPanel extends JPanel {

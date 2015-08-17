@@ -9,6 +9,12 @@ import javax.swing.JTable;
 import org.paradise.etrc.data.v1.TrainRouteSection;
 import org.paradise.etrc.view.timetableedit.TimetableEditSheetModel.PasteParameters;
 
+import com.zearon.util.ui.controller.action.AddTableElementsAction;
+import com.zearon.util.ui.controller.action.ChangeTableSelectionAction;
+import com.zearon.util.ui.controller.action.CompoundAction;
+import com.zearon.util.ui.controller.action.SetValueAction;
+import com.zearon.util.ui.controller.action.UIAction;
+
 public class PasteTrainRouteSectionAction extends CompoundAction {
 	private Runnable callback;
 	private ChangeTableSelectionAction selectionAction;

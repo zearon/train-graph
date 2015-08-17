@@ -31,7 +31,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import org.paradise.etrc.ETRCUtil;
 import org.paradise.etrc.data.annotation.AnnotationException;
 import org.paradise.etrc.data.annotation.TGElement;
 import org.paradise.etrc.data.annotation.TGElementAttr;
@@ -44,6 +43,7 @@ import org.paradise.etrc.data.v1.RailroadLineChart;
 import com.zearon.util.data.Tuple2;
 import com.zearon.util.data.Tuple3;
 import com.zearon.util.data.ValueTypeConverter;
+import com.zearon.util.debug.DebugUtil;
 import com.zearon.util.function.MultiConsumer;
 
 import static org.paradise.etrc.ETRC.__;
@@ -65,17 +65,17 @@ public abstract class TrainGraphPart {
 
 	static void DEBUG_MSG_ANO(String msgFormat, Object... msgArgs) {
 		if (SHOW_DEBUG_MESSAGE_ANO)
-			ETRCUtil.DEBUG_MSG(msgFormat, msgArgs);
+			DebugUtil.DEBUG_MSG(msgFormat, msgArgs);
 	}
 	
 	static void DEBUG_MSG_SAVE(String msgFormat, Object... msgArgs) {
 		if (SHOW_DEBUG_MESSAGE_SAVE)
-			ETRCUtil.DEBUG_MSG(msgFormat, msgArgs);
+			DebugUtil.DEBUG_MSG(msgFormat, msgArgs);
 	}
 	
 	static void DEBUG_MSG_LOAD(String msgFormat, Object... msgArgs) {
 		if (SHOW_DEBUG_MESSAGE_LOAD)
-			ETRCUtil.DEBUG_MSG(msgFormat, msgArgs);
+			DebugUtil.DEBUG_MSG(msgFormat, msgArgs);
 	}
 	
 	// {{ Static fields

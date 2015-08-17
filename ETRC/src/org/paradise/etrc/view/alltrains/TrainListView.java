@@ -10,12 +10,15 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Comparator;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -27,13 +30,20 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableRowSorter;
 
+import org.paradise.etrc.ETRC;
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainType;
+import org.paradise.etrc.dialog.FindTrainsDialog;
 import org.paradise.etrc.dialog.YesNoBox;
+import org.paradise.etrc.filter.CSVFilter;
+import org.paradise.etrc.filter.TRFFilter;
+import org.paradise.etrc.util.config.Config;
+
+import com.zearon.util.ui.map.GLWindowManager;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -162,15 +172,15 @@ public class TrainListView extends JPanel {
 		btLoad.setFont(new Font("dialog", 0, 12));
 		btLoad.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				mainFrame.doLoadTrain();
+				doLoadTrain();
 			}
 		});		
 		
-		JButton btImport = new JButton(__("Import From Schedule"));
+		JButton btImport = new JButton(__("Import Build-in Trains"));
 		btImport.setFont(new Font("dialog", 0, 12));
 		btImport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				mainFrame.doImportTrains();
+				doImportTrains();
 			}
 		});
 
@@ -341,6 +351,84 @@ public class TrainListView extends JPanel {
 		
 		TrainFilter trainFilter = (TrainFilter) cbRaillineFilter.getSelectedItem();
 		tableRowSorter.setRowFilter(trainFilter);
+	}
+
+	public void doImportTrains() {
+		//new MessageBox(this, "todo：从网络获取数据生成车次描述文件(.trf文件)。").showMessage();
+		if(new YesNoBox(mainFrame, __("<html>This operation will delete all the train information on the current railnetwork chart, <br/>"
+				+ "then import the train information from the default time table for this circuit. Continue?</html>")).askForYes()) {
+			FindTrainsDialog waitingBox = new FindTrainsDialog(mainFrame);
+			waitingBox.findTrains();
+		}
+	}
+
+	/**
+	 * doLoadTrain
+	 */
+	public void doLoadTrain() {
+		if(!(new YesNoBox(mainFrame, __("Load train information file and overwrite the existing information. Continue?")).askForYes()))
+			return;
+
+		JFileChooser chooser = new JFileChooser();
+		ETRC.setFont(chooser);
+
+		chooser.setDialogTitle(__("Load Train Information"));
+		chooser.setDialogType(JFileChooser.OPEN_DIALOG);
+		chooser.setMultiSelectionEnabled(true);
+		chooser.addChoosableFileFilter(new CSVFilter());
+		chooser.addChoosableFileFilter(new TRFFilter());
+		chooser.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
+		try {
+			File recentPath = new File(Config.getInstance().getLastFilePath(""));
+			if (recentPath.exists() && recentPath.isDirectory())
+				chooser.setCurrentDirectory(recentPath);
+		} catch (Exception e) {}
+		
+		int returnVal = GLWindowManager.showDialogOnFloatingGLWindow(
+				() -> chooser.showOpenDialog(this));
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			File f[] = chooser.getSelectedFiles();
+			if (f.length > 0)
+				System.out.println(f[0]);
+			else
+				System.out.println("No File selected!");
+
+			Train loadingTrain = null;
+			for (int j = 0; j < f.length; j++) {
+				loadingTrain = TrainGraphFactory.createInstance(Train.class);
+				try {
+					loadingTrain.loadFromFile2(f[j].getAbsolutePath());
+//					prop.setProperty(Prop_Recent_Open_File_Path, chooser.getSelectedFile().getParentFile().getAbsolutePath());
+				} catch (IOException ex) {
+					System.err.println("Error: " + ex.getMessage());
+				}
+
+//				System.out.println(loadingTrain.getTrainName() + "次列车从"
+//						+ loadingTrain.startStation + "到"
+//						+ loadingTrain.terminalStation + "，共经停"
+//						+ loadingTrain.stopNum + "个车站");
+//				for (int i = 0; i < loadingTrain.stopNum; i++)
+//					System.out.println(loadingTrain.stops[i].stationName + "站 "
+//							+ Train.toTrainFormat(loadingTrain.stops[i].arrive)
+//							+ " 到 "
+//							+ Train.toTrainFormat(loadingTrain.stops[i].leave)
+//							+ " 发");
+
+				if(loadingTrain.isDownTrain(trainGraph.currentLineChart.railroadLine, false) > 0)
+					trainGraph.currentLineChart.addTrain(loadingTrain);
+			}
+
+			//System.out.println("1.Move to: "+loadingTrain.getTrainName());
+			//mainView.buildTrainDrawings();
+			mainFrame.runningChartView.getChartView().findAndMoveToTrain(loadingTrain.getTrainName(trainGraph.currentLineChart.railroadLine));
+			mainFrame.runningChartView.refresh();
+//			chartView.repaint();
+//			sheetView.updateData();
+//			chartView.findAndMoveToTrain(loadingTrain.getTrainName(trainGraph.currentLineChart.railroadLine));
+//			runView.refresh();
+			//panelChart.panelLines.repaint();
+		}
+
 	}
 
 	public class ColorCellRenderer implements TableCellRenderer {

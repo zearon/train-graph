@@ -11,9 +11,8 @@ import javax.swing.JComboBox;
 import javax.swing.JToggleButton;
 import javax.swing.text.JTextComponent;
 
-import org.paradise.etrc.controller.action.UIAction;
-
 import com.zearon.util.data.Tuple2;
+import com.zearon.util.ui.controller.action.UIAction;
 import com.zearon.util.ui.widget.JColorChooserLabel;
 
 
@@ -82,9 +81,9 @@ public class UIBindingManager {
 //	}}
 	
 	
-	private static HashMap<Component, UIBindingManager> instanceMap = new HashMap<> ();
+	private static HashMap<Object, UIBindingManager> instanceMap = new HashMap<> ();
 	
-	public static UIBindingManager getInstance(Component containerObj) {
+	public static UIBindingManager getInstance(Object containerObj) {
 		if (instanceMap.containsKey(containerObj))
 			return instanceMap.get(containerObj);
 		else {

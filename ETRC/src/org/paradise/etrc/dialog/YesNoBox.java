@@ -26,7 +26,7 @@ import static org.paradise.etrc.ETRC.__;
  * @version 1.0
  */
 
-public class YesNoBox extends JDialog implements ActionListener {
+public class YesNoBox extends DialogBase implements ActionListener {
 	private static final long serialVersionUID = 256443803232381267L;
 	
 	Boolean saidYes = false;

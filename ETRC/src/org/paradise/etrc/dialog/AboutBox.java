@@ -23,7 +23,7 @@ import static org.paradise.etrc.ETRC.__;
  * @version 1.0
  */
 
-public class AboutBox extends JDialog implements ActionListener {
+public class AboutBox extends DialogBase implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	JPanel panel1 = new JPanel();

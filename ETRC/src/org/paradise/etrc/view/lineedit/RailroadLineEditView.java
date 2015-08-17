@@ -60,10 +60,10 @@ import org.paradise.etrc.util.config.Config;
 import com.zearon.util.ui.widget.table.ColorTableCellEditor;
 import com.zearon.util.ui.widget.table.ColorTableCellRender;
 
-import static org.paradise.etrc.ETRC.__;
+import static com.zearon.util.debug.DebugUtil.DEBUG;
+import static com.zearon.util.debug.DebugUtil.IS_DEBUG;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG;
-import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
+import static org.paradise.etrc.ETRC.__;
 
 public class RailroadLineEditView extends JPanel {
 	private static final long serialVersionUID = 8501387955756137148L;
@@ -906,7 +906,7 @@ public class RailroadLineEditView extends JPanel {
 				new MessageBox(__("Display scale should be a decimal."))
 						.showMessage();
 			}	
-		}, mainFrame.raillineChartView::updateUI).addToManagerAndDoIt();
+		}, mainFrame.runningChartView::updateUI).addToManagerAndDoIt();
 	}
 	
 	private void doRailline_UpdateMultiplicity(String oldValue) {
@@ -924,7 +924,7 @@ public class RailroadLineEditView extends JPanel {
 				new MessageBox(__("Rail count should be an integer."))
 						.showMessage();
 			}
-		}, mainFrame.raillineChartView::updateUI).addToManagerAndDoIt();
+		}, mainFrame.runningChartView::updateUI).addToManagerAndDoIt();
 	}
 
 	private void doRailline_OK() {

@@ -38,9 +38,9 @@ import org.paradise.etrc.util.config.Config;
 import com.zearon.util.data.Tuple2;
 import com.zearon.util.ui.widget.table.JEditTable;
 
-import static org.paradise.etrc.ETRC.__;
+import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import static org.paradise.etrc.ETRC.__;
 
 public class TimetableEditSheetTable extends JEditTable {
 	private static final long serialVersionUID = 1L;

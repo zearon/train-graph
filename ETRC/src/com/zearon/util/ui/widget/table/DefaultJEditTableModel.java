@@ -7,8 +7,9 @@ import java.util.Optional;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.v1.Stop;
+
+import com.zearon.util.ui.controller.action.UIAction;
 
 /**
  * @author Jeff Gong

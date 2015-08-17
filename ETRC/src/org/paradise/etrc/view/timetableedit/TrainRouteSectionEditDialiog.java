@@ -22,7 +22,6 @@ import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
@@ -47,15 +46,17 @@ import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
 import org.paradise.etrc.data.v1.TrainType;
+import org.paradise.etrc.dialog.DialogBase;
 import org.paradise.etrc.dialog.MessageBox;
 
 import com.zearon.util.ui.databinding.UIBindingManager;
 
 import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
 
-public class TrainRouteSectionEditDialiog extends JDialog {
+@SuppressWarnings("serial")
+public class TrainRouteSectionEditDialiog extends DialogBase {
 
 	// Use static fields to keep this object because 
 	// eclipse window builder only support static factory methods
@@ -609,9 +610,7 @@ public class TrainRouteSectionEditDialiog extends JDialog {
 	}
 	
 	private void DB_updateUIforModel(String propertyGroup) {
-		mainFrame.chartView.updateData();
-		mainFrame.sheetView.updateData();
-		mainFrame.runView.repaint();
+		mainFrame.runningChartView.refresh();
 		
 		mainFrame.timetableEditView.refreshColumn(columnIndex);
 	}

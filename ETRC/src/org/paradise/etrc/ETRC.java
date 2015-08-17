@@ -17,7 +17,7 @@ import org.paradise.etrc.util.config.Config;
 
 import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLProfile;
-import com.zearon.util.os.OSVersionUtil;
+import com.zearon.util.os.OSXUtil;
 import com.zearon.util.ui.map.GLWindowManager;
 
 import de.lessvoid.nifty.Nifty;
@@ -137,7 +137,7 @@ public class ETRC {
 
 	
 	public static boolean isOSX10_7OrAbove() {
-		return OSVersionUtil.isOSX10_7OrAbove();
+		return OSXUtil.isOSX10_7OrAbove();
 	}
 
 	public void init() {

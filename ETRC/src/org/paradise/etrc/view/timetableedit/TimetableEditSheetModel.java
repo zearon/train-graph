@@ -9,13 +9,13 @@ import java.util.function.IntSupplier;
 import javax.swing.JTable;
 
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.data.v1.TrainRouteSection;
 
+import com.zearon.util.ui.controller.action.UIAction;
 import com.zearon.util.ui.widget.table.DefaultJEditTableModel;
 
 import static org.paradise.etrc.ETRC.__;

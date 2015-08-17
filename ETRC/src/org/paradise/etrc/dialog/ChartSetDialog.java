@@ -25,11 +25,11 @@ import javax.swing.event.ChangeListener;
 
 import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.v1.ChartSettings;
-import org.paradise.etrc.view.chart.ChartView;
+import org.paradise.etrc.view.runningchart.chart.ChartView;
 
 import static org.paradise.etrc.ETRC.__;
 
-public class ChartSetDialog extends JDialog {
+public class ChartSetDialog extends DialogBase {
 	private static final long serialVersionUID = 1L;
 
 	private MainFrame mainFrame;
@@ -124,15 +124,15 @@ public class ChartSetDialog extends JDialog {
 		cbDrawPoint = new JCheckBox();
 		cbDrawPoint.setFont(new java.awt.Font("Dialog", 0, 12));
 		cbDrawPoint.setText(__("Always highlight terminals"));
-		cbDrawPoint.setSelected(mainFrame.chartView.isDrawNormalPoint);
+		cbDrawPoint.setSelected(mainFrame.getChartView().isDrawNormalPoint);
 		cbDrawPoint.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (((JCheckBox) e.getSource()).isSelected())
-					mainFrame.chartView.isDrawNormalPoint = true;
+					mainFrame.getChartView().isDrawNormalPoint = true;
 				else
-					mainFrame.chartView.isDrawNormalPoint = false;
+					mainFrame.getChartView().isDrawNormalPoint = false;
 				
-				mainFrame.chartView.repaint();
+				mainFrame.getChartView().repaint();
 			}
 		});
 		
@@ -140,15 +140,15 @@ public class ChartSetDialog extends JDialog {
 		cbUnderColor = new JCheckBox();
 		cbUnderColor.setFont(new java.awt.Font("Dialog", 0, 12));
 		cbUnderColor.setText(__("Enable watermark display"));
-		cbUnderColor.setSelected(!(mainFrame.chartView.underDrawingColor == null));
+		cbUnderColor.setSelected(!(mainFrame.getChartView().underDrawingColor == null));
 		cbUnderColor.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
 				if (((JCheckBox) e.getSource()).isSelected())
-					mainFrame.chartView.underDrawingColor = ChartView.DEFAULT_UNDER_COLOR;
+					mainFrame.getChartView().underDrawingColor = ChartView.DEFAULT_UNDER_COLOR;
 				else
-					mainFrame.chartView.underDrawingColor = null;
+					mainFrame.getChartView().underDrawingColor = null;
 				
-				mainFrame.chartView.repaint();
+				mainFrame.getChartView().repaint();
 			}
 		});
 		
@@ -352,8 +352,8 @@ public class ChartSetDialog extends JDialog {
 	          settings.minuteScale = minScale;
 	          settings.timeInterval = interval;
 
-	          mainFrame.chartView.resetSize();
-	          mainFrame.runView.refresh();
+	          mainFrame.getChartView().resetSize();
+	          mainFrame.getRunView().refresh();
 	          
 	          this.statusBar.setText(defaultStatus);
 	      }

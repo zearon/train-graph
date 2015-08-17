@@ -1,10 +1,10 @@
 package org.paradise.etrc.view.timetables;
 
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.controller.action.UIAction;
 import org.paradise.etrc.data.v1.RailNetworkChart;
 import org.paradise.etrc.data.v1.TrainGraph;
 
+import com.zearon.util.ui.controller.action.UIAction;
 import com.zearon.util.ui.widget.table.DefaultJEditTableModel;
 import com.zearon.util.ui.widget.table.JEditTable;
 

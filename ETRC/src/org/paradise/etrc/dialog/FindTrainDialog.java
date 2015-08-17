@@ -26,7 +26,7 @@ import static org.paradise.etrc.ETRC.__;
  * @version 1.0
  */
 
-public class FindTrainDialog extends JDialog implements ActionListener {
+public class FindTrainDialog extends DialogBase implements ActionListener {
  	private static final long serialVersionUID = -2094251491864017010L;
 
 MainFrame mainFrame = null;
@@ -145,7 +145,7 @@ MainFrame mainFrame = null;
     if(trainName.trim().equalsIgnoreCase(""))
     	return;
     
-    if(mainFrame.chartView.findAndMoveToTrain(trainName))
+    if(mainFrame.getChartView().findAndMoveToTrain(trainName))
       this.statusBar.setText(trainName);
     else {
       this.statusBar.setText(__("Not found"));

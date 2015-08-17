@@ -22,11 +22,11 @@ import org.paradise.etrc.data.v1.RailroadLineChart;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
 
-import static org.paradise.etrc.ETRC.__;
+import static com.zearon.util.debug.DebugUtil.DEBUG;
+import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
+import static com.zearon.util.debug.DebugUtil.IS_DEBUG;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG;
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
-import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
+import static org.paradise.etrc.ETRC.__;
 
 public class ETRCSKB {
 	private String path;
@@ -237,21 +237,8 @@ public class ETRCSKB {
 			String tkName = tkInfo[1];
 			
 			networkChart.allRailLineCharts().stream().forEach(lineChart -> {
-				
-				boolean stopAtLine = lineChart.railroadLine.getAllStations().stream()
-					.anyMatch(station -> tkName.equalsIgnoreCase(station.getName()));
-				if (stopAtLine) {
-					Train aTrain;
-					if (addedTrainNames.contains(trainName)) {
-						aTrain = networkChart.findTrain(trainName);
-					} else {
-						aTrain = getTrainByFullName(trainName);
-						addedTrainNames.add(trainName);
-						networkChart.addTrain(aTrain);
-					}
-					
-					lineChart.addTrain(aTrain);
-				}
+				checktkForImport(networkChart, addedTrainNames, trainName, tkName,
+						lineChart);
 			});
 
 			if (progressChangedCallback != null)
@@ -274,6 +261,29 @@ public class ETRCSKB {
 			if (progressChangedCallback != null)
 				progressChangedCallback.accept(++ counter[1]);
 		});
+	}
+
+	private void checktkForImport(RailNetworkChart networkChart,
+			Vector<String> addedTrainNames, String trainName, String tkName,
+			RailroadLineChart lineChart) {
+		
+		boolean stopAtLine = lineChart.railroadLine.getAllStations().stream()
+			.anyMatch(station -> tkName.equalsIgnoreCase(station.getName()));
+		if (stopAtLine) {
+			Train aTrain;
+			if (addedTrainNames.contains(trainName)) {
+				aTrain = networkChart.findTrain(trainName);
+			} else {
+				aTrain = getTrainByFullName(trainName);
+				addedTrainNames.add(trainName);
+				networkChart.addTrain(aTrain);
+			}
+			
+			if (aTrain == null) {
+				DEBUG("trainName:%s, tkName:%s, lineChart:%s, contained:%b", trainName, tkName, lineChart, addedTrainNames.contains(trainName));
+			}
+			lineChart.addTrain(aTrain);
+		}
 	}
 	
 	public void findTrains(RailroadLineChart lineChart) {

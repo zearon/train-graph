@@ -2,13 +2,14 @@ package org.paradise.etrc.wizard.addtrain;
 
 import java.util.Vector;
 
+import org.paradise.etrc.MainFrame;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Train;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.dialog.YesNoBox;
 import org.paradise.etrc.util.config.Config;
 import org.paradise.etrc.view.alltrains.TrainView;
-import org.paradise.etrc.view.chart.ChartView;
+import org.paradise.etrc.view.runningchart.chart.ChartView;
 import org.paradise.etrc.wizard.Wizard;
 import org.paradise.etrc.wizard.WizardDialog;
 
@@ -17,6 +18,7 @@ import static org.paradise.etrc.ETRC.__;
 public class AddTrainWizard extends Wizard {
 	private Train train;
 	private ChartView chartView;
+	private MainFrame mainFrame = MainFrame.getInstance();
 	
 	public AddTrainWizard(ChartView _view) {
 		wizardSteps = 4;
@@ -24,10 +26,10 @@ public class AddTrainWizard extends Wizard {
 	}
 	
 	public int doWizard() {
-		WZTrainNameInput step1 = new WZTrainNameInput(chartView.mainFrame, 1, __("Add New Train"), __("Input Train Number"));
-		WZTimeEdit step2 = new WZTimeEdit(chartView.mainFrame, 2, __("Add New Train"), __("Edit Time Table"));
-		WZInPointSet step3 = new WZInPointSet(chartView.mainFrame, 3, __("Add New Train"), __("Select Start Station"));
-		WZOutPointSet step4 = new WZOutPointSet(chartView.mainFrame, 4, __("Add New Train"), __("Select Terminal Station"));
+		WZTrainNameInput step1 = new WZTrainNameInput(mainFrame, 1, __("Add New Train"), __("Input Train Number"));
+		WZTimeEdit step2 = new WZTimeEdit(mainFrame, 2, __("Add New Train"), __("Edit Time Table"));
+		WZInPointSet step3 = new WZInPointSet(mainFrame, 3, __("Add New Train"), __("Select Start Station"));
+		WZOutPointSet step4 = new WZOutPointSet(mainFrame, 4, __("Add New Train"), __("Select Terminal Station"));
 		
 		String fullName;
 		String downName = null;
@@ -48,20 +50,20 @@ public class AddTrainWizard extends Wizard {
 					downName = step1.getDownName();
 					upName = step1.getUpName();
 					
-					if(new YesNoBox(chartView.mainFrame, __("Automatically get train informtaion from web?")).askForYes()) {
+					if(new YesNoBox(mainFrame, __("Automatically get train informtaion from web?")).askForYes()) {
 						String proxyAddress = Config.getInstance().getHttpProxyServer();
 						int proxyPort = Config.getInstance().getHttpProxyPort();
 						train = TrainView.doLoadTrainFromWeb(fullName, proxyAddress, proxyPort);
 						if (train == null) 
 						{
-							new MessageBox(chartView.mainFrame, String.format(__("Unable to get train information for the train %s from web."), fullName)).showMessage();
+							new MessageBox(mainFrame, String.format(__("Unable to get train information for the train %s from web."), fullName)).showMessage();
 						}
 					}
-					if ((train == null) && (new YesNoBox(chartView.mainFrame, __("Automatically import train informtaion from build-in time table?")).askForYes())) {
+					if ((train == null) && (new YesNoBox(mainFrame, __("Automatically import train informtaion from build-in time table?")).askForYes())) {
 						String[] names = fullName.split("/");
 						Vector<Train> trains = new Vector<Train>();
 						for(int i=0; i<names.length; i++) {
-							Vector<Train> fTras = chartView.mainFrame.getSKB().getTrains(names[i]);
+							Vector<Train> fTras = mainFrame.getSKB().getTrains(names[i]);
 							for(int j=0; j<fTras.size(); j++) {
 								Train obj = fTras.get(j);
 								if(!trains.contains(obj))
@@ -71,7 +73,7 @@ public class AddTrainWizard extends Wizard {
 						
 						//找到了几条数据，如果是多条的话应当选择。
 						if(trains.size() == 0) {
-							new MessageBox(chartView.mainFrame, String.format(__("Unable to find information for the train %s, please input manually."), fullName)).showMessage();
+							new MessageBox(mainFrame, String.format(__("Unable to find information for the train %s, please input manually."), fullName)).showMessage();
 							train = TrainGraphFactory.createInstance(Train.class);
 							train.setName(fullName);
 							train.trainNameDown = downName;
@@ -85,7 +87,7 @@ public class AddTrainWizard extends Wizard {
 							for(int i=1; i<trains.size(); i++) {
 								temp = temp + ", " + ((Train) trains.get(i)).getTrainName();
 							}
-							new MessageBox(chartView.mainFrame, String.format(__("Find %d related information for the train %s, use the first record."), trains.size(), fullName)).showMessage();
+							new MessageBox(mainFrame, String.format(__("Find %d related information for the train %s, use the first record."), trains.size(), fullName)).showMessage();
 						}
 					}
 					else if (train == null) {

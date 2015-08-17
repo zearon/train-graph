@@ -105,6 +105,9 @@ public class RailNetworkChart extends TrainGraphPart {
 				
 		for (String trainName : trainNames)
 			trainDict.put(trainName, train);
+		
+		if (train.getName() != null)
+			trainDict.put(train.getName(), train);
 	}
 	
 	private void removeFromTrainDict(Train train) {
@@ -113,6 +116,9 @@ public class RailNetworkChart extends TrainGraphPart {
 				
 		for (String trainName : trainNames)
 			trainDict.remove(trainName);
+		
+		if (train.getName() != null)
+			trainDict.remove(train.getName(), train);
 	}
 	
 	public void updateTrainDict() {

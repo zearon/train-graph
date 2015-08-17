@@ -7,16 +7,16 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.paradise.etrc.controller.action.ActionFactory;
-import org.paradise.etrc.controller.action.UIAction;
 
 import com.zearon.util.data.Tuple2;
+import com.zearon.util.ui.controller.action.UIAction;
 import com.zearon.util.ui.databinding.converter.IModelValueConverter;
 import com.zearon.util.ui.databinding.converter.IValueTypeConverter;
 import com.zearon.util.ui.databinding.converter.ValueConverterManager;
 
-import static org.paradise.etrc.ETRC.__;
+import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * UIBinding is used to bing a UI control and a data model.

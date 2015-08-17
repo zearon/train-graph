@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 
 import org.paradise.etrc.MainFrame;
-import org.paradise.etrc.view.chart.ChartView;
+import org.paradise.etrc.view.runningchart.chart.ChartView;
 
 import static org.paradise.etrc.ETRC.__;
 /**
@@ -26,7 +26,7 @@ import static org.paradise.etrc.ETRC.__;
  * @version 1.0
  */
 
-public class MarginSetDialog extends JDialog implements ActionListener {
+public class MarginSetDialog extends DialogBase implements ActionListener {
 	private static final long serialVersionUID = 5918995210504867184L;
 
 MainFrame mainFrame = null;
@@ -82,7 +82,7 @@ MainFrame mainFrame = null;
 
     tfRight.setMinimumSize(new Dimension(12, 22));
     tfRight.setPreferredSize(new Dimension(20, 22));
-    tfRight.setText(mainFrame.chartView.rightMargin+"");
+    tfRight.setText(mainFrame.getChartView().rightMargin+"");
 
     lbLeft.setText(__("Left:"));
     lbLeft.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
@@ -92,7 +92,7 @@ MainFrame mainFrame = null;
     tfLeft.setRequestFocusEnabled(true);
     tfLeft.setMinimumSize(new Dimension(12, 22));
     tfLeft.setPreferredSize(new Dimension(20, 22));
-    tfLeft.setText(mainFrame.chartView.leftMargin+"");
+    tfLeft.setText(mainFrame.getChartView().leftMargin+"");
 
     lbDown.setText(__("Bottom:"));
     lbDown.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
@@ -101,7 +101,7 @@ MainFrame mainFrame = null;
 
     tfDown.setMinimumSize(new Dimension(12, 22));
     tfDown.setPreferredSize(new Dimension(20, 22));
-    tfDown.setText(mainFrame.chartView.bottomMargin+"");
+    tfDown.setText(mainFrame.getChartView().bottomMargin+"");
 
     lbUp.setText(__("Top:"));
     lbUp.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
@@ -110,7 +110,7 @@ MainFrame mainFrame = null;
 
     tfUp.setMinimumSize(new Dimension(12, 22));
     tfUp.setPreferredSize(new Dimension(20, 22));
-    tfUp.setText(mainFrame.chartView.topMargin+"");
+    tfUp.setText(mainFrame.getChartView().topMargin+"");
 
     btOK.setFont(new java.awt.Font(__("FONT_NAME"), 0, 12));
     btOK.setText(__("Set"));
@@ -243,12 +243,12 @@ MainFrame mainFrame = null;
       }
       else{
         if(this.mainFrame != null) {
-          mainFrame.chartView.topMargin = up;
-          mainFrame.chartView.bottomMargin = down;
-          mainFrame.chartView.leftMargin = left;
-          mainFrame.chartView.rightMargin = right;
+          mainFrame.getChartView().topMargin = up;
+          mainFrame.getChartView().bottomMargin = down;
+          mainFrame.getChartView().leftMargin = left;
+          mainFrame.getChartView().rightMargin = right;
 
-          mainFrame.chartView.repaint();
+          mainFrame.getChartView().repaint();
           mainFrame.validate();
         }
         this.statusBar.setText(__("Set Graph Margin"));

@@ -24,9 +24,11 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 
+import org.paradise.etrc.dialog.DialogBase;
+
 import static org.paradise.etrc.ETRC.__;
 
-public abstract class WizardDialog extends JDialog {
+public abstract class WizardDialog extends DialogBase {
 	private static final long serialVersionUID = -5409636948664788767L;
 
 	public int step;

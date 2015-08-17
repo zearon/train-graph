@@ -1,5 +1,6 @@
 package org.paradise.etrc.controller.action;
 
+import com.zearon.util.ui.controller.action.UIAction;
 import com.zearon.util.ui.widget.table.JEditTable;
 
 import static org.paradise.etrc.ETRC.__;

@@ -24,7 +24,7 @@ import org.paradise.etrc.data.v1.Station;
 
 import static org.paradise.etrc.ETRC.__;
 
-public class CircuitMakeDialog extends JDialog {
+public class CircuitMakeDialog extends DialogBase {
 	private static final long serialVersionUID = -5891299808461231142L;
 
 	MainFrame mainFrame;

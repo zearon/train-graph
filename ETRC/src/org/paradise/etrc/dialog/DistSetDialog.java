@@ -29,7 +29,7 @@ import static org.paradise.etrc.ETRC.__;
  * @version 1.0
  */
 
-public class DistSetDialog extends JDialog implements ActionListener {
+public class DistSetDialog extends DialogBase implements ActionListener {
 	private static final long serialVersionUID = 5479809489457404370L;
 
 MainFrame mainFrame = null;
@@ -258,8 +258,8 @@ private ChartSettings settings;
         	settings.boldLevel = bold;
 
           mainFrame.validate();
-          mainFrame.chartView.resetSize();
-          mainFrame.runView.refresh();
+          mainFrame.getChartView().resetSize();
+          mainFrame.getRunView().refresh();
         }
         this.statusBar.setText(defaultStatus);
       }

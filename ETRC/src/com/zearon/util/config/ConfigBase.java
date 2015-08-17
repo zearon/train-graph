@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import com.zearon.util.os.OSVersionUtil;
+import com.zearon.util.os.OSXUtil;
 
 public abstract class ConfigBase {
 	static final String configFileName = "config.prop";
@@ -57,7 +57,7 @@ public abstract class ConfigBase {
 	}
 	
 	protected void init() {
-		if (OSVersionUtil.isOSX10_7OrAbove()) {
+		if (OSXUtil.isOSX10_7OrAbove()) {
 			configFilePath = System.getProperty("user.home") + "/Library/Application Support/" + getAppName() + "/" + getConfigFileName();
 			new File(configFilePath).getParentFile().mkdirs();
 		}

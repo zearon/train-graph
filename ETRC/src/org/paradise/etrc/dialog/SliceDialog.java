@@ -29,7 +29,7 @@ import static org.paradise.etrc.ETRC.__;
  * @version 1.0
  */
 
-public class SliceDialog extends JDialog implements ActionListener {
+public class SliceDialog extends DialogBase implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	JPanel mainPanel = new JPanel();

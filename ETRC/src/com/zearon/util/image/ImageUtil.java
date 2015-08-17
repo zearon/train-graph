@@ -10,7 +10,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.util.Arrays;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
+import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
 
 public class ImageUtil {
 	

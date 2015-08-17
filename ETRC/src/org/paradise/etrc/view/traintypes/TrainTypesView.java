@@ -431,8 +431,7 @@ public class TrainTypesView extends JPanel {
 	protected void do_UpdateTypeOfTrains() {
 		trainGraph.setTrainTypeByNameForAllTrains();
 		
-		MainFrame.instance.runView.repaint();
-		MainFrame.instance.chartView.repaint();
+		MainFrame.instance.runningChartView.refresh();
 	}
 	
 	// }}

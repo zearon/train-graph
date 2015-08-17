@@ -27,8 +27,7 @@ import org.paradise.etrc.data.v1.TrainType;
 
 import static org.paradise.etrc.ETRC.__;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG_MSG;
-import static org.paradise.etrc.ETRCUtil.DEBUG_STACKTRACE;
+import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
 
 /**
  * 主界面导航栏
@@ -157,7 +156,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 
 		TreeNode node = (TreeNode) parent.getLastPathComponent();
 		if (node.getChildCount() > 0) {
-			for (Enumeration e = node.children(); e.hasMoreElements();) {
+			for (Enumeration<?> e = node.children(); e.hasMoreElements();) {
 				TreeNode n = (TreeNode) e.nextElement();
 				TreePath path = parent.pathByAddingChild(n);
 				expandAll(tree, path, expand);
@@ -295,7 +294,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 		else
 			selectedTrainType.visible = visible;
 		
-		MainFrame.instance.chartView.updateTrainTypeDisplayOrder();
+		MainFrame.instance.runningChartView.updateTrainTypeDisplayOrder();
 		MainFrame.instance.repaint();
 	}
 	
@@ -304,7 +303,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 		trainGraph.forEachTrainType(trainType -> trainType.visible = false);
 		selectedTrainType.visible = true;
 
-		MainFrame.instance.chartView.updateTrainTypeDisplayOrder();
+		MainFrame.instance.runningChartView.updateTrainTypeDisplayOrder();
 		MainFrame.instance.repaint();
 	}
 	
@@ -315,7 +314,7 @@ public class Navigator extends JTree implements TreeSelectionListener {
 	private void toggleAllTrainTypeVisible(boolean visible) {
 		trainGraph.forEachTrainType(trainType -> trainType.visible = visible);
 		
-		MainFrame.instance.chartView.updateTrainTypeDisplayOrder();
+		MainFrame.instance.runningChartView.updateTrainTypeDisplayOrder();
 		MainFrame.instance.repaint();
 	}
 	

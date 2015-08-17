@@ -2,15 +2,15 @@ package org.paradise.etrc.util.config;
 import java.io.File;
 
 import org.paradise.etrc.ETRC;
-import org.paradise.etrc.controller.ActionManager;
 
 import com.zearon.util.config.ConfigClassGen;
 import com.zearon.util.config.ConfigItem;
-import com.zearon.util.os.OSVersionUtil;
+import com.zearon.util.os.OSXUtil;
+import com.zearon.util.ui.controller.ActionManager;
+
+import static com.zearon.util.debug.DebugUtil.IS_DEBUG;
 
 import static org.paradise.etrc.ETRC.__;
-
-import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
 
 public class Config extends ConfigGenerated {
 	static Config instance;
@@ -33,7 +33,7 @@ public class Config extends ConfigGenerated {
 	protected void init() {
 		super.init();
 		
-		if (OSVersionUtil.isOSX10_7OrAbove() && IS_DEBUG()) {
+		if (OSXUtil.isOSX10_7OrAbove() && IS_DEBUG()) {
 			configFilePath = "./" + getConfigFileName();
 		}
 	}

@@ -22,10 +22,10 @@ import org.paradise.etrc.data.util.BOMStripperInputStream;
 
 import com.zearon.util.data.Tuple2;
 
-import static org.paradise.etrc.ETRC.__;
+import static com.zearon.util.debug.DebugUtil.DEBUG;
+import static com.zearon.util.debug.DebugUtil.IS_DEBUG;
 
-import static org.paradise.etrc.ETRCUtil.DEBUG;
-import static org.paradise.etrc.ETRCUtil.IS_DEBUG;
+import static org.paradise.etrc.ETRC.__;
 
 /**
  * 由多条铁路线路组成的铁路网。

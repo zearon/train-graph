@@ -17,7 +17,7 @@ import javax.swing.table.TableCellEditor;
 import org.paradise.etrc.data.TrainGraphFactory;
 import org.paradise.etrc.data.v1.Stop;
 import org.paradise.etrc.data.v1.Train;
-import org.paradise.etrc.view.sheet.SheetModel;
+import org.paradise.etrc.view.runningchart.sheet.SheetModel;
 
 public class SheetCellEditor extends AbstractCellEditor implements
 		TableCellEditor {

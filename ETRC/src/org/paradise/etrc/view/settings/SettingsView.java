@@ -543,8 +543,7 @@ public class SettingsView extends JPanel {
 		if ("runningChart".equals(propertyGroup)) {
 //			mainFrame.chartView.setModel(mainFrame.trainGraph, mainFrame.currentLineChart);
 //			mainFrame.runView.setModel(mainFrame.trainGraph, mainFrame.currentLineChart);
-			mainFrame.chartView.updateData();
-			mainFrame.runView.updateUI();
+			mainFrame.runningChartView.refresh();
 		} else if ("timetableEdit".equals(propertyGroup)) {
 			mainFrame.timetableEditView.refreshChart();
 		}

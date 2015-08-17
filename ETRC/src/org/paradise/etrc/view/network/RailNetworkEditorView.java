@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JMenu;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -18,8 +19,11 @@ import org.paradise.etrc.data.v1.TrainGraph;
 import org.paradise.etrc.dialog.MessageBox;
 import org.paradise.etrc.filter.ImageFilter;
 import org.paradise.etrc.util.config.Config;
+import org.paradise.etrc.view.IView;
 
+import com.zearon.util.interface_.IMultiInheritance;
 import com.zearon.util.ui.map.MapPane;
+import com.zearon.util.ui.widget.StatusBar;
 
 import static org.paradise.etrc.ETRC.__;
 
@@ -33,16 +37,17 @@ import javax.swing.JLabel;
 import javax.swing.JSeparator;
 import javax.swing.SwingConstants;
 
-import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
-public class RailNetworkEditorView extends JPanel {
+@SuppressWarnings("serial")
+public class RailNetworkEditorView extends JPanel implements IView {
 
 	TrainGraph trainGraph;
 	private boolean ui_inited;
 	private MapPane mapPane;
 	MainFrame mainFrame;
+	private JToolBar toolBar;
 	
 	/**
 	 * Create the panel.
@@ -51,11 +56,25 @@ public class RailNetworkEditorView extends JPanel {
 		setModel(trainGraph);
 		mainFrame = MainFrame.getInstance();
 		
-		
 		setLayout(new BorderLayout(0, 0));
 		
-		JToolBar toolBar = new JToolBar();
+		createToolBar();
 		add(toolBar, BorderLayout.NORTH);
+		
+		mapPane = new MapPane(trainGraph);
+		add(mapPane, BorderLayout.CENTER);
+		
+		JPanel leftPanel = new JPanel();
+		add(leftPanel, BorderLayout.WEST);
+		
+		initUI();
+		
+		ui_inited=true;
+	}
+	
+	private void createToolBar() {
+		toolBar = getToolBar();
+		toolBar.setFloatable(false);
 		
 		JButton btnLoadBackgroundMap = new JButton("Load Background Map");
 		toolBar.add(btnLoadBackgroundMap);
@@ -82,16 +101,6 @@ public class RailNetworkEditorView extends JPanel {
 		btnLoadBackgroundMap.addActionListener((e) -> {
 			do_LoadMap();
 		});
-		
-		mapPane = new MapPane(trainGraph);
-		add(mapPane, BorderLayout.CENTER);
-		
-		JPanel leftPanel = new JPanel();
-		add(leftPanel, BorderLayout.WEST);
-		
-		initUI();
-		
-		ui_inited=true;
 	}
 	
 	public void setModel(TrainGraph trainGraph) {
@@ -146,4 +155,35 @@ public class RailNetworkEditorView extends JPanel {
 		}
 	}
 
+	@Override
+	public JToolBar getToolBar() {
+		if (trainGraph == null)
+			return new JToolBar();
+		else
+			return getDefaultToolBar();
+	}
+
+	// {{ Data binding
+	{
+		IMI_initInterface();
+	}
+	@Override
+	public IMultiInheritance IMI_getThisObject() {
+		return this;
+	}
+
+	@Override
+	public Object UIDB_getModelObject(String objectID) {
+		return null;
+	}
+
+	@Override
+	public String UIDB_getPropertyDesc(String propertyName) {
+		return null;
+	}
+
+	@Override
+	public void UIDB_updateUIforModel(String objectID) {
+	}
+	// }}
 }

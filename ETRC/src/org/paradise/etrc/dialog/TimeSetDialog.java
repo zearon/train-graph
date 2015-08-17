@@ -29,7 +29,7 @@ import static org.paradise.etrc.ETRC.__;
  * @version 1.0
  */
 
-public class TimeSetDialog extends JDialog implements ActionListener {
+public class TimeSetDialog extends DialogBase implements ActionListener {
 	private static final long serialVersionUID = -1303484994776431876L;
 
 	MainFrame mainFrame = null;
@@ -270,7 +270,7 @@ private ChartSettings settings;
         	settings.timeInterval = interval;
 
           mainFrame.validate();
-          mainFrame.chartView.resetSize();
+          mainFrame.getChartView().resetSize();
         }
         this.statusBar.setText(defaultStatus);
       }

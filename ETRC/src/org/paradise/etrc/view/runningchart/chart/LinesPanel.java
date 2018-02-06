@@ -51,6 +51,7 @@ import org.paradise.etrc.wizard.addtrain.AddTrainWizard;
 
 import static org.paradise.etrc.ETRC.__;
 
+import static com.zearon.util.debug.DebugUtil.DEBUG;
 import static com.zearon.util.debug.DebugUtil.DEBUG_ACTION;
 
 /**
@@ -392,7 +393,8 @@ public class LinesPanel extends JPanel implements MouseListener,MouseMotionListe
 			  + chartView.bottomMargin;
 		else
 			h = 480;
-		
+
+		DEBUG("LinesPanel Pref Size: %dx%d", w, h);
 		return new Dimension(w, h);
 	}
 	

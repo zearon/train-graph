@@ -78,7 +78,8 @@ public class DebugUtil {
 	   * @return true if in debug mode and false if else.
 	   */
 	  public static boolean DEBUG(String msgFormat, Object... msgArgs) {
-		  DEBUG_MSG(msgFormat, msgArgs);
+		  if (isDebug)
+			  _printMsg("DEBUG: ", formatMessage(msgFormat, msgArgs), true, true, true, true, true, 0);
 		  
 		  return isDebug;
 	  }

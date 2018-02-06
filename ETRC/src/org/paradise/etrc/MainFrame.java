@@ -101,6 +101,7 @@ import com.zearon.util.ui.widget.StatusBar;
 
 import static org.paradise.etrc.ETRC.__;
 
+import static com.zearon.util.debug.DebugUtil.DEBUG;
 import static com.zearon.util.debug.DebugUtil.DEBUG_ACTION;
 import static com.zearon.util.debug.DebugUtil.DEBUG_MSG;
 
